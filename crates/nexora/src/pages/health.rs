@@ -15,9 +15,9 @@ use crate::icons::Icon;
 use crate::pages::PageKind;
 use crate::state::{AppState, Notice, NoticeAction, OyenzaLink};
 use crate::ui::{wid, PillStyle, Ui, PILL_SMALL};
-use poni_core::datetime::{fmt_clock, fmt_date_short, LocalDateTime};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::health::{fmt_distance, fmt_steps, is_stale, HealthSnapshot};
+use nexora_core::datetime::{fmt_clock, fmt_date_short, LocalDateTime};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::health::{fmt_distance, fmt_steps, is_stale, HealthSnapshot};
 
 const HEIGHT: f32 = 144.0;
 /// The ring on the left, and the gap to the middle column.
@@ -292,7 +292,7 @@ fn fmt_short(n: u32) -> String {
 }
 
 /// The island's notice for the moment new numbers from the phone put today
-/// over the step goal (see `poni_core::health::goal_reached`).
+/// over the step goal (see `nexora_core::health::goal_reached`).
 pub fn goal_notice(steps: u32, until: f64) -> Notice {
     Notice {
         icon: Icon::Steps,

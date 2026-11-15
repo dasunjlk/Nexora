@@ -1,6 +1,6 @@
 //! Clocks: monotonic seconds for animation/timers, local wall time for display.
 
-use poni_core::datetime::LocalDateTime;
+use nexora_core::datetime::LocalDateTime;
 use std::os::raw::{c_char, c_int, c_long};
 use std::sync::OnceLock;
 use std::time::{Instant, SystemTime, UNIX_EPOCH};

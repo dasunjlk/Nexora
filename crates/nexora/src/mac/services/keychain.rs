@@ -19,7 +19,7 @@
 //!
 //! The password never goes into the log.
 
-use studio_usage::{Got, FILE_MAX};
+use nexora_usage::{Got, FILE_MAX};
 use std::io::Read;
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicU32, AtomicU8, Ordering};
@@ -156,7 +156,7 @@ fn ask(service: &str, account: Option<&str>) -> Got {
     // big item can't fill the pipe and hold `security` up meanwhile.
     let (tx, rx) = mpsc::channel();
     let out = child.stdout.take();
-    let reader = std::thread::Builder::new().name("poni-keychain".into()).spawn(move || {
+    let reader = std::thread::Builder::new().name("nexora-keychain".into()).spawn(move || {
         let mut buf = Vec::new();
         if let Some(out) = out {
             let _ = out.take(FILE_MAX + 1).read_to_end(&mut buf);

@@ -1,4 +1,4 @@
-//! Add-on files (`poni_core::addons`): downloads them when an add-on is
+//! Add-on files (`nexora_core::addons`): downloads them when an add-on is
 //! switched on, checks each one against the size and SHA-256 built into the
 //! app, and deletes them when the add-on is switched off.
 //!
@@ -33,7 +33,7 @@
 
 use crate::events::{AppEvent, EventSink};
 use crate::services::http::{Client, FetchError, MtaGuard};
-use poni_core::addons::{self, Addon, AddonFile, Status};
+use nexora_core::addons::{self, Addon, AddonFile, Status};
 use std::collections::BTreeMap;
 use std::fs;
 use std::io;
@@ -71,7 +71,7 @@ impl AddonService {
         let shared = Arc::new(Shared { q: Mutex::new(Queue { want, pro: false, jobs: Vec::new(), shutdown: false }), cv: Condvar::new() });
         let worker = shared.clone();
         std::thread::Builder::new()
-            .name("poni-addons".into())
+            .name("nexora-addons".into())
             .spawn(move || worker_main(worker, sink, crate::paths::addons_dir()))
             .map_err(|e| io::Error::other(format!("could not start the add-ons thread: {e}")))?;
         Ok(Self { shared })
@@ -507,11 +507,11 @@ pub fn fetch_for_selftest(addon: &'static Addon, dir: &Path) -> (bool, String) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use poni_core::addons::JAPANESE_READINGS;
+    use nexora_core::addons::JAPANESE_READINGS;
 
     #[test]
     fn a_pro_add_on_s_files_come_only_with_pro() {
-        use poni_core::addons::{DOWNLOADER, PRAYER_TIMES};
+        use nexora_core::addons::{DOWNLOADER, PRAYER_TIMES};
         // Switched on: kept (and fetched) with Pro, left as they are without it.
         assert_eq!(wanted(&DOWNLOADER, true, true), Some(true));
         assert_eq!(wanted(&DOWNLOADER, true, false), None);
@@ -535,7 +535,7 @@ mod tests {
     fn a_file_read_in_full_is_stamped_and_a_changed_one_is_caught() {
         let file = JAPANESE_READINGS.files[1];
         let bytes: &[u8] = include_bytes!("../../../../addons/ja/NOTICE.txt");
-        let dir = std::env::temp_dir().join(format!("poni-addon-stamp-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("nexora-addon-stamp-{}", std::process::id()));
         let path = dir.join(file.name);
         fs::create_dir_all(&dir).unwrap();
         fs::write(&path, bytes).unwrap();

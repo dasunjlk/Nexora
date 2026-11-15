@@ -90,7 +90,7 @@ P	Zelenchukskaya		RU		43.855	41.590	1
 P	Dugulubgey		RU		43.663	43.537	1
 P	Samtredia		GE		42.154	42.335	0
 P	Karachayevsk		RU		43.772	41.914	1
-P	Zestaponi		GE		42.108	43.033	0
+P	Zestanexora		GE		42.108	43.033	0
 P	Tyrnyauz		RU		43.383	42.918	1
 P	Sürmene	surmene	TR		40.906	40.128	1
 P	Yessentukskaya		RU		44.026	42.875	1

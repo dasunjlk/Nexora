@@ -1,26 +1,26 @@
 [package]
-name = "poni"
+name = "nexora"
 version.workspace = true
 edition.workspace = true
 publish.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Poni - a living notch (Dynamic Island) for Windows 10/11"
+description = "Nexora - a living notch (Dynamic Island) for Windows 10/11"
 build = "build.rs"
 
 [[bin]]
-name = "poni"
+name = "nexora"
 path = "src/main.rs"
 
 [dependencies]
 # Oyenza Studio's own Japanese reading dictionary (3.8 MB) is not built into
-# poni.exe: Windows downloads it as the Japanese readings add-on
-# (poni_core::addons::JAPANESE_READINGS) for the people who want it.
-poni-core = { path = "../poni-core" }
-# The AI tab's readers (crates/studio-usage), built for size.
-studio-usage = { path = "../studio-usage" }
-# The Diorama theme's picture (crates/studio-diorama), built for size.
-studio-diorama = { path = "../studio-diorama" }
+# nexora.exe: Windows downloads it as the Japanese readings add-on
+# (nexora_core::addons::JAPANESE_READINGS) for the people who want it.
+nexora-core = { path = "../nexora-core" }
+# The AI tab's readers (crates/nexora-usage), built for size.
+nexora-usage = { path = "../nexora-usage" }
+# The Diorama theme's picture (crates/nexora-diorama), built for size.
+nexora-diorama = { path = "../nexora-diorama" }
 serde.workspace = true
 serde_json.workspace = true
 

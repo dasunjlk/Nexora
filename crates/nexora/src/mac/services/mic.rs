@@ -263,7 +263,7 @@ fn has_input() -> bool {
 define_class!(
     /// Hears the recorder stop by itself or fail to write (any thread).
     #[unsafe(super(NSObject))]
-    #[name = "PoniMicDelegate"]
+    #[name = "NexoraMicDelegate"]
     #[ivars = EventSink]
     struct MicDelegate;
 

@@ -1193,7 +1193,7 @@ mod tests {
     #[test]
     fn names_cover_every_service() {
         let env = env_names();
-        for name in ["CODEX_HOME", "OPENROUTER_API_KEY", "PONI_INFERENCE_URL"] {
+        for name in ["CODEX_HOME", "OPENROUTER_API_KEY", "NEXORA_INFERENCE_URL"] {
             assert!(env.contains(&name), "{name} missing from {env:?}");
         }
         assert!(env.windows(2).all(|w| w[0] < w[1]), "sorted, once each");
@@ -1217,7 +1217,7 @@ mod tests {
 
     impl Scratch {
         fn new(name: &str) -> Scratch {
-            let d = std::env::temp_dir().join(format!("poni-pace-{name}-{}", std::process::id()));
+            let d = std::env::temp_dir().join(format!("nexora-pace-{name}-{}", std::process::id()));
             let _ = fs::remove_dir_all(&d);
             fs::create_dir_all(&d).unwrap();
             Scratch(d)

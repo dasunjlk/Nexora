@@ -1,6 +1,6 @@
 //! The microphone, for the IELTS page's answers: WASAPI shared-mode capture
 //! from the default recording device, written as 16 kHz mono 16-bit WAV
-//! (`poni_core::ielts::WavWriter`).
+//! (`nexora_core::ielts::WavWriter`).
 //!
 //! Why WASAPI and not WinRT's AudioGraph: `IAudioClient` and
 //! `IAudioCaptureClient` come with Core Audio, which the volume watcher
@@ -9,10 +9,10 @@
 //! (several MB of DLLs and a graph thread) for one microphone, and its level
 //! meter needs a frame node read through COM interop. Shared mode records in
 //! Windows' mix format (usually 48 kHz float stereo), so
-//! `poni_core::ielts::Downmix` averages the channels and resamples to 16 kHz
+//! `nexora_core::ielts::Downmix` averages the channels and resamples to 16 kHz
 //! itself, the same on every PC (and under Wine).
 //!
-//! One thread, `poni-mic`, exists only while recording: [`Mic::start`]
+//! One thread, `nexora-mic`, exists only while recording: [`Mic::start`]
 //! starts it and [`Mic::stop`] (or dropping the `Mic`) ends it. It wakes
 //! every 40 ms to take what the device has (a 500 ms buffer leaves room for
 //! a late wake-up) and keeps the peak of the last 50 ms for the level meter.
@@ -21,7 +21,7 @@
 //! `AppEvent::MicFailed`.
 
 use crate::events::{AppEvent, EventSink};
-use poni_core::ielts::{Downmix, SampleFormat, WavWriter, RATE};
+use nexora_core::ielts::{Downmix, SampleFormat, WavWriter, RATE};
 use std::collections::VecDeque;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
@@ -91,7 +91,7 @@ impl Mic {
         let (ready_tx, ready_rx) = mpsc::channel();
         let (worker, path, sink) = (shared.clone(), out.to_path_buf(), sink.clone());
         let thread = std::thread::Builder::new()
-            .name("poni-mic".into())
+            .name("nexora-mic".into())
             .spawn(move || capture(&path, &worker, &sink, ready_tx))
             .map_err(|e| MicError::Failed(format!("no microphone thread ({e})")))?;
         match ready_rx.recv_timeout(OPEN_TIMEOUT) {
@@ -224,7 +224,7 @@ unsafe fn sample_format(f: *const WAVEFORMATEX) -> Option<SampleFormat> {
     }
 }
 
-/// The `poni-mic` thread: open the device, say whether it opened, then
+/// The `nexora-mic` thread: open the device, say whether it opened, then
 /// record until told to stop.
 fn capture(path: &Path, shared: &Shared, sink: &EventSink, ready: mpsc::Sender<Result<(), MicError>>) -> Result<(PathBuf, f32), MicError> {
     let com = unsafe { CoInitializeEx(None, COINIT_MULTITHREADED) };
@@ -290,7 +290,7 @@ fn record(d: &mut Device, wav: &mut WavWriter, shared: &Shared) -> Result<(), Mi
             }
             unsafe { d.capture.ReleaseBuffer(n) }.map_err(|e| mic_error("the microphone went away", &e))?;
             wav.write(&pcm).map_err(|e| MicError::Failed(format!("can't write the answer ({e})")))?;
-            meter.push_back((pcm.len(), poni_core::ielts::peak(&pcm)));
+            meter.push_back((pcm.len(), nexora_core::ielts::peak(&pcm)));
             while meter.len() > 1 && meter.iter().skip(1).map(|m| m.0).sum::<usize>() >= METER_SAMPLES {
                 meter.pop_front();
             }

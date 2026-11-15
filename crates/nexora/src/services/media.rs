@@ -21,8 +21,8 @@ use crate::commands::MediaCmd;
 use crate::events::{AppEvent, EventSink};
 use crate::services::applemusic_ui::AppleMusicUi;
 use crate::state::MediaSession;
-use poni_core::nowplaying::{self, Controls as Caps};
-use poni_core::timeline::{PendingSeek, Timeline};
+use nexora_core::nowplaying::{self, Controls as Caps};
+use nexora_core::timeline::{PendingSeek, Timeline};
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, Sender};
@@ -89,7 +89,7 @@ impl MediaService {
         let (tx, rx) = mpsc::channel();
         let worker_tx = tx.clone();
         std::thread::Builder::new()
-            .name("poni-media".into())
+            .name("nexora-media".into())
             .spawn(move || worker_main(sink, worker_tx, rx))
             .map_err(|e| windows::core::Error::new(E_FAIL, format!("media thread: {e}")))?;
         Ok(Self { tx })

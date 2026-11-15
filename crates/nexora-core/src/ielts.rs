@@ -111,7 +111,7 @@ impl Spice {
 //
 // Read from `serde_json::Value` by hand, as `stocks` does, rather than with
 // derived deserializers: a dozen small types this way cost a fraction of the
-// code (this ships in poni.exe). Anything missing or of the wrong kind reads
+// code (this ships in nexora.exe). Anything missing or of the wrong kind reads
 // as its default, so a server a little ahead still reads.
 
 fn text(v: &Value) -> String {
@@ -1945,7 +1945,7 @@ mod tests {
 
     #[test]
     fn wav_writer_fills_in_the_header() {
-        let dir = std::env::temp_dir().join(format!("poni-ielts-wav-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("nexora-ielts-wav-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let path = dir.join("a.wav");
         let mut w = WavWriter::create(&path).unwrap();
@@ -2404,7 +2404,7 @@ mod tests {
 
     #[test]
     fn clips_are_saved_and_the_base64_dropped() {
-        let dir = std::env::temp_dir().join(format!("poni-ielts-clips-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("nexora-ielts-clips-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let mut t = parse_skipped(
             r#"{"turn":{"say":[{"text":"a","audio":{"mime":"audio/mpeg","b64":"SUQzBA=="}},{"text":"b","audio":{"mime":"audio/wav","b64":"!!"}},{"text":"c"}]}}"#,

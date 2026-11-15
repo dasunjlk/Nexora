@@ -1,6 +1,6 @@
 //! Steps from the person's phone, as Oyenza sends them.
 //!
-//! Poni has no health data of its own: Oyenza on the person's iPhone or
+//! Nexora has no health data of its own: Oyenza on the person's iPhone or
 //! Android phone reads daily totals from Apple Health or Health Connect and,
 //! once the person turns on Show on Oyenza Studio there, sends the last 7
 //! days to their account, where a signed-in Oyenza Studio reads them
@@ -101,7 +101,7 @@ pub fn goal_reached(prev: Option<&HealthSnapshot>, next: &HealthSnapshot, today:
     before < goal && next.steps_on(today) >= goal
 }
 
-/// [`goal_reached`] for numbers that arrive while Poni runs: the first ones
+/// [`goal_reached`] for numbers that arrive while Nexora runs: the first ones
 /// after start, sign-in or a pause (`prev` None) only set the baseline, as
 /// today may have passed the goal hours before. A restart never repeats the notice.
 pub fn goal_notice(prev: Option<&HealthSnapshot>, next: &HealthSnapshot, today: &str) -> bool {
@@ -185,7 +185,7 @@ mod tests {
         let day = "2026-10-24";
         let below = snap(8000, &[(day, 7900)]);
         let above = snap(8000, &[(day, 8010)]);
-        // Over the goal already when Poni starts or signs in: no notice.
+        // Over the goal already when Nexora starts or signs in: no notice.
         assert!(!goal_notice(None, &above, day));
         assert!(goal_notice(Some(&below), &above, day));
         assert!(!goal_notice(Some(&above), &above, day));

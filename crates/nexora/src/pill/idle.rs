@@ -11,10 +11,10 @@ use crate::gfx::{Canvas, TextStyle, Weight};
 use crate::island::Geom;
 use crate::state::AppState;
 use crate::ui::Ui;
-use poni_core::datetime::fmt_clock;
-use poni_core::geom::{palette, Color, Rect};
-use poni_core::settings::IdleStyle;
-use poni_core::svgpath::Seg;
+use nexora_core::datetime::fmt_clock;
+use nexora_core::geom::{palette, Color, Rect};
+use nexora_core::settings::IdleStyle;
+use nexora_core::svgpath::Seg;
 
 /// Every resting pill is this tall, and a capsule (radius = height / 2).
 const H: f32 = 32.0;
@@ -185,8 +185,8 @@ pub fn battery_glyph(c: &mut Canvas, r: Rect, percent: u8, charging: bool) {
 mod tests {
     use super::*;
     use crate::state::PowerState;
-    use poni_core::settings::{Settings, Theme};
-    use poni_core::store::Store;
+    use nexora_core::settings::{Settings, Theme};
+    use nexora_core::store::Store;
 
     fn state(battery: bool, use_24h: bool) -> AppState {
         let mut st = AppState::new(Settings::default(), Store::default());

@@ -26,7 +26,7 @@ use crate::icons::Icon;
 use crate::island::Geom;
 use crate::state::AppState;
 use crate::ui::Ui;
-use poni_core::geom::{clamp01, lerp, palette, Color, Rect};
+use nexora_core::geom::{clamp01, lerp, palette, Color, Rect};
 use std::cell::Cell;
 use std::hash::{DefaultHasher, Hash, Hasher};
 
@@ -406,9 +406,9 @@ fn glow(ui: &mut Ui, body: Rect, color: Color, level: f32) {
 mod tests {
     use super::*;
     use crate::state::MediaSession;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
-    use poni_core::timeline::Timeline;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
+    use nexora_core::timeline::Timeline;
 
     fn playing(title: &str) -> AppState {
         let mut st = AppState::new(Settings::default(), Store::default());

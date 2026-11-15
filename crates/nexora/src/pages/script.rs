@@ -3,7 +3,7 @@
 //! Paste a script, or drop a .txt file on the island while this page shows,
 //! and read it right under the camera: the line to say bright, the next ones
 //! dim, the way the Music page shows lyrics. The reader moves a line at a
-//! time at the pace in words a minute (`poni_core::script`). Between lines
+//! time at the pace in words a minute (`nexora_core::script`). Between lines
 //! nothing redraws: the app's wake timer brings the next line, which glides
 //! up in about a third of a second.
 //!
@@ -22,8 +22,8 @@ use crate::icons::Icon;
 use crate::pages::media::{follow, settle, step_dt};
 use crate::state::AppState;
 use crate::ui::{wid, KeyInput, PillStyle, Ui, PILL_GAP, PILL_REGULAR};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::script::{self as model, Line, Reader, MAX_WPM, MIN_WPM, WPM_STEP};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::script::{self as model, Line, Reader, MAX_WPM, MIN_WPM, WPM_STEP};
 use std::cell::Cell;
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};

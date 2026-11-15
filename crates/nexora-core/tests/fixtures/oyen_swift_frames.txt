@@ -1,5 +1,5 @@
-# Oyen's face from the Swift port (OyenKit at oyenza-bar commit 213172663), for poni-core's cross-check
-# (crates/poni-core/src/oyen/swift_check.rs). Do not edit by hand: the Swift program at the end of this
+# Oyen's face from the Swift port (OyenKit at oyenza-bar commit 213172663), for nexora-core's cross-check
+# (crates/nexora-core/src/oyen/swift_check.rs). Do not edit by hand: the Swift program at the end of this
 # file wrote it. To write it again, save that program as main.swift (without the leading "# "), then
 #   swiftc -O -module-name OyenKit <OyenKit's four .swift files> main.swift -o oyen-dump
 #   ./oyen-dump fixture oyen_swift_frames.txt main.swift
@@ -1454,12 +1454,12 @@ defs	oyen	<path id="oyen-head" d="M25.65 -58.33L25.65 -58.33Q28.39 -61.57 32.53 
 # ---- main.swift, the program that wrote this file ----
 # import Foundation
 #
-# // Reference frames from OyenKit (the Swift port) for poni-core's Rust port of Oyen's face.
+# // Reference frames from OyenKit (the Swift port) for nexora-core's Rust port of Oyen's face.
 # // Built in one module with OyenKit's own sources, so internals are reachable.
-# // Usage: oyen-dump fixture <out.txt> <this main.swift>   compact, decimal numbers: poni-core's test fixture,
+# // Usage: oyen-dump fixture <out.txt> <this main.swift>   compact, decimal numbers: nexora-core's test fixture,
 # //                                                        with this program appended as comments
 # //        oyen-dump full <out.txt>                        every frame at 60 fps and more, numbers as bit
-# //                                                        patterns, for a diff with poni-core's own dump
+# //                                                        patterns, for a diff with nexora-core's own dump
 # // Build: swiftc -O -module-name OyenKit <OyenKit>/OyenFace.swift <OyenKit>/OyenGeometry.swift \
 # //          <OyenKit>/OyenMarkData.swift <OyenKit>/OyenSVG.swift main.swift -o oyen-dump
 #
@@ -1552,8 +1552,8 @@ defs	oyen	<path id="oyen-head" d="M25.65 -58.33L25.65 -58.33Q28.39 -61.57 32.53 
 #
 # if mode == "fixture" {
 #     lines += [
-#         "# Oyen's face from the Swift port (OyenKit at oyenza-bar commit 213172663), for poni-core's cross-check",
-#         "# (crates/poni-core/src/oyen/swift_check.rs). Do not edit by hand: the Swift program at the end of this",
+#         "# Oyen's face from the Swift port (OyenKit at oyenza-bar commit 213172663), for nexora-core's cross-check",
+#         "# (crates/nexora-core/src/oyen/swift_check.rs). Do not edit by hand: the Swift program at the end of this",
 #         "# file wrote it. To write it again, save that program as main.swift (without the leading \"# \"), then",
 #         "#   swiftc -O -module-name OyenKit <OyenKit's four .swift files> main.swift -o oyen-dump",
 #         "#   ./oyen-dump fixture oyen_swift_frames.txt main.swift",

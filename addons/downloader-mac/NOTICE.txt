@@ -6,7 +6,7 @@ yt-dlp
   from yt-dlp's own release on GitHub (yt-dlp_macos, one file for Apple
   silicon and Intel), unchanged, and saved as yt-dlp. Each version of
   Oyenza Studio names the release it takes and that file's size and
-  SHA-256 (poni_core::addons::DOWNLOADER_MAC), and refuses any other file;
+  SHA-256 (nexora_core::addons::DOWNLOADER_MAC), and refuses any other file;
   a newer yt-dlp comes with a newer Oyenza Studio.
 
 qjs

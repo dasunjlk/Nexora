@@ -1,7 +1,7 @@
 //! Today page: your days at a glance.
 //!
 //! Signed in to Oyenza, with Google Calendar or Gmail switched on for it in
-//! oyenza.app (`poni_core::agenda`): on the left the date, the apps it reads
+//! oyenza.app (`nexora_core::agenda`): on the left the date, the apps it reads
 //! (one switched off shows dimmed) and five weeks from this Monday, with a dot
 //! under each date for what's on it (a calendar event, a flight from Gmail, a
 //! bill due); on the right the schedule from now on: the meeting on now (or
@@ -32,10 +32,10 @@ use crate::icons::Icon;
 use crate::pages::PageKind;
 use crate::state::{AgendaState, AppState, OyenzaLink, PowerState, SysStats};
 use crate::ui::{wid, wid_n, PillStyle, Ui, PILL_SMALL};
-use poni_core::agenda::{self, Answer, Mark, Source, Sources, Weeks};
-use poni_core::datetime::{civil_from_days, days_from_civil, fmt_clock, weekday_from_days, LocalDateTime, MONTH_SHORT, WEEKDAY_SHORT};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::sysmon::Module;
+use nexora_core::agenda::{self, Answer, Mark, Source, Sources, Weeks};
+use nexora_core::datetime::{civil_from_days, days_from_civil, fmt_clock, weekday_from_days, LocalDateTime, MONTH_SHORT, WEEKDAY_SHORT};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::sysmon::Module;
 
 const HEIGHT: f32 = 200.0;
 
@@ -656,7 +656,7 @@ fn intersect(a: Rect, b: Rect) -> Option<Rect> {
 /// The island's black over the list's edge (none on Glass, which has no
 /// solid ground to fade into).
 fn fade(ui: &mut Ui, r: Rect, top: bool) {
-    if ui.c.look().material == poni_core::look::Material::Glass {
+    if ui.c.look().material == nexora_core::look::Material::Glass {
         return;
     }
     let step = r.h / FADE_STEPS as f32;

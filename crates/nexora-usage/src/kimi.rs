@@ -379,7 +379,7 @@ mod tests {
         assert_eq!(wants[1], Want::File { path: PathBuf::from(r"D:\kimi\credentials\kimi-code-env-0e4f99c69cc27850.json"), max: 64 * 1024 });
         assert_eq!(wants[3], Want::File { path: PathBuf::from(r"D:\kimi\device_id"), max: 1024 });
         // The kimi.ai file's name, the way Kimi Code makes it.
-        let slot = poni_core::sha256::hex(&poni_core::sha256::sha256(br#"{"oauthHost":"https://auth.kimi.ai","baseUrl":"https://api.kimi.ai/coding/v1"}"#));
+        let slot = nexora_core::sha256::hex(&nexora_core::sha256::sha256(br#"{"oauthHost":"https://auth.kimi.ai","baseUrl":"https://api.kimi.ai/coding/v1"}"#));
         assert_eq!(SIGNINS[1].0, format!("kimi-code-env-{}.json", &slot[..16]));
     }
 

@@ -3,7 +3,7 @@
 use crate::events::WM_APP_TRAY;
 use crate::state::OyenzaLink;
 use crate::updates::UpdateLine;
-use poni_core::settings::{IdleStyle, Settings, Theme};
+use nexora_core::settings::{IdleStyle, Settings, Theme};
 use windows::core::{Result, PCWSTR};
 use windows::Win32::Foundation::{HWND, LPARAM, POINT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
@@ -18,7 +18,7 @@ impl Tray {
     pub fn add(hwnd: HWND) -> Result<Tray> {
         unsafe {
             let hinst = GetModuleHandleW(None)?;
-            // Ask for the small-icon size so Windows picks poni.ico's own 16-24 px
+            // Ask for the small-icon size so Windows picks nexora.ico's own 16-24 px
             // frames; LoadIconW gives the 32 px one and shrinks it (blurry).
             let (cx, cy) = (GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON));
             let icon = LoadImageW(hinst, PCWSTR(1 as _), IMAGE_ICON, cx, cy, LR_DEFAULTCOLOR)
@@ -370,7 +370,7 @@ mod tests {
         let has = |s: &Settings| menu_items(s, false, &OyenzaLink::Off, false, UpdateLine::None).iter().position(|i| matches!(i, MenuItem::Item { cmd: MenuCmd::ToggleSystemHistory, .. }));
         let mut s = Settings::default();
         assert_eq!(has(&s), None, "System is off by default");
-        s.set_addon(poni_core::addons::SYSTEM.id, true);
+        s.set_addon(nexora_core::addons::SYSTEM.id, true);
         let at = has(&s).expect("no System history item");
         // Right above Sounds, where it always was.
         let items = menu_items(&s, false, &OyenzaLink::Off, false, UpdateLine::None);

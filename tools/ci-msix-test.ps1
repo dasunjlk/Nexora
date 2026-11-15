@@ -1,5 +1,5 @@
 # CI check of the Microsoft Store package (MSIX), used by store.yml:
-# sign a copy with a throwaway certificate, install it, run Poni's self-test
+# sign a copy with a throwaway certificate, install it, run Nexora's self-test
 # inside the package (with the package identity the Store copy has), then
 # start it the normal way and check it keeps running.
 # With -TestCopy, the signed copy, the certificate's public half and the
@@ -32,7 +32,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem, System.Windows.Forms, S
 Add-Type @"
 using System;
 using System.Runtime.InteropServices;
-namespace PoniCi {
+namespace NexoraCi {
     [ComImport, Guid("2e941141-7f97-4756-ba1d-9decde894a3d"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     interface IApplicationActivationManager {
         [PreserveSig] int ActivateApplication([MarshalAs(UnmanagedType.LPWStr)] string appUserModelId,
@@ -56,7 +56,7 @@ namespace PoniCi {
     }
 }
 "@
-[PoniCi.User32]::SetProcessDPIAware() | Out-Null
+[NexoraCi.User32]::SetProcessDPIAware() | Out-Null
 
 function Shot([string]$name, [int]$height = 360) {
     $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
@@ -85,14 +85,14 @@ Set-ItemProperty -Path $unlock -Name AllowAllTrustedApps -Value 1 -Type DWord
 
 # A throwaway certificate whose subject matches the manifest's Publisher.
 $cert = New-SelfSignedCertificate -Type Custom -Subject $identity.Publisher -KeyUsage DigitalSignature `
-    -FriendlyName "Poni CI (MSIX test)" -CertStoreLocation "Cert:\CurrentUser\My" `
+    -FriendlyName "Nexora CI (MSIX test)" -CertStoreLocation "Cert:\CurrentUser\My" `
     -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3", "2.5.29.19={text}")
-$cer = Join-Path $env:TEMP "poni-ci-msix.cer"
+$cer = Join-Path $env:TEMP "nexora-ci-msix.cer"
 Export-Certificate -Cert $cert -FilePath $cer | Out-Null
 Import-Certificate -FilePath $cer -CertStoreLocation "Cert:\LocalMachine\TrustedPeople" | Out-Null
 
 # Sign a copy; the unsigned package stays as built (it is what the Store gets).
-$signed = Join-Path $env:TEMP "poni-ci-signed.msix"
+$signed = Join-Path $env:TEMP "nexora-ci-signed.msix"
 Copy-Item $Msix $signed -Force
 & (Find-SdkTool "signtool.exe") sign /fd SHA256 /sha1 $cert.Thumbprint $signed | Out-Host
 if ($LASTEXITCODE -ne 0) { throw "signtool failed with exit code $LASTEXITCODE" }
@@ -118,16 +118,16 @@ $pkg = Get-AppxPackage -Name $identity.Name
 if (-not $pkg) { throw "$($identity.Name) is not installed after Add-AppxPackage" }
 "installed: $($pkg.PackageFullName)"
 "  at $($pkg.InstallLocation)"
-$aumid = "$($pkg.PackageFamilyName)!Poni"
+$aumid = "$($pkg.PackageFamilyName)!Nexora"
 
 # Park the cursor mid-screen so a hover can't change the scripted states.
 $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
-[PoniCi.User32]::SetCursorPos([int]($bounds.Width / 2), [int]($bounds.Height / 2)) | Out-Null
+[NexoraCi.User32]::SetCursorPos([int]($bounds.Width / 2), [int]($bounds.Height / 2)) | Out-Null
 
 # ---------------------------------------------------------------- self-test inside the package
 
 $selftest = Join-Path $Out "selftest"
-$p = Get-Process -Id ([PoniCi.Apps]::Launch($aumid, "--selftest `"$selftest`""))
+$p = Get-Process -Id ([NexoraCi.Apps]::Launch($aumid, "--selftest `"$selftest`""))
 $null = $p.Handle  # keep the handle so ExitCode is available after exit
 "self-test: process $($p.Id), $($p.Path)"
 if (-not $p.WaitForExit(180000)) {
@@ -166,13 +166,13 @@ if (Test-Path $reportPath) {
     $failures.Add("the packaged self-test wrote no report.json")
 }
 if ($failures.Count -gt 0) {
-    "---- poni.log (tail)"
-    Get-Content (Join-Path $selftest "home\cache\poni.log") -Tail 80 -ErrorAction SilentlyContinue
+    "---- nexora.log (tail)"
+    Get-Content (Join-Path $selftest "home\cache\nexora.log") -Tail 80 -ErrorAction SilentlyContinue
 }
 
 # ---------------------------------------------------------------- normal start
 
-$app = Get-Process -Id ([PoniCi.Apps]::Launch($aumid, ""))
+$app = Get-Process -Id ([NexoraCi.Apps]::Launch($aumid, ""))
 $null = $app.Handle
 Start-Sleep -Seconds 6
 Shot "packaged-idle"
@@ -184,14 +184,14 @@ if ($app.HasExited) {
 }
 # A packaged app's new files under AppData land in its private folder.
 $logs = @(@(
-    (Join-Path $env:LOCALAPPDATA "Packages\$($pkg.PackageFamilyName)\LocalCache\Local\Poni\poni.log"),
-    (Join-Path $env:LOCALAPPDATA "Poni\poni.log")
+    (Join-Path $env:LOCALAPPDATA "Packages\$($pkg.PackageFamilyName)\LocalCache\Local\Nexora\nexora.log"),
+    (Join-Path $env:LOCALAPPDATA "Nexora\nexora.log")
 ) | Where-Object { Test-Path $_ })
 if ($logs.Count -eq 0) {
-    $failures.Add("no poni.log from the normal start")
+    $failures.Add("no nexora.log from the normal start")
 } else {
     "log: $($logs[0])"
-    Copy-Item $logs[0] (Join-Path $Out "packaged-poni.log")
+    Copy-Item $logs[0] (Join-Path $Out "packaged-nexora.log")
     if (-not (Select-String -Path $logs[0] -SimpleMatch "running as the Microsoft Store package" -Quiet)) {
         $failures.Add("the normal start did not log that it runs as the Store package")
     }

@@ -23,7 +23,7 @@ green before a merge into `dev`.
 | 02.0 | Task guideline | merged with 01 | ✅ done |
 | 02a | Port the reference tree as-is (5 granular commits) | `feature/02a-port-codebase` | ⏳ in progress |
 | 02b | Rename tree: crates, src dirs, res, installer, brand files | `feature/02b-rename-tree` | ⬜ pending |
-| 02c | Rebrand Rust names: `poni*`/`PONI*` → `nexora*`, `studio-*` crates | `feature/02c-rebrand-rust-names` | ⬜ pending |
+| 02c | Rebrand Rust names: `nexora*`/`NEXORA*` → `nexora*`, `studio-*` crates | `feature/02c-rebrand-rust-names` | ⬜ pending |
 | 02d | Rebrand mascot: `oyen*` → `nova*`, `oyis_` → `nxis_` | `feature/02d-rebrand-mascot` | ⬜ pending |
 | 02e | Rebrand domains, product name, repo refs, `catat-server` | `feature/02e-rebrand-domains` | ⬜ pending |
 | 02f | Version 0.1.0 + installer/MSIX identity (new GUIDs) | `feature/02f-version-identity` | ⬜ pending |

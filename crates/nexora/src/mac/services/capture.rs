@@ -2,7 +2,7 @@
 //! Windows app's file) records with: the microphone, and the Mac's own sound
 //! (whatever it plays: the voices of a call in Meet, Zoom or Teams, with no
 //! bot joining it). Each is a Core Audio IOProc whose frames become 16 kHz
-//! mono (`poni_core::ielts::Downmix`) in a queue the recording thread empties
+//! mono (`nexora_core::ielts::Downmix`) in a queue the recording thread empties
 //! every 40 ms, as it empties WASAPI's buffers on Windows.
 //!
 //! The Mac's own sound comes through a process tap (macOS 14.2 and later): a
@@ -15,7 +15,7 @@
 //! The microphone is the default input device, after macOS's question (the
 //! IELTS coach's too). While the question is up the recording goes on with
 //! the Mac's sound alone and looks again every 2 s (`Source::moved`). The
-//! tap is made on a thread of its own (`poni-notes-tap`), since making it
+//! tap is made on a thread of its own (`nexora-notes-tap`), since making it
 //! can wait on macOS's question for as long as the person takes to answer:
 //! the recording waits for it a moment, then goes on with the microphone,
 //! and the Mac's sound joins once the tap is there.
@@ -29,8 +29,8 @@ use objc2::runtime::{AnyClass, AnyObject, Bool};
 use objc2::{msg_send, sel, Message};
 use objc2_avf_audio::{AVAudioApplication, AVAudioApplicationRecordPermission};
 use objc2_foundation::{NSArray, NSDictionary, NSNumber, NSString};
-use poni_core::ielts::{peak, Downmix, SampleFormat};
-use poni_core::notes::RATE;
+use nexora_core::ielts::{peak, Downmix, SampleFormat};
+use nexora_core::notes::RATE;
 use std::ffi::{c_char, c_void};
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, TryRecvError};
 use std::sync::Mutex;
@@ -355,7 +355,7 @@ impl Source {
             }
             let (tx, rx) = mpsc::channel();
             std::thread::Builder::new()
-                .name("poni-notes-tap".into())
+                .name("nexora-notes-tap".into())
                 .spawn(move || {
                     let _ = tx.send(open_pc());
                 })

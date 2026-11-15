@@ -11,7 +11,7 @@
 //! - Windows: `v10`, a 12-byte nonce, then AES-256-GCM with the tag last.
 //!   The key sits in the app's `Local State` (`os_crypt.encrypted_key`:
 //!   base64 of `DPAPI` and a DPAPI blob only this Windows user can open).
-//!   Windows' own crypto opens both ([`Want::Unseal`]), so poni.exe carries
+//!   Windows' own crypto opens both ([`Want::Unseal`]), so nexora.exe carries
 //!   no AES of its own. Bytes without `v10` are a DPAPI blob alone (older
 //!   Electron).
 //!

@@ -12,11 +12,11 @@
 //! `AppEvent::Notify`. Every answer from Windows reaches the UI thread as
 //! `NotifyEvent::Access`, which the app hands back to [`Listener::follow`]. Nothing polls and no thread of ours waits, so it
 //! costs nothing at rest; nothing is written down
-//! (`poni_core::notifications` decides what the notice says).
+//! (`nexora_core::notifications` decides what the notice says).
 
 use crate::events::{AppEvent, EventSink};
 use crate::state::NotifyAccess;
-use poni_core::notifications::Seen;
+use nexora_core::notifications::Seen;
 use windows::core::Result;
 use windows::Foundation::{AsyncOperationCompletedHandler, AsyncStatus, EventRegistrationToken, TypedEventHandler};
 use windows::UI::Notifications::Management::{UserNotificationListener, UserNotificationListenerAccessStatus};
@@ -161,7 +161,7 @@ impl Listener {
             }
         }
         let (listener, sink) = (self.listener.clone(), self.sink.clone());
-        let spawned = std::thread::Builder::new().name("poni-notify-apps".into()).spawn(move || {
+        let spawned = std::thread::Builder::new().name("nexora-notify-apps".into()).spawn(move || {
             // `.get()` waits, so it runs here, never on the UI thread.
             let apps = listener.GetNotificationsAsync(NotificationKinds::Toast).and_then(|op| op.get()).and_then(|list| {
                 let mut apps: Vec<(String, String)> = Vec::new();

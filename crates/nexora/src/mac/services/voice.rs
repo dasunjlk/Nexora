@@ -82,7 +82,7 @@ define_class!(
     /// Hears a line's end (main thread).
     #[unsafe(super(NSObject))]
     #[thread_kind = MainThreadOnly]
-    #[name = "PoniVoiceDelegate"]
+    #[name = "NexoraVoiceDelegate"]
     #[ivars = Ivars]
     struct VoiceDelegate;
 

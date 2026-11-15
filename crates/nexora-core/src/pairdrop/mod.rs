@@ -35,7 +35,7 @@ pub use peer::PeerEvent;
 
 use std::sync::OnceLock;
 
-/// The meeting server Oyenza Studio uses unless `PONI_DROP_SERVER` says otherwise.
+/// The meeting server Oyenza Studio uses unless `NEXORA_DROP_SERVER` says otherwise.
 pub const DEFAULT_SERVER: &str = "https://drop.oyenza.com";
 
 /// Public STUN servers for the PC's own internet address.
@@ -45,7 +45,7 @@ type Logger = Box<dyn Fn(&str) + Send + Sync>;
 
 static LOGGER: OnceLock<Logger> = OnceLock::new();
 
-/// Where this module's log lines go (the Windows crate's poni.log). Unset,
+/// Where this module's log lines go (the Windows crate's nexora.log). Unset,
 /// they're dropped.
 pub fn set_logger(f: impl Fn(&str) + Send + Sync + 'static) {
     let _ = LOGGER.set(Box::new(f));

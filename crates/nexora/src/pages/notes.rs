@@ -1,6 +1,6 @@
 //! Notes page, the Meeting notes add-on's (off until switched on; Windows):
 //! one click and Oyen listens to a meeting, then the Oyenza account writes
-//! its notes (`poni_core::notes`).
+//! its notes (`nexora_core::notes`).
 //!
 //! - Signed out: the Oyenza sign-in card, saying what the notes do.
 //! - Signed in without Studio Pro (the server's word, `GET /island/pro`):
@@ -26,8 +26,8 @@ use crate::icons::Icon;
 use crate::oyen::{self, Coach as Oyen};
 use crate::state::{AppState, OyenzaLink};
 use crate::ui::{wid, PillStyle, Ui, PILL_GAP, PILL_SMALL};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::notes::{fmt_length, CaptureIssue, Phase, Problem};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::notes::{fmt_length, CaptureIssue, Phase, Problem};
 
 /// Every state is this tall, so the island never jumps between them.
 const HEIGHT: f32 = 180.0;

@@ -19,9 +19,9 @@ use crate::icons::Icon;
 use crate::services::stocks::{Trouble, Watch};
 use crate::state::AppState;
 use crate::ui::{wid, wid_n, KeyInput, PillStyle, Ui, WidgetId, PILL_SMALL};
-use poni_core::geom::{lerp, palette, Color, Point, Rect};
-use poni_core::stocks::{self, Board, Quote, Range, Trend, INDEX};
-use poni_core::svgpath::Seg;
+use nexora_core::geom::{lerp, palette, Color, Point, Rect};
+use nexora_core::stocks::{self, Board, Quote, Range, Trend, INDEX};
+use nexora_core::svgpath::Seg;
 
 /// The System page's height: the window never grows for this page.
 const HEIGHT: f32 = 256.0;
@@ -161,7 +161,7 @@ pub fn picture(st: &mut AppState, shows: Picture, now: f64) {
     let mut board = stocks::sample(&st.day_key(), 13 * 60 + 40);
     board.at = st.unix - 8;
     board.t = board.at - board.delay_s;
-    let today = poni_core::agenda::day_num(&st.day_key()).unwrap_or(0);
+    let today = nexora_core::agenda::day_num(&st.day_key()).unwrap_or(0);
     let bbca = board.quote("BBCA").map_or(4_940.0, |q| q.price);
     st.stocks.years.insert("BBCA".into(), stocks::sample_history("BBCA", today, bbca));
     st.stocks.board = Some(board);
@@ -567,7 +567,7 @@ fn dotted(ui: &mut Ui, x0: f32, x1: f32, y: f32, c: Color) {
 /// The island's ground over `r`, from solid at the outer edge to clear:
 /// rows fade out where the list is cut off (Glass shows its own backdrop).
 fn fade(ui: &mut Ui, r: Rect, top: bool) {
-    if ui.c.look().material == poni_core::look::Material::Glass {
+    if ui.c.look().material == nexora_core::look::Material::Glass {
         return;
     }
     const STEPS: usize = 8;

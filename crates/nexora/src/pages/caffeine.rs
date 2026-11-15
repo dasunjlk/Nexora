@@ -1,6 +1,6 @@
 //! Caffeine page, the Caffeine add-on's (off until switched on): the day's
 //! drinks and how much caffeine is still in the body, hour by hour
-//! (`poni_core::caffeine`).
+//! (`nexora_core::caffeine`).
 //!
 //! Across the top: the day's drinks and caffeine against the day's limit,
 //! and the last call for the drink the person usually has. On the left the
@@ -31,11 +31,11 @@ use crate::gfx::{Image, ImageData, TextStyle, Weight};
 use crate::icons::Icon;
 use crate::state::AppState;
 use crate::ui::{wid, wid_n, KeyInput, PillStyle, Ui, PILL_GAP, PILL_SMALL};
-use poni_core::caffeine::{bed_of, day_start, freshness, hhmm, in_body, last_call_hours, late_for_bed, local_minute, tmax, Bean, DAY, DAY_START, Drink, Kind, LocalMinute, Log, MAX_AMOUNT, Prefs, Today};
-use poni_core::datetime::LocalDateTime;
-use poni_core::geom::{lerp, palette, Color, Point, Rect, Size};
-use poni_core::look::{Look, Material};
-use poni_core::svgpath::Seg;
+use nexora_core::caffeine::{bed_of, day_start, freshness, hhmm, in_body, last_call_hours, late_for_bed, local_minute, tmax, Bean, DAY, DAY_START, Drink, Kind, LocalMinute, Log, MAX_AMOUNT, Prefs, Today};
+use nexora_core::datetime::LocalDateTime;
+use nexora_core::geom::{lerp, palette, Color, Point, Rect, Size};
+use nexora_core::look::{Look, Material};
+use nexora_core::svgpath::Seg;
 
 /// The System page's height: the window never grows for this page.
 const HEIGHT: f32 = 256.0;
@@ -1403,9 +1403,9 @@ fn stepper(ui: &mut Ui, id: &str, x: f32, y: f32, value: &str, less: bool, more:
 #[cfg(test)]
 mod tests {
     use super::*;
-    use poni_core::caffeine::BEDTIMES;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
+    use nexora_core::caffeine::BEDTIMES;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
 
     /// The page's area at the island's usual width (620), where the app
     /// puts it; and the narrowest and widest the settings allow (480, 900).
@@ -1647,7 +1647,7 @@ mod tests {
         assert!(c.pick_high.unwrap() >= c.today.peak.unwrap().1 - 1.0, "the Americano makes the day's peak");
         // The painting: every dot inside the picture, opaque where a fresh dot sits.
         let (w, h) = ((COLS as f32 * CELL * 2.0) as u32, (ROWS as f32 * CELL * 2.0).round() as u32);
-        let px = paint(&c.dots, w, h, 2.0, CELL, &poni_core::look::CLASSIC);
+        let px = paint(&c.dots, w, h, 2.0, CELL, &nexora_core::look::CLASSIC);
         assert_eq!(px.len(), (w * h * 4) as usize);
         assert!(px.chunks(4).all(|p| p[0] <= p[3] && p[1] <= p[3] && p[2] <= p[3]), "premultiplied");
         let at_px = |x: usize, y: usize| &px[(y * w as usize + x) * 4..][..4];

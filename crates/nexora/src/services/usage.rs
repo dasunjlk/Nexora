@@ -1,7 +1,7 @@
 //! The AI tab's worker: how much of each AI coding plan is left
-//! (`studio_usage`), read on one thread, which the Mac app runs too (it
+//! (`nexora_usage`), read on one thread, which the Mac app runs too (it
 //! shares this file as is). Each service's reader is its own file in
-//! `studio_usage`, and when the worker looks and the rules it keeps are
+//! `nexora_usage`, and when the worker looks and the rules it keeps are
 //! `usage::pace`. This file reads what the services ask for (their files, a
 //! Mac keychain item, the keys typed into the tab), makes their requests,
 //! keeps the typed keys sealed (`services::secret` at
@@ -33,9 +33,9 @@ use crate::commands::UsageCmd;
 use crate::events::{AppEvent, EventSink};
 use crate::services::http::{Client, FetchError, Method, MtaGuard};
 use crate::state::InferenceLink;
-use studio_usage::alerts::{Alert, AlertCfg, Memory};
-use studio_usage::pace::{self, KeyGate, Look, Looks, Pace, Refusals};
-use studio_usage::{self as usage, oyenza, Cli, Dirs, Got, NetFail, Os, Outcome, Provider, ProviderId, Reach, Reply, Request, Snapshot, Trouble, Want};
+use nexora_usage::alerts::{Alert, AlertCfg, Memory};
+use nexora_usage::pace::{self, KeyGate, Look, Looks, Pace, Refusals};
+use nexora_usage::{self as usage, oyenza, Cli, Dirs, Got, NetFail, Os, Outcome, Provider, ProviderId, Reach, Reply, Request, Snapshot, Trouble, Want};
 use std::cell::{Cell, RefCell};
 use std::collections::BTreeSet;
 use std::path::PathBuf;
@@ -85,7 +85,7 @@ pub enum UsageEvent {
     Keys(BTreeSet<&'static str>),
     /// inference.oyenza.com's link changed.
     Link(InferenceLink),
-    /// Heads-up notices for the island (`studio_usage::alerts`), the
+    /// Heads-up notices for the island (`nexora_usage::alerts`), the
     /// most urgent first.
     Alerts(Vec<Alert>),
     /// A look at the services started (true) or ended, while the tab is open.
@@ -101,7 +101,7 @@ impl UsageService {
         let shared = Arc::new(Shared { q: Mutex::new(Queue::default()), cv: Condvar::new() });
         let worker = shared.clone();
         std::thread::Builder::new()
-            .name("poni-usage".into())
+            .name("nexora-usage".into())
             .spawn(move || worker_main(worker, sink))
             .map_err(|e| format!("could not start the AI usage thread: {e}"))?;
         Ok(Self { shared })
@@ -380,7 +380,7 @@ impl Worker {
         let oy = &self.svcs[at(ProviderId::Oyenza)];
         let spent = oy.kept.as_ref().and_then(|s| s.balance.as_ref()).is_some_and(|b| b.micros <= 0);
         let inference = self.keys.contains(oyenza::SECRET) && !spent && !matches!(oy.trouble, Some(Trouble::Refused | Trouble::Disabled));
-        let offset_min = poni_core::oyenza::offset_minutes(&crate::clock::local_now(), crate::clock::unix_now());
+        let offset_min = nexora_core::oyenza::offset_minutes(&crate::clock::local_now(), crate::clock::unix_now());
         AlertCfg { near: pace::near(self.watch.near_pct), offset_min, use_24h: self.watch.use_24h, inference, ..AlertCfg::default() }
     }
 
@@ -635,7 +635,7 @@ impl Worker {
 
     // ------------------------------------------------------------ inference.oyenza.com
 
-    /// The server to ask (a test build's own through `PONI_INFERENCE_URL`).
+    /// The server to ask (a test build's own through `NEXORA_INFERENCE_URL`).
     fn base(&self) -> String {
         oyenza::base(self.dirs.var(oyenza::URL_VAR))
     }
@@ -930,7 +930,7 @@ fn keychain_item(_service: &str, _account: Option<&str>) -> Got {
     Got::Missing
 }
 
-/// One of the programs a reader may run (`studio_usage::Cli`; the Mac's
+/// One of the programs a reader may run (`nexora_usage::Cli`; the Mac's
 /// `services::agy` does it). A program that asked for a browser sign-in
 /// answers 401 and is not run again until Refresh (`held`): the reader hears
 /// 401 meanwhile, as if it had run.
@@ -968,7 +968,7 @@ fn unseal(_sealed: &[u8], _key: Option<&[u8]>) -> Got {
 mod tests {
     use super::*;
     use crate::events::SendHwnd;
-    use studio_usage::{Money, Source, Window, WindowKind};
+    use nexora_usage::{Money, Source, Window, WindowKind};
     use std::sync::mpsc::{channel, Receiver};
 
     const NOW: i64 = 1_793_077_200;

@@ -24,9 +24,9 @@ use crate::gfx::{TextStyle, Weight};
 use crate::icons::Icon;
 use crate::state::{AppState, OyenzaLink};
 use crate::ui::{wid, wid_n, PillStyle, Ui, PILL_GAP, PILL_SMALL};
-use poni_core::datetime::fmt_clock;
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::oyenza::{self, Bill, DayPick, Flow, Txn};
+use nexora_core::datetime::fmt_clock;
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::oyenza::{self, Bill, DayPick, Flow, Txn};
 use std::cell::Cell;
 
 /// Signed in: input, status line, the day strip, the day's heading, its list, footer.
@@ -590,7 +590,7 @@ fn fade_edge(ui: &mut Ui, r: Rect, outer_is_top: bool, strength: f32) {
 
 /// A Unix time as the server writes instants, for [`oyenza::local_clock`].
 fn iso_of(unix: i64) -> String {
-    let (y, m, d) = poni_core::datetime::civil_from_days(unix.div_euclid(86_400));
+    let (y, m, d) = nexora_core::datetime::civil_from_days(unix.div_euclid(86_400));
     let s = unix.rem_euclid(86_400);
     format!("{y:04}-{m:02}-{d:02}T{:02}:{:02}:{:02}Z", s / 3600, s % 3600 / 60, s % 60)
 }

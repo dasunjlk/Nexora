@@ -1,6 +1,6 @@
 //! The Oyen theme: Oyen, the Oyenza cat, living in the island.
 //!
-//! Oyen is drawn from the Oyenza app's own built face ([`poni_core::oyen`]),
+//! Oyen is drawn from the Oyenza app's own built face ([`nexora_core::oyen`]),
 //! never from a picture, so he is the same character, with the same moods, as
 //! in the app. He peeks over a line near the island's bottom edge the way the
 //! Oyenza Studio logo does, his chin hidden behind it. (The logo's cream paws are
@@ -10,10 +10,10 @@
 //! cursor, the night), never an amount of money.
 
 use crate::gfx::Canvas;
-use poni_core::geom::{Color, Point, Rect};
-use poni_core::oyen::{self, Affine, Element, Frame, Input, Mood, Paint, Path, Place};
-use poni_core::settings::Theme;
-use poni_core::svgpath::{self, Seg};
+use nexora_core::geom::{Color, Point, Rect};
+use nexora_core::oyen::{self, Affine, Element, Frame, Input, Mood, Paint, Path, Place};
+use nexora_core::settings::Theme;
+use nexora_core::svgpath::{self, Seg};
 use std::f32::consts::TAU;
 use std::f64::consts::PI;
 use std::sync::OnceLock;

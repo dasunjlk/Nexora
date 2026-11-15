@@ -2,7 +2,7 @@
 //! money that arrived or went out by itself, the last 7 days of transactions
 //! while the Oyenza page is open, bills due soon, and the steps the phone
 //! sent, and saving the spends typed in the island. Words, URLs and parsing
-//! live in `poni_core::oyenza`; this file does the HTTP on one worker thread
+//! live in `nexora_core::oyenza`; this file does the HTTP on one worker thread
 //! and keeps the key with `services::secret` at `paths::oyenza_link_path()`:
 //! sealed with DPAPI on Windows, a file only the Mac account can read on a
 //! Mac (which shares this file as is).
@@ -19,7 +19,7 @@
 //!   (at most once in 30 seconds, battery saver or not); a server from before
 //!   steps (404) counts as none to show. They go to the island only, never to
 //!   disk or the log;
-//! - the day for the Today page (`poni_core::agenda`) when it opens (at most
+//! - the day for the Today page (`nexora_core::agenda`) when it opens (at most
 //!   once in 30 seconds) and every 5 minutes while it stays on screen, and
 //!   never otherwise; a server without it (404) or with it paused (503) is
 //!   asked again only after half an hour. It goes to the island only;
@@ -34,9 +34,9 @@
 use crate::commands::OyenzaCmd;
 use crate::events::{AppEvent, EventSink, OyenzaEvent};
 use crate::services::http::{Client, FetchError, Method, MtaGuard, Response};
-use poni_core::agenda;
-use poni_core::health::HealthSnapshot;
-use poni_core::oyenza::{self, Claim, Link};
+use nexora_core::agenda;
+use nexora_core::health::HealthSnapshot;
+use nexora_core::oyenza::{self, Claim, Link};
 use std::collections::VecDeque;
 use std::sync::{Arc, Condvar, Mutex, MutexGuard};
 use std::time::{Duration, Instant};
@@ -70,7 +70,7 @@ impl OyenzaService {
         let shared = Arc::new(Shared { q: Mutex::new(Queue { activity, ..Default::default() }), cv: Condvar::new() });
         let worker = shared.clone();
         std::thread::Builder::new()
-            .name("poni-oyenza".into())
+            .name("nexora-oyenza".into())
             .spawn(move || worker_main(worker, sink))
             .map_err(|e| std::io::Error::other(format!("could not start the Oyenza thread: {e}")))?;
         Ok(Self { shared })

@@ -33,11 +33,11 @@ use crate::icons::Icon;
 use crate::pages::media::{self as classic, Anim, Frame, LyricsCtx};
 use crate::state::AppState;
 use crate::ui::{wid, Ui, WidgetId};
-use poni_core::datetime::fmt_duration;
-use poni_core::geom::{lerp, palette, Color, Point, Rect};
-use poni_core::addons;
-use poni_core::nowplaying::lyrics_lead_s;
-use poni_core::svgpath::Seg;
+use nexora_core::datetime::fmt_duration;
+use nexora_core::geom::{lerp, palette, Color, Point, Rect};
+use nexora_core::addons;
+use nexora_core::nowplaying::lyrics_lead_s;
+use nexora_core::svgpath::Seg;
 
 // ---------------------------------------------------------------- layout (spec 6.7)
 

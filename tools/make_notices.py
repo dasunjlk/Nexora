@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Write the "Rust crates built into poni.exe" part of THIRD-PARTY-NOTICES.txt.
+"""Write the "Rust crates built into nexora.exe" part of THIRD-PARTY-NOTICES.txt.
 
 Usage:
     python3 tools/make_notices.py            # rewrite that part
     python3 tools/make_notices.py --check    # fail when it is out of date
 
-Lists every crate poni.exe links on Windows (normal dependencies of `poni`
+Lists every crate nexora.exe links on Windows (normal dependencies of `nexora`
 for x86_64-pc-windows-msvc, as `cargo tree` resolves them for that target:
 `cargo metadata` would also count features that only other platforms turn
 on; build tools and proc macros leave nothing in the exe) and carries each
 one's MIT license text with its copyright line, identical texts once. Every
 crate in that list offers MIT (some also Apache-2.0 or the Unlicense), so Oyen
-Poni uses each under MIT; a crate that doesn't offer MIT stops the script,
+Nexora uses each under MIT; a crate that doesn't offer MIT stops the script,
 unless it is in BY_HAND and its notice is written by hand above. A crate that
 ships no license file gets it from tools/notices/<crate>.txt.
 
@@ -30,7 +30,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NOTICES = os.path.join(ROOT, "THIRD-PARTY-NOTICES.txt")
 TARGET = "x86_64-pc-windows-msvc"
 RULE = "-" * 78
-HEADING = "Rust crates built into poni.exe"
+HEADING = "Rust crates built into nexora.exe"
 # Crates without an MIT option whose notice is written by hand above the
 # heading (the script checks the notice is there).
 BY_HAND = {"subtle"}
@@ -39,7 +39,7 @@ MIT_FILES = ["license-mit", "license-mit.md", "license-mit.txt", "license", "lic
 
 
 def linked_crates():
-    """[(name, version, license, source dir)] of the crates poni.exe links."""
+    """[(name, version, license, source dir)] of the crates nexora.exe links."""
     meta = json.loads(subprocess.run(
         ["cargo", "metadata", "--format-version", "1", "--locked"],
         cwd=ROOT, check=True, capture_output=True, text=True,
@@ -49,7 +49,7 @@ def linked_crates():
     # Every path is printed (--no-dedupe) with its depth, so a proc macro's
     # whole subtree can be left out: it runs in the compiler, not in the exe.
     tree = subprocess.run(
-        ["cargo", "tree", "--locked", "-p", "poni", "--target", TARGET, "-e", "normal", "--no-dedupe", "--prefix", "depth", "--format", "{p}"],
+        ["cargo", "tree", "--locked", "-p", "nexora", "--target", TARGET, "-e", "normal", "--no-dedupe", "--prefix", "depth", "--format", "{p}"],
         cwd=ROOT, check=True, capture_output=True, text=True,
     ).stdout
     crates = set()

@@ -1140,7 +1140,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "poni"
+name = "nexora"
 version = "0.2.30"
 dependencies = [
  "block2",
@@ -1156,17 +1156,17 @@ dependencies = [
  "objc2-foundation",
  "objc2-quartz-core",
  "p256",
- "poni-core",
+ "nexora-core",
  "serde",
  "serde_json",
- "studio-diorama",
- "studio-usage",
+ "nexora-diorama",
+ "nexora-usage",
  "windows 0.58.0",
  "windows-core 0.58.0",
 ]
 
 [[package]]
-name = "poni-core"
+name = "nexora-core"
 version = "0.2.30"
 dependencies = [
  "hmac",
@@ -1578,16 +1578,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "studio-diorama"
+name = "nexora-diorama"
 version = "0.2.30"
 
 [[package]]
-name = "studio-usage"
+name = "nexora-usage"
 version = "0.2.30"
 dependencies = [
  "aes",
  "hmac",
- "poni-core",
+ "nexora-core",
  "serde",
  "serde_json",
  "sha1",

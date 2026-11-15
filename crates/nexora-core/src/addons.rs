@@ -140,7 +140,7 @@ pub const JA_READINGS_FILE: &str = "ja-readings.dic.zst";
 /// song whose kanji go unread switches it on ([`ja_switches_on`], once;
 /// switched off by hand it stays off, and the Music page offers it under the
 /// lyrics). The file is
-/// `crates/poni-core/data/ja-readings.dic.zst` (tools/make_ja_dict.py), its
+/// `crates/nexora-core/data/ja-readings.dic.zst` (tools/make_ja_dict.py), its
 /// notice `addons/ja/NOTICE.txt`.
 pub const JAPANESE_READINGS: Addon = Addon {
     id: "ja",
@@ -203,7 +203,7 @@ pub const HEALTH: Addon = Addon {
 };
 
 /// Stocks: the Stocks page, the IHSG and up to ten IDX stocks with their
-/// day's line, from oyenza.trade (`poni_core::stocks`). Its code is in the
+/// day's line, from oyenza.trade (`nexora_core::stocks`). Its code is in the
 /// app, so there is nothing to download. Off, there is no Stocks tab; on, the
 /// prices are asked for only while its page is on screen.
 pub const STOCKS: Addon = Addon {
@@ -218,7 +218,7 @@ pub const STOCKS: Addon = Addon {
 
 /// Caffeine: the Caffeine page, drinks the person adds (an espresso drink by
 /// its shots and beans, the rest by serving), how much is still in them hour
-/// by hour, and a reminder before the day's last call (`poni_core::caffeine`).
+/// by hour, and a reminder before the day's last call (`nexora_core::caffeine`).
 /// Its code is in the app, so there is nothing to download. Off, there is no
 /// Caffeine tab and no reminder.
 pub const CAFFEINE: Addon = Addon {
@@ -321,7 +321,7 @@ pub fn is_downloader_tool(name: &str) -> bool {
     [YTDLP_EXE, QJS_EXE, FFMPEG_EXE].contains(&name)
 }
 
-/// AI usage: the AI tab (`studio_usage`), what's left of each AI plan on this
+/// AI usage: the AI tab (`nexora_usage`), what's left of each AI plan on this
 /// computer and when it resets. A tab for everyone up to 0.2.25; part of
 /// Studio Pro in the versions after it. Its code is in the app, so there is
 /// nothing to download. Without Pro there is no AI tab or Settings section,

@@ -2,15 +2,15 @@
 
 Prayer times is off by default. Switching it on in the Add-ons tab (the "+"
 at the end of the tab row) downloads these files; switching it off deletes
-them. The code that works out the times (`crates/poni-core/src/prayer/`) is
-part of poni.exe and stays asleep until the add-on is on.
+them. The code that works out the times (`crates/nexora-core/src/prayer/`) is
+part of nexora.exe and stays asleep until the add-on is on.
 
 The files are published, byte for byte, on the pre-release
 [`addon-sholat-3`](https://github.com/lucacadalora/oyenza-studio/releases/tag/addon-sholat-3).
-Each one's size and SHA-256 are built into the app (`poni_core::addons`),
-and `cargo test -p poni-core addons` checks that they match the files here.
+Each one's size and SHA-256 are built into the app (`nexora_core::addons`),
+and `cargo test -p nexora-core addons` checks that they match the files here.
 Changing a file means a new tag (`addon-sholat-4`), new numbers in
-`poni_core::addons`, and an app release. Never delete an older tag:
+`nexora_core::addons`, and an app release. Never delete an older tag:
 `addon-sholat-1` holds the files every version up to 0.2.24 downloads (the
 older adzan), and `addon-sholat-2` a world list that went online instead and
 never shipped.
@@ -51,7 +51,7 @@ need nothing online afterwards.
 
 ## How the times are checked
 
-`cargo test -p poni-core prayer` replays:
+`cargo test -p nexora-core prayer` replays:
 
 - Kemenag's published 2026 schedule for all 517 locations, 227,367 times:
   98.2% exact, never more than 1 minute off. Every place is at least 95%

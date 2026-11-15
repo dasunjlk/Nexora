@@ -1,7 +1,7 @@
 //! New versions, the app's side (docs/updates.md): when to read the update
 //! file, what to remember between starts (`update.json` in the data folder),
 //! and what the island, the menu and Settings show. The rules are in
-//! `poni_core::update`, the reading in `services::update`. Both apps keep one
+//! `nexora_core::update`, the reading in `services::update`. Both apps keep one
 //! [`Updater`] and drive it from their own timers.
 //!
 //! Costs at rest: one read of a ~1 KB file a couple of minutes after start
@@ -27,10 +27,10 @@
 use crate::icons::Icon;
 use crate::state::{AppState, InlineAction, Notice, NoticeAction, Said};
 use crate::version::VERSION;
-use poni_core::geom::{palette, Color};
-use poni_core::store::{load_json, save_json_atomic};
-use poni_core::update::{self, Memory, Release};
-use poni_core::update::Download;
+use nexora_core::geom::{palette, Color};
+use nexora_core::store::{load_json, save_json_atomic};
+use nexora_core::update::{self, Memory, Release};
+use nexora_core::update::Download;
 use std::path::PathBuf;
 
 /// Which download is this system's.
@@ -485,12 +485,12 @@ pub fn unix_now() -> u64 {
 #[cfg(all(test, windows))]
 mod tests {
     use super::*;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
 
     /// A temporary folder for `update.json` and the Setups.
     fn folder(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("poni-updates-test-{name}-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("nexora-updates-test-{name}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(dir.join("setups")).unwrap();
         dir
@@ -503,7 +503,7 @@ mod tests {
         let d = Download {
             url: format!("{repo}/download/v{next}/Oyenza-Studio-Setup-{next}.exe"),
             size: setup.len() as u64,
-            sha256: poni_core::sha256::hex(&poni_core::sha256::sha256(setup)),
+            sha256: nexora_core::sha256::hex(&nexora_core::sha256::sha256(setup)),
         };
         let rel = Release { version: next.clone(), date: String::new(), headline: "Next".into(), notes: format!("{repo}/tag/v{next}"), windows: Some(d), mac: None };
         let memory = Memory { checked: 1, latest: Some(rel), ran: VERSION.into(), ..Memory::default() };

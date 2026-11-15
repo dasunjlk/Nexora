@@ -81,7 +81,7 @@ P	Zerbst		DE		51.966	12.085	15
 P	Zelenchukskaya		RU		43.855	41.590	14
 P	Zemst		BE		50.983	4.461	15
 P	Zele		BE		51.066	4.040	15
-P	Zestaponi		GE		42.108	43.033	13
+P	Zestanexora		GE		42.108	43.033	13
 P	Katwijk aan Zee		NL		52.203	4.399	15
 P	Bordj Zemoura		DZ		36.275	4.857	0
 P	Zeerust		ZA		-25.537	26.075	3

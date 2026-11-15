@@ -29,7 +29,7 @@ use objc2_app_kit::{
     NSVisualEffectBlendingMode, NSVisualEffectMaterial, NSVisualEffectState, NSVisualEffectView, NSWindowOrderingMode, NSWorkspace,
 };
 use objc2_foundation::{NSObjectProtocol, NSPoint, NSRect, NSSize};
-use poni_core::geom::{Color, Rect};
+use nexora_core::geom::{Color, Rect};
 use std::cell::RefCell;
 
 /// The black brow fades into the glass over this height (DIPs).

@@ -1,5 +1,5 @@
 //! Oyen's IELTS coach on the Mac, as in the Windows app (`../app.rs`): the
-//! session is `poni_core::ielts::Coach` in `AppState`, and this carries out
+//! session is `nexora_core::ielts::Coach` in `AppState`, and this carries out
 //! what it asks for with the shared `services::ielts::Kit` (the calls, and
 //! the Mac's microphone and voice: `mac/services/mic.rs`, `voice.rs`). A
 //! child of `app`, so it reaches the app's state.
@@ -9,7 +9,7 @@ use crate::commands::{IeltsCmd, MediaCmd};
 use crate::pages::PageKind;
 use crate::services;
 use crate::state::OyenzaLink;
-use poni_core::ielts::{Call, Effect, Reply};
+use nexora_core::ielts::{Call, Effect, Reply};
 
 impl App {
     /// The IELTS page's coach, each frame: told when the page comes and goes
@@ -63,7 +63,7 @@ impl App {
             IeltsCmd::Quit => self.st.ielts.quit(now),
             IeltsCmd::Retry => self.st.ielts.retry(now),
         };
-        if c == IeltsCmd::Start && self.st.ielts.phase == poni_core::ielts::Phase::Starting {
+        if c == IeltsCmd::Start && self.st.ielts.phase == nexora_core::ielts::Phase::Starting {
             // A new session: whatever an earlier one left behind goes first.
             self.ielts.voice.stop();
             services::ielts::clear_files();

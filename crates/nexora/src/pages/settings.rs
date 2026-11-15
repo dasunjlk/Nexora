@@ -27,11 +27,11 @@ use crate::pill::status;
 use crate::state::{AppState, OyenzaLink, Said};
 use crate::ui::{wid, wid_n, PillStyle, Ui, PILL_GAP, PILL_REGULAR, PILL_SMALL};
 use crate::version::VERSION;
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::oyenza;
-use poni_core::phonedrop::fmt_bytes;
-use poni_core::settings::{IdleStyle, Theme};
-use poni_core::update::Release;
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::oyenza;
+use nexora_core::phonedrop::fmt_bytes;
+use nexora_core::settings::{IdleStyle, Theme};
+use nexora_core::update::Release;
 
 /// Account row, a line, the pickers under their labels (or a row each on a
 /// narrow island), then the switches and choices (three rows), the tabs,

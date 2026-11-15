@@ -59,8 +59,8 @@ Wherever `ffmpeg.exe` is published, these go with it: this file, the licence
 text (`COPYING.LGPLv2.1` from the tarball: 26,517 bytes, SHA-256
 `246041b6ecf9bc32d718a62c57877c78b5eb397b6467e74ed7ae2626ab189c30`) and the
 source below, from the same place (the add-on's pre-release), as the LGPL
-asks. poni.exe starts `ffmpeg.exe` as a separate program and links none of
-it, so poni.exe's own licence doesn't change, and anyone can put their own
+asks. nexora.exe starts `ffmpeg.exe` as a separate program and links none of
+it, so nexora.exe's own licence doesn't change, and anyone can put their own
 build in its place.
 
 ## Source

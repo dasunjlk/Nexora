@@ -1,10 +1,10 @@
 //! Phone drop on Windows: picks the PC's Wi-Fi or wired address, makes the
-//! session secret and the inbox folder, and runs `poni_core::phonedrop`'s
+//! session secret and the inbox folder, and runs `nexora_core::phonedrop`'s
 //! web server while the Shelf's phone panel is open. Unlike the other
 //! services it starts on demand and stops when the panel closes.
 
 use crate::events::{AppEvent, EventSink};
-use poni_core::phonedrop::{token, Config, Server};
+use nexora_core::phonedrop::{token, Config, Server};
 use std::net::{IpAddr, Ipv4Addr, SocketAddr, UdpSocket};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
@@ -37,7 +37,7 @@ impl PhoneDrop {
         std::fs::create_dir_all(&inbox).map_err(|e| format!("Couldn't make the folder {} ({e}).", inbox.display()))?;
         let secret = random_token().ok_or_else(|| "Windows couldn't make a secret link.".to_string())?;
         let sink = Mutex::new(sink);
-        let send: Arc<dyn Fn(poni_core::phonedrop::Event) + Send + Sync> = Arc::new(move |e| {
+        let send: Arc<dyn Fn(nexora_core::phonedrop::Event) + Send + Sync> = Arc::new(move |e| {
             if let Ok(s) = sink.lock() {
                 s.send(AppEvent::Phone(e));
             }

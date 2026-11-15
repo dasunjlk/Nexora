@@ -9,7 +9,7 @@
 //! Phone drop lives here too: a Phone tile (empty shelf) or pill (filled
 //! shelf) opens a panel under the shelf with a QR code. A phone that scans it
 //! sends files to the Shelf after a yes on the island, and can save Shelf
-//! files (`services::phonedrop`, `poni_core::phonedrop`).
+//! files (`services::phonedrop`, `nexora_core::phonedrop`).
 
 use crate::commands::{Command, PairCmd, PhoneCmd};
 use crate::dragdrop;
@@ -18,9 +18,9 @@ use crate::icons::Icon;
 use crate::services::imaging::{self, PathKind};
 use crate::state::{AppState, PairedPhone, PhoneDrop, PhoneView};
 use crate::ui::{wid, wid_n, PillStyle, Ui, WidgetId, PILL_GAP, PILL_SMALL};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::phonedrop::{fmt_bytes, QrMatrix};
-use poni_core::shelf::{display_name, extension, ShelfItem, MAX_SHELF_ITEMS};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::phonedrop::{fmt_bytes, QrMatrix};
+use nexora_core::shelf::{display_name, extension, ShelfItem, MAX_SHELF_ITEMS};
 use std::cell::RefCell;
 use std::collections::HashMap;
 
@@ -887,7 +887,7 @@ fn draw_phone(ui: &mut Ui, st: &AppState, l: &mut Local, pd: &PhoneDrop, r: Rect
 
 /// Where pairing links point (the meeting server's host name).
 fn pairing_host() -> String {
-    let server = std::env::var("PONI_DROP_SERVER").ok().filter(|s| s.starts_with("http")).unwrap_or_else(|| poni_core::pairdrop::DEFAULT_SERVER.to_string());
+    let server = std::env::var("NEXORA_DROP_SERVER").ok().filter(|s| s.starts_with("http")).unwrap_or_else(|| nexora_core::pairdrop::DEFAULT_SERVER.to_string());
     server.split("://").nth(1).unwrap_or(&server).trim_end_matches('/').to_string()
 }
 

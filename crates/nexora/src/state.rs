@@ -7,22 +7,22 @@ use crate::commands::{Command, MediaCmd, Sound};
 use crate::gfx::Image;
 use crate::icons::Icon;
 use crate::pages::PageKind;
-use poni_core::addons::Status as AddonStatus;
-use poni_core::datetime::LocalDateTime;
-use poni_core::geom::{palette, Color};
-use poni_core::health::HealthSnapshot;
-use poni_core::lrc::Lyrics;
-use poni_core::oyenza::{Activity, Bill, DayPick, Saved, Seen};
-use poni_core::phonedrop::QrMatrix;
-use poni_core::pomodoro::Pomodoro;
-use poni_core::recorder::Phase as RecPhase;
-use poni_core::prayer::{Place, PlaceList, PrayerMoment, Site, World};
-use poni_core::romanize::Ruby;
-use poni_core::settings::Settings;
-use poni_core::store::Store;
-use poni_core::timeline::Timeline;
-use studio_usage::alerts::{Alert, AlertCfg, AlertKind};
-use studio_usage::{ProviderId, Snapshot, Trouble};
+use nexora_core::addons::Status as AddonStatus;
+use nexora_core::datetime::LocalDateTime;
+use nexora_core::geom::{palette, Color};
+use nexora_core::health::HealthSnapshot;
+use nexora_core::lrc::Lyrics;
+use nexora_core::oyenza::{Activity, Bill, DayPick, Saved, Seen};
+use nexora_core::phonedrop::QrMatrix;
+use nexora_core::pomodoro::Pomodoro;
+use nexora_core::recorder::Phase as RecPhase;
+use nexora_core::prayer::{Place, PlaceList, PrayerMoment, Site, World};
+use nexora_core::romanize::Ruby;
+use nexora_core::settings::Settings;
+use nexora_core::store::Store;
+use nexora_core::timeline::Timeline;
+use nexora_usage::alerts::{Alert, AlertCfg, AlertKind};
+use nexora_usage::{ProviderId, Snapshot, Trouble};
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 #[derive(Clone, Debug)]
@@ -216,7 +216,7 @@ impl Notice {
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct UpdateView {
     /// A later release than this copy, with a download for this system.
-    pub offer: Option<poni_core::update::Release>,
+    pub offer: Option<nexora_core::update::Release>,
     /// Settings shows the Update sheet in place of its rows (until the
     /// island closes or the page changes).
     pub sheet: bool,
@@ -346,7 +346,7 @@ pub struct PageUiState {
     /// his arrival.
     pub oyen_tab: Option<(crate::oyen::TabMove, f64)>,
     /// The module the System page shows under its strip.
-    pub system_module: poni_core::sysmon::Module,
+    pub system_module: nexora_core::sysmon::Module,
     /// The last System reading had a GPU (keeps its chip while the next one is on its way).
     pub system_gpu: bool,
     /// The last full System reading had the whole PC's power (keeps its chip
@@ -361,7 +361,7 @@ pub struct PageUiState {
     /// The Eyes look on a MacBook's notch: the pointer the eyes follow and
     /// the side of the camera they peek out from (`mac/notch.rs`).
     #[cfg(target_os = "macos")]
-    pub peek: poni_core::peek::Peek,
+    pub peek: nexora_core::peek::Peek,
     /// The Stocks page: its scroll, search, edit mode and chart animation.
     pub stocks: crate::pages::stocks::StocksUi,
     /// The Caffeine page: the drink picked, a drag, the list's scroll, Add
@@ -413,9 +413,9 @@ pub struct GameState {
     /// The full-screen app ("cs2.exe").
     pub app: Option<String>,
     /// Its frame rate, while it draws and the frames can be read.
-    pub rate: Option<poni_core::frames::FrameRate>,
+    pub rate: Option<nexora_core::frames::FrameRate>,
     /// Frames per second over the last minute in front.
-    pub history: poni_core::sysmon::Series,
+    pub history: nexora_core::sysmon::Series,
     pub access: FpsAccess,
 }
 
@@ -480,9 +480,9 @@ pub struct OyenzaState {
     pub shown: Vec<String>,
     /// Pinned before a sign-in code pinned the island open.
     pub pinned_before: Option<bool>,
-    /// The Today page's day (`poni_core::agenda`), kept in memory only, and
+    /// The Today page's day (`nexora_core::agenda`), kept in memory only, and
     /// the unix time it came.
-    pub agenda: Option<poni_core::agenda::Answer>,
+    pub agenda: Option<nexora_core::agenda::Answer>,
     pub agenda_unix: Option<i64>,
     pub agenda_state: AgendaState,
     /// Signing in started from the Today page: back to it once connected.
@@ -527,15 +527,15 @@ pub enum CityFile {
 #[derive(Clone, Debug, Default)]
 pub struct StocksState {
     /// The last answer, and the Unix time it came or was last confirmed unchanged.
-    pub board: Option<poni_core::stocks::Board>,
+    pub board: Option<nexora_core::stocks::Board>,
     pub checked: Option<i64>,
     /// Why the last ask failed, until one goes through.
     pub trouble: Option<crate::services::stocks::Trouble>,
     /// Every listed stock's name, once the search has asked for them.
-    pub names: Option<std::sync::Arc<poni_core::stocks::Names>>,
+    pub names: Option<std::sync::Arc<nexora_core::stocks::Names>>,
     pub names_failed: bool,
     /// Years of daily closes read this run, by code (the IHSG's too).
-    pub years: HashMap<String, poni_core::stocks::History>,
+    pub years: HashMap<String, nexora_core::stocks::History>,
     /// Codes whose year couldn't be read.
     pub no_year: Vec<String>,
 }
@@ -577,7 +577,7 @@ impl StocksState {
 pub struct PrayerState {
     /// The add-on's place list, read once its files are in place.
     pub places: Option<std::sync::Arc<PlaceList>>,
-    /// The online city files asked for (`poni_core::prayer::world`): the
+    /// The online city files asked for (`nexora_core::prayer::world`): the
     /// picker's, dropped when it closes, and a location's squares, dropped
     /// once its place is found.
     pub cities: HashMap<String, CityFile>,
@@ -614,7 +614,7 @@ pub struct PrayerState {
 
 
 /// What Oyenza Studio Recorder last said about its recording
-/// (`poni_core::recorder::Message::State`).
+/// (`nexora_core::recorder::Message::State`).
 #[derive(Clone, Debug, Default)]
 pub struct RecView {
     /// None: no recording heard of (none yet, or the last one ended).
@@ -774,7 +774,7 @@ pub struct AppState {
     pub notice: Option<Notice>,
     pub stats: SysStats,
     /// The System page's readings and their last minute (empty while it's closed).
-    pub system: poni_core::sysmon::Monitor,
+    pub system: nexora_core::sysmon::Monitor,
     /// Show over games.
     pub game: GameState,
     pub shelf_thumbs: HashMap<String, Option<Image>>,
@@ -804,7 +804,7 @@ pub struct AppState {
     /// Whether the meeting server answers (None = not asked yet: no pairs).
     pub pair_server: Option<bool>,
     pub oyenza: OyenzaState,
-    /// Where each add-on stands, by id (every one in `poni_core::addons::ALL`).
+    /// Where each add-on stands, by id (every one in `nexora_core::addons::ALL`).
     pub addons: BTreeMap<&'static str, AddonStatus>,
     /// New versions (`crate::updates`): what Settings, the menu and the
     /// island's notice show.
@@ -812,7 +812,7 @@ pub struct AppState {
     /// The Prayer times add-on, while it is on (its choices: `settings.prayer`).
     pub prayer: PrayerState,
     /// The Script page's reading (its script and pace are in `store.script`).
-    pub script: poni_core::script::Reader,
+    pub script: nexora_core::script::Reader,
     /// A message under the script until a time (mono seconds).
     pub script_note: Option<(&'static str, f64)>,
     /// Whether Windows leaves the island out of screen capture while the
@@ -824,8 +824,8 @@ pub struct AppState {
     pub recorder: bool,
     /// The Stocks add-on's prices (its list: `store.stocks`).
     pub stocks: StocksState,
-    /// The Downloads page's jobs (`poni_core::downloads`), in memory only.
-    pub downloads: poni_core::downloads::Jobs,
+    /// The Downloads page's jobs (`nexora_core::downloads`), in memory only.
+    pub downloads: nexora_core::downloads::Jobs,
     /// This app offers the Downloader: Windows outside the Microsoft Store
     /// build, and the Mac (set at start).
     pub downloader_offered: bool,
@@ -841,9 +841,9 @@ pub struct AppState {
     /// The AI tab's readings (its choices: `settings.usage`).
     pub usage: UsageState,
     /// The IELTS page's session with Oyen (the IELTS add-on).
-    pub ielts: poni_core::ielts::Coach,
+    pub ielts: nexora_core::ielts::Coach,
     /// The Notes page's meeting (the Meeting notes add-on).
-    pub notes: poni_core::notes::Taker,
+    pub notes: nexora_core::notes::Taker,
     /// Side effects requested during the frame.
     pub cmds: Vec<Command>,
 }
@@ -894,7 +894,7 @@ impl AppState {
             hud: None,
             notice: None,
             stats: SysStats::default(),
-            system: poni_core::sysmon::Monitor::default(),
+            system: nexora_core::sysmon::Monitor::default(),
             game: GameState::default(),
             shelf_thumbs: HashMap::new(),
             app_icons: HashMap::new(),
@@ -913,12 +913,12 @@ impl AppState {
             addons: BTreeMap::new(),
             update: UpdateView::default(),
             prayer: PrayerState::default(),
-            script: poni_core::script::Reader::default(),
+            script: nexora_core::script::Reader::default(),
             script_note: None,
             script_hidden: None,
             recorder: false,
             stocks: StocksState::default(),
-            downloads: poni_core::downloads::Jobs::default(),
+            downloads: nexora_core::downloads::Jobs::default(),
             downloader_offered: false,
             rec: RecView::default(),
             notify_access: NotifyAccess::Unknown,
@@ -935,7 +935,7 @@ impl AppState {
         st.store.caffeine.mend();
         // On ones start by checking their files (the worker reports back);
         // one without files is ready at once.
-        for a in poni_core::addons::ALL {
+        for a in nexora_core::addons::ALL {
             let on = st.settings.addon_on(a.id);
             st.addons.insert(a.id, if !on { AddonStatus::Off } else if a.downloads() { AddonStatus::Checking } else { AddonStatus::Ready });
         }
@@ -1002,35 +1002,35 @@ impl AppState {
 
     /// The Script reader add-on is on: the Script tab shows.
     pub fn script_on(&self) -> bool {
-        self.addon(poni_core::addons::SCRIPT_READER.id) == AddonStatus::Ready
+        self.addon(nexora_core::addons::SCRIPT_READER.id) == AddonStatus::Ready
     }
 
     /// The System add-on is on: the System tab shows.
     pub fn system_on(&self) -> bool {
-        self.addon(poni_core::addons::SYSTEM.id) == AddonStatus::Ready
+        self.addon(nexora_core::addons::SYSTEM.id) == AddonStatus::Ready
     }
 
     /// The Health add-on is on: the Health tab shows and the steps are asked for.
     pub fn health_on(&self) -> bool {
-        self.addon(poni_core::addons::HEALTH.id) == AddonStatus::Ready
+        self.addon(nexora_core::addons::HEALTH.id) == AddonStatus::Ready
     }
 
     /// The Stocks add-on is on: the Stocks tab shows (its prices are asked
     /// for only while the page is on screen).
     pub fn stocks_on(&self) -> bool {
-        self.addon(poni_core::addons::STOCKS.id) == AddonStatus::Ready
+        self.addon(nexora_core::addons::STOCKS.id) == AddonStatus::Ready
     }
 
     /// The Caffeine add-on is on: the Caffeine tab shows, and the island
     /// reminds of the day's last call.
     pub fn caffeine_on(&self) -> bool {
-        self.addon(poni_core::addons::CAFFEINE.id) == AddonStatus::Ready
+        self.addon(nexora_core::addons::CAFFEINE.id) == AddonStatus::Ready
     }
 
     /// The Downloader add-on is on, with its tools in place, for an account
     /// with Studio Pro: the Downloads tab shows.
     pub fn downloader_on(&self) -> bool {
-        self.downloader_offered && self.studio_pro() == Some(true) && self.addon(poni_core::addons::DOWNLOADER.id) == AddonStatus::Ready
+        self.downloader_offered && self.studio_pro() == Some(true) && self.addon(nexora_core::addons::DOWNLOADER.id) == AddonStatus::Ready
     }
 
     /// Notifications is on: its tab shows, and new notifications from the
@@ -1050,7 +1050,7 @@ impl AppState {
     /// The IELTS add-on is on, and the server hasn't said the account is
     /// without Studio Pro: the IELTS tab shows (signed out, its sign-in card).
     pub fn ielts_on(&self) -> bool {
-        self.addon(poni_core::addons::IELTS.id) == AddonStatus::Ready && self.oyenza.pro != Some(false)
+        self.addon(nexora_core::addons::IELTS.id) == AddonStatus::Ready && self.oyenza.pro != Some(false)
     }
 
     /// AI usage is on: the AI tab shows and its readers may run. It takes an
@@ -1069,12 +1069,12 @@ impl AppState {
 
     /// The Meeting notes add-on is on: the Notes tab shows.
     pub fn notes_on(&self) -> bool {
-        self.addon(poni_core::addons::MEETING_NOTES.id) == AddonStatus::Ready
+        self.addon(nexora_core::addons::MEETING_NOTES.id) == AddonStatus::Ready
     }
 
     /// Prayer times is on and its places are read: the tab and reminders run.
     pub fn prayer_on(&self) -> bool {
-        self.addon(poni_core::addons::PRAYER_TIMES.id) == AddonStatus::Ready && self.prayer.places.is_some()
+        self.addon(nexora_core::addons::PRAYER_TIMES.id) == AddonStatus::Ready && self.prayer.places.is_some()
     }
 
     /// The place the times are for, as the engine needs it, with the
@@ -1094,7 +1094,7 @@ impl AppState {
     /// the prayer put away (none when no countdown runs).
     pub fn prayer_countdown_ok(&mut self) -> Option<PrayerMoment> {
         let site = self.prayer_site()?;
-        let (m, _) = poni_core::prayer::countdown(&site, self.prayer_now(), self.settings.prayer.remind_before_min)?;
+        let (m, _) = nexora_core::prayer::countdown(&site, self.prayer_now(), self.settings.prayer.remind_before_min)?;
         self.prayer.countdown_ok = Some(m.at);
         Some(m)
     }
@@ -1102,10 +1102,10 @@ impl AppState {
     /// New steps from the phone (`None`: none to show), kept in memory only,
     /// never in data.json. Returns today's steps when they just passed the
     /// goal; the first numbers after start or sign-in only set the baseline
-    /// (`poni_core::health::goal_notice`).
+    /// (`nexora_core::health::goal_notice`).
     pub fn take_health(&mut self, next: Option<HealthSnapshot>) -> Option<u32> {
         let today = self.local.day_key();
-        let reached = next.as_ref().filter(|n| poni_core::health::goal_notice(self.health.as_ref(), n, &today)).map(|n| n.steps_on(&today));
+        let reached = next.as_ref().filter(|n| nexora_core::health::goal_notice(self.health.as_ref(), n, &today)).map(|n| n.steps_on(&today));
         self.health = next;
         reached
     }
@@ -1117,7 +1117,7 @@ impl AppState {
     pub fn show_or_hold(&mut self, n: Notice, hidden: bool) {
         if !hidden {
             self.notice = Some(n);
-        } else if self.oyenza.held.as_ref().is_none_or(|(_, at)| self.now - at > poni_core::oyenza::HELD_MAX_S) {
+        } else if self.oyenza.held.as_ref().is_none_or(|(_, at)| self.now - at > nexora_core::oyenza::HELD_MAX_S) {
             self.oyenza.held = Some((n, self.now));
         }
     }
@@ -1136,7 +1136,7 @@ impl AppState {
             waiting.push((a, self.now));
         }
         // Stable: the same urgency keeps the order they came in.
-        studio_usage::sort_small_by(waiting, |(a, _), (b, _)| a.kind.urgency() < b.kind.urgency());
+        nexora_usage::sort_small_by(waiting, |(a, _), (b, _)| a.kind.urgency() < b.kind.urgency());
     }
 
     /// Put the next waiting AI notice up once the island is `free` (the app
@@ -1155,12 +1155,12 @@ impl AppState {
             self.usage.waiting.clear();
             return false;
         }
-        self.usage.waiting.retain(|(a, at)| now - at <= poni_core::oyenza::HELD_MAX_S && !u.hidden.iter().any(|k| k == a.provider.key()));
+        self.usage.waiting.retain(|(a, at)| now - at <= nexora_core::oyenza::HELD_MAX_S && !u.hidden.iter().any(|k| k == a.provider.key()));
         if !free || self.notice.is_some() || self.usage.waiting.is_empty() {
             return false;
         }
         let (a, _) = self.usage.waiting.remove(0);
-        self.notice = Some(usage_notice(&a, self.accent, now + poni_core::oyenza::NOTICE_S));
+        self.notice = Some(usage_notice(&a, self.accent, now + nexora_core::oyenza::NOTICE_S));
         true
     }
 
@@ -1179,7 +1179,7 @@ impl AppState {
         let refused = self.usage.readings.get(&ProviderId::Oyenza).is_some_and(|r| matches!(r.trouble, Some(Trouble::Refused | Trouble::Disabled)));
         AlertCfg {
             near: f32::from(self.usage_near_pct()) / 100.0,
-            offset_min: poni_core::oyenza::offset_minutes(&self.local, self.unix),
+            offset_min: nexora_core::oyenza::offset_minutes(&self.local, self.unix),
             use_24h: self.settings.use_24h,
             inference: matches!(self.usage.inference, InferenceLink::On { .. }) && !refused,
             ..AlertCfg::default()
@@ -1244,7 +1244,7 @@ impl AppState {
     /// Accent for media UI: art colour when available, else the system accent.
     /// The Oyen theme keeps to Oyen's orange.
     pub fn media_accent(&self) -> Color {
-        if self.settings.theme == poni_core::settings::Theme::Oyen {
+        if self.settings.theme == nexora_core::settings::Theme::Oyen {
             return self.accent;
         }
         self.media.as_ref().and_then(|m| m.art_color).unwrap_or(self.accent)
@@ -1280,7 +1280,7 @@ mod tests {
 
     #[test]
     fn the_goal_notice_is_only_for_steps_seen_passing_it() {
-        use poni_core::health::{HealthDay, HealthSource};
+        use nexora_core::health::{HealthDay, HealthSource};
         let mut st = AppState::new(Settings::default(), Store::default());
         st.local = LocalDateTime { year: 2026, month: 10, day: 24, hour: 15, minute: 20, second: 0 };
         let snap = |steps: u32| HealthSnapshot {
@@ -1325,7 +1325,7 @@ mod tests {
         st.show_or_hold(notice("goal"), true);
         assert_eq!(held(&st), Some(("money".into(), 100.0)));
         // ...unless it's too old to show any more.
-        st.now = 100.0 + poni_core::oyenza::HELD_MAX_S + 1.0;
+        st.now = 100.0 + nexora_core::oyenza::HELD_MAX_S + 1.0;
         st.show_or_hold(notice("goal"), true);
         assert_eq!(held(&st).map(|h| h.0), Some("goal".into()));
         // The island on screen: it shows at once.
@@ -1336,7 +1336,7 @@ mod tests {
     #[test]
     fn an_ai_reading_keeps_its_last_numbers_through_a_trouble() {
         use crate::services::usage::UsageEvent;
-        use studio_usage::Source;
+        use nexora_usage::Source;
         let mut u = UsageState::default();
         let snap = Snapshot::new(ProviderId::Codex, 100, Source::Online);
         u.apply(UsageEvent::Reading { id: ProviderId::Codex, outcome: Ok(snap.clone()), at: 100 });
@@ -1421,11 +1421,11 @@ mod tests {
         st.now = 130.0;
         assert!(st.show_usage_notice(true, false));
         let n = st.notice.take().unwrap();
-        assert_eq!((n.title.as_str(), n.subtitle.as_str(), n.until), ("Codex: 80% of 5-hour", "Resets 14:20", 130.0 + poni_core::oyenza::NOTICE_S));
+        assert_eq!((n.title.as_str(), n.subtitle.as_str(), n.until), ("Codex: 80% of 5-hour", "Resets 14:20", 130.0 + nexora_core::oyenza::NOTICE_S));
         assert_eq!((n.action, n.inline), (Some(NoticeAction::OpenPage(PageKind::Ai)), None));
         // Too old once the island is free: dropped.
         st.hold_usage_alerts(vec![codex()]);
-        st.now += poni_core::oyenza::HELD_MAX_S + 1.0;
+        st.now += nexora_core::oyenza::HELD_MAX_S + 1.0;
         assert!(shown(&mut st).is_empty());
         assert!(st.usage.waiting.is_empty());
         // A service hidden since: dropped.
@@ -1471,7 +1471,7 @@ mod tests {
 
     #[test]
     fn ai_notices_go_by_a_sane_line_and_the_apps_clock() {
-        use studio_usage::{alerts, Source, Window, WindowKind};
+        use nexora_usage::{alerts, Source, Window, WindowKind};
         let mut st = AppState::new(Settings::default(), Store::default());
         for (picked, near) in [(0, 0.5), (49, 0.5), (80, 0.8), (95, 0.95), (100, 0.95), (255, 0.95)] {
             st.settings.usage.near_pct = picked;

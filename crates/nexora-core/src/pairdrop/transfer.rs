@@ -21,7 +21,7 @@ pub const MAX_TOTAL: u64 = 64 * 1024 * 1024 * 1024;
 pub const FRAME: usize = 16 * 1024;
 /// Staging folders in the inbox: `<prefix><n>`. Not the same prefix as the
 /// QR phone drop's, which clears its own leftovers whenever it opens.
-pub const STAGING_PREFIX: &str = ".oyen-poni-paired-";
+pub const STAGING_PREFIX: &str = ".nexora-paired-";
 
 /// What a phone says on the data channel.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -312,7 +312,7 @@ mod tests {
     use super::*;
 
     fn dir(name: &str) -> PathBuf {
-        let d = std::env::temp_dir().join(format!("poni-pairdrop-{name}-{}", std::process::id()));
+        let d = std::env::temp_dir().join(format!("nexora-pairdrop-{name}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&d);
         fs::create_dir_all(&d).unwrap();
         d

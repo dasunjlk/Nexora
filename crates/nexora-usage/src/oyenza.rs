@@ -3,7 +3,7 @@
 //! its card and the notices use.
 //!
 //! Connecting is a device code, the way the island signs in to oyenza.app
-//! (`poni_core::oyenza`): the AI tab shows 8 letters, the person approves them in
+//! (`nexora_core::oyenza`): the AI tab shows 8 letters, the person approves them in
 //! the inference dashboard (where they are signed in anyway), and Studio gets
 //! a read-only key of its own (`oyis_…`), kept sealed under [`SECRET`]. The
 //! key reads the summary below and can disconnect itself; it can't call a
@@ -18,9 +18,9 @@ use super::{mask_email, num, reply_json, sort_small_by, time, Ctx, DayUse, Dirs,
 use serde_json::Value;
 
 /// Where Studio asks. A test build points [`URL_VAR`] at another copy of the
-/// server, the way `PONI_STOCKS_URL` does for Stocks.
+/// server, the way `NEXORA_STOCKS_URL` does for Stocks.
 pub const BASE: &str = "https://inference.oyenza.com";
-pub const URL_VAR: &str = "PONI_INFERENCE_URL";
+pub const URL_VAR: &str = "NEXORA_INFERENCE_URL";
 /// The name the key is kept under ([`Want::Secret`]).
 pub const SECRET: &str = "oyenza-inference";
 /// What the start request calls this app.
@@ -164,7 +164,7 @@ pub enum Refusal {
 /// The reason behind a [`Trouble::Refused`], from the answer that said it.
 pub fn refusal(r: &Reply) -> Option<Refusal> {
     match r.status {
-        403 if poni_core::oyenza::error_code(&r.body).as_deref() == Some("account_disabled") => Some(Refusal::Disabled),
+        403 if nexora_core::oyenza::error_code(&r.body).as_deref() == Some("account_disabled") => Some(Refusal::Disabled),
         401 | 403 => Some(Refusal::Key),
         _ => None,
     }
@@ -179,7 +179,7 @@ pub fn start_request(base: &str, device: &str, os: Os, version: &str) -> Request
         Os::Windows => "windows",
         Os::Mac => "mac",
     };
-    let body = serde_json::json!({ "device": poni_core::oyenza::pc_name(device), "os": os, "app": APP, "version": version });
+    let body = serde_json::json!({ "device": nexora_core::oyenza::pc_name(device), "os": os, "app": APP, "version": version });
     Request::post_json(format!("{base}/v1/studio/connect/start"), body.to_string())
 }
 
@@ -401,7 +401,7 @@ pub fn approve_text(code: &str, at: &str) -> String {
 
 /// "9:41" left on the code.
 pub fn time_left(expires_at: i64, now: i64) -> String {
-    poni_core::oyenza::code_time_left((expires_at - now) as f64)
+    nexora_core::oyenza::code_time_left((expires_at - now) as f64)
 }
 
 /// "Connected as l•••@example.com".
@@ -506,7 +506,7 @@ mod tests {
             assert_eq!(Oyenza.wants(&Dirs::sample(os)), [Want::Secret("oyenza-inference")]);
         }
         assert_eq!(Oyenza.id(), ProviderId::Oyenza);
-        assert_eq!(Oyenza.env(), ["PONI_INFERENCE_URL"]);
+        assert_eq!(Oyenza.env(), ["NEXORA_INFERENCE_URL"]);
         assert_eq!(Oyenza.min_gap_s(), 60);
         // Connect, not a field to paste a key into.
         assert_eq!(Oyenza.takes_key(), None);

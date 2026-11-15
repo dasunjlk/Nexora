@@ -7,7 +7,7 @@
 
 use crate::gfx::{Align, Canvas, TextStyle, Weight};
 use crate::icons::Icon;
-use poni_core::geom::{palette, Color, Point, Rect};
+use nexora_core::geom::{palette, Color, Point, Rect};
 
 pub type WidgetId = u64;
 

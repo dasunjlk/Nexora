@@ -1,5 +1,5 @@
 //! The AI tab: how much of each AI coding plan is left, one card per
-//! service on this computer (`studio_usage`, read by `services::usage`
+//! service on this computer (`nexora_usage`, read by `services::usage`
 //! into `st.usage`; the person's choices are `settings.usage`).
 //!
 //! A card: the service's mark, name, plan and masked account; a row per
@@ -32,9 +32,9 @@ use crate::icons::Icon;
 use crate::pages::PageKind;
 use crate::state::{AppState, InferenceLink, Reading};
 use crate::ui::{wid, wid_n, CursorKind, Input, KeyInput, PillStyle, Ui, WidgetId, PILL_GAP, PILL_SMALL};
-use poni_core::datetime::{civil_from_days, fmt_clock, fmt_date_short, LocalDateTime, MONTH_SHORT, WEEKDAY_SHORT};
-use poni_core::geom::{palette, Color, Point, Rect};
-use studio_usage::{self as usage, oyenza, DayUse, KeyAsk, Money, ProviderId, Snapshot, Source, Spend, Trouble, Window};
+use nexora_core::datetime::{civil_from_days, fmt_clock, fmt_date_short, LocalDateTime, MONTH_SHORT, WEEKDAY_SHORT};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_usage::{self as usage, oyenza, DayUse, KeyAsk, Money, ProviderId, Snapshot, Source, Spend, Trouble, Window};
 
 /// The System page's height: the window never grows for this page, and the
 /// cards scroll inside it.
@@ -1278,7 +1278,7 @@ fn ease_out(t: f32) -> f32 {
 /// The island's ground over the list's cut edges (none on Glass, which has
 /// no solid ground to fade into).
 fn fades(ui: &mut Ui, view: Rect, scroll: f32, max: f32) {
-    if ui.c.look().material == poni_core::look::Material::Glass {
+    if ui.c.look().material == nexora_core::look::Material::Glass {
         return;
     }
     const STEPS: usize = 8;
@@ -1341,7 +1341,7 @@ fn money_words(m: &Money) -> (String, String) {
 /// Local time minus UTC, in seconds (to the quarter hour, as the app's
 /// other clocks read it).
 fn offset_s(st: &AppState) -> i64 {
-    poni_core::oyenza::offset_minutes(&st.local, st.unix) as i64 * 60
+    nexora_core::oyenza::offset_minutes(&st.local, st.unix) as i64 * 60
 }
 
 /// Unix seconds on this computer's clock.
@@ -1471,7 +1471,7 @@ impl Picture {
 /// another's state; the caller puts the island on the AI tab.
 #[cfg_attr(target_os = "macos", allow(dead_code))]
 pub fn picture(st: &mut AppState, shows: Picture, now: f64) {
-    use studio_usage::WindowKind::{Monthly, Session, Weekly};
+    use nexora_usage::WindowKind::{Monthly, Session, Weekly};
     use ProviderId::*;
     const H: i64 = 3600;
     const DAY: i64 = 86_400;
@@ -1514,7 +1514,7 @@ pub fn picture(st: &mut AppState, shows: Picture, now: f64) {
     };
 
     st.usage = crate::state::UsageState::default();
-    st.settings.usage = poni_core::settings::UsageSettings::default();
+    st.settings.usage = nexora_core::settings::UsageSettings::default();
     st.ui.usage = UsageUi::default();
     let put = |st: &mut AppState, id: ProviderId, outcome: Result<Snapshot, Trouble>| {
         let r = st.usage.readings.entry(id).or_insert(Reading { snapshot: None, trouble: None, checked_at: unix - 40 });
@@ -1592,8 +1592,8 @@ pub fn picture(st: &mut AppState, shows: Picture, now: f64) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
 
     fn state() -> AppState {
         let mut st = AppState::new(Settings::default(), Store::default());

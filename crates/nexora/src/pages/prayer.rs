@@ -13,7 +13,7 @@
 //! The countdown ticks once a second while the page is open ([`next_wake`])
 //! and someone is at the PC; nothing runs for it otherwise.
 //!
-//! Times come from `poni_core::prayer`; the place from `settings.prayer`,
+//! Times come from `nexora_core::prayer`; the place from `settings.prayer`,
 //! found by Windows' or macOS's location (the app) or picked here.
 
 use crate::commands::Command;
@@ -21,11 +21,11 @@ use crate::gfx::{TextStyle, Weight};
 use crate::icons::Icon;
 use crate::state::{AppState, CityFile, Locate};
 use crate::ui::{wid, wid_n, PillStyle, Ui, PILL_SMALL};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::hijri;
-use poni_core::prayer::{self, world, DayTimes, Method, Place, Prayer, PrayerMoment, Site, World};
-use poni_core::settings::{PrayerFollow, PrayerSound};
-use poni_core::svgpath::Seg;
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::hijri;
+use nexora_core::prayer::{self, world, DayTimes, Method, Place, Prayer, PrayerMoment, Site, World};
+use nexora_core::settings::{PrayerFollow, PrayerSound};
+use nexora_core::svgpath::Seg;
 use std::f32::consts::PI;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};

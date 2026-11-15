@@ -25,7 +25,7 @@
 //!   registry entry (cycles, capacities, voltage, current) and Low Power Mode.
 //! * Apps: this account's processes (`proc_listpids`, `proc_pid_rusage`: CPU
 //!   time, memory footprint as Activity Monitor counts it, disk bytes),
-//!   grouped by `poni_core::sysmon::AppTracker`: every process inside an
+//!   grouped by `nexora_core::sysmon::AppTracker`: every process inside an
 //!   app's bundle counts as that app, and the bundle gives the icon. Other
 //!   accounts' processes (system daemons, WindowServer) take admin rights to
 //!   read, so the lists leave them out.
@@ -51,8 +51,8 @@ use objc2_foundation::{
     NSString, NSURLResourceKey, NSURLVolumeAvailableCapacityForImportantUsageKey, NSURLVolumeIsRemovableKey, NSURLVolumeLocalizedNameKey,
     NSURLVolumeTotalCapacityKey, NSURL,
 };
-use poni_core::power::PowerReading;
-use poni_core::sysmon::{
+use nexora_core::power::PowerReading;
+use nexora_core::sysmon::{
     app_bundle, bundle_name, core_kinds, core_split, level_pressure, pack_mwh, parse_if_list, top_cpu, top_io, top_memory, AppTracker, AppUse,
     BatteryReading, CoreKind, CoreLoad, CoreTimes, CpuReading, DiskActivity, Drive, GpuReading, IfStats, MemoryReading, Monitor, NetReading,
     PressureLevel, ProcSample, Reading, TOP_APPS,
@@ -74,7 +74,7 @@ const FIRST: Duration = Duration::from_millis(350);
 const SLOW: Duration = Duration::from_secs(10);
 /// Readings in a row the GPU may miss before it is looked for again.
 const GPU_MISSES: u32 = 3;
-/// Readings of each kind whose cost goes to poni.log.
+/// Readings of each kind whose cost goes to nexora.log.
 const LOGGED_READINGS: u32 = 3;
 
 const PROCESSOR_CPU_LOAD_INFO: i32 = 2;
@@ -230,7 +230,7 @@ enum Msg {
 impl SysMon {
     pub fn start(sink: EventSink, background: bool) -> std::io::Result<Self> {
         let (tx, rx) = mpsc::channel();
-        let thread = std::thread::Builder::new().name("poni-sysmon".into()).spawn(move || worker(sink, rx, background))?;
+        let thread = std::thread::Builder::new().name("nexora-sysmon".into()).spawn(move || worker(sink, rx, background))?;
         Ok(Self { tx, thread: Some(thread) })
     }
 
@@ -1292,7 +1292,7 @@ define_class!(
     /// Hears the displays sleep and wake and the Mac lock and unlock (main thread).
     #[unsafe(super(NSObject))]
     #[thread_kind = MainThreadOnly]
-    #[name = "PoniAwayObserver"]
+    #[name = "NexoraAwayObserver"]
     struct AwayObserver;
 
     unsafe impl NSObjectProtocol for AwayObserver {}
@@ -1322,7 +1322,7 @@ define_class!(
 
 /// Tell the app when nobody can see the screen: the displays sleep and wake
 /// (NSWorkspace), the Mac locks and unlocks (macOS's distributed
-/// notifications, asked for at once: Poni is never the app in front).
+/// notifications, asked for at once: Nexora is never the app in front).
 /// The observer stays for the app's life.
 pub fn watch_away(mtm: MainThreadMarker, sink: EventSink) {
     if let Ok(mut g) = AWAY_SINK.lock() {

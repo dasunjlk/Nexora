@@ -20,13 +20,13 @@ use crate::icons::Icon;
 use crate::island::Geom;
 use crate::state::{AppState, FpsAccess};
 use crate::ui::Ui;
-use poni_core::datetime::fmt_countdown;
-use poni_core::frames::fmt_fps;
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::pomodoro::Phase;
-use poni_core::prayer::Prayer;
-use poni_core::svgpath::Seg;
-use poni_core::sysmon::fmt_pct;
+use nexora_core::datetime::fmt_countdown;
+use nexora_core::frames::fmt_fps;
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::pomodoro::Phase;
+use nexora_core::prayer::Prayer;
+use nexora_core::svgpath::Seg;
+use nexora_core::sysmon::fmt_pct;
 use std::cell::Cell;
 
 /// Every collapsed pill is this tall, a capsule (radius = height / 2).
@@ -194,7 +194,7 @@ fn draw_timer(ui: &mut Ui, st: &AppState, body: Rect) {
 /// pause mark while paused, a ring while it starts or saves), the time
 /// where the countdown sits.
 fn draw_recording(ui: &mut Ui, st: &AppState, body: Rect) {
-    use poni_core::recorder::Phase;
+    use nexora_core::recorder::Phase;
     let c = Point::new(body.x + GLYPH_INSET + RING_D / 2.0, body.center().y);
     let phase = st.rec.phase;
     match phase {
@@ -202,7 +202,7 @@ fn draw_recording(ui: &mut Ui, st: &AppState, body: Rect) {
         Some(Phase::Paused) => ui.c.icon(Icon::Pause, Rect::from_center(c, 11.0, 11.0), palette::TEXT),
         _ => ui.c.stroke_circle(c, 4.4, palette::TEXT_DIM, 1.4),
     }
-    let text = poni_core::recorder::fmt_length(st.rec_elapsed());
+    let text = nexora_core::recorder::fmt_length(st.rec_elapsed());
     let right = body.right() - DIGITS_RIGHT;
     ui.c.text(&text, Rect::new(right - 80.0, body.y, 80.0, body.h), &digits(phase != Some(Phase::Recording)).right());
 }
@@ -276,7 +276,7 @@ fn prayer_w(st: &AppState) -> f32 {
     (GLYPH_INSET + MOON + MOON_GAP + 7.0 * prayer_slot_text(prayer).chars().count() as f32 + PRAYER_OK_ROOM).ceil()
 }
 
-/// A filled crescent `d` across centred on `c`: Poni's moon icon, filled
+/// A filled crescent `d` across centred on `c`: Nexora's moon icon, filled
 /// (also the Mac's, in the right ear around a notch).
 pub(crate) fn moon(ui: &mut Ui, c: Point, d: f32, col: Color) {
     // The icon's outline on its 24-unit grid: a circle of radius 8 round
@@ -371,7 +371,7 @@ impl Piece {
 }
 
 /// "144 fps | GPU 97% · 71° | CPU 38%" along one baseline, centred: the
-/// frame rate is a dash until Windows lets Poni read frames and while the
+/// frame rate is a dash until Windows lets Nexora read frames and while the
 /// game isn't drawing (dimmer while the one-time OK is outstanding); the
 /// rest comes from the System page's readers.
 fn draw_game(ui: &mut Ui, st: &AppState, body: Rect) {
@@ -447,11 +447,11 @@ fn draw_game(ui: &mut Ui, st: &AppState, body: Rect) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use poni_core::frames::FrameRate;
-    use poni_core::pomodoro::RunState;
-    use poni_core::settings::{Settings, Theme};
-    use poni_core::store::Store;
-    use poni_core::sysmon::{GpuReading, Reading};
+    use nexora_core::frames::FrameRate;
+    use nexora_core::pomodoro::RunState;
+    use nexora_core::settings::{Settings, Theme};
+    use nexora_core::store::Store;
+    use nexora_core::sysmon::{GpuReading, Reading};
 
     fn state() -> AppState {
         let mut st = AppState::new(Settings::default(), Store::default());

@@ -4,8 +4,8 @@
 //! `Canvas` calls both of them have.
 
 use crate::gfx::Canvas;
-use poni_core::geom::{Color, Point, Rect};
-use poni_core::svgpath::Seg;
+use nexora_core::geom::{Color, Point, Rect};
+use nexora_core::svgpath::Seg;
 
 /// Room the window keeps beside and below the floating body: the shadow
 /// reaches 15 DIP beside it and 19 below (it drops [`SHADOW_DROP`]), plus a
@@ -119,12 +119,12 @@ fn hairline_round(c: &mut Canvas, body: Rect, r: f32, b: Color) {
 }
 
 /// The frame's thickness (DIPs) round a body `w` by `h`: the resting
-/// picture's bezel (`studio_diorama::BEZEL`) at the resting pill's height,
+/// picture's bezel (`nexora_diorama::BEZEL`) at the resting pill's height,
 /// growing with the shorter side to [`FRAME_MAX`] for the open card, so the
 /// pill's frame turns into the card's as the island opens.
 pub fn frame_width(w: f32, h: f32) -> f32 {
-    let t = ((w.min(h) - studio_diorama::H) / (FRAME_GROWN - studio_diorama::H)).clamp(0.0, 1.0);
-    studio_diorama::BEZEL + (FRAME_MAX - studio_diorama::BEZEL) * t
+    let t = ((w.min(h) - nexora_diorama::H) / (FRAME_GROWN - nexora_diorama::H)).clamp(0.0, 1.0);
+    nexora_diorama::BEZEL + (FRAME_MAX - nexora_diorama::BEZEL) * t
 }
 
 /// The open card's frame, and the shorter side from which a body has it.
@@ -153,7 +153,7 @@ const FRAME_UNLIT: f32 = 0.7;
 /// line. The frame's colours are drawn as they are (a look would repaint
 /// the lit frame's white as its ink), the pane and the line as the look
 /// paints them.
-pub fn draw_framed_body(c: &mut Canvas, body: Rect, radius: f32, fill: Color, border: Option<Color>, frame: &poni_core::look::Frame) {
+pub fn draw_framed_body(c: &mut Canvas, body: Rect, radius: f32, fill: Color, border: Option<Color>, frame: &nexora_core::look::Frame) {
     let s = c.scale();
     let body = snap(body, s);
     let r = radius.min(body.h / 2.0).min(body.w / 2.0).max(0.0);
@@ -296,7 +296,7 @@ fn ramp_at(ramp: &[(f32, f32)], d: f32) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use poni_core::svgpath::arc_to_cubics;
+    use nexora_core::svgpath::arc_to_cubics;
 
     const SCALES: [f32; 5] = [1.0, 1.25, 1.5, 1.75, 2.0];
 
@@ -560,8 +560,8 @@ mod tests {
     fn the_frame_grows_from_the_pills_bezel_to_the_cards() {
         // The resting pill's own frame at its height (under the pointer too,
         // where the picture covers the body), the open card's at its size.
-        assert_eq!(frame_width(100.0, studio_diorama::H), studio_diorama::BEZEL);
-        assert_eq!(frame_width(124.0, 30.0), studio_diorama::BEZEL);
+        assert_eq!(frame_width(100.0, nexora_diorama::H), nexora_diorama::BEZEL);
+        assert_eq!(frame_width(124.0, 30.0), nexora_diorama::BEZEL);
         assert_eq!(frame_width(620.0, 216.0), FRAME_MAX);
         // On the way between them it grows without a step.
         let mut last = frame_width(620.0, 30.0);

@@ -1,14 +1,14 @@
 //! Oyen's IELTS coach on this PC: the calls to the server, the microphone
-//! and Oyen's voice. The session itself is `poni_core::ielts::Coach` in
+//! and Oyen's voice. The session itself is `nexora_core::ielts::Coach` in
 //! `AppState`; the app carries out what it asks for ([`Effect`]s) with a
 //! [`Kit`].
 //!
-//! Nothing here exists at rest. The worker thread (`poni-ielts`) starts with
+//! Nothing here exists at rest. The worker thread (`nexora-ielts`) starts with
 //! the first call (the IELTS page opening asks for the ladder) and ends once
 //! the page is closed with nothing in flight; the microphone's thread runs
 //! only while recording (`services/mic.rs`); the player only while a clip
 //! plays (`services/voice.rs`). Oyen's clips and the answer are files in
-//! `%LOCALAPPDATA%\Poni\ielts\`, each deleted once used; anything left over
+//! `%LOCALAPPDATA%\Nexora\ielts\`, each deleted once used; anything left over
 //! (the app closed mid-session) goes when the next session starts or the
 //! add-on is switched off.
 //!
@@ -17,14 +17,14 @@
 //! reaches the UI thread or the log. An answer, its upload and the server's
 //! thinking, may take a while: 60 s before it counts as no answer.
 //!
-//! [`Effect`]: poni_core::ielts::Effect
+//! [`Effect`]: nexora_core::ielts::Effect
 
 use crate::events::{AppEvent, EventSink};
 use crate::services::http::{Client, Method, MtaGuard};
 use crate::services::mic::{Mic, MicError};
 use crate::services::voice::VoicePlayer;
-use poni_core::ielts::{self, Call, MicIssue, Problem, Reply};
-use poni_core::oyenza;
+use nexora_core::ielts::{self, Call, MicIssue, Problem, Reply};
+use nexora_core::oyenza;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{mpsc, Arc};
@@ -224,7 +224,7 @@ impl Worker {
         let (tx, rx) = mpsc::channel::<Call>();
         let busy = Arc::new(AtomicUsize::new(0));
         let left = busy.clone();
-        let spawned = std::thread::Builder::new().name("poni-ielts".into()).spawn(move || {
+        let spawned = std::thread::Builder::new().name("nexora-ielts".into()).spawn(move || {
             let _com = MtaGuard::new();
             let base = api.as_ref().map_or(ielts::BASE.to_string(), |a| a.0.clone());
             let fixed = api.is_some();

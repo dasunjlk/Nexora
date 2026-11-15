@@ -25,9 +25,9 @@
 
 use crate::icons::{self, Icon};
 use crate::glass::{GlassParams, GlassPass};
-use poni_core::geom::{Color, Point, Rect};
-use poni_core::look::{self, Look};
-use poni_core::svgpath::Seg;
+use nexora_core::geom::{Color, Point, Rect};
+use nexora_core::look::{self, Look};
+use nexora_core::svgpath::Seg;
 use std::collections::HashMap;
 use std::ffi::c_void;
 use std::mem::ManuallyDrop;
@@ -169,7 +169,7 @@ pub struct TextStyle {
 
 impl TextStyle {
     pub fn new(size: f32) -> Self {
-        Self { size, weight: Weight::Regular, color: poni_core::geom::palette::TEXT, align: Align::Left, tabular: false, wrap: false, vcenter: true, line: 0.0 }
+        Self { size, weight: Weight::Regular, color: nexora_core::geom::palette::TEXT, align: Align::Left, tabular: false, wrap: false, vcenter: true, line: 0.0 }
     }
     pub fn caption() -> Self {
         Self::new(ts::CAPTION)
@@ -858,9 +858,9 @@ fn has_family(coll: &IDWriteFontCollection, name: &[u16]) -> bool {
     unsafe { coll.FindFamilyName(PCWSTR(name.as_ptr()), &mut index, &mut exists).is_ok() && exists.as_bool() }
 }
 
-/// `PONI_RENDERER=software` forces the software renderer (troubleshooting).
+/// `NEXORA_RENDERER=software` forces the software renderer (troubleshooting).
 fn gpu_wanted() -> bool {
-    !std::env::var("PONI_RENDERER").is_ok_and(|v| v.trim().eq_ignore_ascii_case("software"))
+    !std::env::var("NEXORA_RENDERER").is_ok_and(|v| v.trim().eq_ignore_ascii_case("software"))
 }
 
 fn setup_target(rt: &ID2D1RenderTarget) {
@@ -895,7 +895,7 @@ impl Gfx {
             let family = pick_font_family(&dwrite);
             let gpu_allowed = gpu_wanted();
             if !gpu_allowed {
-                crate::pinfo!("renderer: software (PONI_RENDERER=software)");
+                crate::pinfo!("renderer: software (NEXORA_RENDERER=software)");
             }
             Ok(Gfx {
                 d2d,
@@ -1572,7 +1572,7 @@ impl Gfx {
                         }
                         // Flatten to Béziers ourselves: native arc support varies
                         // between Direct2D implementations (Wine draws chords).
-                        for c in poni_core::svgpath::arc_to_cubics(cur.0, cur.1, rx, ry, rot, large, sweep, x, y) {
+                        for c in nexora_core::svgpath::arc_to_cubics(cur.0, cur.1, rx, ry, rot, large, sweep, x, y) {
                             sink.AddBezier(&D2D1_BEZIER_SEGMENT { point1: pt(c[0], c[1]), point2: pt(c[2], c[3]), point3: pt(c[4], c[5]) });
                         }
                         cur = (x, y);
@@ -1599,7 +1599,7 @@ impl Gfx {
         }
         let mut out = Vec::new();
         for part in icons::parts(icon) {
-            match poni_core::svgpath::parse(part.d) {
+            match nexora_core::svgpath::parse(part.d) {
                 Ok(segs) => match self.path_geometry(&segs, part.fill) {
                     Ok(geo) => out.push((geo, part.fill)),
                     Err(e) => crate::pwarn!("icon {icon:?} geometry failed: {e}"),
@@ -1908,7 +1908,7 @@ impl<'a> Canvas<'a> {
             let shadow = Rect::new(b.x - grow, b.y, b.w + 2.0 * grow, b.h + p.shadow_drop + grow);
             self.path(&notch_segments(shadow, p.radius + grow, p.shoulder), Some(Color::black(p.shadow_alpha / 4.0)), None);
         }
-        let ground = Color::lerp(p.ground_dark, p.ground_light, p.light_mix).with_alpha(poni_core::glass::SMOKED_OPACITY);
+        let ground = Color::lerp(p.ground_dark, p.ground_light, p.light_mix).with_alpha(nexora_core::glass::SMOKED_OPACITY);
         self.notch(p.body, p.radius, p.shoulder, ground, Some(Color::white((0.55 * p.rim).clamp(0.0, 1.0))));
     }
 

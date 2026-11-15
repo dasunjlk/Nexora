@@ -24,17 +24,17 @@ use crate::tray::{self, Tray};
 use crate::ui::{wid, CursorKind, Hit, Input, KeyInput, MouseButton, Ui};
 use crate::window::{self, FrameClock, FrameTick, MonitorInfo};
 use crate::{dragdrop, selftest, shell};
-use poni_core::spot;
-use poni_core::addons::Status as AddonStatus;
-use poni_core::frametime::{ambient_divisor, MotionStats};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::oyenza;
-use poni_core::pairdrop::{MeetEvent, PeerEvent};
-use poni_core::phonedrop::{Event as PhoneEvent, QrMatrix};
-use poni_core::prayer::{Due, PlaceList, Prayer, PrayerMoment};
-use poni_core::settings::{IdleStyle, PrayerSound, Settings, Theme};
-use poni_core::settings::MonitorChoice;
-use poni_core::store::{load_json, parse_json, save_json_atomic, LoadOutcome, Store};
+use nexora_core::spot;
+use nexora_core::addons::Status as AddonStatus;
+use nexora_core::frametime::{ambient_divisor, MotionStats};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::oyenza;
+use nexora_core::pairdrop::{MeetEvent, PeerEvent};
+use nexora_core::phonedrop::{Event as PhoneEvent, QrMatrix};
+use nexora_core::prayer::{Due, PlaceList, Prayer, PrayerMoment};
+use nexora_core::settings::{IdleStyle, PrayerSound, Settings, Theme};
+use nexora_core::settings::MonitorChoice;
+use nexora_core::store::{load_json, parse_json, save_json_atomic, LoadOutcome, Store};
 use std::cell::{Cell, RefCell};
 use std::collections::HashSet;
 use std::path::PathBuf;
@@ -115,10 +115,10 @@ pub fn main_entry() -> i32 {
     if let Some(dir) = &selftest_dir {
         let home = std::path::Path::new(dir).join("home");
         let _ = std::fs::remove_dir_all(&home);
-        std::env::set_var("PONI_HOME", &home);
+        std::env::set_var("NEXORA_HOME", &home);
     }
     crate::plog::init(paths::log_path());
-    pinfo!("Poni {} starting (args: {:?})", env!("CARGO_PKG_VERSION"), &args[1..]);
+    pinfo!("Nexora {} starting (args: {:?})", env!("CARGO_PKG_VERSION"), &args[1..]);
     std::panic::set_hook(Box::new(|info| {
         perror!("panic: {info}");
     }));
@@ -127,7 +127,7 @@ pub fn main_entry() -> i32 {
         let _ = SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
     }
     // Single instance (the self-test may run next to a normal instance).
-    let mutex_name = if selftest_dir.is_some() { w!("Local\\Poni.Island.SelfTest") } else { w!("Local\\Poni.Island") };
+    let mutex_name = if selftest_dir.is_some() { w!("Local\\Nexora.Island.SelfTest") } else { w!("Local\\Nexora.Island") };
     let _mutex = unsafe { CreateMutexW(None, true, mutex_name) };
     if unsafe { GetLastError() } == ERROR_ALREADY_EXISTS {
         pinfo!("another instance is running; exiting");
@@ -154,7 +154,7 @@ pub fn main_entry() -> i32 {
         }
     };
     unsafe { OleUninitialize() };
-    pinfo!("Poni exiting with code {code}");
+    pinfo!("Nexora exiting with code {code}");
     code
 }
 
@@ -235,15 +235,15 @@ pub fn with_app<R>(f: impl FnOnce(&mut App) -> R) -> Option<R> {
 thread_local! {
     /// Recorder messages that came while the app was busy (re-entered): the
     /// next `WM_APP_EVENT` hands them over.
-    static REC_MISSED: RefCell<Vec<(poni_core::recorder::Message, isize)>> = const { RefCell::new(Vec::new()) };
+    static REC_MISSED: RefCell<Vec<(nexora_core::recorder::Message, isize)>> = const { RefCell::new(Vec::new()) };
 }
 
-/// A message from Oyenza Studio Recorder (`poni_core::recorder`), read while
+/// A message from Oyenza Studio Recorder (`nexora_core::recorder`), read while
 /// it waits in `SendMessageTimeout`: true tells it the island shows the
 /// recording (or its Record page), so it keeps its own bar and controls
 /// hidden; false, that it should show them.
 unsafe fn recorder_message(hwnd: HWND, wp: WPARAM, lp: LPARAM) -> bool {
-    use poni_core::recorder::{parse_message, COPYDATA_ID, MESSAGE_MAX};
+    use nexora_core::recorder::{parse_message, COPYDATA_ID, MESSAGE_MAX};
     let Some(cds) = (lp.0 as *const windows::Win32::System::DataExchange::COPYDATASTRUCT).as_ref() else { return false };
     let len = cds.cbData as usize;
     if cds.dwData != COPYDATA_ID || cds.lpData.is_null() || len > MESSAGE_MAX {
@@ -400,7 +400,7 @@ pub struct App {
     /// it is thrown away), for Try again.
     notes_take: Option<services::notes::Take>,
     /// When the meeting being taken down began (local time, for its notes).
-    notes_started: poni_core::datetime::LocalDateTime,
+    notes_started: nexora_core::datetime::LocalDateTime,
     /// The self-test's own notes server and key, in place of api.oyenza.app
     /// and this PC's sign-in.
     pub(crate) notes_api: Option<(String, String)>,
@@ -462,7 +462,7 @@ pub struct App {
     /// The System page is open (its readings come each second).
     sysmon_on: bool,
     /// What the System reader was last told about nobody being there and battery saver.
-    sysmon_rest: poni_core::sysmon::Rest,
+    sysmon_rest: nexora_core::sysmon::Rest,
     /// The Oyenza page is on screen: its day list stays live (`services::oyenza`).
     oyenza_watch: bool,
     /// The Stocks page was on screen at the last look (`set_stocks_watch`).
@@ -713,7 +713,7 @@ impl App {
             stats_on: false,
             sysmon: None,
             sysmon_on: false,
-            sysmon_rest: poni_core::sysmon::Rest::default(),
+            sysmon_rest: nexora_core::sysmon::Rest::default(),
             oyenza_watch: false,
             stocks_open: false,
             today_watch: false,
@@ -775,7 +775,7 @@ impl App {
             if self.st.settings.system_history_on() {
                 self.start_sysmon();
             }
-            // A frame count left running by a Poni that crashed, and whether
+            // A frame count left running by a Nexora that crashed, and whether
             // Windows lets this sign-in read frames (the System page shows it).
             services::frames::stop_stale();
             if self.st.settings.game_stats {
@@ -815,7 +815,7 @@ impl App {
     fn shutdown(&mut self) -> i32 {
         self.save_now();
         self.settings_win = None;
-        // Stops the frame count's trace session (it would outlive Poni).
+        // Stops the frame count's trace session (it would outlive Nexora).
         self.frames = None;
         self.set_peek_hotkey(false);
         self.set_script_hotkey(false);
@@ -1509,7 +1509,7 @@ impl App {
             WM_QUERYENDSESSION => Some(LRESULT(1)),
             WM_ENDSESSION => {
                 self.save_now();
-                // Windows ends Poni without shutdown(): stop the frame count's
+                // Windows ends Nexora without shutdown(): stop the frame count's
                 // trace session now, or it would outlive the sign-in.
                 if wp.0 != 0 {
                     self.frames = None;
@@ -1858,13 +1858,13 @@ impl App {
     /// and take it off the clipboard.
     fn use_apple_music_token(&mut self) {
         let text = services::clipboard::read_text(self.hwnd).unwrap_or_default();
-        let Some(token) = poni_core::applemusic::clean_user_token(&text) else {
+        let Some(token) = nexora_core::applemusic::clean_user_token(&text) else {
             self.st.notify(Icon::Lyrics, palette::ORANGE, "No Apple Music token copied", "Copy media-user-token first", 6.0, None);
             return;
         };
         if let Err(e) = services::secret::save(&paths::apple_music_token_path(), &token) {
             pwarn!("apple music: cannot save the token ({e})");
-            self.st.notify(Icon::Lyrics, palette::ORANGE, "Couldn't save the token", "Details in poni.log", 5.0, None);
+            self.st.notify(Icon::Lyrics, palette::ORANGE, "Couldn't save the token", "Details in nexora.log", 5.0, None);
             return;
         }
         pinfo!("apple music: token saved");
@@ -1879,7 +1879,7 @@ impl App {
     fn forget_apple_music_token(&mut self) {
         if let Err(e) = services::secret::delete(&paths::apple_music_token_path()) {
             pwarn!("apple music: cannot remove the token ({e})");
-            self.st.notify(Icon::Lyrics, palette::ORANGE, "Couldn't remove the token", "Details in poni.log", 5.0, None);
+            self.st.notify(Icon::Lyrics, palette::ORANGE, "Couldn't remove the token", "Details in nexora.log", 5.0, None);
             return;
         }
         pinfo!("apple music: token removed");
@@ -2280,7 +2280,7 @@ impl App {
         }
         self.st.pomodoro.cfg = self.st.settings.pomodoro.clone();
         // Prayer times: off stops it at once; a new place, or following the location again.
-        let prayer_id = poni_core::addons::PRAYER_TIMES.id;
+        let prayer_id = nexora_core::addons::PRAYER_TIMES.id;
         if before.addon_on(prayer_id) && !self.st.settings.addon_on(prayer_id) {
             self.prayer_off();
         }
@@ -2291,12 +2291,12 @@ impl App {
             self.locate();
         }
         // The Downloader: off stops its downloads before its tools are deleted.
-        let downloader_id = poni_core::addons::DOWNLOADER.id;
+        let downloader_id = nexora_core::addons::DOWNLOADER.id;
         if before.addon_on(downloader_id) && !self.st.settings.addon_on(downloader_id) {
             self.downloads_off();
         }
         // An add-on switched on downloads its files; off deletes them.
-        for a in poni_core::addons::ALL {
+        for a in nexora_core::addons::ALL {
             let on = self.st.settings.addon_on(a.id);
             if before.addon_on(a.id) != on {
                 pinfo!("add-ons: {} switched {}", a.id, if on { "on" } else { "off" });
@@ -2317,18 +2317,18 @@ impl App {
             }
         }
         // IELTS off: a session ends, the microphone and voice stop, the files go.
-        let ielts_id = poni_core::addons::IELTS.id;
+        let ielts_id = nexora_core::addons::IELTS.id;
         if before.addon_on(ielts_id) && !self.st.settings.addon_on(ielts_id) {
             self.ielts_off();
         }
         // Meeting notes off: a recording stops and its audio goes.
-        let notes_id = poni_core::addons::MEETING_NOTES.id;
+        let notes_id = nexora_core::addons::MEETING_NOTES.id;
         if before.addon_on(notes_id) && !self.st.settings.addon_on(notes_id) {
             self.notes_off();
         }
         // Health on or off: the Oyenza worker asks for the steps only while
         // it's on, and off forgets the ones it had.
-        let health_id = poni_core::addons::HEALTH.id;
+        let health_id = nexora_core::addons::HEALTH.id;
         if before.addon_on(health_id) != self.st.settings.addon_on(health_id) {
             if !self.st.settings.addon_on(health_id) {
                 self.st.health = None;
@@ -2435,7 +2435,7 @@ impl App {
                     }
                     Err(e) => {
                         pwarn!("settings.json not reloaded: {e}");
-                        self.st.notify(crate::icons::Icon::Sliders, palette::ORANGE, "Settings not reloaded", "settings.json has an error; see poni.log", 5.0, None);
+                        self.st.notify(crate::icons::Icon::Sliders, palette::ORANGE, "Settings not reloaded", "settings.json has an error; see nexora.log", 5.0, None);
                     }
                 }
             }
@@ -2483,7 +2483,7 @@ impl App {
         // A download's bytes coming in while nobody can see the island (locked,
         // display off) wait for the next frame something else asks for: the
         // pill catches up then, as nothing else of it moves on its own.
-        let unseen = matches!(ev, AppEvent::Download { line: poni_core::ytdlp::Line::Progress { .. }, .. }) && (self.locked || self.display_off);
+        let unseen = matches!(ev, AppEvent::Download { line: nexora_core::ytdlp::Line::Progress { .. }, .. }) && (self.locked || self.display_off);
         match ev {
             AppEvent::Backdrop => {
                 if self.glass.on_backdrop(self.hwnd, &mut self.gfx) {
@@ -2551,9 +2551,9 @@ impl App {
                             // the song is read again with romaji. Only people
                             // who play Japanese songs get it; switched off by
                             // hand, it stays off (the Music page still offers it).
-                            if poni_core::addons::ja_switches_on(&self.st.settings, wants_ja_readings) {
+                            if nexora_core::addons::ja_switches_on(&self.st.settings, wants_ja_readings) {
                                 pinfo!("lyrics: a Japanese song's kanji went unread; switching Japanese readings on");
-                                self.st.settings.set_addon(poni_core::addons::JAPANESE_READINGS.id, true);
+                                self.st.settings.set_addon(nexora_core::addons::JAPANESE_READINGS.id, true);
                                 self.st.cmd(Command::SaveSettings);
                             }
                         }
@@ -2658,7 +2658,7 @@ impl App {
                     // Peeks only: a sharp drop shows the readout (at most every half minute).
                     let now = clock::mono();
                     if let Some(fps) = fps.filter(|_| self.st.settings.game_peek) {
-                        if now >= self.game_peek_until && now - self.game_drop_at >= DROP_PEEK_EVERY_S && poni_core::frames::sharp_drop(&before, fps) {
+                        if now >= self.game_peek_until && now - self.game_drop_at >= DROP_PEEK_EVERY_S && nexora_core::frames::sharp_drop(&before, fps) {
                             self.game_drop_at = now;
                             self.peek_game("the frame rate dropped");
                         }
@@ -2685,7 +2685,7 @@ impl App {
                 if self.st.settings.addon_on(id) || status == AddonStatus::Off {
                     self.st.addons.insert(id, status);
                 }
-                if id == poni_core::addons::PRAYER_TIMES.id {
+                if id == nexora_core::addons::PRAYER_TIMES.id {
                     if status == AddonStatus::Ready && self.st.settings.addon_on(id) && self.st.prayer.places.is_none() {
                         self.prayer_ready();
                     } else if status == AddonStatus::Off {
@@ -2694,7 +2694,7 @@ impl App {
                 }
                 // Japanese readings arrived for the song that asked for them:
                 // read it again (its lyrics come from the cache).
-                if id == poni_core::addons::JAPANESE_READINGS.id && status == AddonStatus::Ready && self.st.lyrics.wants_ja_readings {
+                if id == nexora_core::addons::JAPANESE_READINGS.id && status == AddonStatus::Ready && self.st.lyrics.wants_ja_readings {
                     if let (Some(svc), Some(m)) = (self.services.as_ref(), self.st.media.as_ref()) {
                         if m.track_key == self.st.lyrics.track_key {
                             pinfo!("lyrics: Japanese readings are on this PC; reading the song again");
@@ -2968,12 +2968,12 @@ impl App {
     }
 
     /// Nobody at the PC (locked, or the display off) and battery saver.
-    fn rest_now(&self) -> poni_core::sysmon::Rest {
-        poni_core::sysmon::Rest { away: self.locked || self.display_off, saver: self.st.power.saver }
+    fn rest_now(&self) -> nexora_core::sysmon::Rest {
+        nexora_core::sysmon::Rest { away: self.locked || self.display_off, saver: self.st.power.saver }
     }
 
     /// The System reader rests while nobody is at the PC, and its kept minute
-    /// also on battery saver (`poni_core::sysmon::reads`). What it drops, the
+    /// also on battery saver (`nexora_core::sysmon::reads`). What it drops, the
     /// page drops too, so a minute from before never shows as the last one.
     fn tell_sysmon_rest(&mut self) {
         let rest = self.rest_now();
@@ -2984,7 +2984,7 @@ impl App {
         if let Some(s) = &self.sysmon {
             s.rest(rest);
         }
-        if !poni_core::sysmon::reads(self.sysmon_on, self.st.game.active, self.st.settings.system_history_on(), rest) {
+        if !nexora_core::sysmon::reads(self.sysmon_on, self.st.game.active, self.st.settings.system_history_on(), rest) {
             self.st.system.clear();
         }
     }
@@ -3082,7 +3082,7 @@ impl App {
         }
     }
 
-    /// Alt+Shift+F belongs to Poni only while a game is in front.
+    /// Alt+Shift+F belongs to Nexora only while a game is in front.
     fn set_peek_hotkey(&mut self, on: bool) {
         if on == self.peek_hotkey {
             return;
@@ -3100,7 +3100,7 @@ impl App {
         }
     }
 
-    /// Alt+Shift+S belongs to Poni only while the Script page can read.
+    /// Alt+Shift+S belongs to Nexora only while the Script page can read.
     fn set_script_hotkey(&mut self, on: bool) {
         if on == self.script_hotkey {
             return;
@@ -3119,7 +3119,7 @@ impl App {
     }
 
     /// The Script page: a reading pauses while its page isn't on screen, the
-    /// island may close once nothing holds it, and the shortcut is Poni's
+    /// island may close once nothing holds it, and the shortcut is Nexora's
     /// only while there's a script to read on the page. Whether Record shows
     /// is asked as the page comes on screen.
     fn script_tick(&mut self) {
@@ -3143,8 +3143,8 @@ impl App {
     /// Oyenza Studio Recorder's word on its recording, or "show yourself"
     /// (`recorder_message`). True when the island takes it: it shows the
     /// recording, or opened on its Record page.
-    fn on_recorder_message(&mut self, m: poni_core::recorder::Message, sender: isize) -> bool {
-        use poni_core::recorder::{Message, Phase};
+    fn on_recorder_message(&mut self, m: nexora_core::recorder::Message, sender: isize) -> bool {
+        use nexora_core::recorder::{Message, Phase};
         // Only an installed recorder that reads the Record page's links
         // writes: the Record tab can show from now on (remembered).
         self.st.recorder = true;
@@ -3307,7 +3307,7 @@ impl App {
         }
     }
 
-    /// Asks (off the UI thread) whether Windows lets Poni read frames.
+    /// Asks (off the UI thread) whether Windows lets Nexora read frames.
     fn check_fps(&mut self) {
         if self.selftest.is_some() || matches!(self.st.game.access, FpsAccess::Checking | FpsAccess::Asking) {
             return;
@@ -3791,7 +3791,7 @@ impl App {
             let small = !matches!(mode, Mode::Expanded(_));
             let (light, p, moving) = self.glass.frame(body, geom.r, SHOULDER, small, now, dt, scale, &mut self.gfx);
             glass_moving = moving;
-            self.gfx.set_look(poni_core::look::glass(light));
+            self.gfx.set_look(nexora_core::look::glass(light));
             self.gfx.prepare_glass(&p, canvas_px);
             Some(p)
         } else {
@@ -4078,7 +4078,7 @@ impl App {
         if let Some(b) = self.st.pomodoro.next_second_boundary(now).filter(|_| visible) {
             consider(now + b + 0.005);
         }
-        if let poni_core::pomodoro::RunState::Running { ends_at } = self.st.pomodoro.run {
+        if let nexora_core::pomodoro::RunState::Running { ends_at } = self.st.pomodoro.run {
             consider(ends_at + 0.005);
         }
         // A recording's time, on the closed island and its page: a frame for
@@ -4276,7 +4276,7 @@ impl App {
     /// Prayer times' files are in place: read its places, settle the place,
     /// and ask where the PC is when following the location.
     fn prayer_ready(&mut self) {
-        let a = &poni_core::addons::PRAYER_TIMES;
+        let a = &nexora_core::addons::PRAYER_TIMES;
         let path = paths::addons_dir().join(a.id).join(a.tag).join("places.json");
         match std::fs::read_to_string(&path).map_err(|e| e.to_string()).and_then(|t| PlaceList::parse(&t)) {
             Ok(list) => {
@@ -4308,11 +4308,11 @@ impl App {
         let Some(list) = self.st.prayer.places.clone() else { return };
         let chosen = match self.st.settings.prayer.place.as_deref() {
             Some(id) if self.st.prayer.place.as_ref().is_some_and(|p| p.id == id) => self.st.prayer.place.clone(),
-            Some(id) => poni_core::prayer::find(&list, self.st.settings.prayer.world_place.as_deref(), id),
+            Some(id) => nexora_core::prayer::find(&list, self.st.settings.prayer.world_place.as_deref(), id),
             None => None,
         };
         let suggested = chosen.is_none();
-        let place = chosen.or_else(|| poni_core::prayer::suggested_place_id(self.utc_offset_min()).and_then(|id| list.find(id)).cloned());
+        let place = chosen.or_else(|| nexora_core::prayer::suggested_place_id(self.utc_offset_min()).and_then(|id| list.find(id)).cloned());
         let changed = place.as_ref().map(|p| &p.id) != self.st.prayer.place.as_ref().map(|p| &p.id);
         self.st.prayer.place = place;
         self.st.prayer.suggested = suggested;
@@ -4326,7 +4326,7 @@ impl App {
     /// The PC's UTC offset in minutes, from its clock.
     fn utc_offset_min(&self) -> i32 {
         let l = &self.st.local;
-        let local = poni_core::datetime::days_from_civil(l.year, l.month, l.day) * 86_400 + l.hour as i64 * 3600 + l.minute as i64 * 60 + l.second as i64;
+        let local = nexora_core::datetime::days_from_civil(l.year, l.month, l.day) * 86_400 + l.hour as i64 * 3600 + l.minute as i64 * 60 + l.second as i64;
         (((local - self.st.unix) as f64 / 900.0).round() * 15.0) as i32
     }
 
@@ -4371,8 +4371,8 @@ impl App {
             return;
         }
         self.st.prayer.handled_until = Some(now);
-        for m in poni_core::prayer::prayers_between(&site, from, now) {
-            match poni_core::prayer::due(m.at, now) {
+        for m in nexora_core::prayer::prayers_between(&site, from, now) {
+            match nexora_core::prayer::due(m.at, now) {
                 Due::Ring => self.prayer_moment(m, true),
                 Due::Quiet => self.prayer_moment(m, false),
                 Due::Skip => {}
@@ -4411,7 +4411,7 @@ impl App {
 
     /// Start the adzan; music that plays pauses (and stays paused).
     fn play_adzan(&mut self) -> bool {
-        let a = &poni_core::addons::PRAYER_TIMES;
+        let a = &nexora_core::addons::PRAYER_TIMES;
         let path = paths::addons_dir().join(a.id).join(a.tag).join("adzan.m4a");
         match self.adzan.play(&path, &self.sink) {
             Ok(()) => {
@@ -4492,7 +4492,7 @@ impl App {
             IeltsCmd::Quit => self.st.ielts.quit(now),
             IeltsCmd::Retry => self.st.ielts.retry(now),
         };
-        if c == IeltsCmd::Start && self.st.ielts.phase == poni_core::ielts::Phase::Starting {
+        if c == IeltsCmd::Start && self.st.ielts.phase == nexora_core::ielts::Phase::Starting {
             // A new session: whatever an earlier one left behind goes first.
             self.ielts.voice.stop();
             services::ielts::clear_files();
@@ -4503,8 +4503,8 @@ impl App {
     /// Carry out what the coach asked for, in order; what an effect brings
     /// back from the coach (a clip that won't play, a recording that
     /// stopped) runs before the rest.
-    fn ielts_do(&mut self, fx: Vec<poni_core::ielts::Effect>) {
-        use poni_core::ielts::Effect;
+    fn ielts_do(&mut self, fx: Vec<nexora_core::ielts::Effect>) {
+        use nexora_core::ielts::Effect;
         if !self.ielts_live() {
             // The self-test's made-up states ask for nothing.
             return;
@@ -4568,7 +4568,7 @@ impl App {
     /// The add-on switched off, or signed out: the session ends (the server
     /// is told), nothing of it keeps running, and its files go.
     fn ielts_off(&mut self) {
-        use poni_core::ielts::{Call, Effect};
+        use nexora_core::ielts::{Call, Effect};
         let now = self.st.now;
         // Everything Udahan does but read the ladder again.
         let fx = self.st.ielts.quit(now).into_iter().filter(|e| *e != Effect::Call(Call::Me)).collect();
@@ -4616,7 +4616,7 @@ impl App {
             }
             NotesCmd::Copy => {
                 if let Some(last) = &self.st.notes.last {
-                    let md = poni_core::notes::markdown(&last.notes, &last.started, false);
+                    let md = nexora_core::notes::markdown(&last.notes, &last.started, false);
                     services::clipboard::set_text(self.hwnd, &md);
                     self.st.ui.notes_note = Some(("Copied".into(), now + 2.0));
                 }
@@ -4644,14 +4644,14 @@ impl App {
             Err(issue) => {
                 pwarn!("notes: no recording ({issue:?})");
                 self.st.ui.notes_kept = false;
-                self.st.notes.failed(poni_core::notes::Problem::Capture(issue));
+                self.st.notes.failed(nexora_core::notes::Problem::Capture(issue));
             }
         }
     }
 
     /// Stop: the meeting is over, its notes get written.
     fn notes_stop(&mut self) {
-        use poni_core::notes::{CaptureIssue, Problem};
+        use nexora_core::notes::{CaptureIssue, Problem};
         let Some(rec) = self.notes_rec.take() else { return };
         match rec.stop() {
             Ok(take) if take.secs >= 1.0 && !take.parts.is_empty() => {
@@ -4675,14 +4675,14 @@ impl App {
     fn notes_send(&mut self) {
         let Some(take) = self.notes_take.clone() else { return };
         self.st.notes.stopped(take.parts.len() as u32, take.secs);
-        let job = services::notes::Job { take, started: self.notes_started, lang: poni_core::notes::Lang::Auto, api: self.notes_api.clone(), out: crate::paths::notes_dir() };
+        let job = services::notes::Job { take, started: self.notes_started, lang: nexora_core::notes::Lang::Auto, api: self.notes_api.clone(), out: crate::paths::notes_dir() };
         services::notes::send(job, &self.sink);
     }
 
     /// The meeting on its way: how far, the notes saved, or what went wrong.
     /// With the island closed, the end of it shows as a notice.
-    fn notes_reply(&mut self, r: poni_core::notes::Reply) {
-        use poni_core::notes::Reply;
+    fn notes_reply(&mut self, r: nexora_core::notes::Reply) {
+        use nexora_core::notes::Reply;
         if !self.st.notes_on() {
             return;
         }
@@ -4716,7 +4716,7 @@ impl App {
             self.st.notes.secs = take.secs;
             self.notes_take = Some(take);
             self.st.ui.notes_kept = true;
-            self.st.notes.failed(poni_core::notes::Problem::Unfinished);
+            self.st.notes.failed(nexora_core::notes::Problem::Unfinished);
         }
     }
 
@@ -4813,7 +4813,7 @@ impl App {
                     self.st.rec.error = None;
                     // A window or an area is picked on the recorder's overlay:
                     // the open island would sit over it.
-                    if rec.target != poni_core::recorder::Target::Screen {
+                    if rec.target != nexora_core::recorder::Target::Screen {
                         self.collapse();
                     }
                 }
@@ -4822,7 +4822,7 @@ impl App {
                 Command::RecordStop => services::recorder::stop(),
                 Command::ScriptPaste => {
                     // Read here, not through the text field path: that one drops line breaks.
-                    let text = services::clipboard::read_text(self.hwnd).map(|t| poni_core::script::clean(&t)).filter(|t| !t.is_empty());
+                    let text = services::clipboard::read_text(self.hwnd).map(|t| nexora_core::script::clean(&t)).filter(|t| !t.is_empty());
                     match text {
                         Some(text) => pages::script::set_text(&mut self.st, text),
                         None => pages::script::note(&mut self.st, "Copy your script first"),
@@ -5139,7 +5139,7 @@ impl App {
                 match r {
                     Ok(url) => {
                         pinfo!("pair drop: showing a pairing code");
-                        pd.view = PhoneView::Pairing { qr: QrMatrix::encode(&url), url, until: now + poni_core::pairdrop::meet::PAIRING_FOR.as_secs_f64() };
+                        pd.view = PhoneView::Pairing { qr: QrMatrix::encode(&url), url, until: now + nexora_core::pairdrop::meet::PAIRING_FOR.as_secs_f64() };
                     }
                     Err(e) => {
                         pwarn!("pair drop: {e}");
@@ -5332,8 +5332,8 @@ impl App {
         self.st.ielts = Default::default();
         self.st.oyenza = Default::default();
         self.st.oyenza.link = OyenzaLink::Connected { account: "s\u{2022}\u{2022}\u{2022}@example.com".into() };
-        self.st.settings.set_addon(poni_core::addons::IELTS.id, true);
-        self.st.addons.insert(poni_core::addons::IELTS.id, AddonStatus::Ready);
+        self.st.settings.set_addon(nexora_core::addons::IELTS.id, true);
+        self.st.addons.insert(nexora_core::addons::IELTS.id, AddonStatus::Ready);
         self.st.notice = None;
         self.st.hud = None;
         self.st.page = PageKind::Ielts;
@@ -5360,10 +5360,10 @@ impl App {
     /// the run's own server with its own key.
     pub fn selftest_notes_begin(&mut self, base: String, key: String, take: services::notes::Take) {
         self.notes_api = Some((base, key));
-        self.st.settings.set_addon(poni_core::addons::MEETING_NOTES.id, true);
-        self.st.addons.insert(poni_core::addons::MEETING_NOTES.id, AddonStatus::Ready);
+        self.st.settings.set_addon(nexora_core::addons::MEETING_NOTES.id, true);
+        self.st.addons.insert(nexora_core::addons::MEETING_NOTES.id, AddonStatus::Ready);
         self.st.notes = Default::default();
-        self.notes_started = poni_core::datetime::LocalDateTime { year: 2026, month: 10, day: 29, hour: 14, minute: 5, second: 0 };
+        self.notes_started = nexora_core::datetime::LocalDateTime { year: 2026, month: 10, day: 29, hour: 14, minute: 5, second: 0 };
         self.notes_take = Some(take);
         self.st.ui.notes_kept = true;
         self.notes_send();
@@ -5372,16 +5372,16 @@ impl App {
     pub fn selftest_notes_end(&mut self) {
         self.notes_off();
         self.notes_api = None;
-        self.st.settings.set_addon(poni_core::addons::MEETING_NOTES.id, false);
-        self.st.addons.insert(poni_core::addons::MEETING_NOTES.id, AddonStatus::Off);
+        self.st.settings.set_addon(nexora_core::addons::MEETING_NOTES.id, false);
+        self.st.addons.insert(nexora_core::addons::MEETING_NOTES.id, AddonStatus::Off);
     }
 
     pub fn selftest_ielts_end(&mut self) {
         self.ielts_off();
         self.ielts_turn = false;
         self.ielts = Default::default();
-        self.st.settings.set_addon(poni_core::addons::IELTS.id, false);
-        self.st.addons.insert(poni_core::addons::IELTS.id, AddonStatus::Off);
+        self.st.settings.set_addon(nexora_core::addons::IELTS.id, false);
+        self.st.addons.insert(nexora_core::addons::IELTS.id, AddonStatus::Off);
         self.st.oyenza = Default::default();
         self.st.page = PageKind::ALL[0];
     }
@@ -5483,7 +5483,7 @@ impl App {
 
     /// Self-test: the last frame's glass came from the shader, the backdrop
     /// is on the GPU, and the look content was painted in.
-    pub fn selftest_glass_state(&self) -> (bool, bool, &'static poni_core::look::Look) {
+    pub fn selftest_glass_state(&self) -> (bool, bool, &'static nexora_core::look::Look) {
         (self.gfx.glass_drew(), self.gfx.glass_has_copy(), self.gfx.look())
     }
 
@@ -5627,7 +5627,7 @@ fn theme_accent(theme: Theme) -> Color {
     if oyen::on(theme) {
         oyen::ORANGE
     } else if theme == Theme::Diorama {
-        poni_core::look::DIORAMA_ACCENT
+        nexora_core::look::DIORAMA_ACCENT
     } else if theme == Theme::Glass {
         services::system_accent_base().unwrap_or(palette::BLUE)
     } else {
@@ -5720,7 +5720,7 @@ fn motion_name(from: &Mode, to: &Mode) -> &'static str {
 
 /// "1 file", "3 files".
 /// The panel's list: most recently used first.
-fn paired_phones(pairs: Vec<poni_core::pairdrop::Pair>) -> Vec<PairedPhone> {
+fn paired_phones(pairs: Vec<nexora_core::pairdrop::Pair>) -> Vec<PairedPhone> {
     let mut v: Vec<PairedPhone> = pairs.into_iter().map(|p| PairedPhone { room: p.room(), name: p.name, seen: p.seen.max(p.added) }).collect();
     v.sort_by_key(|a| std::cmp::Reverse(a.seen));
     v

@@ -27,7 +27,7 @@ use pure::{decode_body, network_detail};
 /// Budget for one request: connect + headers + body.
 pub const DEFAULT_TIMEOUT: Duration = Duration::from_secs(8);
 
-/// Bodies larger than this are refused (nothing Poni fetches comes close).
+/// Bodies larger than this are refused (nothing Nexora fetches comes close).
 const MAX_BODY_BYTES: u64 = 8 * 1024 * 1024;
 
 /// A request body past this size (an IELTS answer's audio) goes as UTF-8
@@ -436,7 +436,7 @@ fn other(what: &str, e: &windows::core::Error) -> FetchError {
 
 /// OS-free helpers (unit-tested on any host).
 mod pure {
-    use poni_core::datetime::{days_from_civil, days_in_month};
+    use nexora_core::datetime::{days_from_civil, days_in_month};
 
     /// Seconds to wait according to a `Retry-After` value: delta-seconds
     /// (`"120"`) or an HTTP-date (IMF-fixdate or the obsolete RFC 850 form),

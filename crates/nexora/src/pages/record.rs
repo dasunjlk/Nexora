@@ -1,5 +1,5 @@
 //! Record page: the island as the face of Oyenza Studio Recorder, the
-//! separate app (built from Cap) that makes the video (`poni_core::recorder`).
+//! separate app (built from Cap) that makes the video (`nexora_core::recorder`).
 //!
 //! Before a recording: what to record (this screen at once, or a window or
 //! an area picked on the recorder's own overlay), whether the camera, the
@@ -16,8 +16,8 @@ use crate::gfx::{ts, TextStyle, Weight};
 use crate::icons::Icon;
 use crate::state::AppState;
 use crate::ui::{wid, wid_n, PillStyle, Ui, PILL_GAP, PILL_REGULAR, PILL_SMALL};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::recorder::{fmt_length, Phase, Target};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::recorder::{fmt_length, Phase, Target};
 
 /// Focus's height, so this page never makes the window grow.
 const HEIGHT: f32 = 144.0;
@@ -273,9 +273,9 @@ fn disabled_pill(ui: &mut Ui, r: Rect, label: &str, icon: Icon) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use poni_core::recorder::Phase;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
+    use nexora_core::recorder::Phase;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
 
     fn state() -> AppState {
         let mut st = AppState::new(Settings::default(), Store { recorder_island: true, ..Store::default() });

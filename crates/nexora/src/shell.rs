@@ -3,7 +3,7 @@
 //! `ShellExecuteW` never runs on the UI thread: shell handlers may run a
 //! nested modal loop there that swallows the island's messages, and a UNC
 //! path can block for many seconds while the network times out. Every call
-//! gets a short-lived "poni-shell" STA thread instead.
+//! gets a short-lived "nexora-shell" STA thread instead.
 //!
 //! Targets arrive from drag-and-drop (shelf paths) and from pages (URLs), so
 //! only two kinds are handed to the shell: existing absolute local or UNC
@@ -13,7 +13,7 @@
 //! ([`open_startup_settings`]) and Settings > Privacy > Notifications
 //! ([`open_notification_settings`]), constant URIs; Oyenza Studio Recorder's
 //! own action links ([`open_recorder_link`]): its fixed scheme and one
-//! percent-encoded value, as `poni_core::recorder` builds them; and an app
+//! percent-encoded value, as `nexora_core::recorder` builds them; and an app
 //! by its AppUserModelID in the Apps folder ([`open_app`]), the characters
 //! of an id only; the AI tab's Sign in: the Claude app's own `claude://`
 //! link ([`open_claude_app`]) and a service's sign-in command in a console
@@ -60,9 +60,9 @@ pub fn open(target: &str) {
 }
 
 /// Open one of Oyenza Studio Recorder's action links (asynchronously). Only
-/// the shape `poni_core::recorder` builds reaches the shell.
+/// the shape `nexora_core::recorder` builds reaches the shell.
 pub fn open_recorder_link(link: &str) {
-    if !poni_core::recorder::is_action_link(link) {
+    if !nexora_core::recorder::is_action_link(link) {
         crate::pwarn!("recorder link refused: {}", for_log(link));
         return;
     }
@@ -77,7 +77,7 @@ pub fn open_recorder_link(link: &str) {
 }
 
 /// Open Settings > Apps > Startup (asynchronously). The Store build sends
-/// people there when they turned Poni's startup task off in Windows, the only
+/// people there when they turned Nexora's startup task off in Windows, the only
 /// place it can be turned back on.
 pub fn open_startup_settings() {
     run("open", || {
@@ -199,14 +199,14 @@ pub fn reveal(path: &str) {
     });
 }
 
-/// Run `job` on a new "poni-shell" thread inside a single-threaded apartment.
+/// Run `job` on a new "nexora-shell" thread inside a single-threaded apartment.
 fn run(what: &'static str, job: impl FnOnce() + Send + 'static) {
     if IN_FLIGHT.fetch_add(1, Ordering::SeqCst) >= MAX_IN_FLIGHT {
         IN_FLIGHT.fetch_sub(1, Ordering::SeqCst);
         crate::pwarn!("{what} refused: {MAX_IN_FLIGHT} shell requests are still pending");
         return;
     }
-    let spawned = std::thread::Builder::new().name("poni-shell".into()).spawn(move || {
+    let spawned = std::thread::Builder::new().name("nexora-shell".into()).spawn(move || {
         let _slot = Slot;
         // Shell extensions are apartment-threaded COM objects; DDE is off.
         let hr = unsafe { CoInitializeEx(None, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE) };

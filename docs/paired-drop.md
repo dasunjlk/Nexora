@@ -8,7 +8,7 @@ Three parts work together:
 
 | Part | Where | What it does |
 |---|---|---|
-| Oyenza Studio | the PC (`crates/poni-core/src/pairdrop`, `crates/poni/src/services/pairdrop.rs`) | keeps the pairs, waits for phones through the meeting server, answers with a direct WebRTC link, saves the files |
+| Oyenza Studio | the PC (`crates/nexora-core/src/pairdrop`, `crates/nexora/src/services/pairdrop.rs`) | keeps the pairs, waits for phones through the meeting server, answers with a direct WebRTC link, saves the files |
 | Phone page | `server/public`, served at `https://drop.oyenza.com` | pairing, your PCs (online or offline), send, save Shelf files; installs to the Home Screen; joins Android's share sheet |
 | Meeting server | `server/drop-server.mjs` | tells a phone whether its PC is online and passes the two sides' connection details; hands out short-lived relay passes |
 
@@ -17,7 +17,7 @@ the Wi-Fi, straight across the internet, or (when both networks block that)
 through a TURN relay that only forwards encrypted bytes. No server stores a
 file, a file name or a device name.
 
-Today's QR phone drop (`poni_core::phonedrop`, same Wi-Fi, nothing through
+Today's QR phone drop (`nexora_core::phonedrop`, same Wi-Fi, nothing through
 the internet) stays as it is for phones that aren't paired.
 
 ## Pairing secret and what is derived from it
@@ -137,7 +137,7 @@ The phone makes the offer with one data channel labelled `oyen-drop`
 | phone | `{"t":"bye"}` | done; either side may also just close |
 
 Files are staged and moved into the inbox only when every byte of every file
-arrived, under names made safe for Windows (`poni_core::phonedrop::names`).
+arrived, under names made safe for Windows (`nexora_core::phonedrop::names`).
 
 ## Hosting your own meeting server
 
@@ -150,5 +150,5 @@ node server/drop-server.mjs --port 8797
 Put it behind HTTPS (the phone page needs a secure context). For the relay,
 set `TURN_KEY_ID` and `TURN_KEY_API_TOKEN` from a Cloudflare Realtime TURN key;
 without them, phones and PCs connect directly or not at all. Oyenza Studio reads
-the server address from the environment variable `PONI_DROP_SERVER`
+the server address from the environment variable `NEXORA_DROP_SERVER`
 (default `https://drop.oyenza.com`).

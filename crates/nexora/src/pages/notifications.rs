@@ -1,6 +1,6 @@
 //! Notifications page, the bell tab while Notifications is on (Windows'
 //! Store copy, on by default): other apps' notifications on the island
-//! (`poni_core::notifications`, read by `services::notifications`).
+//! (`nexora_core::notifications`, read by `services::notifications`).
 //!
 //! First a bell and what Windows allows, with Allow while Windows hasn't
 //! been asked and Windows settings once it said no there. Under a line, two
@@ -16,9 +16,9 @@ use crate::gfx::{TextStyle, Weight};
 use crate::icons::Icon;
 use crate::pages::settings::switch_row;
 use crate::state::{AppState, InlineAction, Notice, NoticeAction, NotifyAccess};
-use poni_core::notifications::{self, NotificationSettings, Seen};
+use nexora_core::notifications::{self, NotificationSettings, Seen};
 use crate::ui::{wid, wid_n, PillStyle, Ui, PILL_GAP, PILL_SMALL};
-use poni_core::geom::{palette, Color, Point, Rect};
+use nexora_core::geom::{palette, Color, Point, Rect};
 
 const HEAD_H: f32 = 44.0;
 /// The bell's disc, and the text column right of it.

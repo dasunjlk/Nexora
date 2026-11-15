@@ -65,7 +65,7 @@ pub struct Look {
 }
 
 /// The raised frame the Diorama theme sets its island's ground in: the
-/// resting pill's own frame (`studio_diorama`'s), grown to every shape the
+/// resting pill's own frame (`nexora_diorama`'s), grown to every shape the
 /// island takes. Its colours are drawn as they are, outside the look.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Frame {
@@ -118,7 +118,7 @@ pub const CLASSIC: Look = Look {
 };
 
 /// Oyen: warm cream paper, espresso ink, Oyen's orange, and Outfit (the Oyen
-/// Poni website's typeface) for every Latin letter.
+/// Nexora website's typeface) for every Latin letter.
 pub const OYEN: Look = Look {
     ground: Color::hex(0xFFF1DE),
     ink: Color::hex(0x2B1B10),
@@ -224,7 +224,7 @@ pub const PILL: Look = Look {
 /// read as a fill. Each Diorama look swaps it for its own: itself by day
 /// (the roof for text), the lit window's gold at night.
 pub const DIORAMA_ACCENT: Color = Color::hex(0x4C58A8);
-/// The lit window's gold (`studio_diorama`'s window light and its glow).
+/// The lit window's gold (`nexora_diorama`'s window light and its glow).
 const WINDOW_LIGHT: Color = Color::hex(0xFFD76A);
 const WINDOW_GLOW: Color = Color::hex(0xE9AE3A);
 
@@ -498,7 +498,7 @@ mod tests {
             assert_eq!(look.paint(palette::TEXT_DIM), look.ink.with_alpha(0.62));
             assert_eq!(look.paint_text(palette::ON_ACCENT), palette::ON_ACCENT);
         }
-        // The frame is the picture's (studio_diorama's FRAME_DAY and
+        // The frame is the picture's (nexora_diorama's FRAME_DAY and
         // FRAME_NIGHT): cream by day, indigo at night, and the pane between
         // its face and, at night, the night sky.
         let (day, night) = (DIORAMA_DAY.frame.unwrap(), DIORAMA_NIGHT.frame.unwrap());

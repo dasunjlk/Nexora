@@ -1,4 +1,4 @@
-//! Poni — a living notch (Dynamic Island) for Windows 10/11, and for macOS.
+//! Nexora — a living notch (Dynamic Island) for Windows 10/11, and for macOS.
 //!
 //! The Mac app lives in `src/mac/`: its own window, renderer (Core Graphics +
 //! Core Text), main loop and menu bar item, around the same state, pages and
@@ -126,5 +126,5 @@ fn main() {
 
 #[cfg(not(any(windows, target_os = "macos")))]
 fn main() {
-    eprintln!("Poni runs on Windows and macOS. Build it with `cargo wbuild` (Windows, cross) or on a Mac.");
+    eprintln!("Nexora runs on Windows and macOS. Build it with `cargo wbuild` (Windows, cross) or on a Mac.");
 }

@@ -3,7 +3,7 @@
 //! (browsers too) and which since macOS 15.4 answers Apple's own programs
 //! only. `/usr/bin/perl` is one of those: it loads the adapter's framework
 //! and runs one of its commands, `stream` (a JSON line for every change
-//! until it is stopped, `poni_core::mediaremote` reads them), `send` (play,
+//! until it is stopped, `nexora_core::mediaremote` reads them), `send` (play,
 //! pause, next, previous) or `seek`.
 //!
 //! The app carries the framework in Contents/Frameworks and the script in
@@ -78,7 +78,7 @@ impl Adapter {
         let mut child = self.command().args(["stream", "--micros", "--debounce=100"]).stdout(Stdio::piped()).stderr(Stdio::piped()).spawn()?;
         let out = child.stdout.take().ok_or_else(|| io::Error::other("no output"))?;
         let err = child.stderr.take().ok_or_else(|| io::Error::other("no error output"))?;
-        let errors = std::thread::Builder::new().name("poni-nowplaying-err".into()).spawn(move || {
+        let errors = std::thread::Builder::new().name("nexora-nowplaying-err".into()).spawn(move || {
             let mut last = String::new();
             for (i, l) in BufReader::new(err).lines().map_while(Result::ok).enumerate() {
                 if i < ERR_LINES {
@@ -88,7 +88,7 @@ impl Adapter {
             }
             last
         })?;
-        std::thread::Builder::new().name("poni-nowplaying".into()).spawn(move || {
+        std::thread::Builder::new().name("nexora-nowplaying".into()).spawn(move || {
             for l in BufReader::new(out).lines().map_while(Result::ok) {
                 line(l);
             }

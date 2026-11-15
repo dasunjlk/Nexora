@@ -6,8 +6,8 @@
 //! analyzer's data:
 //!
 //! ```text
-//! PONI_JA_COMPARE=<folder of .lrc files> PONI_JA_COMPARE_OUT=<report.md>
-//! cargo test -p poni compare_readings -- --ignored --nocapture
+//! NEXORA_JA_COMPARE=<folder of .lrc files> NEXORA_JA_COMPARE_OUT=<report.md>
+//! cargo test -p nexora compare_readings -- --ignored --nocapture
 //! ```
 //!
 //! The report counts the lines both read the same way and lists the words
@@ -15,8 +15,8 @@
 //! right: a person judges the list. It shows words, never whole lines.
 
 use super::romanize::{japanese, on_sta};
-use poni_core::lrc::parse_lrc;
-use poni_core::romanize::{self, JaDict, Ruby, Script};
+use nexora_core::lrc::parse_lrc;
+use nexora_core::romanize::{self, JaDict, Ruby, Script};
 use std::collections::{HashMap, HashSet};
 
 /// How many differences the report lists, most frequent first.
@@ -34,11 +34,11 @@ struct Stats {
 }
 
 #[test]
-#[ignore = "needs PONI_JA_COMPARE (songs fetched at run time) and Windows' Japanese reading data"]
+#[ignore = "needs NEXORA_JA_COMPARE (songs fetched at run time) and Windows' Japanese reading data"]
 fn compare_readings() {
-    let dir = std::env::var("PONI_JA_COMPARE").expect("PONI_JA_COMPARE: a folder of .lrc files");
+    let dir = std::env::var("NEXORA_JA_COMPARE").expect("NEXORA_JA_COMPARE: a folder of .lrc files");
     // The repo's copy of the Japanese readings add-on's dictionary.
-    let dict = JaDict::load(include_bytes!("../../../poni-core/data/ja-readings.dic.zst")).expect("Oyenza Studio's dictionary loads");
+    let dict = JaDict::load(include_bytes!("../../../nexora-core/data/ja-readings.dic.zst")).expect("Oyenza Studio's dictionary loads");
     let mut files: Vec<_> = std::fs::read_dir(&dir).expect("the folder reads").filter_map(|e| e.ok().map(|e| e.path())).filter(|p| p.extension().is_some_and(|x| x == "lrc")).collect();
     files.sort();
 
@@ -80,7 +80,7 @@ fn compare_readings() {
 
     let report = report(&stats, diffs);
     println!("{report}");
-    if let Ok(out) = std::env::var("PONI_JA_COMPARE_OUT") {
+    if let Ok(out) = std::env::var("NEXORA_JA_COMPARE_OUT") {
         std::fs::write(&out, &report).expect("the report writes");
     }
     assert!(stats.songs > 0, "no Japanese songs in {dir}");

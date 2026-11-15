@@ -103,7 +103,7 @@ mod tests {
         let mut l = TaskList::default();
         assert_eq!(l.add("   ", 0), None);
         let a = l.add("  buy   milk ", 10).unwrap();
-        let b = l.add("ship poni", 20).unwrap();
+        let b = l.add("ship nexora", 20).unwrap();
         assert_eq!(l.tasks[0].text, "buy milk");
         assert!(l.toggle(a, 100));
         assert_eq!(l.today_progress(50), (1, 2));

@@ -8,7 +8,7 @@
 //! The Diorama theme is this island too ([`on`] is true for both): only its
 //! resting pill differs, a small window onto a pixel-art place ([`diorama`]).
 //!
-//! How it plugs in: `poni_core::look::PILL` has `Shape::Pill`, the island
+//! How it plugs in: `nexora_core::look::PILL` has `Shape::Pill`, the island
 //! floats [`TOP_GAP`] below the edge (`Island::set_floating`), [`shape`]
 //! draws the outline, and the hooks below let each surface lay itself out
 //! and draw the Pill way. A hook that returns `None` / `false` leaves that
@@ -38,8 +38,8 @@ use crate::activities::{Activity, Mode};
 use crate::island::Geom;
 use crate::state::AppState;
 use crate::ui::Ui;
-use poni_core::geom::Rect;
-use poni_core::settings::Theme;
+use nexora_core::geom::Rect;
+use nexora_core::settings::Theme;
 use std::sync::atomic::{AtomicU8, Ordering};
 
 /// The island floats this far below the screen's top edge (DIPs).
@@ -52,10 +52,10 @@ pub fn on(theme: Theme) -> bool {
 }
 
 /// The look the island paints in this frame: the theme's
-/// (`poni_core::look::of`, or `around_notch` where it wraps a camera notch),
+/// (`nexora_core::look::of`, or `around_notch` where it wraps a camera notch),
 /// except that Diorama's takes its night when the picture does
 /// ([`diorama::night`]), the whole island with it. Glass picks its own.
-pub fn look(st: &AppState, around_notch: bool) -> &'static poni_core::look::Look {
+pub fn look(st: &AppState, around_notch: bool) -> &'static nexora_core::look::Look {
     match st.settings.theme {
         // It floats below a notch too, so it keeps its look there.
         Theme::Diorama => {
@@ -64,10 +64,10 @@ pub fn look(st: &AppState, around_notch: bool) -> &'static poni_core::look::Look
                 1 => true,
                 _ => diorama::night(st),
             };
-            poni_core::look::diorama(night)
+            nexora_core::look::diorama(night)
         }
-        theme if around_notch => poni_core::look::around_notch(theme),
-        theme => poni_core::look::of(theme),
+        theme if around_notch => nexora_core::look::around_notch(theme),
+        theme => nexora_core::look::of(theme),
     }
 }
 

@@ -1,19 +1,19 @@
 """Draw Oyenza Studio's brand files: the app icon, the installer pictures and the logo used in the docs.
 
 Oyenza Studio belongs to the Oyen family. Oyen is the orange cat of the Oyenza logo; docs/brand/oyen-mark*.svg are
-that logo, copied unchanged from the brand kit. The logo is an orange tile with Poni's island hanging from its top
+that logo, copied unchanged from the brand kit. The logo is an orange tile with Nexora's island hanging from its top
 edge, playing music (album cover and equalizer, as on the real island), and the white Oyen below it. The plush Oyen
 pictures in docs/brand/art are the source for the installer's welcome picture.
 
 Run: python3 tools/make_brand.py  (needs Pillow)
 
 Writes:
-  crates/poni/res/poni.ico           app, window and tray icon; every size is drawn on its own
+  crates/nexora/res/nexora.ico           app, window and tray icon; every size is drawn on its own
   installer/art/wizard-small-*.png   Inno Setup header logo (WizardSmallImageFile)
   installer/art/wizard-*.png         Inno Setup welcome and finish picture (WizardImageFile)
-  installer/art/nsis-*.bmp           the same two for installer/poni.nsi
-  docs/brand/oyen-poni-logo.svg      the logo as a vector
-  docs/brand/oyen-poni-logo-512.png
+  installer/art/nsis-*.bmp           the same two for installer/nexora.nsi
+  docs/brand/nexora-logo.svg      the logo as a vector
+  docs/brand/nexora-logo-512.png
 """
 import re
 import sys
@@ -23,7 +23,7 @@ from PIL import Image, ImageChops, ImageDraw
 
 ROOT = Path(__file__).resolve().parent.parent
 BRAND = ROOT / "docs" / "brand"
-RES = ROOT / "crates" / "poni" / "res"
+RES = ROOT / "crates" / "nexora" / "res"
 ART = ROOT / "installer" / "art"
 
 ORANGE, FOLD, INK = "#F0892E", "#C9581A", "#171717"
@@ -88,7 +88,7 @@ def evenodd(size: tuple[int, int], polys: list[list[tuple[float, float]]]) -> Im
 
 
 def island_points(cx: float, y0: float, w: float, h: float, r: float, f: float) -> str:
-    """Path data for Poni's island: flat top on the edge, flared top corners, rounded bottom corners."""
+    """Path data for Nexora's island: flat top on the edge, flared top corners, rounded bottom corners."""
     x0, x1 = cx - w / 2, cx + w / 2
     return (
         f"M{x0 - f} {y0} Q{x0} {y0} {x0} {y0 + f} L{x0} {y0 + h - r} Q{x0} {y0 + h} {x0 + r} {y0 + h} "
@@ -208,18 +208,18 @@ def wizard_image(w: int, h: int, oyen: Image.Image) -> Image.Image:
 def main() -> int:
     # App icon: every size drawn on its own.
     icons = {n: draw_logo(n) for n in ICO_SIZES}
-    icons[256].save(RES / "poni.ico", format="ICO", sizes=[(n, n) for n in ICO_SIZES], append_images=[icons[n] for n in ICO_SIZES[:-1]])
-    stale = RES / "poni-512.png"
+    icons[256].save(RES / "nexora.ico", format="ICO", sizes=[(n, n) for n in ICO_SIZES], append_images=[icons[n] for n in ICO_SIZES[:-1]])
+    stale = RES / "nexora-512.png"
     if stale.exists():
         stale.unlink()
 
-    BRAND.joinpath("oyen-poni-logo.svg").write_text(logo_svg())
-    draw_logo(512).save(BRAND / "oyen-poni-logo-512.png", optimize=True)
+    BRAND.joinpath("nexora-logo.svg").write_text(logo_svg())
+    draw_logo(512).save(BRAND / "nexora-logo-512.png", optimize=True)
 
     ART.mkdir(exist_ok=True)
     for n in WIZARD_SMALL_SIZES:
         draw_logo(n).save(ART / f"wizard-small-{n}.png", optimize=True)
-    oyen = trimmed(BRAND / "art" / "oyen-poni-sit.webp")
+    oyen = trimmed(BRAND / "art" / "nexora-sit.webp")
     for w, h in WIZARD_SIZES:
         wizard_image(w, h, oyen).convert("RGB").save(ART / f"wizard-{w}x{h}.png", optimize=True)
 
@@ -229,7 +229,7 @@ def main() -> int:
     header.alpha_composite(draw_logo(48), (150 - 48 - 6, (57 - 48) // 2))
     header.convert("RGB").save(ART / "nsis-header.bmp")
 
-    for p in sorted([RES / "poni.ico", BRAND / "oyen-poni-logo.svg", BRAND / "oyen-poni-logo-512.png", *ART.iterdir()]):
+    for p in sorted([RES / "nexora.ico", BRAND / "nexora-logo.svg", BRAND / "nexora-logo-512.png", *ART.iterdir()]):
         print(f"{p.relative_to(ROOT)}  {p.stat().st_size} bytes")
     return 0
 

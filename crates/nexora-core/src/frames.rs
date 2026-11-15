@@ -1,6 +1,6 @@
 //! A game's frame rate, from the frames it hands to Windows.
 //!
-//! `poni::services::frames` reads Windows' own log of each Present call
+//! `nexora::services::frames` reads Windows' own log of each Present call
 //! (event tracing, the way PresentMon and Xbox Game Bar measure it; nothing
 //! is loaded into the game) and passes every frame of the game's process
 //! here: where it was logged and when. Nothing in this module touches the OS.

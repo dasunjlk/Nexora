@@ -1,4 +1,4 @@
-//! `poni.exe --selftest <dir>`: drive the real app through every visual state
+//! `nexora.exe --selftest <dir>`: drive the real app through every visual state
 //! with fake (original) data, save screenshots, verify pixel invariants and
 //! frame timings, and write `<dir>/report.json`.
 //!
@@ -13,37 +13,37 @@
 //! raw alpha channel); the Diorama theme's own pictures have no number. The
 //! exit code is 0 when every check passes, else 1.
 //!
-//! PONI_SELFTEST_THEME=glass runs every scene in the Glass theme over a page
-//! the self-test draws itself (no screen copy): PONI_SELFTEST_GLASS=light (a
+//! NEXORA_SELFTEST_THEME=glass runs every scene in the Glass theme over a page
+//! the self-test draws itself (no screen copy): NEXORA_SELFTEST_GLASS=light (a
 //! light browser page, Windows in light mode), dark (a dark video page, dark
 //! mode) or flip (the dark page in light mode: small glass turns dark, the
 //! open island stays light). Its screenshots are composited over that page.
 //!
-//! PONI_SELFTEST_THEME=pill runs every scene in the Pill theme, where the
+//! NEXORA_SELFTEST_THEME=pill runs every scene in the Pill theme, where the
 //! island floats below the top edge: its ground is checked inside the body,
 //! and its own checks say the gap above the body shows the screen and the
 //! shadow fades out inside the window (see `pill_checks`).
 //!
-//! PONI_SELFTEST_THEME=diorama runs every scene in the Diorama theme: the
+//! NEXORA_SELFTEST_THEME=diorama runs every scene in the Diorama theme: the
 //! Pill theme's island, so Pill's checks hold, with a picture as its resting
 //! pill. After the scenes it takes that pill's own pictures, each at a set
 //! time of day on 29 October 2026 (`diorama-<what>.png`, the list is
 //! `RESTS`): the hours from dawn to the small hours, a 12-hour clock, the
 //! battery's badges, the Minimal look, the pill under the pointer, and the
 //! glass ball halfway to the tree as the sun sets. Each is checked against
-//! `studio_diorama`'s picture of that moment, and must ask for no frames
+//! `nexora_diorama`'s picture of that moment, and must ask for no frames
 //! once drawn; only the rolling ball does (see `diorama_checks`).
-//! PONI_SELFTEST_DIORAMA=only takes those pictures and skips the scenes: a
+//! NEXORA_SELFTEST_DIORAMA=only takes those pictures and skips the scenes: a
 //! few seconds instead of a minute and a half, for looking at the art.
 //! The whole island takes the picture's day or night look, so a Diorama run
 //! holds the scenes' clock at 10:08 of the day it runs (its pictures keep
-//! their own times), whenever CI runs it; PONI_SELFTEST_DIORAMA=night holds
+//! their own times), whenever CI runs it; NEXORA_SELFTEST_DIORAMA=night holds
 //! them at 21:30 instead: every scene in the night look.
 //!
-//! PONI_SELFTEST_PRAYER_AT=HH:MM shows the Prayer page at that time of the
+//! NEXORA_SELFTEST_PRAYER_AT=HH:MM shows the Prayer page at that time of the
 //! day (the other Prayer scenes stay 8 minutes before Ashar).
 //!
-//! PONI_SELFTEST_ADDONS=download also downloads the Prayer times add-on's
+//! NEXORA_SELFTEST_ADDONS=download also downloads the Prayer times add-on's
 //! files from their release while the scenes run and checks each one
 //! (`addon-download`; Windows CI only, it needs github.com).
 
@@ -63,25 +63,25 @@ use crate::state::{
     OyenzaState, PhoneAsk, PairedPhone, PhoneDrop, PhoneTransfer, PhoneView, PowerState, PrayerState, SysStats, VolumeState,
 };
 use crate::ui::wid;
-use poni_core::addons::{Status as AddonStatus, CAFFEINE, DOWNLOADER, HEALTH, IELTS, JAPANESE_READINGS, MEETING_NOTES, PRAYER_TIMES, SCRIPT_READER, STOCKS, SYSTEM};
-use poni_core::notifications::NotificationSettings;
-use poni_core::datetime::{days_from_civil, LocalDateTime};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::health::{HealthDay, HealthSnapshot, HealthSource};
-use poni_core::lrc::{parse_lrc, Lyrics};
-use poni_core::oyenza::{Activity, Bill, Day, DayPick, Saved, Seen, Txn, WalletRef};
-use poni_core::phonedrop::QrMatrix;
-use poni_core::prayer::{PlaceList, World};
-use poni_core::pomodoro::{Phase as PomoPhase, RunState};
-use poni_core::power::{PowerReading, PsuReading, Rail};
-use poni_core::settings::{IdleStyle, PrayerFollow, Theme};
-use poni_core::shelf::ShelfItem;
-use poni_core::frames::FrameRate;
-use poni_core::sysmon::{
+use nexora_core::addons::{Status as AddonStatus, CAFFEINE, DOWNLOADER, HEALTH, IELTS, JAPANESE_READINGS, MEETING_NOTES, PRAYER_TIMES, SCRIPT_READER, STOCKS, SYSTEM};
+use nexora_core::notifications::NotificationSettings;
+use nexora_core::datetime::{days_from_civil, LocalDateTime};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::health::{HealthDay, HealthSnapshot, HealthSource};
+use nexora_core::lrc::{parse_lrc, Lyrics};
+use nexora_core::oyenza::{Activity, Bill, Day, DayPick, Saved, Seen, Txn, WalletRef};
+use nexora_core::phonedrop::QrMatrix;
+use nexora_core::prayer::{PlaceList, World};
+use nexora_core::pomodoro::{Phase as PomoPhase, RunState};
+use nexora_core::power::{PowerReading, PsuReading, Rail};
+use nexora_core::settings::{IdleStyle, PrayerFollow, Theme};
+use nexora_core::shelf::ShelfItem;
+use nexora_core::frames::FrameRate;
+use nexora_core::sysmon::{
     AppUse, BatteryReading, CoreKind, CoreLoad, CpuReading, DiskActivity, Drive, GpuReading, MemoryReading, Module, Monitor, NetReading, Reading,
     Series, HISTORY_LEN,
 };
-use poni_core::timeline::Timeline;
+use nexora_core::timeline::Timeline;
 use serde::Serialize;
 use std::cell::Cell;
 use std::fs;
@@ -90,7 +90,7 @@ use std::sync::{Arc, Mutex};
 use std::path::PathBuf;
 use std::thread::JoinHandle;
 use std::time::Instant;
-use studio_diorama::{Badge, Clock, Moment, View};
+use nexora_diorama::{Badge, Clock, Moment, View};
 use windows::Win32::Foundation::{HWND, RECT};
 use windows::Win32::UI::WindowsAndMessaging::{
     GetWindowLongPtrW, GetWindowRect, IsWindowVisible, GWL_EXSTYLE, WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TOPMOST,
@@ -181,7 +181,7 @@ const LYRICS_LRC: &str = "\
 ";
 
 /// The same song in Japanese, Korean and Chinese (written for the test, same
-/// timings), for the pronunciation lines (PONI_SELFTEST_LYRICS=ja|ko|zh).
+/// timings), for the pronunciation lines (NEXORA_SELFTEST_LYRICS=ja|ko|zh).
 const LYRICS_JA: &str = "\
 [00:38.00]朝をたたんで小さな形にした
 [00:43.50]港の壁のそばで水に浮かべた
@@ -549,7 +549,7 @@ fn sample_reading(laptop: bool, s: &Sample) -> Reading {
 /// Judge one reading from the real sources: the core readings must be
 /// there; the rest is reported (a build server has no battery or GPU counters).
 fn system_readings(p: crate::services::sysmon::Probe) -> (bool, String) {
-    use poni_core::sysmon::fmt_bytes;
+    use nexora_core::sysmon::fmt_bytes;
     let r = &p.reading;
     let cpu = r.cpu.as_ref().filter(|c| (0.0..=1.0).contains(&c.load) && c.logical > 0);
     let mem = r.memory.as_ref().filter(|m| m.total > 0 && m.used <= m.total);
@@ -571,7 +571,7 @@ fn system_readings(p: crate::services::sysmon::Probe) -> (bool, String) {
         mem.map_or("missing".into(), |m| format!("{} of {} (wired {}, compressed {}, cached {}, free {})", fmt_bytes(m.used), fmt_bytes(m.total), fmt_bytes(m.wired), fmt_bytes(m.compressed), fmt_bytes(m.cached), fmt_bytes(m.free))),
         if r.drives.is_empty() { "none".into() } else { r.drives.iter().map(|d| d.root.clone()).collect::<Vec<_>>().join(" ") },
         if r.disk.is_some() { "yes" } else { "no" },
-        r.network.as_ref().map_or("unavailable".into(), |n| if n.online { format!("{} {} {}", n.adapter, n.ipv4.as_deref().unwrap_or(""), poni_core::sysmon::fmt_link(n.link_bps)) } else { "offline".into() }),
+        r.network.as_ref().map_or("unavailable".into(), |n| if n.online { format!("{} {} {}", n.adapter, n.ipv4.as_deref().unwrap_or(""), nexora_core::sysmon::fmt_link(n.link_bps)) } else { "offline".into() }),
         r.battery.as_ref().map_or("none".into(), |b| format!("{}%", b.percent)),
         if apps.is_empty() { "none".into() } else { apps.join(", ") },
         ms(p.light),
@@ -604,7 +604,7 @@ fn fake_stats() -> SysStats {
 /// tomorrow and later.
 fn fake_oyenza(st: &AppState, scene: Scene, now: f64) -> OyenzaState {
     let iso = |t: i64| {
-        let (y, m, d) = poni_core::datetime::civil_from_days(t.div_euclid(86_400));
+        let (y, m, d) = nexora_core::datetime::civil_from_days(t.div_euclid(86_400));
         let s = t.rem_euclid(86_400);
         format!("{y:04}-{m:02}-{d:02}T{:02}:{:02}:{:02}Z", s / 3600, s % 3600 / 60, s % 60)
     };
@@ -723,8 +723,8 @@ fn fake_oyenza(st: &AppState, scene: Scene, now: f64) -> OyenzaState {
 /// The Today page's days for its scenes, around the clock it runs at
 /// (`agenda::sample`); none switched on for `TodayNoApps`, Google Calendar
 /// off (so no events came) for `TodayOff`.
-fn fake_agenda(st: &AppState, scene: Scene) -> Option<poni_core::agenda::Answer> {
-    use poni_core::agenda::{sample, Answer, Source};
+fn fake_agenda(st: &AppState, scene: Scene) -> Option<nexora_core::agenda::Answer> {
+    use nexora_core::agenda::{sample, Answer, Source};
     let today = st.day_key();
     let now_min = st.local.hour as i32 * 60 + st.local.minute as i32;
     match scene {
@@ -742,8 +742,8 @@ fn fake_agenda(st: &AppState, scene: Scene) -> Option<poni_core::agenda::Answer>
 
 /// The WhatsApp message in the Notifications scenes (made up: the self-test
 /// reads no notifications).
-fn sample_message() -> poni_core::notifications::Seen {
-    poni_core::notifications::Seen {
+fn sample_message() -> nexora_core::notifications::Seen {
+    nexora_core::notifications::Seen {
         app_id: "5319275A.WhatsAppDesktop_cv1g1gvanyjgm!App".into(),
         app: "WhatsApp".into(),
         lines: vec!["Mom".into(), "Dinner at 7 tonight?".into()],
@@ -787,7 +787,7 @@ fn seed_stocks(st: &mut AppState, scene: Scene, now: f64) {
         Scene::StocksSearch => Picture::Search,
         Scene::StocksEdit => Picture::Edit,
         _ => {
-            st.store.stocks = poni_core::stocks::Watchlist::default();
+            st.store.stocks = nexora_core::stocks::Watchlist::default();
             st.stocks = crate::state::StocksState::default();
             st.ui.stocks = crate::pages::stocks::StocksUi::default();
             return;
@@ -806,7 +806,7 @@ fn seed_caffeine(st: &mut AppState, scene: Scene) {
             clock::hold_local(Some(st.local));
         }
         None => {
-            st.store.caffeine = poni_core::caffeine::Log::default();
+            st.store.caffeine = nexora_core::caffeine::Log::default();
             st.ui.caffeine = crate::pages::caffeine::CaffeineUi::default();
             clock::hold_local(None);
         }
@@ -816,13 +816,13 @@ fn seed_caffeine(st: &mut AppState, scene: Scene) {
 /// The Downloads page's list for its scenes, newest first: a YouTube link
 /// whose puzzle QuickJS is solving, a film coming in from PeerTube, a
 /// private video that failed and a finished film, moved along by yt-dlp's
-/// lines as the app moves them (`poni_core::downloads::Jobs`), so the bar and
+/// lines as the app moves them (`nexora_core::downloads::Jobs`), so the bar and
 /// the island's pill count the bytes as they do for real; every other scene:
 /// none. No pictures, so nothing is fetched, and the self-test starts no
 /// downloader.
 fn seed_downloads(st: &mut AppState, scene: Scene) {
-    use poni_core::downloads::{Jobs, State};
-    use poni_core::ytdlp::{Line, Mode};
+    use nexora_core::downloads::{Jobs, State};
+    use nexora_core::ytdlp::{Line, Mode};
     let ui = &mut st.ui.downloads;
     ui.link.clear();
     ui.mode = Mode::Video;
@@ -866,7 +866,7 @@ fn seed_ai(st: &mut AppState, scene: Scene, now: f64) {
         pages::usage::picture(st, p, now);
     } else {
         st.usage = crate::state::UsageState::default();
-        st.settings.usage = poni_core::settings::UsageSettings::default();
+        st.settings.usage = nexora_core::settings::UsageSettings::default();
         st.ui.usage = pages::usage::UsageUi::default();
     }
 }
@@ -874,7 +874,7 @@ fn seed_ai(st: &mut AppState, scene: Scene, now: f64) {
 /// The IELTS page's scenes in made-up states (`ielts::Coach::sample`); every
 /// other scene: the coach as it starts.
 fn seed_ielts(st: &mut AppState, scene: Scene, now: f64) {
-    use poni_core::ielts::{Coach, Sample};
+    use nexora_core::ielts::{Coach, Sample};
     let shows = match scene {
         Scene::Page(PageKind::Ielts) | Scene::IeltsSignedOut => Sample::Home,
         Scene::IeltsTalking => Sample::Talking,
@@ -894,7 +894,7 @@ fn seed_ielts(st: &mut AppState, scene: Scene, now: f64) {
 /// hold still, and the time sits half a second into its second so the
 /// picture doesn't catch it turning); every other scene: no meeting.
 fn seed_notes(st: &mut AppState, scene: Scene, now: f64) {
-    use poni_core::notes::{Phase, Reply, Taker};
+    use nexora_core::notes::{Phase, Reply, Taker};
     st.notes = Taker::default();
     st.ui.notes_kept = false;
     st.ui.notes_note = None;
@@ -923,8 +923,8 @@ fn seed_notes(st: &mut AppState, scene: Scene, now: f64) {
 }
 
 /// A made-up meeting's notes (no real names).
-fn sample_notes() -> poni_core::notes::Saved {
-    use poni_core::notes::{Action, Line, Notes, Saved, Topic};
+fn sample_notes() -> nexora_core::notes::Saved {
+    use nexora_core::notes::{Action, Line, Notes, Saved, Topic};
     let s = |v: &[&str]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>();
     let notes = Notes {
         title: "Studio launch plan".into(),
@@ -944,7 +944,7 @@ fn sample_notes() -> poni_core::notes::Saved {
         transcript: vec![Line { t: 3.0, who: "Rina".into(), text: "Okay, let's start with the date.".into() }],
         secs: 1834,
     };
-    let started = poni_core::datetime::LocalDateTime { year: 2026, month: 10, day: 29, hour: 14, minute: 5, second: 0 };
+    let started = nexora_core::datetime::LocalDateTime { year: 2026, month: 10, day: 29, hour: 14, minute: 5, second: 0 };
     Saved { notes, file: "2026-10-29 14.05 Studio launch plan.md".into(), started }
 }
 
@@ -974,7 +974,7 @@ fn seed_prayer(st: &mut AppState, scene: Scene, until: f64) {
         let list = PlaceList::parse(SAMPLE_PLACES).expect("sample places");
         st.prayer.places = Some(std::sync::Arc::new(list));
     }
-    let world = World::parse(poni_core::prayer::world::SAMPLE.into()).expect("sample world places");
+    let world = World::parse(nexora_core::prayer::world::SAMPLE.into()).expect("sample world places");
     let list = st.prayer.places.clone().expect("places");
     st.prayer.place = if scene == Scene::PrayerWorld { world.place(0) } else { list.find("jakarta").cloned() };
     st.settings.prayer.world_place = st.prayer.place.as_ref().and_then(|p| p.world_lines.clone());
@@ -994,10 +994,10 @@ fn seed_prayer(st: &mut AppState, scene: Scene, until: f64) {
     };
     let site = st.prayer_site().expect("the place's site");
     let today = site.local_day(st.unix);
-    let ashar = poni_core::prayer::day_times(&site, today).expect("today's times").ashar;
-    // PONI_SELFTEST_PRAYER_AT=HH:MM: the Prayer page at that time of
+    let ashar = nexora_core::prayer::day_times(&site, today).expect("today's times").ashar;
+    // NEXORA_SELFTEST_PRAYER_AT=HH:MM: the Prayer page at that time of
     // Jakarta's day instead (pictures of the night side: the moon on the arc).
-    let at = std::env::var("PONI_SELFTEST_PRAYER_AT").ok().filter(|_| scene == Scene::Page(PageKind::Prayer)).and_then(|v| {
+    let at = std::env::var("NEXORA_SELFTEST_PRAYER_AT").ok().filter(|_| scene == Scene::Page(PageKind::Prayer)).and_then(|v| {
         let (h, m) = v.trim().split_once(':')?;
         Some(h.parse::<i64>().ok()? * 3600 + m.parse::<i64>().ok()? * 60)
     });
@@ -1012,7 +1012,7 @@ fn seed_prayer(st: &mut AppState, scene: Scene, until: f64) {
         st.notice = Some(Notice {
             icon: Icon::Moon,
             color: st.accent,
-            title: crate::pages::prayer::moment_title(poni_core::prayer::Prayer::Ashar),
+            title: crate::pages::prayer::moment_title(nexora_core::prayer::Prayer::Ashar),
             title_dim: String::new(),
             subtitle: format!("{} \u{b7} {place}", site.hhmm(ashar)),
             until,
@@ -1295,18 +1295,18 @@ enum Scene {
 }
 
 /// A later release than this build, as the update file describes one.
-fn fake_release() -> poni_core::update::Release {
+fn fake_release() -> nexora_core::update::Release {
     let mut parts: Vec<u64> = crate::version::VERSION.split('.').filter_map(|p| p.parse().ok()).collect();
     if let Some(last) = parts.last_mut() {
         *last += 1;
     }
     let version = parts.iter().map(u64::to_string).collect::<Vec<_>>().join(".");
     let repo = "https://github.com/lucacadalora/oyenza-studio/releases";
-    poni_core::update::Release {
+    nexora_core::update::Release {
         date: "2026-10-26".into(),
         headline: "A smoother island, and fixes".into(),
         notes: format!("{repo}/tag/v{version}"),
-        windows: Some(poni_core::update::Download { url: format!("{repo}/download/v{version}/Oyenza-Studio-Setup-{version}.exe"), size: 2_500_000, sha256: "0".repeat(64) }),
+        windows: Some(nexora_core::update::Download { url: format!("{repo}/download/v{version}/Oyenza-Studio-Setup-{version}.exe"), size: 2_500_000, sha256: "0".repeat(64) }),
         mac: None,
         version,
     }
@@ -1316,8 +1316,8 @@ fn fake_release() -> poni_core::update::Release {
 /// readings of a 5-hour limit that resets in 2 h 20 min, on the app's clock:
 /// Claude Code from 70 to 90 %, or Codex from 70 % to all used with Oyenza
 /// Inference connected.
-fn ai_alert(st: &AppState, out: bool) -> Option<studio_usage::alerts::Alert> {
-    use studio_usage::{alerts, ProviderId, Snapshot, Source, Window, WindowKind};
+fn ai_alert(st: &AppState, out: bool) -> Option<nexora_usage::alerts::Alert> {
+    use nexora_usage::{alerts, ProviderId, Snapshot, Source, Window, WindowKind};
     let id = if out { ProviderId::Codex } else { ProviderId::Claude };
     let read = |used| Snapshot {
         windows: vec![Window::new(WindowKind::Session, "5-hour", used).resets(Some(st.unix + 2 * 3600 + 20 * 60)).length(Some(18_000))],
@@ -1337,7 +1337,7 @@ const DRAG_DX: f32 = 560.0;
 fn drag_check(app: &mut App) -> (bool, String) {
     let body = app.island_body();
     let (from, mon_w) = (app.selftest_island_centre(), app.selftest_monitor_width());
-    let want = poni_core::spot::fit_centre(from + DRAG_DX, mon_w, body.w, app.selftest_side_room());
+    let want = nexora_core::spot::fit_centre(from + DRAG_DX, mon_w, body.w, app.selftest_side_room());
     let opened = app.selftest_drag(body.center(), DRAG_DX);
     let to = app.selftest_island_centre();
     let spot = app.st.settings.island_x;
@@ -1366,7 +1366,7 @@ fn on_screen_check(app: &App, scene: Scene) -> Check {
     let placed = match scene {
         // Against the right edge: no room left beside it.
         Scene::IslandOpenAtEdge => right >= mon_w - 1.5,
-        _ => centre > mon_w / 2.0 + poni_core::spot::SNAP,
+        _ => centre > mon_w / 2.0 + nexora_core::spot::SNAP,
     };
     check(
         "island-on-screen",
@@ -1805,7 +1805,7 @@ impl Scene {
     /// What the recorder last told the island: recording (0:42 on the page,
     /// 12:34 on the closed island) or paused, held still for the pictures.
     fn recording(self, now: f64) -> crate::state::RecView {
-        use poni_core::recorder::Phase;
+        use nexora_core::recorder::Phase;
         let (phase, elapsed_ms) = match self {
             Scene::RecordLive => (Phase::Recording, 42_000),
             Scene::RecordActivity => (Phase::Recording, 754_000),
@@ -1981,7 +1981,7 @@ enum Shot {
 
 /// What a picture of the Diorama theme's resting pill should show.
 struct Sight {
-    /// The moment `studio_diorama` paints: the app's clock on the house's
+    /// The moment `nexora_diorama` paints: the app's clock on the house's
     /// own day, the ball where that time rests it.
     moment: Moment,
     /// The pill swells under the pointer.
@@ -2035,13 +2035,13 @@ impl Sight {
     /// The pill's size at rest, and as the island shows it (6 DIPs more
     /// each way under the pointer).
     fn sizes(&self) -> ((f32, f32), (f32, f32)) {
-        let rest = (studio_diorama::width(self.moment.clock, self.moment.badge), studio_diorama::H);
+        let rest = (nexora_diorama::width(self.moment.clock, self.moment.badge), nexora_diorama::H);
         let lift = if self.lifted { 2.0 * crate::pill::motion::HOVER_OUTSET } else { 0.0 };
         (rest, (rest.0 + lift, rest.1 + lift))
     }
 }
 
-/// How much of a captured pill is `studio_diorama`'s picture of `m`: the
+/// How much of a captured pill is `nexora_diorama`'s picture of `m`: the
 /// pixels at least 1 DIP inside its outline (the edge is anti-aliased onto
 /// the island under it) that match within [`PICTURE_TOLERANCE`], out of how
 /// many, and the largest difference in a channel. The picture is drawn
@@ -2052,7 +2052,7 @@ impl Sight {
 fn picture_match(frame: &Frame, body: Rect, origin: (i32, i32), scale: f32, m: &Moment, rest: (f32, f32), shown: (f32, f32)) -> (usize, usize, u8) {
     // Where `pill::diorama::draw` puts it: the body's top middle, on whole pixels.
     let at = crate::pill::shape::snap(Rect::new(body.center().x - shown.0 / 2.0, body.y, shown.0, shown.1), scale);
-    let p = studio_diorama::render(m, &View { w: at.w, h: at.h, rest_w: rest.0, rest_h: rest.1, scale });
+    let p = nexora_diorama::render(m, &View { w: at.w, h: at.h, rest_w: rest.0, rest_h: rest.1, scale });
     let (x0, y0) = ((at.x * scale).round() as i32 - origin.0, (at.y * scale).round() as i32 - origin.1);
     let (bw, bh) = (p.w as f32 / scale, p.h as f32 / scale);
     let r = bw.min(bh) / 2.0;
@@ -2104,10 +2104,10 @@ fn indigo_frame(p: [u8; 4]) -> bool {
 /// The Diorama theme's own checks for a picture of its resting pill, in the
 /// captured `frame` (`body` and `origin` as for [`picture_match`]; `geom`
 /// is what `pill::diorama` asks the island for).
-/// Its size: `studio_diorama::width` by 38 DIPs with round ends (radius 19),
+/// Its size: `nexora_diorama::width` by 38 DIPs with round ends (radius 19),
 /// 6 more each way under the pointer, measured in the pixels too. Not a
 /// black capsule: its frame is cream by day and indigo at night, its sky
-/// light at midday and dark deep in the night. And it is `studio_diorama`'s
+/// light at midday and dark deep in the night. And it is `nexora_diorama`'s
 /// picture of the moment, which puts the time in the sky and the glass ball
 /// on the house by day, on the tree at night.
 fn diorama_checks(frame: &Frame, body: Rect, origin: (i32, i32), scale: f32, s: &Sight, geom: Option<Geom>, checks: &mut Vec<Check>) {
@@ -2149,7 +2149,7 @@ fn diorama_checks(frame: &Frame, body: Rect, origin: (i32, i32), scale: f32, s: 
 
     // The frame, halfway through its thickness at the top, the bottom and
     // both ends. While the ball rolls it is between its two colours.
-    let mid = studio_diorama::BEZEL / 2.0;
+    let mid = nexora_diorama::BEZEL / 2.0;
     let px = |x: f32, y: f32| frame.at((x * scale).floor() as i32, (y * scale).floor() as i32);
     let (mx, my) = (b.x + b.w / 2.0, b.y + b.h / 2.0);
     let ring = [px(mx, b.y + mid), px(mx, b.bottom() - mid), px(b.x + mid, my), px(b.right() - mid, my)];
@@ -2199,7 +2199,7 @@ fn diorama_checks(frame: &Frame, body: Rect, origin: (i32, i32), scale: f32, s: 
     checks.push(check(
         "diorama-picture",
         picture_ok(seen),
-        format!("{} of {} pixels inside the pill are studio_diorama's picture of {} (largest difference in a channel: {})", seen.0, seen.1, s.what, seen.2),
+        format!("{} of {} pixels inside the pill are nexora_diorama's picture of {} (largest difference in a channel: {})", seen.0, seen.1, s.what, seen.2),
     ));
 }
 
@@ -2218,7 +2218,7 @@ pub fn fetch_phone_page(url: &str) -> (bool, String) {
     let fetch = || -> std::io::Result<String> {
         let mut s = TcpStream::connect_timeout(&addr, Duration::from_secs(3))?;
         s.set_read_timeout(Some(Duration::from_secs(5)))?;
-        write!(s, "GET /{path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: poni-selftest\r\n\r\n")?;
+        write!(s, "GET /{path} HTTP/1.1\r\nHost: {host}\r\nUser-Agent: nexora-selftest\r\n\r\n")?;
         let mut out = String::new();
         s.read_to_string(&mut out)?;
         Ok(out)
@@ -2296,7 +2296,7 @@ impl IeltsRun {
         run.server = Some(std::thread::spawn(move || ielts_server(listener, &seen, &stop)));
         let stand_in = paths::cache_dir().join("ielts-stand-in.wav");
         let _ = fs::create_dir_all(paths::cache_dir());
-        if let Err(e) = fs::write(&stand_in, poni_core::ielts::tone_wav(2.0, 220.0, poni_core::ielts::RATE)) {
+        if let Err(e) = fs::write(&stand_in, nexora_core::ielts::tone_wav(2.0, 220.0, nexora_core::ielts::RATE)) {
             run.note(format!("can't write the stand-in answer ({e})"));
         }
         crate::pinfo!("selftest: IELTS turn against 127.0.0.1:{port}");
@@ -2313,7 +2313,7 @@ impl IeltsRun {
     /// One self-test step, `t` seconds into the run: the check once it's over.
     fn step(&mut self, app: &mut App, t: f64) -> Option<Check> {
         use crate::commands::IeltsCmd;
-        use poni_core::ielts::Phase as P;
+        use nexora_core::ielts::Phase as P;
         let c = &app.st.ielts;
         let next = match self.step {
             IeltsStep::Ladder if c.me.is_some() => {
@@ -2387,7 +2387,7 @@ impl IeltsRun {
             && self.band == Some(6.5)
             && left == 0;
         let ok = turned || wine;
-        let band = self.band.map_or("none".into(), poni_core::ielts::fmt_band);
+        let band = self.band.map_or("none".into(), nexora_core::ielts::fmt_band);
         let note = if wine { "Wine has no WinRT HttpClient, so this runs on Windows only; " } else { "" };
         let detail = format!("{note}{}server saw [{}]; band shown {band}; files left in ielts/: {left}; {ms} ms", stopped.map_or(String::new(), |s| format!("{s}; ")), seen.join(" | "));
         crate::pinfo!("selftest: ielts-turn {}: {detail}", if ok { "ok" } else { "FAILED" });
@@ -2401,10 +2401,10 @@ const IELTS_ME: &str = r#"{"levels":[{"n":1,"name":"Pemanasan","blurb":"Part 1."
 
 /// The IELTS routes as catat-server answers them, for one session, until
 /// `stop`. What each request carried goes into `seen`, one line each. The
-/// answers are written as text (this ships in poni.exe: no `json!` code).
+/// answers are written as text (this ships in nexora.exe: no `json!` code).
 fn ielts_server(listener: std::net::TcpListener, seen: &Mutex<Vec<String>>, stop: &AtomicBool) {
     use std::io::{Read, Write};
-    let voice = poni_core::ielts::b64_encode(&poni_core::ielts::tone_wav(0.4, 440.0, poni_core::ielts::RATE));
+    let voice = nexora_core::ielts::b64_encode(&nexora_core::ielts::tone_wav(0.4, 440.0, nexora_core::ielts::RATE));
     let clip = |text: &str| format!(r#"{{"text":"{text}","lang":"en","audio":{{"mime":"audio/wav","b64":"{voice}"}}}}"#);
     let session = format!("/island/ielts/session/{IELTS_SESSION}");
     while !stop.load(std::sync::atomic::Ordering::SeqCst) {
@@ -2455,7 +2455,7 @@ fn ielts_server(listener: std::net::TcpListener, seen: &Mutex<Vec<String>>, stop
                 (200, format!(r#"{{"id":"{IELTS_SESSION}","turn":{turn},"fillers":[{}]}}"#, clip("Hmm, bentar ya.")))
             }
             ("POST", p) if p == format!("{session}/answer") => {
-                let wav = json["audio"]["b64"].as_str().and_then(poni_core::ielts::b64_decode).and_then(|b| poni_core::ielts::wav_info(&b));
+                let wav = json["audio"]["b64"].as_str().and_then(nexora_core::ielts::b64_decode).and_then(|b| nexora_core::ielts::wav_info(&b));
                 let mime = json["audio"]["mime"].as_str() == Some("audio/wav");
                 match wav.filter(|_| mime) {
                     Some(w) => line.push_str(&format!(" wav={}/{}/{} {:.1}s", w.rate, w.channels, w.bits, w.secs)),
@@ -2524,10 +2524,10 @@ impl NotesRun {
         let _ = listener.set_nonblocking(true);
         run.server = Some(std::thread::spawn(move || notes_server(listener, &seen, &stop)));
         let _ = fs::create_dir_all(&dir);
-        let rate = poni_core::notes::RATE;
+        let rate = nexora_core::notes::RATE;
         let parts = vec![dir.join("part-000.wav"), dir.join("part-001.wav")];
         for (path, secs) in parts.iter().zip([2.0, 1.0]) {
-            if let Err(e) = fs::write(path, poni_core::ielts::tone_wav(secs, 220.0, rate)) {
+            if let Err(e) = fs::write(path, nexora_core::ielts::tone_wav(secs, 220.0, rate)) {
                 run.note(format!("can't write a stand-in part ({e})"));
             }
         }
@@ -2544,7 +2544,7 @@ impl NotesRun {
 
     /// One self-test step, `t` seconds into the run: the check once it's over.
     fn step(&mut self, app: &mut App, t: f64) -> Option<Check> {
-        use poni_core::notes::Phase as P;
+        use nexora_core::notes::Phase as P;
         match &app.st.notes.phase {
             P::Ready => Some(self.finish(app, None)),
             P::Failed(p) => {
@@ -2645,7 +2645,7 @@ fn notes_server(listener: std::net::TcpListener, seen: &Mutex<Vec<String>>, stop
             }
             ("POST", p) if p.starts_with(&format!("{meeting}/part/")) => {
                 let n: u32 = p.rsplit('/').next().and_then(|n| n.parse().ok()).unwrap_or(0);
-                match poni_core::ielts::wav_info(&body) {
+                match nexora_core::ielts::wav_info(&body) {
                     Some(w) => line.push_str(&format!(" wav={}/{}/{} {:.1}s", w.rate, w.channels, w.bits, w.secs)),
                     None => line.push_str(" no wav"),
                 }
@@ -2723,11 +2723,11 @@ struct Report {
 // ---------------------------------------------------------------- driver
 
 enum Phase {
-    /// Record one transition frame by frame (PONI_SELFTEST_ANIM=1).
+    /// Record one transition frame by frame (NEXORA_SELFTEST_ANIM=1).
     Anim { seq: usize },
-    /// Record the media pill playing, then paused (PONI_SELFTEST_LOOP=1).
+    /// Record the media pill playing, then paused (NEXORA_SELFTEST_LOOP=1).
     Loop,
-    /// Film the lyrics moving to the next line (PONI_SELFTEST_SCROLL=<Hz>).
+    /// Film the lyrics moving to the next line (NEXORA_SELFTEST_SCROLL=<Hz>).
     Scroll,
     Settle { i: usize, since: f64, steps: u32, stable: u32 },
     Click { i: usize },
@@ -2752,7 +2752,7 @@ enum Phase {
     /// The Diorama theme's own pictures of its resting pill, `RESTS[k]`,
     /// each settled like a scene. Diorama runs only: after the scenes and
     /// the Settings window (or the scene deadline), or with
-    /// PONI_SELFTEST_DIORAMA=only from the start.
+    /// NEXORA_SELFTEST_DIORAMA=only from the start.
     Rests { k: usize, since: f64, steps: u32, stable: u32 },
     Finish { since: f64 },
     Done(i32),
@@ -2775,30 +2775,30 @@ pub struct SelfTest {
     writes: Vec<(String, JoinHandle<Vec<String>>)>,
     scale: f32,
     expanded_width: f32,
-    /// PONI_SELFTEST_DPI: render at this DPI instead of the monitor's.
+    /// NEXORA_SELFTEST_DPI: render at this DPI instead of the monitor's.
     dpi: Option<u32>,
-    /// PONI_SELFTEST_ANIM=1: after the scenes, record transitions frame by frame.
+    /// NEXORA_SELFTEST_ANIM=1: after the scenes, record transitions frame by frame.
     anim: bool,
-    /// PONI_SELFTEST_LOOP=1: after the scenes, record the media pill on a held
+    /// NEXORA_SELFTEST_LOOP=1: after the scenes, record the media pill on a held
     /// clock, frame by frame.
     media_loop: bool,
-    /// PONI_SELFTEST_SCROLL=<Hz>: after the scenes, film the lyrics moving to
+    /// NEXORA_SELFTEST_SCROLL=<Hz>: after the scenes, film the lyrics moving to
     /// the next line on a held clock, one frame per refresh at that rate.
     scroll_hz: Option<f64>,
     dpi_applied: bool,
-    /// PONI_SELFTEST_THEME=oyen|glass|pill|diorama: run every scene in that theme.
+    /// NEXORA_SELFTEST_THEME=oyen|glass|pill|diorama: run every scene in that theme.
     theme: Theme,
-    /// PONI_SELFTEST_DIORAMA=only, in the Diorama theme: its own pictures
+    /// NEXORA_SELFTEST_DIORAMA=only, in the Diorama theme: its own pictures
     /// (`RESTS`) and no scene.
     rests_only: bool,
     /// The Diorama theme's scenes: the clock they are held at (its
     /// pictures hold their own), and whether that is night
-    /// (PONI_SELFTEST_DIORAMA=night).
+    /// (NEXORA_SELFTEST_DIORAMA=night).
     diorama_clock: Option<(LocalDateTime, bool)>,
     /// The clock's 12 or 24 hours as the run found them: the Diorama
     /// pictures change the setting and put it back.
     use_24h: bool,
-    /// Glass: which page is under the island (PONI_SELFTEST_GLASS), the
+    /// Glass: which page is under the island (NEXORA_SELFTEST_GLASS), the
     /// window size its backdrop was drawn for, and the scene last seeded.
     glass: Option<GlassRun>,
     /// The frame budget the scenes were held to (for the report).
@@ -2807,17 +2807,17 @@ pub struct SelfTest {
     slow_frames: Vec<String>,
     glass_size: Cell<(i32, i32)>,
     glass_scene: Cell<Option<Scene>>,
-    /// PONI_SELFTEST_LYRICS=ja|ko|zh: the sample song in that language.
+    /// NEXORA_SELFTEST_LYRICS=ja|ko|zh: the sample song in that language.
     lyrics_lang: Option<String>,
     renderer: &'static str,
     /// The seeded shelf and its thumbnails (the empty-shelf scene hides
     /// them, and the page forgets thumbnails of items that left).
     shelf_items: Vec<ShelfItem>,
     shelf_thumbs: Vec<(String, Option<Image>)>,
-    /// The real add-on download (PONI_SELFTEST_ADDONS=download), running beside the scenes.
+    /// The real add-on download (NEXORA_SELFTEST_ADDONS=download), running beside the scenes.
     addon_fetch: Option<std::sync::mpsc::Receiver<(bool, String)>>,
-    /// Show over games' frame count, run on Poni's own frames: Windows' frame
-    /// log must deliver them (PONI_SELFTEST_FRAMES=required on Windows CI,
+    /// Show over games' frame count, run on Nexora's own frames: Windows' frame
+    /// log must deliver them (NEXORA_SELFTEST_FRAMES=required on Windows CI,
     /// which runs as admin).
     frames: Option<crate::services::frames::Frames>,
     /// The IELTS one-turn run, while it goes.
@@ -2843,7 +2843,7 @@ const LOOP_PAUSE_S: f64 = 2.4;
 const LOOP_FPS: f64 = 30.0;
 const LOOP_ALIGN_S: f64 = 4.8;
 const LOOP_PREROLL_S: f64 = 2.4;
-/// The lyrics scroll film (PONI_SELFTEST_SCROLL): where the track starts
+/// The lyrics scroll film (NEXORA_SELFTEST_SCROLL): where the track starts
 /// (the next line starts 0.5 s in), unsaved lead-in, and the filmed length.
 const SCROLL_FROM_S: f64 = 65.0;
 const SCROLL_PREROLL_S: f64 = 1.0;
@@ -2852,14 +2852,14 @@ const SCROLL_FILM_S: f64 = 1.3;
 impl SelfTest {
     pub fn new(dir: String) -> Self {
         let track_key = MediaSession::make_track_key(TITLE, ARTIST, ALBUM);
-        let theme = match std::env::var("PONI_SELFTEST_THEME").map(|v| v.trim().to_ascii_lowercase()).as_deref() {
+        let theme = match std::env::var("NEXORA_SELFTEST_THEME").map(|v| v.trim().to_ascii_lowercase()).as_deref() {
             Ok("oyen") => Theme::Oyen,
             Ok("glass") => Theme::Glass,
             Ok("pill") => Theme::Pill,
             Ok("diorama") => Theme::Diorama,
             _ => Theme::Classic,
         };
-        let diorama_run = std::env::var("PONI_SELFTEST_DIORAMA").map(|v| v.trim().to_ascii_lowercase()).unwrap_or_default();
+        let diorama_run = std::env::var("NEXORA_SELFTEST_DIORAMA").map(|v| v.trim().to_ascii_lowercase()).unwrap_or_default();
         let rests_only = theme == Theme::Diorama && diorama_run == "only";
         // The day the run starts, at a time in the morning (or the night):
         // the scenes' look never depends on when CI runs them.
@@ -2881,10 +2881,10 @@ impl SelfTest {
             writes: Vec::new(),
             scale: 1.0,
             expanded_width: 0.0,
-            dpi: std::env::var("PONI_SELFTEST_DPI").ok().and_then(|v| v.trim().parse().ok()),
-            anim: std::env::var("PONI_SELFTEST_ANIM").is_ok_and(|v| v.trim() == "1"),
-            media_loop: std::env::var("PONI_SELFTEST_LOOP").is_ok_and(|v| v.trim() == "1"),
-            scroll_hz: std::env::var("PONI_SELFTEST_SCROLL").ok().and_then(|v| v.trim().parse().ok()).filter(|hz: &f64| (20.0..=500.0).contains(hz)),
+            dpi: std::env::var("NEXORA_SELFTEST_DPI").ok().and_then(|v| v.trim().parse().ok()),
+            anim: std::env::var("NEXORA_SELFTEST_ANIM").is_ok_and(|v| v.trim() == "1"),
+            media_loop: std::env::var("NEXORA_SELFTEST_LOOP").is_ok_and(|v| v.trim() == "1"),
+            scroll_hz: std::env::var("NEXORA_SELFTEST_SCROLL").ok().and_then(|v| v.trim().parse().ok()).filter(|hz: &f64| (20.0..=500.0).contains(hz)),
             dpi_applied: false,
             theme,
             rests_only,
@@ -2895,7 +2895,7 @@ impl SelfTest {
             slow_frames: Vec::new(),
             glass_size: Cell::new((0, 0)),
             glass_scene: Cell::new(None),
-            lyrics_lang: std::env::var("PONI_SELFTEST_LYRICS").ok().map(|v| v.trim().to_ascii_lowercase()).filter(|v| !v.is_empty()),
+            lyrics_lang: std::env::var("NEXORA_SELFTEST_LYRICS").ok().map(|v| v.trim().to_ascii_lowercase()).filter(|v| !v.is_empty()),
             renderer: "software",
             shelf_items: Vec::new(),
             shelf_thumbs: Vec::new(),
@@ -2917,8 +2917,8 @@ impl SelfTest {
         let missing: Vec<&str> = AiPicture::ALL.into_iter().filter(|p| !SCENES.contains(&Scene::Ai(*p))).map(AiPicture::name).collect();
         let detail = if missing.is_empty() { format!("all {} of the AI page's pictures", AiPicture::ALL.len()) } else { format!("no scene for {}", missing.join(", ")) };
         self.checks.push(check("ai-pictures", missing.is_empty(), detail));
-        // Show over games: count Poni's own frames through the whole run.
-        let required = std::env::var("PONI_SELFTEST_FRAMES").is_ok_and(|v| v.trim().eq_ignore_ascii_case("required"));
+        // Show over games: count Nexora's own frames through the whole run.
+        let required = std::env::var("NEXORA_SELFTEST_FRAMES").is_ok_and(|v| v.trim().eq_ignore_ascii_case("required"));
         match crate::services::frames::Frames::start_selftest(std::process::id()) {
             Ok(f) => self.frames = Some(f),
             Err(e) if required => self.checks.push(check("frame-count", false, format!("the frame count didn't start: {e:?}"))),
@@ -2954,9 +2954,9 @@ impl SelfTest {
         let art = ImageData::new(ART_PX, ART_PX, make_art(ART_PX));
         self.art_color = Some(art.accent_color());
         self.art = Some(art);
-        // PONI_SELFTEST_LRC=<file>: a real song for a one-off check on CI
+        // NEXORA_SELFTEST_LRC=<file>: a real song for a one-off check on CI
         // (fetched there at run time; song lyrics never go in the repo).
-        let file = std::env::var("PONI_SELFTEST_LRC").ok().and_then(|p| fs::read_to_string(p.trim()).ok());
+        let file = std::env::var("NEXORA_SELFTEST_LRC").ok().and_then(|p| fs::read_to_string(p.trim()).ok());
         let lrc = match (file.as_deref(), self.lyrics_lang.as_deref()) {
             (Some(f), _) => f,
             (None, Some("ja")) => LYRICS_JA,
@@ -2976,24 +2976,24 @@ impl SelfTest {
         if let Some(pos) = lyric_scene_pos(&parsed) {
             self.lyric_pos = pos;
         }
-        // PONI_SELFTEST_ANALYZER: "required" (Windows CI) = Windows' own
+        // NEXORA_SELFTEST_ANALYZER: "required" (Windows CI) = Windows' own
         // analyzer must work and every line must read, kanji lines included;
         // "off" = read the song the way a PC without Windows' Japanese reading
         // data does (Oyenza Studio's own dictionary), every line too; "kana" = the
         // way 0.1.11 and older read it there (kana lines only), for
         // before/after pictures. Without it, Wine has no analyzer, so its
         // lines come from Oyenza Studio's own dictionary.
-        let analyzer = std::env::var("PONI_SELFTEST_ANALYZER").map(|v| v.trim().to_ascii_lowercase()).unwrap_or_default();
+        let analyzer = std::env::var("NEXORA_SELFTEST_ANALYZER").map(|v| v.trim().to_ascii_lowercase()).unwrap_or_default();
         let texts: Vec<&str> = parsed.lines.iter().map(|l| l.text.trim()).collect();
-        let japanese = poni_core::romanize::song_script(&texts) == Some(poni_core::romanize::Script::Japanese);
+        let japanese = nexora_core::romanize::song_script(&texts) == Some(nexora_core::romanize::Script::Japanese);
         if analyzer == "required" {
             let works = crate::services::romanize::analyzer_works();
             self.checks.push(check("japanese-analyzer", works.is_ok(), works.err().unwrap_or_else(|| "Windows' analyzer reads Japanese".into())));
         }
-        // PONI_SELFTEST_JA_DICT=<file> (CI passes the repo's copy): Oyen
-        // Poni's own dictionary, put where the Japanese readings add-on keeps
+        // NEXORA_SELFTEST_JA_DICT=<file> (CI passes the repo's copy): Oyen
+        // Nexora's own dictionary, put where the Japanese readings add-on keeps
         // it, so the run reads Japanese the way a PC with the add-on does.
-        if let Ok(src) = std::env::var("PONI_SELFTEST_JA_DICT") {
+        if let Ok(src) = std::env::var("NEXORA_SELFTEST_JA_DICT") {
             let file = &JAPANESE_READINGS.files[0];
             let to = crate::services::addons::file_path(&JAPANESE_READINGS, file.name);
             let placed = fs::read(src.trim()).map_err(|e| format!("{}: {e}", src.trim())).and_then(|b| {
@@ -3011,7 +3011,7 @@ impl SelfTest {
         } else if japanese && analyzer == "kana" {
             // A PC without Windows' Japanese data or the add-on: kana lines
             // read, and the Music page offers the add-on.
-            let kana = |t: &str| if poni_core::romanize::needs_roman(t) { poni_core::romanize::japanese_kana_ruby(t).unwrap_or_default() } else { Vec::new() };
+            let kana = |t: &str| if nexora_core::romanize::needs_roman(t) { nexora_core::romanize::japanese_kana_ruby(t).unwrap_or_default() } else { Vec::new() };
             (texts.iter().map(|t| kana(t)).collect(), true)
         } else {
             // Read on a thread in the multithreaded apartment, the way the
@@ -3031,8 +3031,8 @@ impl SelfTest {
         if let Some(lang) = &lang {
             // The CI log shows how each line reads (on Windows the Japanese
             // readings come from the system's analyzer).
-            let read = |p: &[poni_core::romanize::Ruby]| p.iter().filter(|r| !r.roman.is_empty()).map(|r| r.roman.as_str()).collect::<Vec<_>>().join(" ");
-            let needing = texts.iter().filter(|t| poni_core::romanize::needs_roman(t)).count();
+            let read = |p: &[nexora_core::romanize::Ruby]| p.iter().filter(|r| !r.roman.is_empty()).map(|r| r.roman.as_str()).collect::<Vec<_>>().join(" ");
+            let needing = texts.iter().filter(|t| nexora_core::romanize::needs_roman(t)).count();
             let lines_read = ruby.iter().filter(|p| p.iter().any(|r| !r.roman.is_empty())).count();
             for (line, p) in parsed.lines.iter().zip(&ruby) {
                 crate::pinfo!("selftest: [{lang}] {} -> {}", line.text, read(p));
@@ -3062,14 +3062,14 @@ impl SelfTest {
         };
         self.checks.push(check("notifications", ok, detail));
 
-        // PONI_SELFTEST_ADDONS=download (Windows CI): fetch every add-on's files
+        // NEXORA_SELFTEST_ADDONS=download (Windows CI): fetch every add-on's files
         // from their releases and check each against the size and SHA-256 built in.
-        if std::env::var("PONI_SELFTEST_ADDONS").is_ok_and(|v| v.trim() == "download") {
+        if std::env::var("NEXORA_SELFTEST_ADDONS").is_ok_and(|v| v.trim() == "download") {
             let (tx, rx) = std::sync::mpsc::channel();
             let dir = paths::addons_dir().join("selftest-download");
             let _ = std::thread::Builder::new().name("selftest-addon".into()).spawn(move || {
                 let (mut ok, mut said) = (true, Vec::new());
-                for a in poni_core::addons::ALL {
+                for a in nexora_core::addons::ALL {
                     // An add-on whose files aren't on their release yet (the
                     // Downloader until addon-downloader-1 is published) has
                     // nothing to check; its switch says so (`Status::Unpinned`).
@@ -3310,10 +3310,10 @@ impl SelfTest {
                             self.checks.push(check("settings-window-frame", median(&full) < SETTINGS_FRAME_BUDGET_MS, detail));
                             // A person using it, filmed: what the glides' frames
                             // drawn in part show must be what drawing it all shows.
-                            // PONI_SELFTEST_FILM keeps every frame as the screen shows
+                            // NEXORA_SELFTEST_FILM keeps every frame as the screen shows
                             // it (film-settings.bgra: premultiplied BGRA, one frame after
                             // another) and the part each drew (film-settings.json).
-                            let mut keep = std::env::var_os("PONI_SELFTEST_FILM").and_then(|_| fs::File::create(self.dir.join("film-settings.bgra")).ok()).map(std::io::BufWriter::new);
+                            let mut keep = std::env::var_os("NEXORA_SELFTEST_FILM").and_then(|_| fs::File::create(self.dir.join("film-settings.bgra")).ok()).map(std::io::BufWriter::new);
                             let mut parts = Vec::new();
                             let film = app.selftest_settings_film(144.0, |k, _, _, px, part| {
                                 if let Some(out) = keep.as_mut() {
@@ -3669,7 +3669,7 @@ impl SelfTest {
             st.accent = match self.theme {
                 Theme::Oyen => crate::oyen::ORANGE,
                 // Diorama's own, as the app keeps it (`theme_accent`).
-                Theme::Diorama => poni_core::look::DIORAMA_ACCENT,
+                Theme::Diorama => nexora_core::look::DIORAMA_ACCENT,
                 _ => palette::BLUE,
             };
         }
@@ -3844,7 +3844,7 @@ impl SelfTest {
         };
         st.oyenza = if scene.oyenza() { fake_oyenza(st, scene, now) } else { OyenzaState::default() };
         // Today's list starts at today, or at the date clicked ten days on.
-        st.ui.today_pick = (scene == Scene::TodayPicked).then(|| poni_core::agenda::day_num(&st.day_key()).unwrap_or(0) + 10);
+        st.ui.today_pick = (scene == Scene::TodayPicked).then(|| nexora_core::agenda::day_num(&st.day_key()).unwrap_or(0) + 10);
         st.ui.today_jump = st.ui.today_pick.is_some();
         st.ui.today_scroll = 0.0;
         st.ui.today_drawn = now;
@@ -3895,7 +3895,7 @@ impl SelfTest {
         seed_notifications(st, scene);
         seed_ielts(st, scene, now);
         seed_notes(st, scene, now);
-        st.ui.addon_about = (scene == Scene::AddonsAbout).then_some(poni_core::addons::AI_USAGE.id);
+        st.ui.addon_about = (scene == Scene::AddonsAbout).then_some(nexora_core::addons::AI_USAGE.id);
         if scene.pro() {
             st.oyenza.link = OyenzaLink::Connected { account: "a•••@example.com".into() };
             st.oyenza.pro = Some(true);
@@ -3907,7 +3907,7 @@ impl SelfTest {
         }
         seed_prayer(st, scene, until);
         // The Script page: empty, or partway through the sample script.
-        st.script = poni_core::script::Reader::default();
+        st.script = nexora_core::script::Reader::default();
         if matches!(scene, Scene::ScriptReading | Scene::ScriptRecorder) {
             st.store.script.text = SAMPLE_SCRIPT.into();
             st.script.word = 22;
@@ -3918,7 +3918,7 @@ impl SelfTest {
         st.recorder = scene.recorder();
         st.store.recorder_island = scene.recorder() && scene != Scene::ScriptRecorder;
         st.rec = scene.recording(now);
-        st.settings.record = poni_core::settings::RecordSettings::default();
+        st.settings.record = nexora_core::settings::RecordSettings::default();
         st.system = fake_system(scene);
         st.settings.game_stats = scene.game();
         st.game = fake_game(scene, &mut st.system);
@@ -3976,7 +3976,7 @@ impl SelfTest {
     /// on a held clock the minute turns 18:00 and the glass ball sets off
     /// for the tree, is halfway after half its [`ROLL_S`], and rests there
     /// once they are over. The ball asks for frames while it rolls and for
-    /// none once it has arrived, and each frame is `studio_diorama`'s
+    /// none once it has arrived, and each frame is `nexora_diorama`'s
     /// picture of that point of the roll. Returns the frame of the ball
     /// halfway, which is the picture kept. Waits the roll out (about 1.5 s)
     /// so the app's clock never runs ahead of the real one.
@@ -4010,7 +4010,7 @@ impl SelfTest {
             "diorama-roll",
             sets_off && rolling && picture_ok(halfway),
             format!(
-                "at {hour:02}:{minute:02} the ball set off and {}; halfway it {}, and {} of {} pixels inside the pill are studio_diorama's picture of the ball halfway across (largest difference in a channel: {})",
+                "at {hour:02}:{minute:02} the ball set off and {}; halfway it {}, and {} of {} pixels inside the pill are nexora_diorama's picture of the ball halfway across (largest difference in a channel: {})",
                 said(sets_off),
                 said(rolling),
                 halfway.0,
@@ -4022,7 +4022,7 @@ impl SelfTest {
             "diorama-roll-ends",
             !still_wants && picture_ok(arrived),
             format!(
-                "{:.2} s after it set off the ball {}, and {} of {} pixels inside the pill are studio_diorama's picture of the ball on the tree (largest difference in a channel: {})",
+                "{:.2} s after it set off the ball {}, and {} of {} pixels inside the pill are nexora_diorama's picture of the ball on the tree (largest difference in a channel: {})",
                 ROLL_S + 0.05,
                 said(still_wants),
                 arrived.0,
@@ -4039,7 +4039,7 @@ impl SelfTest {
     /// go there, it rolls on to the tree and the theme keeps the night 45
     /// minutes after sunset, the clock in the sky still the morning's;
     /// tapped, it rolls back to the house and the morning. Each is
-    /// `studio_diorama`'s picture. Returns the frame of the ball halfway,
+    /// `nexora_diorama`'s picture. Returns the frame of the ball halfway,
     /// the picture kept. Waits its rolls out (about 1.6 s), as `sunset` does.
     fn slide(&self, app: &mut App, before: &Sight, scale: f32, checks: &mut Vec<Check>) -> Option<(i32, i32, Vec<u8>)> {
         let wait = |s: f64| std::thread::sleep(std::time::Duration::from_secs_f64(s));
@@ -4069,7 +4069,7 @@ impl SelfTest {
             "diorama-slide",
             in_hand && !held_wants && picture_ok(half),
             format!(
-                "pressed on the house end and carried halfway, the ball is {}in hand and the frame {} while the pointer rests; {} of {} pixels inside the pill are studio_diorama's picture of the sunset it passes (largest difference in a channel: {})",
+                "pressed on the house end and carried halfway, the ball is {}in hand and the frame {} while the pointer rests; {} of {} pixels inside the pill are nexora_diorama's picture of the sunset it passes (largest difference in a channel: {})",
                 if in_hand { "" } else { "not " },
                 said(held_wants),
                 half.0,
@@ -4089,7 +4089,7 @@ impl SelfTest {
             "diorama-slid",
             rolls_on && !night_wants && theme_night && picture_ok(at_night),
             format!(
-                "let go halfway, the ball {} and 0.45 s on {}; the theme shows its {}, and {} of {} pixels inside the pill are studio_diorama's picture of the night 45 minutes after sunset with the clock at {:02}:{:02} (largest difference in a channel: {})",
+                "let go halfway, the ball {} and 0.45 s on {}; the theme shows its {}, and {} of {} pixels inside the pill are nexora_diorama's picture of the night 45 minutes after sunset with the clock at {:02}:{:02} (largest difference in a channel: {})",
                 said(rolls_on),
                 said(night_wants),
                 if theme_night { "night" } else { "day" },
@@ -4113,7 +4113,7 @@ impl SelfTest {
             "diorama-tap",
             !opened && flips && !back_wants && !back_night && picture_ok(back),
             format!(
-                "tapped at the tree, the island {} and the ball {}; 1.15 s on it {}; the theme shows its {}, and {} of {} pixels inside the pill are studio_diorama's picture of the morning (largest difference in a channel: {})",
+                "tapped at the tree, the island {} and the ball {}; 1.15 s on it {}; the theme shows its {}, and {} of {} pixels inside the pill are nexora_diorama's picture of the morning (largest difference in a channel: {})",
                 if opened { "opened" } else { "stayed closed" },
                 said(flips),
                 said(back_wants),
@@ -4264,7 +4264,7 @@ impl SelfTest {
                 // Glass shows what's under it, so no one ground colour: opaque is
                 // the rule, and smoked glass (no backdrop) lets the screen through.
                 let copy = app.selftest_glass_state().1;
-                let min = if copy { 254 } else { (poni_core::glass::SMOKED_OPACITY * 255.0) as u8 - 3 };
+                let min = if copy { 254 } else { (nexora_core::glass::SMOKED_OPACITY * 255.0) as u8 - 3 };
                 checks.push(check("glass-opaque", a >= min, format!("pixel ({cx}, {top}) = rgba({r}, {g}, {b}, {a}), want alpha >= {min}")));
             } else if picture {
                 // A picture covers the island's ground: opaque is the rule
@@ -4548,7 +4548,7 @@ impl SelfTest {
         }
         let median = Frame { w, h, px: &seen }.median_in(body, scale);
         let ink = [look.ink.r, look.ink.g, look.ink.b];
-        let c = poni_core::glass::contrast(median, ink);
+        let c = nexora_core::glass::contrast(median, ink);
         checks.push(check("glass-ink-contrast", c >= 4.5, format!("{c:.2}:1 for ink rgb{:?} on glass rgb{:?}", rgb8(look.ink), median.map(|v| (v * 255.0).round() as u8))));
         if run == GlassRun::Flip {
             let want_light = scene.expanded();
@@ -4576,7 +4576,7 @@ impl SelfTest {
             }
             errors
         };
-        match std::thread::Builder::new().name("poni-selftest-png".into()).spawn(job) {
+        match std::thread::Builder::new().name("nexora-selftest-png".into()).spawn(job) {
             Ok(handle) => self.writes.push((name.to_string(), handle)),
             Err(e) => self.checks.push(check("png-writer", false, format!("{name}: could not start a writer thread: {e}"))),
         }
@@ -4630,7 +4630,7 @@ impl SelfTest {
         let mut code = if ok { 0 } else { 1 };
         let total_ms = self.t0.elapsed().as_millis() as u64;
         let report = Report {
-            app: "Poni",
+            app: "Nexora",
             version: env!("CARGO_PKG_VERSION"),
             ok,
             exit_code: code,
@@ -5087,7 +5087,7 @@ fn lyric_line_check(st: &AppState) -> Check {
     match lyrics.and_then(|l| l.line_index_at(pos).map(|k| (k, l.lines[k].text.trim()))) {
         Some((k, text)) if !text.is_empty() => {
             // The reading the pill sings under it, when the song has them.
-            let reading = st.lyrics.ruby.get(k).filter(|_| st.settings.lyrics_pronunciation).and_then(|p| poni_core::romanize::reading(p));
+            let reading = st.lyrics.ruby.get(k).filter(|_| st.settings.lyrics_pronunciation).and_then(|p| nexora_core::romanize::reading(p));
             let under = reading.map(|r| format!(", read \"{r}\"")).unwrap_or_default();
             check("lyric-line", true, format!("line {} \"{text}\"{under} sung at {pos:.1} s", k + 1))
         }
@@ -5177,7 +5177,7 @@ fn rgb8(c: Color) -> [u8; 3] {
 
 // ---------------------------------------------------------------- Glass backdrops
 
-/// What the Glass self-test puts under the island (PONI_SELFTEST_GLASS).
+/// What the Glass self-test puts under the island (NEXORA_SELFTEST_GLASS).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum GlassRun {
     /// A light browser page, Windows in light mode.
@@ -5191,7 +5191,7 @@ enum GlassRun {
 
 impl GlassRun {
     fn from_env() -> Self {
-        match std::env::var("PONI_SELFTEST_GLASS").map(|v| v.trim().to_ascii_lowercase()).as_deref() {
+        match std::env::var("NEXORA_SELFTEST_GLASS").map(|v| v.trim().to_ascii_lowercase()).as_deref() {
             Ok("dark") => GlassRun::Dark,
             Ok("flip") => GlassRun::Flip,
             _ => GlassRun::Light,
@@ -5380,8 +5380,8 @@ fn backdrop_dip(dark: bool, x: f32, y: f32) -> [u8; 3] {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
 
     /// The app's state in the Diorama picture `r`, as `apply_rest` leaves it.
     fn state(r: &Rest) -> AppState {
@@ -5393,7 +5393,7 @@ mod tests {
         st
     }
 
-    /// A captured frame of the pill as the app draws it: `studio_diorama`'s
+    /// A captured frame of the pill as the app draws it: `nexora_diorama`'s
     /// picture of `m`, `shown` DIPs large around a pane of `rest`, cut to a
     /// capsule with ends of `radius`, floating below the top of a window
     /// with its middle `cx` DIPs in (`Island::body_rect_at`). The frame
@@ -5404,7 +5404,7 @@ mod tests {
         // Under the pointer the pill reaches 2 DIPs up into its 8 DIP gap.
         let body = Rect::new(cx - shown.0 / 2.0, if shown.1 > rest.1 { 6.0 } else { 8.0 }, shown.0, shown.1);
         let at = crate::pill::shape::snap(body, scale);
-        let p = studio_diorama::render(m, &View { w: at.w, h: at.h, rest_w: rest.0, rest_h: rest.1, scale });
+        let p = nexora_diorama::render(m, &View { w: at.w, h: at.h, rest_w: rest.0, rest_h: rest.1, scale });
         let (w, h) = (((body.right() + 20.0) * scale).ceil() as i32 - origin.0, ((body.bottom() + 20.0) * scale).ceil() as i32 - origin.1);
         let (x0, y0) = ((at.x * scale).round() as i32 - origin.0, (at.y * scale).round() as i32 - origin.1);
         let mut px = vec![0u8; (w * h * 4) as usize];

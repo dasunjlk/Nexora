@@ -16,7 +16,7 @@
 //! call Apple Music doesn't answer within [`TRANSACTION_MS`], so a hung player
 //! can't stall now playing for long.
 
-use poni_core::nowplaying;
+use nexora_core::nowplaying;
 use std::time::{Duration, Instant};
 use windows::core::{Interface, PWSTR, VARIANT};
 use windows::Win32::Foundation::{CloseHandle, BOOL, HWND, LPARAM, TRUE};
@@ -329,11 +329,11 @@ mod tests {
 
     /// CI runs `tools/fake-apple-music.cs` as AppleMusic.exe: a window with a
     /// slider and a back button under Apple Music's automation ids, logging
-    /// what happens to them to `PONI_FAKE_AM_LOG`.
+    /// what happens to them to `NEXORA_FAKE_AM_LOG`.
     #[test]
     #[ignore = "needs the stand-in Apple Music window (tools/fake-apple-music.cs, run by CI)"]
     fn presses_apple_musics_own_controls() {
-        let log = std::env::var("PONI_FAKE_AM_LOG").expect("PONI_FAKE_AM_LOG names the stand-in's log");
+        let log = std::env::var("NEXORA_FAKE_AM_LOG").expect("NEXORA_FAKE_AM_LOG names the stand-in's log");
         wait_for(&log, "ready");
         let _ = unsafe { CoInitializeEx(None, COINIT_MULTITHREADED) };
         let mut ui = AppleMusicUi::default();

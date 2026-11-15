@@ -42,14 +42,14 @@ jobs:
 
       - name: Build (Apple Silicon and Intel)
         run: |
-          cargo build -p poni --release --target aarch64-apple-darwin
-          cargo build -p poni --release --target x86_64-apple-darwin
+          cargo build -p nexora --release --target aarch64-apple-darwin
+          cargo build -p nexora --release --target x86_64-apple-darwin
 
       - name: Unit tests (core)
-        run: cargo test -p poni-core -p studio-usage -p studio-diorama --release
+        run: cargo test -p nexora-core -p nexora-usage -p nexora-diorama --release
 
       # The Downloader add-on for real (services/downloader_live.rs): yt-dlp,
-      # our QuickJS-ng and our FFmpeg exactly as poni_core::addons pins them
+      # our QuickJS-ng and our FFmpeg exactly as nexora_core::addons pins them
       # for the Mac, made runnable as the add-on makes them, then a 70 s
       # Blender film from Blender's own PeerTube as video and as sound, and
       # through the island's own runner (a process group per download, and a
@@ -57,7 +57,7 @@ jobs:
       # film's site having trouble only warns.
       - name: Downloader with the pinned tools and a real link
         timeout-minutes: 10
-        run: cargo test -p poni --release --target aarch64-apple-darwin the_pinned_tools_download_a_real_link -- --ignored --nocapture
+        run: cargo test -p nexora --release --target aarch64-apple-darwin the_pinned_tools_download_a_real_link -- --ignored --nocapture
 
       # The island around a MacBook's notch (mac/notch.rs): where each state
       # sits in Pill and in Diorama, whose resting pill floats below the menu
@@ -66,7 +66,7 @@ jobs:
       # build only for a Mac, so they run here, from the test build the step
       # above made.
       - name: Unit tests (the island around a notch, the renders)
-        run: cargo test -p poni --release --target aarch64-apple-darwin -- notch::tests render::tests
+        run: cargo test -p nexora --release --target aarch64-apple-darwin -- notch::tests render::tests
 
       # Every island state with sample data, Classic, Oyen, Glass (a
       # smoked stand-in for macOS's glass), Pill and Diorama (Pill with a
@@ -75,7 +75,7 @@ jobs:
       # notch layouts are looked at.
       - name: Render the island (offscreen)
         run: |
-          bin=target/aarch64-apple-darwin/release/poni
+          bin=target/aarch64-apple-darwin/release/nexora
           $bin --render mac-renders
           $bin --render mac-renders --theme oyen
           $bin --render mac-renders --theme glass
@@ -112,7 +112,7 @@ jobs:
       - name: App bundle and DMG
         run: |
           chmod +x tools/make_mac_app.sh
-          MEDIAREMOTE_BUILD=build/mediaremote tools/make_mac_app.sh target/aarch64-apple-darwin/release/poni target/x86_64-apple-darwin/release/poni build/OyenzaStudio.icns dist
+          MEDIAREMOTE_BUILD=build/mediaremote tools/make_mac_app.sh target/aarch64-apple-darwin/release/nexora target/x86_64-apple-darwin/release/nexora build/OyenzaStudio.icns dist
 
       # The real app on the runner's screen: idle, hover, open (Focus, then
       # Today with live stats), the timer, a notice, the volume and charging
@@ -127,20 +127,20 @@ jobs:
       - name: Smoke run (the real window, with screenshots)
         env:
           MEDIAREMOTE_TEST_CLIENT: build/mediaremote/MediaRemoteAdapterTestClient
-        run: bash tools/mac-smoke.sh "dist/Oyenza Studio.app/Contents/MacOS/poni"
+        run: bash tools/mac-smoke.sh "dist/Oyenza Studio.app/Contents/MacOS/nexora"
 
       - name: Check the DMG
         run: |
           dmg=$(ls dist/*.dmg)
-          hdiutil attach "$dmg" -nobrowse -readonly -mountpoint /tmp/poni-dmg
-          ls -la /tmp/poni-dmg
+          hdiutil attach "$dmg" -nobrowse -readonly -mountpoint /tmp/nexora-dmg
+          ls -la /tmp/nexora-dmg
           # What a PR costs on the Mac: the DMG, and the app's binary in it.
-          ls -l "$dmg" "/tmp/poni-dmg/Oyenza Studio.app/Contents/MacOS/poni"
-          plutil -p "/tmp/poni-dmg/Oyenza Studio.app/Contents/Info.plist"
-          lipo -info "/tmp/poni-dmg/Oyenza Studio.app/Contents/MacOS/poni"
-          codesign --verify --deep --strict "/tmp/poni-dmg/Oyenza Studio.app"
-          spctl --assess --type execute -vv "/tmp/poni-dmg/Oyenza Studio.app" || echo "(expected: Gatekeeper turns down a build that isn't signed with a Developer ID yet)"
-          hdiutil detach /tmp/poni-dmg
+          ls -l "$dmg" "/tmp/nexora-dmg/Oyenza Studio.app/Contents/MacOS/nexora"
+          plutil -p "/tmp/nexora-dmg/Oyenza Studio.app/Contents/Info.plist"
+          lipo -info "/tmp/nexora-dmg/Oyenza Studio.app/Contents/MacOS/nexora"
+          codesign --verify --deep --strict "/tmp/nexora-dmg/Oyenza Studio.app"
+          spctl --assess --type execute -vv "/tmp/nexora-dmg/Oyenza Studio.app" || echo "(expected: Gatekeeper turns down a build that isn't signed with a Developer ID yet)"
+          hdiutil detach /tmp/nexora-dmg
 
       # A Mac installs its own update (docs/updates.md): an installed copy
       # finds a newer version waiting (this build numbered 99.0.0, in a DMG
@@ -170,7 +170,7 @@ jobs:
             smoke/*.png
             smoke/report.json
             smoke/stdout.txt
-            smoke/home/poni.log
+            smoke/home/nexora.log
 
   # The Downloader add-on's Mac tools (addons/downloader-mac/NOTICE.txt): our
   # minimal FFmpeg (tools/build-ffmpeg-min.sh) and QuickJS-ng, each one file
@@ -231,13 +231,13 @@ jobs:
           shasum -a 256 ffmpeg-mac qjs-mac | tee SHA256SUMS
           ls -l ffmpeg-mac qjs-mac
       # The app downloads the files on addon-downloader-mac-1, pinned in
-      # poni_core::addons::DOWNLOADER_MAC. A build here that differs (another
+      # nexora_core::addons::DOWNLOADER_MAC. A build here that differs (another
       # Xcode, another script) is worth knowing, not a failure: the release's
       # files are the ones people get.
       - name: Same bytes as the pinned files
         run: |
           for f in ffmpeg qjs; do
-            pin=$(grep -o "name: \"$f\", size: [0-9_]*, sha256: \"[0-9a-f]*\"" crates/poni-core/src/addons.rs | grep -o '[0-9a-f]\{64\}' || true)
+            pin=$(grep -o "name: \"$f\", size: [0-9_]*, sha256: \"[0-9a-f]*\"" crates/nexora-core/src/addons.rs | grep -o '[0-9a-f]\{64\}' || true)
             got=$(shasum -a 256 "dist/downloader-mac/$f-mac" | cut -d' ' -f1)
             if [ "$pin" = "$got" ]; then echo "$f matches the pin ($got)"; else echo "::warning::this build of the Mac's $f ($got) isn't the pinned one (${pin:-none})"; fi
           done
@@ -274,11 +274,11 @@ jobs:
         run: |
           chmod +x "$MEDIAREMOTE_TEST_CLIENT"
           sw_vers
-          hdiutil attach dmg/*.dmg -nobrowse -readonly -mountpoint /tmp/poni-dmg
+          hdiutil attach dmg/*.dmg -nobrowse -readonly -mountpoint /tmp/nexora-dmg
           mkdir -p dist
-          cp -R "/tmp/poni-dmg/Oyenza Studio.app" dist/
-          hdiutil detach /tmp/poni-dmg
-          bash tools/mac-smoke.sh "dist/Oyenza Studio.app/Contents/MacOS/poni"
+          cp -R "/tmp/nexora-dmg/Oyenza Studio.app" dist/
+          hdiutil detach /tmp/nexora-dmg
+          bash tools/mac-smoke.sh "dist/Oyenza Studio.app/Contents/MacOS/nexora"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -287,7 +287,7 @@ jobs:
             smoke/*.png
             smoke/report.json
             smoke/stdout.txt
-            smoke/home/poni.log
+            smoke/home/nexora.log
 
   # The signing path on every run that isn't a release, with a throwaway
   # certificate: the app gets the hardened runtime and its entitlements, the
@@ -342,14 +342,14 @@ jobs:
           MEDIAREMOTE_TEST_CLIENT: build/mediaremote/MediaRemoteAdapterTestClient
         run: |
           chmod +x "$MEDIAREMOTE_TEST_CLIENT"
-          hdiutil attach signed/*.dmg -nobrowse -readonly -mountpoint /tmp/poni-signed
+          hdiutil attach signed/*.dmg -nobrowse -readonly -mountpoint /tmp/nexora-signed
           mkdir -p dist
-          cp -R /tmp/poni-signed/*.app dist/
-          hdiutil detach /tmp/poni-signed
+          cp -R /tmp/nexora-signed/*.app dist/
+          hdiutil detach /tmp/nexora-signed
           apps=(dist/*.app)
           app="${apps[0]}"
           codesign --display --verbose=2 "$app" 2>&1 | grep -E "^(Authority|Timestamp|CodeDirectory)"
-          bash tools/mac-smoke.sh "$app/Contents/MacOS/poni"
+          bash tools/mac-smoke.sh "$app/Contents/MacOS/nexora"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -358,7 +358,7 @@ jobs:
             smoke/*.png
             smoke/report.json
             smoke/stdout.txt
-            smoke/home/poni.log
+            smoke/home/nexora.log
 
   # The release DMG, signed with the Developer ID, notarized by Apple and
   # stapled, so it opens with a plain "Open". Runs on release tags, and by hand
@@ -453,13 +453,13 @@ jobs:
           MEDIAREMOTE_TEST_CLIENT: build/mediaremote/MediaRemoteAdapterTestClient
         run: |
           chmod +x "$MEDIAREMOTE_TEST_CLIENT"
-          hdiutil attach signed/*.dmg -nobrowse -readonly -mountpoint /tmp/poni-signed
+          hdiutil attach signed/*.dmg -nobrowse -readonly -mountpoint /tmp/nexora-signed
           mkdir -p dist
-          cp -R /tmp/poni-signed/*.app dist/
-          hdiutil detach /tmp/poni-signed
+          cp -R /tmp/nexora-signed/*.app dist/
+          hdiutil detach /tmp/nexora-signed
           apps=(dist/*.app)
           app="${apps[0]}"
-          bash tools/mac-smoke.sh "$app/Contents/MacOS/poni"
+          bash tools/mac-smoke.sh "$app/Contents/MacOS/nexora"
       # The signed app's reader for macOS's now playing (browsers, any player),
       # tried the way the build job tries the unsigned framework: as signed in
       # the app, and as the copy the app made in its cache folder. It only
@@ -496,7 +496,7 @@ jobs:
             smoke/*.png
             smoke/report.json
             smoke/stdout.txt
-            smoke/home/poni.log
+            smoke/home/nexora.log
       - name: Remove the keychain and the key
         if: always()
         run: |
@@ -505,7 +505,7 @@ jobs:
 
   # The Mac app on the release: Oyenza-Studio-<version>-mac.dmg, plus
   # Oyenza-Studio-Mac.dmg, the fixed name the README's and the website's Mac
-  # buttons download from releases/latest, and Oyen-Poni-Mac.dmg, the fixed
+  # buttons download from releases/latest, and Oyen-Nexora-Mac.dmg, the fixed
   # name from before the rename (0.1.17 to the last 0.1.x), which links out there still
   # use. ci publishes the release once the Windows build, installer and install
   # test pass, so this waits for it. It
@@ -551,12 +551,12 @@ jobs:
           src=$(ls dist/*.dmg | head -1)
           [ "$src" = "dist/Oyenza-Studio-${tag#v}-mac.dmg" ] || cp "$src" "dist/Oyenza-Studio-${tag#v}-mac.dmg"
           cp "$src" dist/Oyenza-Studio-Mac.dmg
-          cp "$src" dist/Oyen-Poni-Mac.dmg
+          cp "$src" dist/Oyen-Nexora-Mac.dmg
           for i in $(seq 1 90); do
             gh release view "$tag" > /dev/null 2>&1 && break
             sleep 30
           done
-          gh release upload "$tag" "dist/Oyenza-Studio-${tag#v}-mac.dmg" dist/Oyenza-Studio-Mac.dmg dist/Oyen-Poni-Mac.dmg --clobber
+          gh release upload "$tag" "dist/Oyenza-Studio-${tag#v}-mac.dmg" dist/Oyenza-Studio-Mac.dmg dist/Oyen-Nexora-Mac.dmg --clobber
       # latest.json tells Macs about a release only once its DMG is there
       # (docs/updates.md): have the Website workflow write it again now.
       - name: Let the update file name the DMG

@@ -303,7 +303,7 @@ pub fn release() {
 
 /// Draw `r` of the window again (DIPs), on the next display pass: a frame
 /// of a glide redraws only what moves.
-pub fn redraw_in(r: poni_core::geom::Rect) {
+pub fn redraw_in(r: nexora_core::geom::Rect) {
     HOST.with(|h| {
         if let Some(host) = h.borrow().as_ref() {
             let nr = NSRect::new(NSPoint::new(r.x as f64, r.y as f64), NSSize::new(r.w as f64, r.h as f64));

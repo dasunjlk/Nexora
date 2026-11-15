@@ -5,7 +5,7 @@
 // flat top on the screen's edge, concave shoulders, rounded bottom corners),
 // then:
 //   rim     bends the screen copy inward, like a convex lens: the edge
-//           magnifies what's under it (poni_core::glass::rim_offset)
+//           magnifies what's under it (nexora_core::glass::rim_offset)
 //   middle  shows the copy frosted (two blur levels, mixed by thickness)
 //   tint    deepens toward black (dark glass) or white (light glass) only as
 //           far as legible text needs (chosen on the CPU)

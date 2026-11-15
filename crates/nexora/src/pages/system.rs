@@ -13,13 +13,13 @@
 //! Mac's page says it its way.
 //!
 //! On a desktop, Power is the whole PC's draw: its power supply's own
-//! reading when it reports over USB, else an estimate (`poni_core::power`),
+//! reading when it reports over USB, else an estimate (`nexora_core::power`),
 //! split into the CPU, the graphics card and the rest, with the source on
 //! the right. On a Mac without a battery it's the whole Mac's draw from its
 //! own sensor, which macOS doesn't split by part.
 //!
 //! The last module, Games (Windows only), holds Show over games: its switch,
-//! whether the readout stays or peeks, whether Windows lets Poni read frames
+//! whether the readout stays or peeks, whether Windows lets Nexora read frames
 //! (with the one-time OK), the frame rate's last minute and what's in front.
 
 use crate::commands::Command;
@@ -27,11 +27,11 @@ use crate::gfx::{Image, ImageData, TextStyle, Weight};
 use crate::icons::Icon;
 use crate::state::{AppState, FpsAccess};
 use crate::ui::{wid, wid_n, PillStyle, Ui, PILL_SMALL};
-use poni_core::frames::{fmt_fps, fmt_frame_ms};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::power::{fmt_w, watts_ceiling, PowerReading, REST_W};
-use poni_core::svgpath::Seg;
-use poni_core::sysmon::{
+use nexora_core::frames::{fmt_fps, fmt_frame_ms};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::power::{fmt_w, watts_ceiling, PowerReading, REST_W};
+use nexora_core::svgpath::Seg;
+use nexora_core::sysmon::{
     fmt_app_cpu, fmt_bytes, fmt_link, fmt_pct, fmt_rate, fmt_time_left, fmt_uptime, fmt_watts, pressure_word, AppUse, BatteryReading, CoreKind,
     CpuReading, Drive, GpuReading, History, MemPart, MemoryReading, Module, NetReading, Reading, Series, HISTORY_LEN,
 };
@@ -860,7 +860,7 @@ fn fps_ceiling(peak: f32) -> f32 {
     FPS_TOPS.into_iter().find(|t| peak <= *t).unwrap_or_else(|| (peak / 120.0).ceil().max(1.0) * 120.0)
 }
 
-/// Show over games: the switch and whether Windows lets Poni read frames on
+/// Show over games: the switch and whether Windows lets Nexora read frames on
 /// the left, the frame rate's minute in the middle, what's in front on the
 /// right.
 fn draw_games(ui: &mut Ui, st: &mut AppState, cols: &Cols) {
@@ -905,7 +905,7 @@ fn draw_games(ui: &mut Ui, st: &mut AppState, cols: &Cols) {
         FpsAccess::NeedsOk => ("Needs a one-time OK from Windows, as Xbox Game Bar does.".to_string(), Some(("Allow FPS", Command::AllowFps))),
         FpsAccess::Asking => ("Answer Windows' prompt to allow it.".to_string(), None),
         FpsAccess::SignOut => ("Allowed. Sign out of Windows and back in, and FPS shows.".to_string(), None),
-        // Why goes to poni.log; the page says it plainly.
+        // Why goes to nexora.log; the page says it plainly.
         FpsAccess::Failed(_) => ("Windows didn't allow it this time.".to_string(), Some(("Check again", Command::CheckFps))),
     };
     let (text_r, rest) = rest.split_top(44.0);

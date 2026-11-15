@@ -1,5 +1,5 @@
 //! Prayer times' cities outside Indonesia, looked up online one small file
-//! at a time (`poni_core::prayer::world`: the two letters typed in the place
+//! at a time (`nexora_core::prayer::world`: the two letters typed in the place
 //! picker, or a 5-degree square around a location). Shared by the Windows
 //! and Mac apps.
 //!
@@ -8,7 +8,7 @@
 
 use crate::events::{AppEvent, EventSink};
 use crate::services::http::{Client, MtaGuard};
-use poni_core::prayer::{world, World};
+use nexora_core::prayer::{world, World};
 use std::time::Duration;
 
 const USER_AGENT: &str = concat!("OyenzaStudio/", env!("CARGO_PKG_VERSION"), " (+https://github.com/lucacadalora/oyenza-studio)");
@@ -18,7 +18,7 @@ const TIMEOUT: Duration = Duration::from_secs(10);
 
 /// Get `file` ("ed", "near/55_-5"); the answer comes as `AppEvent::Cities`.
 pub fn fetch(file: String, sink: EventSink) {
-    let spawned = std::thread::Builder::new().name("poni-cities".into()).spawn({
+    let spawned = std::thread::Builder::new().name("nexora-cities".into()).spawn({
         let file = file.clone();
         let sink = sink.clone();
         move || {

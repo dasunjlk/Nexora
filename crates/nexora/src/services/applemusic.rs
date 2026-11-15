@@ -1,6 +1,6 @@
 //! Apple Music's own lyrics for the lyrics worker: opt-in, with the user's
 //! Apple Music token (`media-user-token`). Parsing lives in
-//! `poni_core::applemusic`; this file does the HTTP.
+//! `nexora_core::applemusic`; this file does the HTTP.
 //!
 //! Per song: catalog search (artist + title) → the best match that has
 //! time-synced lyrics → its TTML lyrics. The web player's developer token is
@@ -9,12 +9,12 @@
 //! account's storefront. Runs on the lyrics worker thread only.
 
 use crate::services::http::{Client, FetchError, Response};
-use poni_core::applemusic::{self, DevToken};
-use poni_core::lrclib::{LrclibRecord, TrackQuery, MIN_LINES};
-use poni_core::ttml::parse_ttml;
+use nexora_core::applemusic::{self, DevToken};
+use nexora_core::lrclib::{LrclibRecord, TrackQuery, MIN_LINES};
+use nexora_core::ttml::parse_ttml;
 use std::time::Duration;
 
-const USER_AGENT: &str = "Poni/0.1 (+https://github.com/lucacadalora/oyenza-studio)";
+const USER_AGENT: &str = "Nexora/0.1 (+https://github.com/lucacadalora/oyenza-studio)";
 /// API replies are small.
 const API_TIMEOUT: Duration = Duration::from_secs(8);
 /// The web player page and its script bundle are several MB each.
@@ -224,12 +224,12 @@ fn fetch_miss(e: FetchError) -> Miss {
 
 fn read_dev_token() -> Option<DevToken> {
     let text = std::fs::read_to_string(crate::paths::apple_music_web_token_path()).ok()?;
-    poni_core::store::parse_json(&text).ok()
+    nexora_core::store::parse_json(&text).ok()
 }
 
 fn write_dev_token(t: &DevToken) {
     let path = crate::paths::apple_music_web_token_path();
-    if let Err(e) = poni_core::store::write_json_atomic(&path, t) {
+    if let Err(e) = nexora_core::store::write_json_atomic(&path, t) {
         crate::pwarn!("apple music: cannot cache the developer token ({e})");
     }
 }

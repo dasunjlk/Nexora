@@ -8,16 +8,16 @@
 //! it. Nothing new is read, polled or animated for it. No Bluetooth glyph:
 //! the app keeps no list of connected devices (the service only reports
 //! changes, as pop-ups), so there is nothing true to show; and none of the
-//! reference's chevrons or bell, which Poni has nothing behind.
+//! reference's chevrons or bell, which Nexora has nothing behind.
 
 use crate::gfx::{TextStyle, Weight};
 use crate::icons::Icon;
 use crate::island::Geom;
 use crate::state::AppState;
 use crate::ui::Ui;
-use poni_core::datetime::{fmt_clock, fmt_date_short};
-use poni_core::geom::{palette, Color, Rect};
-use poni_core::settings::{IdleStyle, Theme};
+use nexora_core::datetime::{fmt_clock, fmt_date_short};
+use nexora_core::geom::{palette, Color, Rect};
+use nexora_core::settings::{IdleStyle, Theme};
 use std::cell::Cell;
 
 /// Every resting pill is this tall, a capsule.
@@ -205,8 +205,8 @@ pub(crate) fn battery(ui: &mut Ui, r: Rect, percent: u8, charging: bool) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
 
     #[test]
     fn status_is_the_pill_themes_own() {

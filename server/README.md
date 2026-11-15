@@ -39,7 +39,7 @@ session life, 120000), `--rate` (requests a minute per address, 120).
    and its service worker. With Cloudflare in
    front, start it with `--trust-proxy` so each phone gets its own rate limit.
    Long polls hold for up to 25 s, which fits Cloudflare's 100 s limit.
-3. Point Oyenza Studio at it with `PONI_DROP_SERVER=https://your.host` on the PC.
+3. Point Oyenza Studio at it with `NEXORA_DROP_SERVER=https://your.host` on the PC.
    Pairing QR codes then carry your address.
 
 Every answer carries a strict Content-Security-Policy; the page has no inline
@@ -63,8 +63,8 @@ python3 tools/pairdrop-e2e/run_e2e.py --webkit
 `vm-gate run --`). `run_interop.py` in the same folder runs the phone page
 against Oyenza Studio's real Rust PC side instead of the emulator, through the
 `pairdrop_pc` example (build it first with
-`cargo build -p poni-core --example pairdrop_pc`).
+`cargo build -p nexora-core --example pairdrop_pc`).
 
 `python3 server/make_icons.py` redraws the icons from
-`docs/brand/oyen-poni-logo-512.png` (the brand files are not MIT; see
+`docs/brand/nexora-logo-512.png` (the brand files are not MIT; see
 `docs/brand/README.md`).

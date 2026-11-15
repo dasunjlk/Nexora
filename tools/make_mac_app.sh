@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build "Oyenza Studio.app" and its DMG from Poni's Mac binaries. Runs on a Mac (lipo, codesign, hdiutil).
+# Build "Oyenza Studio.app" and its DMG from Nexora's Mac binaries. Runs on a Mac (lipo, codesign, hdiutil).
 #
 #   tools/make_mac_app.sh <arm64 binary> <x86_64 binary | -> <OyenzaStudio.icns | -> <out dir>
 #
@@ -11,7 +11,7 @@ set -euo pipefail
 arm="$1"; intel="$2"; icns="$3"; out="$4"
 root="$(cd "$(dirname "$0")/.." && pwd)"
 version="$(cargo metadata --no-deps --format-version 1 --manifest-path "$root/Cargo.toml" \
-  | python3 -c 'import sys, json; print(next(p["version"] for p in json.load(sys.stdin)["packages"] if p["name"] == "poni"))')"
+  | python3 -c 'import sys, json; print(next(p["version"] for p in json.load(sys.stdin)["packages"] if p["name"] == "nexora"))')"
 
 mkdir -p "$out"
 app="$out/Oyenza Studio.app"
@@ -20,12 +20,12 @@ mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 
 # One binary for Apple Silicon and Intel Macs.
 if [ "$intel" != "-" ]; then
-  lipo -create -output "$app/Contents/MacOS/poni" "$arm" "$intel"
+  lipo -create -output "$app/Contents/MacOS/nexora" "$arm" "$intel"
 else
-  cp "$arm" "$app/Contents/MacOS/poni"
+  cp "$arm" "$app/Contents/MacOS/nexora"
 fi
-chmod +x "$app/Contents/MacOS/poni"
-lipo -info "$app/Contents/MacOS/poni"
+chmod +x "$app/Contents/MacOS/nexora"
+lipo -info "$app/Contents/MacOS/nexora"
 
 sed "s/@VERSION@/$version/g" "$root/installer/mac/Info.plist" > "$app/Contents/Info.plist"
 plutil -lint "$app/Contents/Info.plist"
@@ -36,7 +36,7 @@ fi
 
 # What plays, from macOS's own now playing (browsers, Spotify, Music): the MediaRemote adapter's framework
 # and script (third_party/mediaremote-adapter), which /usr/bin/perl runs for the app
-# (crates/poni/src/mac/services/mediaremote.rs). MEDIAREMOTE_BUILD is its CMake build (mac.yml); without
+# (crates/nexora/src/mac/services/mediaremote.rs). MEDIAREMOTE_BUILD is its CMake build (mac.yml); without
 # it the app reads Music and Spotify only.
 if [ -n "${MEDIAREMOTE_BUILD:-}" ]; then
   mkdir -p "$app/Contents/Frameworks"

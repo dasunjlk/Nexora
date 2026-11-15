@@ -56,9 +56,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 API = "https://api.github.com"
 # The page's picture, copied next to the page so it never links into main.
-ART = ROOT / "docs/brand/art/oyen-poni-peek.webp"
+ART = ROOT / "docs/brand/art/nexora-peek.webp"
 
-# Oyen's look (crates/poni-core/src/look.rs) on a cream card. The bars are a
+# Oyen's look (crates/nexora-core/src/look.rs) on a cream card. The bars are a
 # step deeper than Oyen's orange so they keep 3:1 contrast on the cream.
 CREAM = "#FFF1DE"
 INK = "#2B1B10"
@@ -80,7 +80,7 @@ REFERRERS = ["date", "referrer", "views", "visitors"]
 KINDS = {"button": "Download button", "installer": "Versioned installer", "zip": "Portable zip", "other": "Other files"}
 # The repo's name before it became lucacadalora/oyenza-studio. GitHub forwards its URLs, so a
 # step may still fetch through it.
-OLD_NAMES = ("lucacadalora/poni",)
+OLD_NAMES = ("lucacadalora/nexora",)
 DOWNLOAD_URL = re.compile(r"github\.com/([\w.-]+/[\w.-]+)/releases/download/([^/\s\"']+)/([^\s\"'?#]+)")
 
 
@@ -88,8 +88,8 @@ def kind(file: str) -> str:
     if file.endswith("-portable.zip"):
         return "zip"
     # The website's and README's Download link: releases/latest/download/Oyenza-Studio-Setup.exe
-    # (Oyen-Poni-Setup.exe before the rename, which every release still carries for older links).
-    if re.fullmatch(r"(Oyen-)?Poni-Setup\.exe|Oyenza-Studio-Setup\.exe", file):
+    # (Oyen-Nexora-Setup.exe before the rename, which every release still carries for older links).
+    if re.fullmatch(r"(Oyen-)?Nexora-Setup\.exe|Oyenza-Studio-Setup\.exe", file):
         return "button"
     if file.endswith(".exe"):
         return "installer"
@@ -112,7 +112,7 @@ class GitHub:
             url = API + url
         if params:
             url += ("&" if "?" in url else "?") + urllib.parse.urlencode(params)
-        headers = {"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "oyen-poni-download-stats"}
+        headers = {"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "nexora-download-stats"}
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}"
         for attempt in range(5):

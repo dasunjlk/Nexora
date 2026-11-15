@@ -1,6 +1,6 @@
 //! The Diorama theme's resting pill: a small window onto a pixel-art place
 //! that keeps the day's hours, with the time written in its sky. The
-//! picture is `studio_diorama`'s; this is the app's side of it: what the
+//! picture is `nexora_diorama`'s; this is the app's side of it: what the
 //! moment is (the clock, the sun's times, the battery), where the glass
 //! ball is, and the painting kept between frames.
 //!
@@ -41,11 +41,11 @@ use crate::gfx::{Image, ImageData};
 use crate::island::Geom;
 use crate::state::AppState;
 use crate::ui::{wid, CursorKind, Ui};
-use poni_core::datetime::days_from_civil;
-use poni_core::geom::Rect;
-use poni_core::settings::{IdleStyle, Theme};
+use nexora_core::datetime::days_from_civil;
+use nexora_core::geom::Rect;
+use nexora_core::settings::{IdleStyle, Theme};
 use std::cell::{Cell, RefCell};
-use studio_diorama::{Badge, Clock, Moment, View};
+use nexora_diorama::{Badge, Clock, Moment, View};
 
 /// The glass ball's roll from one end of the pane to the other (seconds).
 const ROLL: f64 = 1.5;
@@ -212,7 +212,7 @@ fn timed(st: &AppState) -> bool {
 
 /// The resting pill's size, or `None` where it isn't the picture.
 pub fn geom(st: &AppState) -> Option<Geom> {
-    shows(st).then(|| Geom::new(studio_diorama::width(clock(st), badge(st)), studio_diorama::H, studio_diorama::H / 2.0))
+    shows(st).then(|| Geom::new(nexora_diorama::width(clock(st), badge(st)), nexora_diorama::H, nexora_diorama::H / 2.0))
 }
 
 /// The time in the sky; Minimal is the place alone.
@@ -242,7 +242,7 @@ fn badge(st: &AppState) -> Option<Badge> {
 struct SunKey {
     lat: u64,
     lng: u64,
-    follow: poni_core::settings::PrayerFollow,
+    follow: nexora_core::settings::PrayerFollow,
     quarter: i64,
     ahead: i64,
 }
@@ -268,8 +268,8 @@ fn sun(st: &AppState) -> (f32, f32) {
 /// `ahead` seconds east of UTC: the place's sun on the clock the picture's
 /// time comes from. `None` where the day has no sunrise or sunset, or one
 /// the picture can't show (the sun up or down for less than two hours).
-fn sun_at(site: &poni_core::prayer::Site, now: i64, ahead: i64) -> Option<(f32, f32)> {
-    let t = poni_core::prayer::day_times(site, site.local_day(now))?;
+fn sun_at(site: &nexora_core::prayer::Site, now: i64, ahead: i64) -> Option<(f32, f32)> {
+    let t = nexora_core::prayer::day_times(site, site.local_day(now))?;
     let minute = |utc: i64| ((utc + ahead).div_euclid(60).rem_euclid(1440)) as f32;
     let (rise, set) = (minute(t.terbit), minute(t.maghrib));
     (set - rise >= 120.0 && set - rise <= 1320.0).then_some((rise, set))
@@ -497,7 +497,7 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, body: Rect) -> bool {
         match kept.as_ref() {
             Some((k, image)) if *k == key => image.clone(),
             _ => {
-                let p = studio_diorama::render(&key.moment, &key.view);
+                let p = nexora_diorama::render(&key.moment, &key.view);
                 let image = ImageData::new(p.w, p.h, p.bgra);
                 if let Some((_, old)) = kept.replace((key, image.clone())) {
                     ui.c.forget_image(&old);
@@ -516,9 +516,9 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, body: Rect) -> bool {
 mod tests {
     use super::*;
     use crate::state::PowerState;
-    use poni_core::datetime::LocalDateTime;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
+    use nexora_core::datetime::LocalDateTime;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
 
     fn state(hour: u8, minute: u8) -> AppState {
         let mut st = AppState::new(Settings { theme: Theme::Diorama, ..Settings::default() }, Store::default());
@@ -565,11 +565,11 @@ mod tests {
 
     #[test]
     fn with_a_prayer_place_the_sun_keeps_its_hours_there() {
-        use poni_core::prayer::{Clock as Zone, Method, Site, KEMENAG_ISYA_ANGLE, KEMENAG_SUBUH_ANGLE};
+        use nexora_core::prayer::{Clock as Zone, Method, Site, KEMENAG_ISYA_ANGLE, KEMENAG_SUBUH_ANGLE};
         // Jakarta on 10 November 2026, 12:00 WIB (05:00 UTC), on a
         // computer keeping WIB: up about 05:26, down about 17:49.
         let jakarta = Site { lat: -6.2, lng: 106.816, clock: Zone::Fixed(420), h0: -1.0, subuh_angle: KEMENAG_SUBUH_ANGLE, isya_angle: KEMENAG_ISYA_ANGLE, method: Method::Kemenag, hanafi: false };
-        let noon_utc = poni_core::datetime::days_from_civil(2026, 11, 10) * 86_400 + 5 * 3600;
+        let noon_utc = nexora_core::datetime::days_from_civil(2026, 11, 10) * 86_400 + 5 * 3600;
         let (rise, set) = sun_at(&jakarta, noon_utc, 7 * 3600).expect("Jakarta has a sunrise");
         assert!((320.0..=335.0).contains(&rise), "sunrise at minute {rise}");
         assert!((1062.0..=1076.0).contains(&set), "sunset at minute {set}");

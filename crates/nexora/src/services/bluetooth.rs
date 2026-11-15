@@ -88,7 +88,7 @@ impl BluetoothService {
         let (done_tx, done) = mpsc::channel();
         let worker_tx = tx.clone();
         let thread = std::thread::Builder::new()
-            .name("poni-bluetooth".into())
+            .name("nexora-bluetooth".into())
             .spawn(move || {
                 run(sink, worker_tx, rx);
                 let _ = done_tx.send(());

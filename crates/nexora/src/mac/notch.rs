@@ -1,6 +1,6 @@
 //! The island around a MacBook's camera notch.
 //!
-//! The notch has no pixels: whatever Poni draws in its middle is never seen.
+//! The notch has no pixels: whatever Nexora draws in its middle is never seen.
 //! So on a screen with a notch each island state picks one of three fits:
 //!
 //! * **Inside**: the resting island hides inside the notch (nothing shows;
@@ -48,12 +48,12 @@ use crate::oyen;
 use crate::pill;
 use crate::state::AppState;
 use crate::ui::Ui;
-use poni_core::datetime::{fmt_clock, fmt_countdown};
-use poni_core::geom::{clamp01, palette, Color, Point, Rect};
-use poni_core::peek;
-use poni_core::pomodoro::Phase;
-use poni_core::settings::IdleStyle;
-use poni_core::svgpath::Seg;
+use nexora_core::datetime::{fmt_clock, fmt_countdown};
+use nexora_core::geom::{clamp01, palette, Color, Point, Rect};
+use nexora_core::peek;
+use nexora_core::pomodoro::Phase;
+use nexora_core::settings::IdleStyle;
+use nexora_core::svgpath::Seg;
 
 /// The notch as macOS reports it, in DIPs (points).
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -372,7 +372,7 @@ pub fn draw_ears(ui: &mut Ui, st: &mut AppState, m: &Mode, body: Rect, n: Notch)
             if listening {
                 ui.c.fill_circle(Point::new(right.x + 10.0, cy), 4.0, palette::RED);
                 let ts = TextStyle::body().weight(Weight::Semibold).tabular().color(palette::TEXT).right();
-                let text = poni_core::notes::fmt_length(st.notes.elapsed(st.now));
+                let text = nexora_core::notes::fmt_length(st.notes.elapsed(st.now));
                 ui.c.text(&text, Rect::new(right.x + 18.0, body.y, (right.w - 18.0 - 8.0).max(0.0), body.h), &ts);
             } else {
                 let ts = TextStyle::footnote().weight(Weight::Semibold).color(palette::TEXT_DIM).center();
@@ -446,9 +446,9 @@ mod tests {
     use super::*;
     use crate::activities::HudTag;
     use crate::pages::PageKind;
-    use poni_core::datetime::LocalDateTime;
-    use poni_core::settings::{Settings, Theme};
-    use poni_core::store::Store;
+    use nexora_core::datetime::LocalDateTime;
+    use nexora_core::settings::{Settings, Theme};
+    use nexora_core::store::Store;
 
     const N: Notch = Notch::MACBOOK;
     /// A resting pill's size without a notch.

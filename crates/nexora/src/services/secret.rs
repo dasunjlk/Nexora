@@ -1,6 +1,6 @@
 //! Small secrets on disk (the Apple Music token), sealed with DPAPI so only
 //! the same Windows user on this PC can read them back. Kept under
-//! `%LOCALAPPDATA%\Poni\`: never roams, and uninstalling removes it.
+//! `%LOCALAPPDATA%\Nexora\`: never roams, and uninstalling removes it.
 //!
 //! Also opens what other Electron apps sealed the same way, for the AI tab
 //! ([`open_electron`]).
@@ -18,7 +18,7 @@ use windows::Win32::Security::Cryptography::{
 
 pub fn save(path: &Path, secret: &str) -> io::Result<()> {
     let sealed = protect(secret.as_bytes())?;
-    poni_core::store::write_bytes_atomic(path, &sealed)
+    nexora_core::store::write_bytes_atomic(path, &sealed)
 }
 
 /// The secret at `path`; `None` when there is none or it can't be unsealed
@@ -68,11 +68,11 @@ fn unprotect(data: &[u8]) -> io::Result<Vec<u8>> {
 }
 
 /// What an Electron app sealed with `safeStorage` (Cursor's and the Claude
-/// app's sign-ins, `studio_usage::safe_storage`): `v10`, a 12-byte nonce,
+/// app's sign-ins, `nexora_usage::safe_storage`): `v10`, a 12-byte nonce,
 /// then AES-256-GCM with the 16-byte tag last, under `key` (the DPAPI blob
 /// from the app's `Local State`); anything else is a DPAPI blob alone. None
 /// when it doesn't open (another user's, or changed). Windows' own AES, so
-/// poni.exe carries none.
+/// nexora.exe carries none.
 pub fn open_electron(sealed: &[u8], key: Option<&[u8]>) -> Option<Vec<u8>> {
     let Some(body) = sealed.strip_prefix(b"v10") else { return unprotect(sealed).ok() };
     let key = unprotect(key?).ok()?;
@@ -133,13 +133,13 @@ mod tests {
 
     /// An AES-256 key and what it sealed the way Electron does on Windows
     /// (made with Python's `cryptography` by make.py beside it).
-    const SEALED: &str = include_str!("../../../studio-usage/src/fixtures/safe-storage/windows-v10.txt");
+    const SEALED: &str = include_str!("../../../nexora-usage/src/fixtures/safe-storage/windows-v10.txt");
 
     fn sample() -> (Vec<u8>, Vec<u8>) {
         let mut lines = SEALED.lines();
         let key = lines.next().unwrap();
         let key = (0..key.len()).step_by(2).map(|i| u8::from_str_radix(&key[i..i + 2], 16).unwrap()).collect();
-        (key, studio_usage::b64url(lines.next().unwrap()).unwrap())
+        (key, nexora_usage::b64url(lines.next().unwrap()).unwrap())
     }
 
     #[test]

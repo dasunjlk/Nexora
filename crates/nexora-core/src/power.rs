@@ -11,7 +11,7 @@
 //! * else, on a desktop, an estimate: what the CPU package and the graphics
 //!   card report of their own power, plus [`REST_W`] for the rest of the PC.
 //!
-//! The Windows side (`poni::services::psu`, `services::sysmon`) does the I/O;
+//! The Windows side (`nexora::services::psu`, `services::sysmon`) does the I/O;
 //! the decoding and the sums are here, so they're tested anywhere.
 
 /// A PSU's HID report without its report id (always 0 on these PSUs).

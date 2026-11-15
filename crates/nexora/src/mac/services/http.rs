@@ -23,7 +23,7 @@ use std::time::{Duration, Instant};
 /// Budget for one request: connect + headers + body.
 pub const DEFAULT_TIMEOUT: Duration = Duration::from_secs(8);
 
-/// Bodies larger than this are refused (nothing Poni fetches comes close).
+/// Bodies larger than this are refused (nothing Nexora fetches comes close).
 const MAX_BODY_BYTES: usize = 8 * 1024 * 1024;
 
 /// How often a download in progress ([`Client::get_bytes`]) says how far it
@@ -101,7 +101,7 @@ define_class!(
     /// header goes on to another host (the private session's delegate, on
     /// its own queue).
     #[unsafe(super(NSObject))]
-    #[name = "PoniNoRedirect"]
+    #[name = "NexoraNoRedirect"]
     struct NoRedirect;
 
     unsafe impl NSObjectProtocol for NoRedirect {}

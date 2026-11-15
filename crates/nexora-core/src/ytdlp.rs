@@ -448,12 +448,12 @@ fn short(text: &str) -> String {
 mod tests {
     use super::*;
 
-    const DIR: &str = r"C:\Users\Luca Cada\AppData\Local\Poni\addons\downloader";
+    const DIR: &str = r"C:\Users\Luca Cada\AppData\Local\Nexora\addons\downloader";
     const TOOLS: Tools<'static> = Tools {
-        ytdlp: r"C:\Users\Luca Cada\AppData\Local\Poni\addons\downloader\yt-dlp.exe",
-        qjs: r"C:\Users\Luca Cada\AppData\Local\Poni\addons\downloader\qjs.exe",
-        ffmpeg: r"C:\Users\Luca Cada\AppData\Local\Poni\addons\downloader\ffmpeg.exe",
-        cache: r"C:\Users\Luca Cada\AppData\Local\Poni\addons\downloader\cache",
+        ytdlp: r"C:\Users\Luca Cada\AppData\Local\Nexora\addons\downloader\yt-dlp.exe",
+        qjs: r"C:\Users\Luca Cada\AppData\Local\Nexora\addons\downloader\qjs.exe",
+        ffmpeg: r"C:\Users\Luca Cada\AppData\Local\Nexora\addons\downloader\ffmpeg.exe",
+        cache: r"C:\Users\Luca Cada\AppData\Local\Nexora\addons\downloader\cache",
     };
     const FILM: &str = "https://video.blender.org/w/b29290cc-dc51-4a12-bcb2-2aa5fece7605";
     const OVERGROWN: &str = "OVERGROWN: a feature film project by Blender Studio";
@@ -466,14 +466,14 @@ mod tests {
     #[test]
     fn video_arguments() {
         let want = [
-            "--ignore-config", "--no-plugin-dirs", "--cache-dir", r"C:\Users\Luca Cada\AppData\Local\Poni\addons\downloader\cache",
+            "--ignore-config", "--no-plugin-dirs", "--cache-dir", r"C:\Users\Luca Cada\AppData\Local\Nexora\addons\downloader\cache",
             "--color", "never", "--newline", "--encoding", "utf-8",
             "--no-simulate", "--no-quiet", "--progress", "--progress-delta", "0.2",
             "--progress-template", PROGRESS, "--progress-template", STEP, "--print", INFO, "--print", DONE,
             "--no-playlist", "--playlist-items", "1",
             "--no-mtime", "--windows-filenames", "--continue",
-            "--ffmpeg-location", r"C:\Users\Luca Cada\AppData\Local\Poni\addons\downloader\ffmpeg.exe",
-            "--no-js-runtimes", "--js-runtimes", r"quickjs:C:\Users\Luca Cada\AppData\Local\Poni\addons\downloader\qjs.exe",
+            "--ffmpeg-location", r"C:\Users\Luca Cada\AppData\Local\Nexora\addons\downloader\ffmpeg.exe",
+            "--no-js-runtimes", "--js-runtimes", r"quickjs:C:\Users\Luca Cada\AppData\Local\Nexora\addons\downloader\qjs.exe",
             "-P", r"home:C:\Users\Luca Cada\Downloads",
             "-o", "%(title).150B [%(id).50B].%(ext)s",
             "-f", "bv*+ba/b",

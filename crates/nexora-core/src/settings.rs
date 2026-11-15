@@ -41,7 +41,7 @@ pub enum Theme {
     /// window onto a pixel-art place that keeps the day's hours: a house, a
     /// tree, the sun and the moon on their way across, and a glass ball
     /// that rolls from the house to the tree when night falls
-    /// (`crates/studio-diorama`). Everything else is Pill's.
+    /// (`crates/nexora-diorama`). Everything else is Pill's.
     Diorama,
 }
 
@@ -49,7 +49,7 @@ pub enum Theme {
 #[serde(rename_all = "snake_case")]
 pub enum MonitorChoice {
     Primary,
-    /// The monitor under the cursor when Poni starts.
+    /// The monitor under the cursor when Nexora starts.
     Cursor,
 }
 
@@ -116,8 +116,8 @@ pub struct Settings {
     /// of the kernel counters once a second), so they're full when it opens.
     /// Only while the System add-on is on ([`Settings::system_history_on`]).
     pub system_history: bool,
-    /// Add-ons switched on, by id (`poni_core::addons`). Ids this version
-    /// doesn't know are kept, so a newer Poni's choices survive a save.
+    /// Add-ons switched on, by id (`nexora_core::addons`). Ids this version
+    /// doesn't know are kept, so a newer Nexora's choices survive a save.
     pub addons: BTreeMap<String, bool>,
     /// The Prayer times add-on's choices.
     pub prayer: PrayerSettings,
@@ -134,7 +134,7 @@ pub struct Settings {
     /// front. Its own name: the corner test build wrote `game_readout`
     /// ("peek" as its default) into the files of the people who tried it.
     pub game_peek: bool,
-    /// The AI tab's choices (its readers are the `studio-usage` crate).
+    /// The AI tab's choices (its readers are the `nexora-usage` crate).
     pub usage: UsageSettings,
     /// The Record page's choices (Oyenza Studio Recorder).
     pub record: RecordSettings,
@@ -149,7 +149,7 @@ pub struct Settings {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct UsageSettings {
-    /// Services the person hid, by key (`studio_usage::ProviderId::key`). Keys this
+    /// Services the person hid, by key (`nexora_usage::ProviderId::key`). Keys this
     /// version doesn't know are kept, so a newer Studio's choices survive a save.
     pub hidden: Vec<String>,
     /// Services shown even when nothing of them is on this computer (the
@@ -424,7 +424,7 @@ mod tests {
         assert!(!s.addon_on("sholat"));
         s.set_addon("sholat", true);
         assert!(s.addon_on("sholat"));
-        // A newer Poni's add-on stays in the file when this one saves it.
+        // A newer Nexora's add-on stays in the file when this one saves it.
         let s: Settings = serde_json::from_str(r#"{"addons":{"sholat":true,"future":true}}"#).unwrap();
         assert!(s.addon_on("sholat"));
         let back: Settings = serde_json::from_str(&serde_json::to_string(&s).unwrap()).unwrap();
@@ -562,7 +562,7 @@ mod tests {
         let s: Settings = serde_json::from_str(r#"{"settings_version":3,"collapse_delay_ms":380}"#).unwrap();
         assert_eq!(s.sanitized().collapse_delay_ms, 380);
         assert_eq!(Settings::default().sanitized().collapse_delay_ms, 0);
-        // A file from a newer Poni keeps its version.
+        // A file from a newer Nexora keeps its version.
         let s: Settings = serde_json::from_str(r#"{"settings_version":9}"#).unwrap();
         assert_eq!(s.sanitized().settings_version, 9);
     }
