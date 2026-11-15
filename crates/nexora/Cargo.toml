@@ -17,10 +17,10 @@ path = "src/main.rs"
 # nexora.exe: Windows downloads it as the Japanese readings add-on
 # (nexora_core::addons::JAPANESE_READINGS) for the people who want it.
 nexora-core = { path = "../nexora-core" }
-# The AI tab's readers (crates/studio-usage), built for size.
-studio-usage = { path = "../studio-usage" }
-# The Diorama theme's picture (crates/studio-diorama), built for size.
-studio-diorama = { path = "../studio-diorama" }
+# The AI tab's readers (crates/nexora-usage), built for size.
+nexora-usage = { path = "../nexora-usage" }
+# The Diorama theme's picture (crates/nexora-diorama), built for size.
+nexora-diorama = { path = "../nexora-diorama" }
 serde.workspace = true
 serde_json.workspace = true
 

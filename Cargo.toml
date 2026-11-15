@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/nexora-core", "crates/studio-usage", "crates/studio-diorama", "crates/nexora"]
+members = ["crates/nexora-core", "crates/nexora-usage", "crates/nexora-diorama", "crates/nexora"]
 
 [workspace.package]
 version = "0.2.30"
@@ -46,12 +46,12 @@ opt-level = "s"
 opt-level = "s"
 [profile.release.package.qrcodegen]
 opt-level = "s"
-# The AI tab's readers (crates/studio-usage): JSON and log parsing that runs
+# The AI tab's readers (crates/nexora-usage): JSON and log parsing that runs
 # for moments every few minutes, while the tab is open or its notices are on.
-[profile.release.package.studio-usage]
+[profile.release.package.nexora-usage]
 opt-level = "s"
-# The Diorama theme's picture (crates/studio-diorama): painted once a minute
+# The Diorama theme's picture (crates/nexora-diorama): painted once a minute
 # while the pill rests, and for the moment its glass ball rolls at sunrise
 # and sunset.
-[profile.release.package.studio-diorama]
+[profile.release.package.nexora-diorama]
 opt-level = "s"

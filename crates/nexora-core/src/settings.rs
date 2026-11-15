@@ -41,7 +41,7 @@ pub enum Theme {
     /// window onto a pixel-art place that keeps the day's hours: a house, a
     /// tree, the sun and the moon on their way across, and a glass ball
     /// that rolls from the house to the tree when night falls
-    /// (`crates/studio-diorama`). Everything else is Pill's.
+    /// (`crates/nexora-diorama`). Everything else is Pill's.
     Diorama,
 }
 
@@ -134,7 +134,7 @@ pub struct Settings {
     /// front. Its own name: the corner test build wrote `game_readout`
     /// ("peek" as its default) into the files of the people who tried it.
     pub game_peek: bool,
-    /// The AI tab's choices (its readers are the `studio-usage` crate).
+    /// The AI tab's choices (its readers are the `nexora-usage` crate).
     pub usage: UsageSettings,
     /// The Record page's choices (Oyenza Studio Recorder).
     pub record: RecordSettings,
@@ -149,7 +149,7 @@ pub struct Settings {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct UsageSettings {
-    /// Services the person hid, by key (`studio_usage::ProviderId::key`). Keys this
+    /// Services the person hid, by key (`nexora_usage::ProviderId::key`). Keys this
     /// version doesn't know are kept, so a newer Studio's choices survive a save.
     pub hidden: Vec<String>,
     /// Services shown even when nothing of them is on this computer (the

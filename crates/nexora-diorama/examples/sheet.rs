@@ -1,5 +1,5 @@
 //! Paints the Diorama pill at a list of moments, for looking at while
-//! drawing it: `cargo run -p studio-diorama --example sheet -- <out-dir>
+//! drawing it: `cargo run -p nexora-diorama --example sheet -- <out-dir>
 //! [scale] [12h] [bare] [charging|low] [day=N] [film] [slide=HHMM]`. One PPM
 //! per moment (`HHMM.ppm`, and `roll-NN.ppm` for the ball's roll at
 //! sunset), which any image tool opens; `film` writes a whole day instead, a
@@ -8,7 +8,7 @@
 //! app.
 
 use std::io::Write;
-use studio_diorama::{render, width, Badge, Clock, Moment, View, H};
+use nexora_diorama::{render, width, Badge, Clock, Moment, View, H};
 
 fn save(dir: &str, name: &str, m: &Moment, scale: f32, lift: f32) {
     let w = width(m.clock, m.badge);

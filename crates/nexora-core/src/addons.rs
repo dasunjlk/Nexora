@@ -321,7 +321,7 @@ pub fn is_downloader_tool(name: &str) -> bool {
     [YTDLP_EXE, QJS_EXE, FFMPEG_EXE].contains(&name)
 }
 
-/// AI usage: the AI tab (`studio_usage`), what's left of each AI plan on this
+/// AI usage: the AI tab (`nexora_usage`), what's left of each AI plan on this
 /// computer and when it resets. A tab for everyone up to 0.2.25; part of
 /// Studio Pro in the versions after it. Its code is in the app, so there is
 /// nothing to download. Without Pro there is no AI tab or Settings section,

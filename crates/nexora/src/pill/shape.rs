@@ -119,12 +119,12 @@ fn hairline_round(c: &mut Canvas, body: Rect, r: f32, b: Color) {
 }
 
 /// The frame's thickness (DIPs) round a body `w` by `h`: the resting
-/// picture's bezel (`studio_diorama::BEZEL`) at the resting pill's height,
+/// picture's bezel (`nexora_diorama::BEZEL`) at the resting pill's height,
 /// growing with the shorter side to [`FRAME_MAX`] for the open card, so the
 /// pill's frame turns into the card's as the island opens.
 pub fn frame_width(w: f32, h: f32) -> f32 {
-    let t = ((w.min(h) - studio_diorama::H) / (FRAME_GROWN - studio_diorama::H)).clamp(0.0, 1.0);
-    studio_diorama::BEZEL + (FRAME_MAX - studio_diorama::BEZEL) * t
+    let t = ((w.min(h) - nexora_diorama::H) / (FRAME_GROWN - nexora_diorama::H)).clamp(0.0, 1.0);
+    nexora_diorama::BEZEL + (FRAME_MAX - nexora_diorama::BEZEL) * t
 }
 
 /// The open card's frame, and the shorter side from which a body has it.
@@ -560,8 +560,8 @@ mod tests {
     fn the_frame_grows_from_the_pills_bezel_to_the_cards() {
         // The resting pill's own frame at its height (under the pointer too,
         // where the picture covers the body), the open card's at its size.
-        assert_eq!(frame_width(100.0, studio_diorama::H), studio_diorama::BEZEL);
-        assert_eq!(frame_width(124.0, 30.0), studio_diorama::BEZEL);
+        assert_eq!(frame_width(100.0, nexora_diorama::H), nexora_diorama::BEZEL);
+        assert_eq!(frame_width(124.0, 30.0), nexora_diorama::BEZEL);
         assert_eq!(frame_width(620.0, 216.0), FRAME_MAX);
         // On the way between them it grows without a step.
         let mut last = frame_width(620.0, 30.0);

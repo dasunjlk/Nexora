@@ -46,7 +46,7 @@ jobs:
           cargo build -p nexora --release --target x86_64-apple-darwin
 
       - name: Unit tests (core)
-        run: cargo test -p nexora-core -p studio-usage -p studio-diorama --release
+        run: cargo test -p nexora-core -p nexora-usage -p nexora-diorama --release
 
       # The Downloader add-on for real (services/downloader_live.rs): yt-dlp,
       # our QuickJS-ng and our FFmpeg exactly as nexora_core::addons pins them

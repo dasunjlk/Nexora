@@ -5195,7 +5195,7 @@ impl App {
                 let before = services::keychain::asked();
                 let read = services::keychain::read(SMOKE_KEYCHAIN.0, Some("plain"));
                 let asked = services::keychain::asked() - before;
-                let kept = std::env::var_os("NEXORA_SMOKE_KEYCHAIN").is_none() || read == studio_usage::Got::Text(SMOKE_KEYCHAIN.1.into());
+                let kept = std::env::var_os("NEXORA_SMOKE_KEYCHAIN").is_none() || read == nexora_usage::Got::Text(SMOKE_KEYCHAIN.1.into());
                 let ok = self.away.1 && !ask && keep && kept && asked == 0;
                 Some(("keychain-locked", ok, format!("locked, notices on: may ask macOS {ask}, keeps what it read {keep}; a read now: {read:?}, macOS asked {asked} times")))
             }
@@ -5376,7 +5376,7 @@ const SMOKE_KEYCHAIN: (&str, &str, &str) = ("Oyenza Studio smoke", "{\"claudeAiO
 /// how often macOS was asked. The worker never runs in the smoke run, so the
 /// reader's gate is this test's alone.
 fn smoke_keychain() -> (bool, String) {
-    use studio_usage::Got;
+    use nexora_usage::Got;
     use services::keychain as k;
     if std::env::var_os("NEXORA_SMOKE_KEYCHAIN").is_none() {
         return (true, "skipped: no test items in the keychain".into());

@@ -31,7 +31,7 @@
 //! `RESTS`): the hours from dawn to the small hours, a 12-hour clock, the
 //! battery's badges, the Minimal look, the pill under the pointer, and the
 //! glass ball halfway to the tree as the sun sets. Each is checked against
-//! `studio_diorama`'s picture of that moment, and must ask for no frames
+//! `nexora_diorama`'s picture of that moment, and must ask for no frames
 //! once drawn; only the rolling ball does (see `diorama_checks`).
 //! NEXORA_SELFTEST_DIORAMA=only takes those pictures and skips the scenes: a
 //! few seconds instead of a minute and a half, for looking at the art.
@@ -90,7 +90,7 @@ use std::sync::{Arc, Mutex};
 use std::path::PathBuf;
 use std::thread::JoinHandle;
 use std::time::Instant;
-use studio_diorama::{Badge, Clock, Moment, View};
+use nexora_diorama::{Badge, Clock, Moment, View};
 use windows::Win32::Foundation::{HWND, RECT};
 use windows::Win32::UI::WindowsAndMessaging::{
     GetWindowLongPtrW, GetWindowRect, IsWindowVisible, GWL_EXSTYLE, WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TOPMOST,
@@ -1316,8 +1316,8 @@ fn fake_release() -> nexora_core::update::Release {
 /// readings of a 5-hour limit that resets in 2 h 20 min, on the app's clock:
 /// Claude Code from 70 to 90 %, or Codex from 70 % to all used with Oyenza
 /// Inference connected.
-fn ai_alert(st: &AppState, out: bool) -> Option<studio_usage::alerts::Alert> {
-    use studio_usage::{alerts, ProviderId, Snapshot, Source, Window, WindowKind};
+fn ai_alert(st: &AppState, out: bool) -> Option<nexora_usage::alerts::Alert> {
+    use nexora_usage::{alerts, ProviderId, Snapshot, Source, Window, WindowKind};
     let id = if out { ProviderId::Codex } else { ProviderId::Claude };
     let read = |used| Snapshot {
         windows: vec![Window::new(WindowKind::Session, "5-hour", used).resets(Some(st.unix + 2 * 3600 + 20 * 60)).length(Some(18_000))],
@@ -1981,7 +1981,7 @@ enum Shot {
 
 /// What a picture of the Diorama theme's resting pill should show.
 struct Sight {
-    /// The moment `studio_diorama` paints: the app's clock on the house's
+    /// The moment `nexora_diorama` paints: the app's clock on the house's
     /// own day, the ball where that time rests it.
     moment: Moment,
     /// The pill swells under the pointer.
@@ -2035,13 +2035,13 @@ impl Sight {
     /// The pill's size at rest, and as the island shows it (6 DIPs more
     /// each way under the pointer).
     fn sizes(&self) -> ((f32, f32), (f32, f32)) {
-        let rest = (studio_diorama::width(self.moment.clock, self.moment.badge), studio_diorama::H);
+        let rest = (nexora_diorama::width(self.moment.clock, self.moment.badge), nexora_diorama::H);
         let lift = if self.lifted { 2.0 * crate::pill::motion::HOVER_OUTSET } else { 0.0 };
         (rest, (rest.0 + lift, rest.1 + lift))
     }
 }
 
-/// How much of a captured pill is `studio_diorama`'s picture of `m`: the
+/// How much of a captured pill is `nexora_diorama`'s picture of `m`: the
 /// pixels at least 1 DIP inside its outline (the edge is anti-aliased onto
 /// the island under it) that match within [`PICTURE_TOLERANCE`], out of how
 /// many, and the largest difference in a channel. The picture is drawn
@@ -2052,7 +2052,7 @@ impl Sight {
 fn picture_match(frame: &Frame, body: Rect, origin: (i32, i32), scale: f32, m: &Moment, rest: (f32, f32), shown: (f32, f32)) -> (usize, usize, u8) {
     // Where `pill::diorama::draw` puts it: the body's top middle, on whole pixels.
     let at = crate::pill::shape::snap(Rect::new(body.center().x - shown.0 / 2.0, body.y, shown.0, shown.1), scale);
-    let p = studio_diorama::render(m, &View { w: at.w, h: at.h, rest_w: rest.0, rest_h: rest.1, scale });
+    let p = nexora_diorama::render(m, &View { w: at.w, h: at.h, rest_w: rest.0, rest_h: rest.1, scale });
     let (x0, y0) = ((at.x * scale).round() as i32 - origin.0, (at.y * scale).round() as i32 - origin.1);
     let (bw, bh) = (p.w as f32 / scale, p.h as f32 / scale);
     let r = bw.min(bh) / 2.0;
@@ -2104,10 +2104,10 @@ fn indigo_frame(p: [u8; 4]) -> bool {
 /// The Diorama theme's own checks for a picture of its resting pill, in the
 /// captured `frame` (`body` and `origin` as for [`picture_match`]; `geom`
 /// is what `pill::diorama` asks the island for).
-/// Its size: `studio_diorama::width` by 38 DIPs with round ends (radius 19),
+/// Its size: `nexora_diorama::width` by 38 DIPs with round ends (radius 19),
 /// 6 more each way under the pointer, measured in the pixels too. Not a
 /// black capsule: its frame is cream by day and indigo at night, its sky
-/// light at midday and dark deep in the night. And it is `studio_diorama`'s
+/// light at midday and dark deep in the night. And it is `nexora_diorama`'s
 /// picture of the moment, which puts the time in the sky and the glass ball
 /// on the house by day, on the tree at night.
 fn diorama_checks(frame: &Frame, body: Rect, origin: (i32, i32), scale: f32, s: &Sight, geom: Option<Geom>, checks: &mut Vec<Check>) {
@@ -2149,7 +2149,7 @@ fn diorama_checks(frame: &Frame, body: Rect, origin: (i32, i32), scale: f32, s: 
 
     // The frame, halfway through its thickness at the top, the bottom and
     // both ends. While the ball rolls it is between its two colours.
-    let mid = studio_diorama::BEZEL / 2.0;
+    let mid = nexora_diorama::BEZEL / 2.0;
     let px = |x: f32, y: f32| frame.at((x * scale).floor() as i32, (y * scale).floor() as i32);
     let (mx, my) = (b.x + b.w / 2.0, b.y + b.h / 2.0);
     let ring = [px(mx, b.y + mid), px(mx, b.bottom() - mid), px(b.x + mid, my), px(b.right() - mid, my)];
@@ -2199,7 +2199,7 @@ fn diorama_checks(frame: &Frame, body: Rect, origin: (i32, i32), scale: f32, s: 
     checks.push(check(
         "diorama-picture",
         picture_ok(seen),
-        format!("{} of {} pixels inside the pill are studio_diorama's picture of {} (largest difference in a channel: {})", seen.0, seen.1, s.what, seen.2),
+        format!("{} of {} pixels inside the pill are nexora_diorama's picture of {} (largest difference in a channel: {})", seen.0, seen.1, s.what, seen.2),
     ));
 }
 
@@ -3976,7 +3976,7 @@ impl SelfTest {
     /// on a held clock the minute turns 18:00 and the glass ball sets off
     /// for the tree, is halfway after half its [`ROLL_S`], and rests there
     /// once they are over. The ball asks for frames while it rolls and for
-    /// none once it has arrived, and each frame is `studio_diorama`'s
+    /// none once it has arrived, and each frame is `nexora_diorama`'s
     /// picture of that point of the roll. Returns the frame of the ball
     /// halfway, which is the picture kept. Waits the roll out (about 1.5 s)
     /// so the app's clock never runs ahead of the real one.
@@ -4010,7 +4010,7 @@ impl SelfTest {
             "diorama-roll",
             sets_off && rolling && picture_ok(halfway),
             format!(
-                "at {hour:02}:{minute:02} the ball set off and {}; halfway it {}, and {} of {} pixels inside the pill are studio_diorama's picture of the ball halfway across (largest difference in a channel: {})",
+                "at {hour:02}:{minute:02} the ball set off and {}; halfway it {}, and {} of {} pixels inside the pill are nexora_diorama's picture of the ball halfway across (largest difference in a channel: {})",
                 said(sets_off),
                 said(rolling),
                 halfway.0,
@@ -4022,7 +4022,7 @@ impl SelfTest {
             "diorama-roll-ends",
             !still_wants && picture_ok(arrived),
             format!(
-                "{:.2} s after it set off the ball {}, and {} of {} pixels inside the pill are studio_diorama's picture of the ball on the tree (largest difference in a channel: {})",
+                "{:.2} s after it set off the ball {}, and {} of {} pixels inside the pill are nexora_diorama's picture of the ball on the tree (largest difference in a channel: {})",
                 ROLL_S + 0.05,
                 said(still_wants),
                 arrived.0,
@@ -4039,7 +4039,7 @@ impl SelfTest {
     /// go there, it rolls on to the tree and the theme keeps the night 45
     /// minutes after sunset, the clock in the sky still the morning's;
     /// tapped, it rolls back to the house and the morning. Each is
-    /// `studio_diorama`'s picture. Returns the frame of the ball halfway,
+    /// `nexora_diorama`'s picture. Returns the frame of the ball halfway,
     /// the picture kept. Waits its rolls out (about 1.6 s), as `sunset` does.
     fn slide(&self, app: &mut App, before: &Sight, scale: f32, checks: &mut Vec<Check>) -> Option<(i32, i32, Vec<u8>)> {
         let wait = |s: f64| std::thread::sleep(std::time::Duration::from_secs_f64(s));
@@ -4069,7 +4069,7 @@ impl SelfTest {
             "diorama-slide",
             in_hand && !held_wants && picture_ok(half),
             format!(
-                "pressed on the house end and carried halfway, the ball is {}in hand and the frame {} while the pointer rests; {} of {} pixels inside the pill are studio_diorama's picture of the sunset it passes (largest difference in a channel: {})",
+                "pressed on the house end and carried halfway, the ball is {}in hand and the frame {} while the pointer rests; {} of {} pixels inside the pill are nexora_diorama's picture of the sunset it passes (largest difference in a channel: {})",
                 if in_hand { "" } else { "not " },
                 said(held_wants),
                 half.0,
@@ -4089,7 +4089,7 @@ impl SelfTest {
             "diorama-slid",
             rolls_on && !night_wants && theme_night && picture_ok(at_night),
             format!(
-                "let go halfway, the ball {} and 0.45 s on {}; the theme shows its {}, and {} of {} pixels inside the pill are studio_diorama's picture of the night 45 minutes after sunset with the clock at {:02}:{:02} (largest difference in a channel: {})",
+                "let go halfway, the ball {} and 0.45 s on {}; the theme shows its {}, and {} of {} pixels inside the pill are nexora_diorama's picture of the night 45 minutes after sunset with the clock at {:02}:{:02} (largest difference in a channel: {})",
                 said(rolls_on),
                 said(night_wants),
                 if theme_night { "night" } else { "day" },
@@ -4113,7 +4113,7 @@ impl SelfTest {
             "diorama-tap",
             !opened && flips && !back_wants && !back_night && picture_ok(back),
             format!(
-                "tapped at the tree, the island {} and the ball {}; 1.15 s on it {}; the theme shows its {}, and {} of {} pixels inside the pill are studio_diorama's picture of the morning (largest difference in a channel: {})",
+                "tapped at the tree, the island {} and the ball {}; 1.15 s on it {}; the theme shows its {}, and {} of {} pixels inside the pill are nexora_diorama's picture of the morning (largest difference in a channel: {})",
                 if opened { "opened" } else { "stayed closed" },
                 said(flips),
                 said(back_wants),
@@ -5393,7 +5393,7 @@ mod tests {
         st
     }
 
-    /// A captured frame of the pill as the app draws it: `studio_diorama`'s
+    /// A captured frame of the pill as the app draws it: `nexora_diorama`'s
     /// picture of `m`, `shown` DIPs large around a pane of `rest`, cut to a
     /// capsule with ends of `radius`, floating below the top of a window
     /// with its middle `cx` DIPs in (`Island::body_rect_at`). The frame
@@ -5404,7 +5404,7 @@ mod tests {
         // Under the pointer the pill reaches 2 DIPs up into its 8 DIP gap.
         let body = Rect::new(cx - shown.0 / 2.0, if shown.1 > rest.1 { 6.0 } else { 8.0 }, shown.0, shown.1);
         let at = crate::pill::shape::snap(body, scale);
-        let p = studio_diorama::render(m, &View { w: at.w, h: at.h, rest_w: rest.0, rest_h: rest.1, scale });
+        let p = nexora_diorama::render(m, &View { w: at.w, h: at.h, rest_w: rest.0, rest_h: rest.1, scale });
         let (w, h) = (((body.right() + 20.0) * scale).ceil() as i32 - origin.0, ((body.bottom() + 20.0) * scale).ceil() as i32 - origin.1);
         let (x0, y0) = ((at.x * scale).round() as i32 - origin.0, (at.y * scale).round() as i32 - origin.1);
         let mut px = vec![0u8; (w * h * 4) as usize];

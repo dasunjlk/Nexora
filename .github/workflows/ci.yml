@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - run: cargo test -p nexora-core -p studio-usage -p studio-diorama
+      - run: cargo test -p nexora-core -p nexora-usage -p nexora-diorama
       # THIRD-PARTY-NOTICES.txt ships with every build: it must list every
       # crate nexora.exe links (run the script after changing dependencies).
       - name: Third-party notices up to date
@@ -434,7 +434,7 @@ jobs:
       # resting pill, so every scene runs as in the Pill self-test. After
       # them the self-test takes that pill's own pictures at set times of day
       # (diorama-*.png) and checks each one: its size, that it is
-      # studio_diorama's picture of that moment (diorama-picture), and that
+      # nexora_diorama's picture of that moment (diorama-picture), and that
       # at rest it asks for no frames (diorama-rests). After this machine's
       # smoke runs, so their numbers are there whatever this step says.
       - name: Self-test, Diorama theme

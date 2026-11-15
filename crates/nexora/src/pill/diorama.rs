@@ -1,6 +1,6 @@
 //! The Diorama theme's resting pill: a small window onto a pixel-art place
 //! that keeps the day's hours, with the time written in its sky. The
-//! picture is `studio_diorama`'s; this is the app's side of it: what the
+//! picture is `nexora_diorama`'s; this is the app's side of it: what the
 //! moment is (the clock, the sun's times, the battery), where the glass
 //! ball is, and the painting kept between frames.
 //!
@@ -45,7 +45,7 @@ use nexora_core::datetime::days_from_civil;
 use nexora_core::geom::Rect;
 use nexora_core::settings::{IdleStyle, Theme};
 use std::cell::{Cell, RefCell};
-use studio_diorama::{Badge, Clock, Moment, View};
+use nexora_diorama::{Badge, Clock, Moment, View};
 
 /// The glass ball's roll from one end of the pane to the other (seconds).
 const ROLL: f64 = 1.5;
@@ -212,7 +212,7 @@ fn timed(st: &AppState) -> bool {
 
 /// The resting pill's size, or `None` where it isn't the picture.
 pub fn geom(st: &AppState) -> Option<Geom> {
-    shows(st).then(|| Geom::new(studio_diorama::width(clock(st), badge(st)), studio_diorama::H, studio_diorama::H / 2.0))
+    shows(st).then(|| Geom::new(nexora_diorama::width(clock(st), badge(st)), nexora_diorama::H, nexora_diorama::H / 2.0))
 }
 
 /// The time in the sky; Minimal is the place alone.
@@ -497,7 +497,7 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, body: Rect) -> bool {
         match kept.as_ref() {
             Some((k, image)) if *k == key => image.clone(),
             _ => {
-                let p = studio_diorama::render(&key.moment, &key.view);
+                let p = nexora_diorama::render(&key.moment, &key.view);
                 let image = ImageData::new(p.w, p.h, p.bgra);
                 if let Some((_, old)) = kept.replace((key, image.clone())) {
                     ui.c.forget_image(&old);

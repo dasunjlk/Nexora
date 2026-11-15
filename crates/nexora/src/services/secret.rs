@@ -68,7 +68,7 @@ fn unprotect(data: &[u8]) -> io::Result<Vec<u8>> {
 }
 
 /// What an Electron app sealed with `safeStorage` (Cursor's and the Claude
-/// app's sign-ins, `studio_usage::safe_storage`): `v10`, a 12-byte nonce,
+/// app's sign-ins, `nexora_usage::safe_storage`): `v10`, a 12-byte nonce,
 /// then AES-256-GCM with the 16-byte tag last, under `key` (the DPAPI blob
 /// from the app's `Local State`); anything else is a DPAPI blob alone. None
 /// when it doesn't open (another user's, or changed). Windows' own AES, so
@@ -133,13 +133,13 @@ mod tests {
 
     /// An AES-256 key and what it sealed the way Electron does on Windows
     /// (made with Python's `cryptography` by make.py beside it).
-    const SEALED: &str = include_str!("../../../studio-usage/src/fixtures/safe-storage/windows-v10.txt");
+    const SEALED: &str = include_str!("../../../nexora-usage/src/fixtures/safe-storage/windows-v10.txt");
 
     fn sample() -> (Vec<u8>, Vec<u8>) {
         let mut lines = SEALED.lines();
         let key = lines.next().unwrap();
         let key = (0..key.len()).step_by(2).map(|i| u8::from_str_radix(&key[i..i + 2], 16).unwrap()).collect();
-        (key, studio_usage::b64url(lines.next().unwrap()).unwrap())
+        (key, nexora_usage::b64url(lines.next().unwrap()).unwrap())
     }
 
     #[test]

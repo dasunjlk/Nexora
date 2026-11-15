@@ -1,7 +1,7 @@
 //! Side effects requested by pages; executed by the app after each frame.
 
 use crate::pages::PageKind;
-use studio_usage::ProviderId;
+use nexora_usage::ProviderId;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum MediaCmd {
@@ -101,7 +101,7 @@ pub enum UsageCmd {
     /// Disconnect inference.oyenza.com (its key stops working there too).
     Disconnect,
     /// Start a service's own sign-in on this computer (Claude Code's
-    /// `claude auth login`, or the Claude app): `studio_usage::claude::sign_in`.
+    /// `claude auth login`, or the Claude app): `nexora_usage::claude::sign_in`.
     SignIn(ProviderId),
     /// Take a service's card off the tab.
     Hide(ProviderId),

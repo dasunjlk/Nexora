@@ -25,8 +25,8 @@ upstream branding left.
    reference; keep the `oyenza-studio-main/` ignore line.
 2. **File and directory renames** (git records them as renames):
    `crates/nexora → crates/nexora`, `crates/nexora-core → crates/nexora-core`,
-   `crates/studio-usage → crates/nexora-usage`,
-   `crates/studio-diorama → crates/nexora-diorama`,
+   `crates/nexora-usage → crates/nexora-usage`,
+   `crates/nexora-diorama → crates/nexora-diorama`,
    `src/oyen.rs → src/nova.rs`, `src/oyen/ → src/nova/`,
    `res/nexora.{ico,rc,manifest} → res/nexora.*`,
    `installer/nexora.{iss,nsi} → installer/nexora.*`,
@@ -41,8 +41,8 @@ upstream branding left.
    nexora.trade`, `studio.oyenza.com → dasunjlk.github.io/Nexora`);
    `oyis_` → `nxis_`; `catat-server` → `nexora-notes-server`; then the
    case variants `Oyenza Studio`, `Nexora`, `nexora`, `Oyenza`,
-   `OYENZA`, `oyenza`, `Oyen`, `OYEN`, `oyen`, `studio-usage`/`studio_usage`,
-   `studio-diorama`/`studio_diorama`, `Nexora`, `NEXORA`, `nexora`.
+   `OYENZA`, `oyenza`, `Oyen`, `OYEN`, `oyen`, `nexora-usage`/`nexora_usage`,
+   `nexora-diorama`/`nexora_diorama`, `Nexora`, `NEXORA`, `nexora`.
 4. **Version reset**: workspace version `0.2.30 → 0.1.0` in `Cargo.toml`,
    the CI env, both installer scripts and the website's fallback version;
    regenerate `Cargo.lock`.

@@ -1,5 +1,5 @@
 [package]
-name = "studio-usage"
+name = "nexora-usage"
 version.workspace = true
 edition.workspace = true
 publish.workspace = true

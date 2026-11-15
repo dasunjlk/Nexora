@@ -21,8 +21,8 @@ use nexora_core::romanize::Ruby;
 use nexora_core::settings::Settings;
 use nexora_core::store::Store;
 use nexora_core::timeline::Timeline;
-use studio_usage::alerts::{Alert, AlertCfg, AlertKind};
-use studio_usage::{ProviderId, Snapshot, Trouble};
+use nexora_usage::alerts::{Alert, AlertCfg, AlertKind};
+use nexora_usage::{ProviderId, Snapshot, Trouble};
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 #[derive(Clone, Debug)]
@@ -1136,7 +1136,7 @@ impl AppState {
             waiting.push((a, self.now));
         }
         // Stable: the same urgency keeps the order they came in.
-        studio_usage::sort_small_by(waiting, |(a, _), (b, _)| a.kind.urgency() < b.kind.urgency());
+        nexora_usage::sort_small_by(waiting, |(a, _), (b, _)| a.kind.urgency() < b.kind.urgency());
     }
 
     /// Put the next waiting AI notice up once the island is `free` (the app
@@ -1336,7 +1336,7 @@ mod tests {
     #[test]
     fn an_ai_reading_keeps_its_last_numbers_through_a_trouble() {
         use crate::services::usage::UsageEvent;
-        use studio_usage::Source;
+        use nexora_usage::Source;
         let mut u = UsageState::default();
         let snap = Snapshot::new(ProviderId::Codex, 100, Source::Online);
         u.apply(UsageEvent::Reading { id: ProviderId::Codex, outcome: Ok(snap.clone()), at: 100 });
@@ -1471,7 +1471,7 @@ mod tests {
 
     #[test]
     fn ai_notices_go_by_a_sane_line_and_the_apps_clock() {
-        use studio_usage::{alerts, Source, Window, WindowKind};
+        use nexora_usage::{alerts, Source, Window, WindowKind};
         let mut st = AppState::new(Settings::default(), Store::default());
         for (picked, near) in [(0, 0.5), (49, 0.5), (80, 0.8), (95, 0.95), (100, 0.95), (255, 0.95)] {
             st.settings.usage.near_pct = picked;

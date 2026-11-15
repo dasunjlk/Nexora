@@ -1,8 +1,8 @@
-//! Antigravity's `agy`, run for the AI tab (`studio_usage::Cli`): the limits
+//! Antigravity's `agy`, run for the AI tab (`nexora_usage::Cli`): the limits
 //! are answered to Antigravity itself only, so its own `/usage` command is
 //! how we ask. One run is a 190 MB program starting and asking Google: about
 //! 2 seconds of CPU, which is why the worker runs it only while the AI tab is
-//! on screen, at most every 15 minutes (`studio_usage::antigravity`), and
+//! on screen, at most every 15 minutes (`nexora_usage::antigravity`), and
 //! after every other service, so their cards don't wait for it.
 //!
 //! Only the two fixed command lines of [`Cli`] are ever run, from where
@@ -22,7 +22,7 @@
 //! - whatever it leaves running in its process group when it ends is ended
 //!   too: asked first, then made to.
 
-use studio_usage::{Cli, NetFail, Reply};
+use nexora_usage::{Cli, NetFail, Reply};
 use std::fs::{self, DirBuilder, OpenOptions};
 use std::io::{self, Read, Write};
 use std::os::unix::fs::{DirBuilderExt, OpenOptionsExt};

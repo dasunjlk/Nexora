@@ -84,19 +84,19 @@ const THEME_FLOAT: f32 = 7.0;
 /// pixel for pixel, and is taller than the little capsules beside it.
 const DIORAMA_FLOAT: f32 = 3.0;
 /// The card's picture is the place on a shorter pane than the resting
-/// pill's (`studio_diorama::LONG`), so it fits the little screen at its own
+/// pill's (`nexora_diorama::LONG`), so it fits the little screen at its own
 /// size: the house, the clock, the fence and the tree.
 const DIORAMA_CARD_W: f32 = 120.0;
 /// The Diorama card shows the theme's own picture as it rests on the real
 /// screen: this moment of it, a morning at the 10:08 the other cards' clocks
 /// say, the glass ball on the house.
-const DIORAMA_MOMENT: studio_diorama::Moment = studio_diorama::Moment {
+const DIORAMA_MOMENT: nexora_diorama::Moment = nexora_diorama::Moment {
     minute: 608.0,
     sunrise: 360.0,
     sunset: 1080.0,
     day: 9817,
     lens: 0.0,
-    clock: Some(studio_diorama::Clock { hour: 10, minute: 8, h24: true }),
+    clock: Some(nexora_diorama::Clock { hour: 10, minute: 8, h24: true }),
     badge: None,
     dark: None,
 };
@@ -1710,9 +1710,9 @@ thread_local! {
 /// The Diorama card's picture for a canvas of `scale` pixels per DIP: the
 /// theme's resting pill at [`DIORAMA_MOMENT`], at its own size (a smaller
 /// copy would smear its pixels and the time in its sky).
-fn diorama_picture(scale: f32) -> studio_diorama::Picture {
-    let (w, h) = (DIORAMA_CARD_W, studio_diorama::H);
-    studio_diorama::render(&DIORAMA_MOMENT, &studio_diorama::View { w, h, rest_w: w, rest_h: h, scale })
+fn diorama_picture(scale: f32) -> nexora_diorama::Picture {
+    let (w, h) = (DIORAMA_CARD_W, nexora_diorama::H);
+    nexora_diorama::render(&DIORAMA_MOMENT, &nexora_diorama::View { w, h, rest_w: w, rest_h: h, scale })
 }
 
 /// That picture as an image, painted once for a scale and kept. With it
@@ -2156,7 +2156,7 @@ mod tests {
             let p = diorama_picture(scale);
             // The card's pane, 120 x 38 DIP, to the pixel.
             assert_eq!(p.w as f32, DIORAMA_CARD_W * scale, "{scale}");
-            assert!((p.h as f32 - studio_diorama::H * scale).abs() <= 0.5, "{scale}: {} px tall", p.h);
+            assert!((p.h as f32 - nexora_diorama::H * scale).abs() <= 0.5, "{scale}: {} px tall", p.h);
             assert_eq!(p.bgra.len(), (p.w * p.h * 4) as usize, "{scale}");
             // Its place has the picture's own shape (so nothing of it is
             // cropped or stretched) on whole pixels, inside the screen.

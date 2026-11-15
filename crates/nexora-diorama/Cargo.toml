@@ -1,5 +1,5 @@
 [package]
-name = "studio-diorama"
+name = "nexora-diorama"
 version.workspace = true
 edition.workspace = true
 publish.workspace = true
