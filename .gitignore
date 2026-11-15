@@ -1,1 +1,13 @@
-oyenza-studio-main/
+/target
+/dist
+*.log
+.DS_Store
+/selftest-out
+/.claude/
+/design-review
+/after
+/ci-artifacts
+/_site
+
+# local reference tree (upstream, never committed)
+/oyenza-studio-main/

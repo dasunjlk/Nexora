@@ -33,14 +33,19 @@
 ```
 main ──────────────┬──────────────► (tag vX when releasing) ──► production
                    │ merge dev                                (merge from main)
-dev ──┬──┬──┬───────┴─────►
-      │  │  │
-      │  │  └─ feature/06-merge-ladder   (the merges themselves)
-      │  └─ feature/02-port-rebrand     (port + rebrand + build/test)
-      └─ feature/01-project-docs        (docs)
+dev ──┬──┬──┬───┬────┴────────────────►
+      │  │  │   │
+      │  │  │   └─ feature/06-merge-ladder
+      │  │  └─ feature/04a-workflows … 04d-root-docs
+      │  └─ feature/03a-logo-icon, 03b-installer-phone-art
+      └─ feature/02a-port-codebase, 02b-rename-tree, 02c…02g rebrand passes,
+         05-build-test …
 testing ◄── merge from dev (QA snapshot)
 ```
 
-- Tasks 01–0x each had a `feature/NN-*` branch merged into `dev` after CI.
+- **One short-lived branch per sub-task** (see `docs/task.md`), created from
+  the current tip of `dev`, merged back with `--no-ff` as soon as it is
+  green. Each branch carries small, granular commits (one logical step per
+  commit) so history reads like a changelog.
 - `testing` and `main`/`production` receive the result at the milestones
   defined in `docs/task.md`.
