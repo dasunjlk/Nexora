@@ -17,8 +17,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Keep in sync with Cargo.toml's workspace version, installer/poni.nsi and installer/poni.iss.
-  PONI_VERSION: "0.2.30"
+  # Keep in sync with Cargo.toml's workspace version, installer/nexora.nsi and installer/nexora.iss.
+  NEXORA_VERSION: "0.2.30"
 
 jobs:
   core:
@@ -28,9 +28,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - run: cargo test -p poni-core -p studio-usage -p studio-diorama
+      - run: cargo test -p nexora-core -p studio-usage -p studio-diorama
       # THIRD-PARTY-NOTICES.txt ships with every build: it must list every
-      # crate poni.exe links (run the script after changing dependencies).
+      # crate nexora.exe links (run the script after changing dependencies).
       - name: Third-party notices up to date
         run: |
           cargo fetch --locked
@@ -40,10 +40,10 @@ jobs:
       - name: Design tokens up to date
         run: python3 tools/tokens.py --check
 
-  # poni.exe is built once, here. The unit tests, the self-tests and the
+  # nexora.exe is built once, here. The unit tests, the self-tests and the
   # installer each run on their own machine, side by side.
   windows:
-    name: Build poni.exe (Windows)
+    name: Build nexora.exe (Windows)
     runs-on: windows-2025
     steps:
       - uses: actions/checkout@v4
@@ -51,13 +51,13 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - name: Build release
-        run: cargo build -p poni --release
+        run: cargo build -p nexora --release
 
-      - name: Upload poni.exe
+      - name: Upload nexora.exe
         uses: actions/upload-artifact@v4
         with:
-          name: poni-exe
-          path: target/release/poni.exe
+          name: nexora-exe
+          path: target/release/nexora.exe
           if-no-files-found: error
 
   # The tests compile the app again, in test mode. They need the same
@@ -85,14 +85,14 @@ jobs:
           New-Item -ItemType Directory -Force fake-am | Out-Null
           & "$fw\csc.exe" /nologo /target:winexe /out:fake-am\AppleMusic.exe /r:"$fw\WPF\PresentationFramework.dll" /r:"$fw\WPF\PresentationCore.dll" /r:"$fw\WPF\WindowsBase.dll" /r:"$fw\System.Xaml.dll" tools\fake-apple-music.cs
           if ($LASTEXITCODE -ne 0) { throw "the stand-in didn't build" }
-          $env:PONI_FAKE_AM_LOG = "$PWD\fake-am\am.log"
-          $am = Start-Process -FilePath fake-am\AppleMusic.exe -ArgumentList "`"$env:PONI_FAKE_AM_LOG`"" -PassThru
+          $env:NEXORA_FAKE_AM_LOG = "$PWD\fake-am\am.log"
+          $am = Start-Process -FilePath fake-am\AppleMusic.exe -ArgumentList "`"$env:NEXORA_FAKE_AM_LOG`"" -PassThru
           try {
-            cargo test -p poni --release presses_apple_musics_own_controls -- --ignored --nocapture
+            cargo test -p nexora --release presses_apple_musics_own_controls -- --ignored --nocapture
             if ($LASTEXITCODE -ne 0) { throw "Apple Music controls test failed" }
           } finally {
             Stop-Process -Id $am.Id -Force -ErrorAction SilentlyContinue
-            Get-Content $env:PONI_FAKE_AM_LOG -ErrorAction SilentlyContinue
+            Get-Content $env:NEXORA_FAKE_AM_LOG -ErrorAction SilentlyContinue
           }
 
       # The Stocks thread against the live oyenza.trade, from the build above.
@@ -100,26 +100,26 @@ jobs:
       # how 0.2.11 shipped a thread that never asked. Silence fails the step;
       # oyenza.trade answering badly only warns.
       - name: Stocks from the live oyenza.trade
-        run: cargo test -p poni --release the_live_market_comes_in -- --ignored --nocapture
+        run: cargo test -p nexora --release the_live_market_comes_in -- --ignored --nocapture
 
       # Windows reads the Bluetooth watchers' filters only when they start,
       # and one it refused would mean no Bluetooth pop-ups at all. The runner
       # has no Bluetooth radio: this proves Windows takes the paired-only
       # filters as it takes its own, not which devices they let through.
       - name: Bluetooth filters on a real Windows
-        run: cargo test -p poni --release the_paired_only_filters_work_like_windows_own -- --ignored --nocapture
+        run: cargo test -p nexora --release the_paired_only_filters_work_like_windows_own -- --ignored --nocapture
 
       # The Downloader add-on for real (services/downloader_live.rs): yt-dlp
-      # and QuickJS exactly as poni_core::addons pins them, then a 70 s
+      # and QuickJS exactly as nexora_core::addons pins them, then a 70 s
       # Blender film from Blender's own PeerTube as video and as sound, every
-      # line read by poni_core::ytdlp::parse. Takes about a minute; the
+      # line read by nexora_core::ytdlp::parse. Takes about a minute; the
       # film's site having trouble only warns.
       - name: Downloader with the pinned tools and a real link
         timeout-minutes: 10
-        run: cargo test -p poni --release the_pinned_tools_download_a_real_link -- --ignored --nocapture
+        run: cargo test -p nexora --release the_pinned_tools_download_a_real_link -- --ignored --nocapture
 
   # The self-tests and smoke runs on three machines at once, from the
-  # poni.exe built above. Each step is the same as when one machine ran them
+  # nexora.exe built above. Each step is the same as when one machine ran them
   # all in a row; `group` says which machine runs it:
   #   classic: the scripted self-test, the add-on on/off run, Japanese lyrics,
   #            the Pill smoke run
@@ -144,28 +144,28 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: poni-exe
+          name: nexora-exe
           path: target/release
 
       # The runner is an admin, so Show over games' frame count runs on Oyen
-      # Poni's own frames here: Windows' frame log must deliver them.
+      # Nexora's own frames here: Windows' frame log must deliver them.
       - name: Self-test (scripted screenshots)
         if: matrix.group == 'classic'
         shell: pwsh
         env:
           # Also download the Prayer times add-on's files from their release
           # and check each one against the size and SHA-256 built in.
-          PONI_SELFTEST_ADDONS: download
-          PONI_SELFTEST_FRAMES: required
+          NEXORA_SELFTEST_ADDONS: download
+          NEXORA_SELFTEST_FRAMES: required
         run: |
           # Park the cursor mid-screen so a hover can't change the scripted states.
           Add-Type -AssemblyName System.Windows.Forms
-          Add-Type -Namespace PoniCi -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
+          Add-Type -Namespace NexoraCi -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
           $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
-          [PoniCi.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
+          [NexoraCi.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
 
           New-Item -ItemType Directory -Force -Path selftest-out | Out-Null
-          $p = Start-Process -FilePath target\release\poni.exe -ArgumentList "--selftest","selftest-out" -PassThru
+          $p = Start-Process -FilePath target\release\nexora.exe -ArgumentList "--selftest","selftest-out" -PassThru
           $null = $p.Handle  # keep the handle so ExitCode is available after exit
           if (-not $p.WaitForExit(180000)) {
             Stop-Process -Id $p.Id -Force
@@ -186,8 +186,8 @@ jobs:
           Get-ChildItem selftest-out -Filter *.png | ForEach-Object { "  $($_.Name)  $($_.Length) bytes" }
 
           if ($code -ne 0) {
-            "---- poni.log (tail)"
-            Get-Content selftest-out\home\cache\poni.log -Tail 80 -ErrorAction SilentlyContinue
+            "---- nexora.log (tail)"
+            Get-Content selftest-out\home\cache\nexora.log -Tail 80 -ErrorAction SilentlyContinue
             exit 1
           }
 
@@ -199,12 +199,12 @@ jobs:
         shell: pwsh
         run: |
           $dir = New-Item -ItemType Directory -Force -Path addon-home
-          $env:PONI_HOME = $dir.FullName
+          $env:NEXORA_HOME = $dir.FullName
           $files = Join-Path $dir.FullName "cache\addons\sholat\addon-sholat-3"
-          $log = Join-Path $dir.FullName "cache\poni.log"
-          function Run-Poni($on, $pattern) {
-            "{`"addons`":{`"sholat`":$on}}" | Set-Content (Join-Path $env:PONI_HOME "settings.json")
-            $p = Start-Process -FilePath target\release\poni.exe -PassThru
+          $log = Join-Path $dir.FullName "cache\nexora.log"
+          function Run-Nexora($on, $pattern) {
+            "{`"addons`":{`"sholat`":$on}}" | Set-Content (Join-Path $env:NEXORA_HOME "settings.json")
+            $p = Start-Process -FilePath target\release\nexora.exe -PassThru
             $seen = $false
             for ($i = 0; $i -lt 90 -and -not $seen; $i++) {
               Start-Sleep -Seconds 1
@@ -214,14 +214,14 @@ jobs:
             Start-Sleep -Seconds 1
             return $seen
           }
-          $ready = Run-Poni "true" "add-ons: sholat: ready"
+          $ready = Run-Nexora "true" "add-ons: sholat: ready"
           "---- files"
           Get-ChildItem $files -ErrorAction SilentlyContinue | ForEach-Object { "  $($_.Name)  $($_.Length) bytes" }
           # The add-on's own files; .ok is the add-on service's stamp of what it checked.
           $have = @(Get-ChildItem $files -ErrorAction SilentlyContinue | Where-Object Name -ne '.ok').Count
-          $gone = Run-Poni "false" "add-ons: sholat: switched off, files deleted"
+          $gone = Run-Nexora "false" "add-ons: sholat: switched off, files deleted"
           $left = Test-Path (Join-Path $dir.FullName "cache\addons\sholat")
-          "---- poni.log (add-ons)"
+          "---- nexora.log (add-ons)"
           Select-String -Path $log -Pattern 'add-ons' -ErrorAction SilentlyContinue | ForEach-Object { $_.Line }
           "ready: $ready, files: $have, deleted when off: $gone, folder left: $left"
           if (-not $ready -or $have -ne 3 -or -not $gone -or $left) { exit 1 }
@@ -235,17 +235,17 @@ jobs:
         if: matrix.group == 'classic'
         shell: pwsh
         env:
-          PONI_SELFTEST_THEME: oyen
-          PONI_SELFTEST_LYRICS: ja
-          PONI_SELFTEST_ANALYZER: required
+          NEXORA_SELFTEST_THEME: oyen
+          NEXORA_SELFTEST_LYRICS: ja
+          NEXORA_SELFTEST_ANALYZER: required
         run: |
           Add-Type -AssemblyName System.Windows.Forms
-          Add-Type -Namespace PoniCiOyen -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
+          Add-Type -Namespace NexoraCiOyen -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
           $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
-          [PoniCiOyen.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
+          [NexoraCiOyen.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
 
           New-Item -ItemType Directory -Force -Path selftest-oyen-ja | Out-Null
-          $p = Start-Process -FilePath target\release\poni.exe -ArgumentList "--selftest","selftest-oyen-ja" -PassThru
+          $p = Start-Process -FilePath target\release\nexora.exe -ArgumentList "--selftest","selftest-oyen-ja" -PassThru
           $null = $p.Handle
           if (-not $p.WaitForExit(180000)) { Stop-Process -Id $p.Id -Force; $code = -1 } else { $code = $p.ExitCode }
           "oyen + japanese self-test exit code: $code"
@@ -254,10 +254,10 @@ jobs:
             "renderer: $($r.renderer); states passed: $($r.states_passed)/$($r.states_total); failed: $($r.failed_checks -join ', ')"
             if ($r.slow_frames) { "::warning title=Slow frames on CI's software GPU (not counted)::$($r.slow_frames -join '; ')" }
           }
-          "---- pronunciation (poni.log)"
-          Select-String -Path selftest-oyen-ja\home\cache\poni.log -Pattern 'selftest: \[ja\]|fonts:|reading analyzer' -ErrorAction SilentlyContinue | ForEach-Object { $_.Line }
+          "---- pronunciation (nexora.log)"
+          Select-String -Path selftest-oyen-ja\home\cache\nexora.log -Pattern 'selftest: \[ja\]|fonts:|reading analyzer' -ErrorAction SilentlyContinue | ForEach-Object { $_.Line }
           if ($code -ne 0) {
-            Get-Content selftest-oyen-ja\home\cache\poni.log -Tail 80 -ErrorAction SilentlyContinue
+            Get-Content selftest-oyen-ja\home\cache\nexora.log -Tail 80 -ErrorAction SilentlyContinue
             exit 1
           }
 
@@ -269,18 +269,18 @@ jobs:
         if: matrix.group == 'classic'
         shell: pwsh
         env:
-          PONI_SELFTEST_THEME: oyen
-          PONI_SELFTEST_LYRICS: ja
-          PONI_SELFTEST_ANALYZER: "off"
-          PONI_SELFTEST_JA_DICT: crates\poni-core\data\ja-readings.dic.zst
+          NEXORA_SELFTEST_THEME: oyen
+          NEXORA_SELFTEST_LYRICS: ja
+          NEXORA_SELFTEST_ANALYZER: "off"
+          NEXORA_SELFTEST_JA_DICT: crates\nexora-core\data\ja-readings.dic.zst
         run: |
           Add-Type -AssemblyName System.Windows.Forms
-          Add-Type -Namespace PoniCiOwn -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
+          Add-Type -Namespace NexoraCiOwn -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
           $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
-          [PoniCiOwn.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
+          [NexoraCiOwn.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
 
           New-Item -ItemType Directory -Force -Path selftest-ja-own | Out-Null
-          $p = Start-Process -FilePath target\release\poni.exe -ArgumentList "--selftest","selftest-ja-own" -PassThru
+          $p = Start-Process -FilePath target\release\nexora.exe -ArgumentList "--selftest","selftest-ja-own" -PassThru
           $null = $p.Handle
           if (-not $p.WaitForExit(180000)) { Stop-Process -Id $p.Id -Force; $code = -1 } else { $code = $p.ExitCode }
           "own-dictionary self-test exit code: $code"
@@ -289,10 +289,10 @@ jobs:
             "renderer: $($r.renderer); states passed: $($r.states_passed)/$($r.states_total); failed: $($r.failed_checks -join ', ')"
             if ($r.slow_frames) { "::warning title=Slow frames on CI's software GPU (not counted)::$($r.slow_frames -join '; ')" }
           }
-          "---- pronunciation (poni.log)"
-          Select-String -Path selftest-ja-own\home\cache\poni.log -Pattern 'selftest: \[ja\]|reading' -ErrorAction SilentlyContinue | ForEach-Object { $_.Line }
+          "---- pronunciation (nexora.log)"
+          Select-String -Path selftest-ja-own\home\cache\nexora.log -Pattern 'selftest: \[ja\]|reading' -ErrorAction SilentlyContinue | ForEach-Object { $_.Line }
           if ($code -ne 0) {
-            Get-Content selftest-ja-own\home\cache\poni.log -Tail 80 -ErrorAction SilentlyContinue
+            Get-Content selftest-ja-own\home\cache\nexora.log -Tail 80 -ErrorAction SilentlyContinue
             exit 1
           }
 
@@ -305,17 +305,17 @@ jobs:
         shell: pwsh
         run: |
           Add-Type -AssemblyName System.Windows.Forms
-          Add-Type -Namespace PoniCiGlass -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
+          Add-Type -Namespace NexoraCiGlass -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
           $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
-          [PoniCiGlass.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
+          [NexoraCiGlass.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
 
-          $env:PONI_SELFTEST_THEME = "glass"
+          $env:NEXORA_SELFTEST_THEME = "glass"
           $failed = 0
           foreach ($run in "light", "dark", "flip") {
-            $env:PONI_SELFTEST_GLASS = $run
+            $env:NEXORA_SELFTEST_GLASS = $run
             $dir = "selftest-glass-$run"
             New-Item -ItemType Directory -Force -Path $dir | Out-Null
-            $p = Start-Process -FilePath target\release\poni.exe -ArgumentList "--selftest",$dir -PassThru
+            $p = Start-Process -FilePath target\release\nexora.exe -ArgumentList "--selftest",$dir -PassThru
             $null = $p.Handle
             if (-not $p.WaitForExit(180000)) { Stop-Process -Id $p.Id -Force; $code = -1 } else { $code = $p.ExitCode }
             "glass ($run) self-test exit code: $code"
@@ -324,9 +324,9 @@ jobs:
               "renderer: $($r.renderer); states passed: $($r.states_passed)/$($r.states_total); failed: $($r.failed_checks -join ', ')"
               if ($r.slow_frames) { "::warning title=Slow Glass ($run) frames on CI's software GPU (not counted)::$($r.slow_frames -join '; ')" }
             }
-            Select-String -Path "$dir\home\cache\poni.log" -Pattern 'glass:' -ErrorAction SilentlyContinue | Select-Object -First 6 | ForEach-Object { $_.Line }
+            Select-String -Path "$dir\home\cache\nexora.log" -Pattern 'glass:' -ErrorAction SilentlyContinue | Select-Object -First 6 | ForEach-Object { $_.Line }
             if ($code -ne 0) {
-              Get-Content "$dir\home\cache\poni.log" -Tail 60 -ErrorAction SilentlyContinue
+              Get-Content "$dir\home\cache\nexora.log" -Tail 60 -ErrorAction SilentlyContinue
               $failed = 1
             }
           }
@@ -340,15 +340,15 @@ jobs:
         if: matrix.group == 'glass'
         shell: pwsh
         env:
-          PONI_SELFTEST_THEME: pill
+          NEXORA_SELFTEST_THEME: pill
         run: |
           Add-Type -AssemblyName System.Windows.Forms
-          Add-Type -Namespace PoniCiPill -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
+          Add-Type -Namespace NexoraCiPill -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
           $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
-          [PoniCiPill.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
+          [NexoraCiPill.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
 
           New-Item -ItemType Directory -Force -Path selftest-pill | Out-Null
-          $p = Start-Process -FilePath target\release\poni.exe -ArgumentList "--selftest","selftest-pill" -PassThru
+          $p = Start-Process -FilePath target\release\nexora.exe -ArgumentList "--selftest","selftest-pill" -PassThru
           $null = $p.Handle
           if (-not $p.WaitForExit(180000)) { Stop-Process -Id $p.Id -Force; $code = -1 } else { $code = $p.ExitCode }
           "pill self-test exit code: $code"
@@ -363,14 +363,14 @@ jobs:
             if ($pillChecks -eq 0) { "::error title=Pill self-test::no pill-gap check ran, so this was not a Pill run"; exit 1 }
           }
           if ($code -ne 0) {
-            Get-Content selftest-pill\home\cache\poni.log -Tail 80 -ErrorAction SilentlyContinue
+            Get-Content selftest-pill\home\cache\nexora.log -Tail 80 -ErrorAction SilentlyContinue
             exit 1
           }
 
       - name: Smoke run (real desktop, hover, idle CPU/RAM)
         if: matrix.group == 'smoke'
         shell: pwsh
-        run: ./tools/ci-smoke.ps1 -Exe target\release\poni.exe -Out smoke-out
+        run: ./tools/ci-smoke.ps1 -Exe target\release\nexora.exe -Out smoke-out
 
       # Finger taps (InjectTouchInput, no touch screen needed): beside and
       # below the island they reach the window under it, on the island they
@@ -378,12 +378,12 @@ jobs:
       - name: Smoke run, touch
         if: matrix.group == 'smoke'
         shell: pwsh
-        run: ./tools/ci-smoke-touch.ps1 -Exe target\release\poni.exe -Out smoke-touch
+        run: ./tools/ci-smoke-touch.ps1 -Exe target\release\nexora.exe -Out smoke-touch
 
       - name: Smoke run, touch, Pill theme
         if: matrix.group == 'smoke'
         shell: pwsh
-        run: ./tools/ci-smoke-touch.ps1 -Exe target\release\poni.exe -Out smoke-touch-pill -Theme pill
+        run: ./tools/ci-smoke-touch.ps1 -Exe target\release\nexora.exe -Out smoke-touch-pill -Theme pill
 
       # The Pill theme on a real desktop: the island floats below the top
       # edge, so the smoke run looks for it there, and the gap above it takes
@@ -392,14 +392,14 @@ jobs:
       - name: Smoke run, Pill theme
         if: matrix.group == 'classic'
         shell: pwsh
-        run: ./tools/ci-smoke.ps1 -Exe target\release\poni.exe -Out smoke-pill -Theme pill
+        run: ./tools/ci-smoke.ps1 -Exe target\release\nexora.exe -Out smoke-pill -Theme pill
 
       # Glass on a real desktop: with its screen copy running, screenshots
       # show what's under the island instead of the island.
       - name: Smoke run, Glass theme (left out of screenshots)
         if: matrix.group == 'glass'
         shell: pwsh
-        run: ./tools/ci-smoke-glass.ps1 -Exe target\release\poni.exe -Out smoke-glass
+        run: ./tools/ci-smoke-glass.ps1 -Exe target\release\nexora.exe -Out smoke-glass
 
       # The GPU renderer is the default (runners draw with WARP). The software
       # renderer is its fallback (no DirectComposition, device loss): test it too.
@@ -407,15 +407,15 @@ jobs:
         if: matrix.group == 'smoke'
         shell: pwsh
         env:
-          PONI_RENDERER: software
+          NEXORA_RENDERER: software
         run: |
           Add-Type -AssemblyName System.Windows.Forms
-          Add-Type -Namespace PoniCiSoft -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
+          Add-Type -Namespace NexoraCiSoft -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
           $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
-          [PoniCiSoft.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
+          [NexoraCiSoft.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
 
           New-Item -ItemType Directory -Force -Path selftest-soft | Out-Null
-          $p = Start-Process -FilePath target\release\poni.exe -ArgumentList "--selftest","selftest-soft" -PassThru
+          $p = Start-Process -FilePath target\release\nexora.exe -ArgumentList "--selftest","selftest-soft" -PassThru
           $null = $p.Handle
           if (-not $p.WaitForExit(180000)) { Stop-Process -Id $p.Id -Force; $code = -1 } else { $code = $p.ExitCode }
           "software self-test exit code: $code"
@@ -424,11 +424,11 @@ jobs:
             "renderer: $($r.renderer); states passed: $($r.states_passed)/$($r.states_total); failed: $($r.failed_checks -join ', ')"
           }
           if ($code -ne 0) {
-            Get-Content selftest-soft\home\cache\poni.log -Tail 80 -ErrorAction SilentlyContinue
+            Get-Content selftest-soft\home\cache\nexora.log -Tail 80 -ErrorAction SilentlyContinue
             exit 1
           }
-          ./tools/ci-smoke.ps1 -Exe target\release\poni.exe -Out smoke-soft
-          ./tools/ci-smoke-touch.ps1 -Exe target\release\poni.exe -Out smoke-touch-soft
+          ./tools/ci-smoke.ps1 -Exe target\release\nexora.exe -Out smoke-soft
+          ./tools/ci-smoke-touch.ps1 -Exe target\release\nexora.exe -Out smoke-touch-soft
 
       # The Diorama theme: the Pill theme's island with a picture as its
       # resting pill, so every scene runs as in the Pill self-test. After
@@ -441,15 +441,15 @@ jobs:
         if: matrix.group == 'smoke'
         shell: pwsh
         env:
-          PONI_SELFTEST_THEME: diorama
+          NEXORA_SELFTEST_THEME: diorama
         run: |
           Add-Type -AssemblyName System.Windows.Forms
-          Add-Type -Namespace PoniCiDiorama -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
+          Add-Type -Namespace NexoraCiDiorama -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
           $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
-          [PoniCiDiorama.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
+          [NexoraCiDiorama.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
 
           New-Item -ItemType Directory -Force -Path selftest-diorama | Out-Null
-          $p = Start-Process -FilePath target\release\poni.exe -ArgumentList "--selftest","selftest-diorama" -PassThru
+          $p = Start-Process -FilePath target\release\nexora.exe -ArgumentList "--selftest","selftest-diorama" -PassThru
           $null = $p.Handle
           if (-not $p.WaitForExit(180000)) { Stop-Process -Id $p.Id -Force; $code = -1 } else { $code = $p.ExitCode }
           "diorama self-test exit code: $code"
@@ -465,29 +465,29 @@ jobs:
             if ($checked -eq 0) { "::error title=Diorama self-test::no diorama-picture check ran, so this was not a Diorama run"; exit 1 }
           }
           if ($code -ne 0) {
-            Get-Content selftest-diorama\home\cache\poni.log -Tail 80 -ErrorAction SilentlyContinue
+            Get-Content selftest-diorama\home\cache\nexora.log -Tail 80 -ErrorAction SilentlyContinue
             exit 1
           }
 
       # The whole Diorama island takes its picture's day or night look, so
       # the run above holds its scenes at 10:08 whenever CI runs; this one
-      # (PONI_SELFTEST_DIORAMA=night) holds them at 21:30: every scene in the
+      # (NEXORA_SELFTEST_DIORAMA=night) holds them at 21:30: every scene in the
       # night look, its pictures as above. On the glass machine, which has
       # the room (smoke runs the other Diorama steps).
       - name: Self-test, Diorama theme at night
         if: matrix.group == 'glass'
         shell: pwsh
         env:
-          PONI_SELFTEST_THEME: diorama
-          PONI_SELFTEST_DIORAMA: night
+          NEXORA_SELFTEST_THEME: diorama
+          NEXORA_SELFTEST_DIORAMA: night
         run: |
           Add-Type -AssemblyName System.Windows.Forms
-          Add-Type -Namespace PoniCiDioramaNight -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
+          Add-Type -Namespace NexoraCiDioramaNight -Name User32 -MemberDefinition '[DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);'
           $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
-          [PoniCiDioramaNight.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
+          [NexoraCiDioramaNight.User32]::SetCursorPos([int]($b.Width / 2), [int]($b.Height / 2)) | Out-Null
 
           New-Item -ItemType Directory -Force -Path selftest-diorama-night | Out-Null
-          $p = Start-Process -FilePath target\release\poni.exe -ArgumentList "--selftest","selftest-diorama-night" -PassThru
+          $p = Start-Process -FilePath target\release\nexora.exe -ArgumentList "--selftest","selftest-diorama-night" -PassThru
           $null = $p.Handle
           if (-not $p.WaitForExit(180000)) { Stop-Process -Id $p.Id -Force; $code = -1 } else { $code = $p.ExitCode }
           "diorama night self-test exit code: $code"
@@ -501,11 +501,11 @@ jobs:
             if ($framed -eq 0) { "::error title=Diorama night self-test::no scene was checked in the night look"; exit 1 }
           }
           if ($code -ne 0) {
-            Get-Content selftest-diorama-night\home\cache\poni.log -Tail 80 -ErrorAction SilentlyContinue
+            Get-Content selftest-diorama-night\home\cache\nexora.log -Tail 80 -ErrorAction SilentlyContinue
             exit 1
           }
 
-      # The same pictures alone (PONI_SELFTEST_DIORAMA=only, a few seconds a
+      # The same pictures alone (NEXORA_SELFTEST_DIORAMA=only, a few seconds a
       # run) at 125 %, 150 % and 200 %: the picture is painted for the
       # display's own scale, so each scale is its own pixels, and between
       # whole scales its art pixels fall on part pixels.
@@ -513,15 +513,15 @@ jobs:
         if: matrix.group == 'smoke'
         shell: pwsh
         env:
-          PONI_SELFTEST_THEME: diorama
-          PONI_SELFTEST_DIORAMA: only
+          NEXORA_SELFTEST_THEME: diorama
+          NEXORA_SELFTEST_DIORAMA: only
         run: |
           $failed = @()
           foreach ($dpi in 120, 144, 192) {
-            $env:PONI_SELFTEST_DPI = "$dpi"
+            $env:NEXORA_SELFTEST_DPI = "$dpi"
             $dir = "selftest-diorama-$dpi"
             New-Item -ItemType Directory -Force -Path $dir | Out-Null
-            $p = Start-Process -FilePath target\release\poni.exe -ArgumentList "--selftest",$dir -PassThru
+            $p = Start-Process -FilePath target\release\nexora.exe -ArgumentList "--selftest",$dir -PassThru
             $null = $p.Handle
             if (-not $p.WaitForExit(90000)) { Stop-Process -Id $p.Id -Force; $code = -1 } else { $code = $p.ExitCode }
             $said = "(no report)"
@@ -534,7 +534,7 @@ jobs:
             "$dpi DPI: exit code $code; diorama-picture checks run: $checked; $said"
             if ($code -ne 0 -or $checked -eq 0) {
               $failed += $dpi
-              Get-Content "$dir\home\cache\poni.log" -Tail 40 -ErrorAction SilentlyContinue
+              Get-Content "$dir\home\cache\nexora.log" -Tail 40 -ErrorAction SilentlyContinue
             }
           }
           if ($failed) { "::error title=Diorama self-test::failed at $($failed -join ', ') DPI"; exit 1 }
@@ -551,15 +551,15 @@ jobs:
               Where-Object { Test-Path $_ } | Select-Object -First 1
           }
           if (-not $iscc) { Write-Error "ISCC.exe not found after installing Inno Setup"; exit 1 }
-          & $iscc "/DAppVersion=$env:PONI_VERSION" installer\poni.iss
+          & $iscc "/DAppVersion=$env:NEXORA_VERSION" installer\nexora.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          Get-Item "dist\Oyenza-Studio-Setup-$env:PONI_VERSION.exe" | Format-List Name, Length
+          Get-Item "dist\Oyenza-Studio-Setup-$env:NEXORA_VERSION.exe" | Format-List Name, Length
 
       - name: Upload screenshots and logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: poni-screens-${{ matrix.group }}
+          name: nexora-screens-${{ matrix.group }}
           path: |
             selftest-out
             selftest-oyen-ja
@@ -587,11 +587,11 @@ jobs:
         if: matrix.group == 'smoke'
         uses: actions/upload-artifact@v4
         with:
-          name: poni-setup-inno
-          path: dist/Oyenza-Studio-Setup-${{ env.PONI_VERSION }}.exe
+          name: nexora-setup-inno
+          path: dist/Oyenza-Studio-Setup-${{ env.NEXORA_VERSION }}.exe
           if-no-files-found: error
 
-  # The three machines' screenshots and logs as one poni-screens download,
+  # The three machines' screenshots and logs as one nexora-screens download,
   # the same as when one machine ran every self-test.
   screens:
     name: Screenshots and logs in one download
@@ -601,39 +601,39 @@ jobs:
     steps:
       - uses: actions/upload-artifact/merge@v4
         with:
-          name: poni-screens
-          pattern: poni-screens-*
+          name: nexora-screens
+          pattern: nexora-screens-*
           delete-merged: true
 
   installer:
     name: NSIS installer and portable zip (what releases ship)
     needs: windows
-    # Pinned: 24.04's nsis 3.09 has the amd64-unicode stubs poni.nsi needs.
+    # Pinned: 24.04's nsis 3.09 has the amd64-unicode stubs nexora.nsi needs.
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: poni-exe
+          name: nexora-exe
           path: dist
       - name: Build
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq nsis zip > /dev/null
-          makensis -V2 -DEXE="$PWD/dist/poni.exe" -DOUTDIR="$PWD/dist" installer/poni.nsi
+          makensis -V2 -DEXE="$PWD/dist/nexora.exe" -DOUTDIR="$PWD/dist" installer/nexora.nsi
           # Portable build inside its own folder, as tools/package.sh makes it.
-          ( cd dist && mkdir Poni && cp poni.exe ../THIRD-PARTY-NOTICES.txt Poni/ && zip -qr "Oyenza-Studio-$PONI_VERSION-portable.zip" Poni && rm -rf Poni )
+          ( cd dist && mkdir Nexora && cp nexora.exe ../THIRD-PARTY-NOTICES.txt Nexora/ && zip -qr "Oyenza-Studio-$NEXORA_VERSION-portable.zip" Nexora && rm -rf Nexora )
           ls -la dist
       # The download against tools/weight-budget.json (the Windows job's smoke
       # run weighs memory, CPU and wake-ups).
       - name: Weight check, download size
-        run: tools/ci-weight-download.sh "dist/Oyenza-Studio-Setup-$PONI_VERSION.exe"
+        run: tools/ci-weight-download.sh "dist/Oyenza-Studio-Setup-$NEXORA_VERSION.exe"
       - uses: actions/upload-artifact@v4
         with:
           name: oyenza-studio-setup
           path: |
-            dist/Oyenza-Studio-Setup-${{ env.PONI_VERSION }}.exe
-            dist/Oyenza-Studio-${{ env.PONI_VERSION }}-portable.zip
+            dist/Oyenza-Studio-Setup-${{ env.NEXORA_VERSION }}.exe
+            dist/Oyenza-Studio-${{ env.NEXORA_VERSION }}-portable.zip
           if-no-files-found: error
 
   install-test:
@@ -649,10 +649,10 @@ jobs:
       - name: Fetch the release to upgrade from
         shell: pwsh
         # 0.1.1 is the installer people have today; the check upgrades from it.
-        run: Invoke-WebRequest -Uri "https://github.com/lucacadalora/oyenza-studio/releases/download/v0.1.1/Poni-Setup-0.1.1.exe" -OutFile previous-setup.exe
+        run: Invoke-WebRequest -Uri "https://github.com/lucacadalora/oyenza-studio/releases/download/v0.1.1/Nexora-Setup-0.1.1.exe" -OutFile previous-setup.exe
       - name: Install, check, uninstall
         shell: pwsh
-        run: ./tools/ci-installer.ps1 -Setup "dist\Oyenza-Studio-Setup-$env:PONI_VERSION.exe" -Version $env:PONI_VERSION -Previous previous-setup.exe -Out installer-out
+        run: ./tools/ci-installer.ps1 -Setup "dist\Oyenza-Studio-Setup-$env:NEXORA_VERSION.exe" -Version $env:NEXORA_VERSION -Previous previous-setup.exe -Out installer-out
       - name: Upload screenshots and results
         if: always()
         uses: actions/upload-artifact@v4
@@ -686,12 +686,12 @@ jobs:
       - name: Size and SHA-256
         run: ls -l dist/ffmpeg/windows/ffmpeg.exe && cat dist/ffmpeg/SHA256SUMS
       # The app downloads the ffmpeg.exe on addon-downloader-1, pinned in
-      # poni_core::addons::DOWNLOADER_WINDOWS. A build here that differs (another
+      # nexora_core::addons::DOWNLOADER_WINDOWS. A build here that differs (another
       # MinGW, another script) is worth knowing, not a failure: the release's
       # file is the one people get.
       - name: Same bytes as the pinned ffmpeg.exe
         run: |
-          pin=$(grep -o 'name: "ffmpeg.exe", size: [0-9_]*, sha256: "[0-9a-f]*"' crates/poni-core/src/addons.rs | grep -o '[0-9a-f]\{64\}')
+          pin=$(grep -o 'name: "ffmpeg.exe", size: [0-9_]*, sha256: "[0-9a-f]*"' crates/nexora-core/src/addons.rs | grep -o '[0-9a-f]\{64\}')
           got=$(sha256sum dist/ffmpeg/windows/ffmpeg.exe | cut -d' ' -f1)
           if [ "$pin" = "$got" ]; then echo "ffmpeg.exe matches the pin ($got)"; else echo "::warning::this build of ffmpeg.exe ($got) isn't the pinned one ($pin)"; fi
       - uses: actions/upload-artifact@v4
@@ -715,48 +715,48 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: The tag matches PONI_VERSION
+      - name: The tag matches NEXORA_VERSION
         if: startsWith(github.ref, 'refs/tags/v')
-        run: test "$GITHUB_REF_NAME" = "v$PONI_VERSION"
+        run: test "$GITHUB_REF_NAME" = "v$NEXORA_VERSION"
       - uses: actions/download-artifact@v4
         with:
           name: oyenza-studio-setup
           path: dist
-      # Oyen-Poni-Setup.exe is the fixed name before the rename (0.1.2 to the last 0.1.x). Links to it are
+      # Oyen-Nexora-Setup.exe is the fixed name before the rename (0.1.2 to the last 0.1.x). Links to it are
       # out there (oyenza.com, shared links, old README copies), so every release keeps carrying it.
       - name: Copy the installer to the fixed names the download links use
         run: |
-          cp "dist/Oyenza-Studio-Setup-$PONI_VERSION.exe" dist/Oyenza-Studio-Setup.exe
-          cp "dist/Oyenza-Studio-Setup-$PONI_VERSION.exe" dist/Oyen-Poni-Setup.exe
+          cp "dist/Oyenza-Studio-Setup-$NEXORA_VERSION.exe" dist/Oyenza-Studio-Setup.exe
+          cp "dist/Oyenza-Studio-Setup-$NEXORA_VERSION.exe" dist/Oyen-Nexora-Setup.exe
       - name: Publish as the latest release
         if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
-          name: Oyenza Studio ${{ env.PONI_VERSION }}
+          name: Oyenza Studio ${{ env.NEXORA_VERSION }}
           body_path: docs/release-notes/${{ github.ref_name }}.md
           prerelease: false
           make_latest: "true"
           files: |
-            dist/Oyenza-Studio-Setup-${{ env.PONI_VERSION }}.exe
+            dist/Oyenza-Studio-Setup-${{ env.NEXORA_VERSION }}.exe
             dist/Oyenza-Studio-Setup.exe
-            dist/Oyen-Poni-Setup.exe
-            dist/Oyenza-Studio-${{ env.PONI_VERSION }}-portable.zip
+            dist/Oyen-Nexora-Setup.exe
+            dist/Oyenza-Studio-${{ env.NEXORA_VERSION }}-portable.zip
           fail_on_unmatched_files: true
       - name: What a tag would publish (dry run, nothing is published)
         if: github.event_name != 'push'
         run: |
-          notes="docs/release-notes/v$PONI_VERSION.md"
+          notes="docs/release-notes/v$NEXORA_VERSION.md"
           if [ ! -s "$notes" ]; then
-            echo "::error file=$notes::Missing: a v$PONI_VERSION tag would publish without release notes."
+            echo "::error file=$notes::Missing: a v$NEXORA_VERSION tag would publish without release notes."
             exit 1
           fi
           {
             echo "### Release dry run: nothing was published"
             echo
-            echo "A \`v$PONI_VERSION\` tag would publish **Oyenza Studio $PONI_VERSION** as the latest release, with \`$notes\` as its text and these files:"
+            echo "A \`v$NEXORA_VERSION\` tag would publish **Oyenza Studio $NEXORA_VERSION** as the latest release, with \`$notes\` as its text and these files:"
             echo
             echo '```'
-            (cd dist && sha256sum "Oyenza-Studio-Setup-$PONI_VERSION.exe" Oyenza-Studio-Setup.exe Oyen-Poni-Setup.exe "Oyenza-Studio-$PONI_VERSION-portable.zip" && ls -l "Oyenza-Studio-Setup-$PONI_VERSION.exe" Oyenza-Studio-Setup.exe Oyen-Poni-Setup.exe "Oyenza-Studio-$PONI_VERSION-portable.zip")
+            (cd dist && sha256sum "Oyenza-Studio-Setup-$NEXORA_VERSION.exe" Oyenza-Studio-Setup.exe Oyen-Nexora-Setup.exe "Oyenza-Studio-$NEXORA_VERSION-portable.zip" && ls -l "Oyenza-Studio-Setup-$NEXORA_VERSION.exe" Oyenza-Studio-Setup.exe Oyen-Nexora-Setup.exe "Oyenza-Studio-$NEXORA_VERSION-portable.zip")
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
@@ -786,9 +786,9 @@ jobs:
         if: github.event_name != 'push'
         run: |
           page=$(tools/ci-site-check.sh version)
-          if [ "$page" = "$PONI_VERSION" ]; then
-            msg="The page on main names $page, so a v$PONI_VERSION tag would start the Website workflow and put it live."
+          if [ "$page" = "$NEXORA_VERSION" ]; then
+            msg="The page on main names $page, so a v$NEXORA_VERSION tag would start the Website workflow and put it live."
           else
-            msg="The page on main names ${page:-no version}, so a v$PONI_VERSION tag would open the issue \"Landing page not updated for v$PONI_VERSION\"."
+            msg="The page on main names ${page:-no version}, so a v$NEXORA_VERSION tag would open the issue \"Landing page not updated for v$NEXORA_VERSION\"."
           fi
           echo "$msg" | tee -a "$GITHUB_STEP_SUMMARY"

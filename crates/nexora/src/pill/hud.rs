@@ -11,8 +11,8 @@ use crate::icons::Icon;
 use crate::island::Geom;
 use crate::state::{AppState, HudKind};
 use crate::ui::Ui;
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::svgpath::Seg;
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::svgpath::Seg;
 
 /// One height for every pop-up, with round ends (spec 6.1).
 const H: f32 = 32.0;
@@ -281,8 +281,8 @@ fn battery(ui: &mut Ui, r: Rect, percent: u8, charging: bool) {
 mod tests {
     use super::*;
     use crate::state::Hud;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
 
     fn with_device(name: &str, battery: Option<u8>) -> AppState {
         let mut st = AppState::new(Settings::default(), Store::default());

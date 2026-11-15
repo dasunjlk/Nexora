@@ -10,11 +10,11 @@
 	<key>CFBundleName</key>
 	<string>Oyenza Studio</string>
 	<key>CFBundleExecutable</key>
-	<string>poni</string>
+	<string>nexora</string>
 	<key>CFBundleIconFile</key>
 	<string>OyenzaStudio</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.oyenza.poni</string>
+	<string>com.oyenza.nexora</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>

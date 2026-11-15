@@ -7,12 +7,12 @@
 
 use crate::gfx::Image;
 use crate::state::{MediaSession, PowerState, SysStats};
-use poni_core::health::HealthSnapshot;
-use poni_core::lrc::Lyrics;
-use poni_core::agenda;
-use poni_core::oyenza::{Activity, Arrival, Bill, Saved};
-use poni_core::romanize::Ruby;
-use poni_core::timeline::Timeline;
+use nexora_core::health::HealthSnapshot;
+use nexora_core::lrc::Lyrics;
+use nexora_core::agenda;
+use nexora_core::oyenza::{Activity, Arrival, Bill, Saved};
+use nexora_core::romanize::Ruby;
+use nexora_core::timeline::Timeline;
 use std::sync::mpsc::Sender;
 
 #[derive(Clone)]
@@ -123,7 +123,7 @@ pub enum AppEvent {
     Stats(SysStats),
     /// The System page's latest reading and the minute behind it
     /// (`services::sysmon`, each second while the page is open).
-    System(Box<poni_core::sysmon::Monitor>),
+    System(Box<nexora_core::sysmon::Monitor>),
     /// An app's icon for the System page, by its path (`Command::LoadAppIcon`).
     AppIcon { path: String, image: Option<Image> },
     /// The displays went to sleep (true) or woke.
@@ -131,11 +131,11 @@ pub enum AppEvent {
     /// The Mac was locked (true) or unlocked.
     Locked(bool),
     /// Something happened in Phone drop (a phone visited, asked, sent files).
-    Phone(poni_core::phonedrop::Event),
+    Phone(nexora_core::phonedrop::Event),
     /// Where an add-on's files stand (`services::addons`).
-    Addon { id: &'static str, status: poni_core::addons::Status },
+    Addon { id: &'static str, status: nexora_core::addons::Status },
     /// One of yt-dlp's lines for download `id` (`services::downloader`).
-    Download { id: u64, line: poni_core::ytdlp::Line },
+    Download { id: u64, line: nexora_core::ytdlp::Line },
     /// yt-dlp for download `id` ended (`ok`: it exited with 0).
     DownloadEnded { id: u64, ok: bool },
     /// What the update file said (`services::update`).
@@ -143,7 +143,7 @@ pub enum AppEvent {
     /// Where the Mac is, for Prayer times (`services::location`).
     Located(crate::services::location::Located),
     /// One of Prayer times' online city files (`services::cities`).
-    Cities { file: String, got: Result<poni_core::prayer::World, String> },
+    Cities { file: String, got: Result<nexora_core::prayer::World, String> },
     /// The Stocks page's prices, names and years (`services::stocks`).
     Stocks(crate::services::stocks::StocksEvent),
     /// The AI tab's readings, typed keys, inference.oyenza.com's link and
@@ -154,12 +154,12 @@ pub enum AppEvent {
     /// Free-form log line from a service thread.
     Log(String),
     /// The IELTS worker's answer (`services::ielts`).
-    Ielts(Box<poni_core::ielts::Reply>),
+    Ielts(Box<nexora_core::ielts::Reply>),
     /// The meeting being handed over, as it goes (`services::notes`).
-    Notes(Box<poni_core::notes::Reply>),
+    Notes(Box<nexora_core::notes::Reply>),
     /// The meeting's recording stopped by itself (the longest meeting taken,
     /// or the disk): why (`services::notes`).
-    NotesStopped(poni_core::notes::CaptureIssue),
+    NotesStopped(nexora_core::notes::CaptureIssue),
     /// The IELTS coach's voice played a line to its end, or couldn't play on (`services::voice`).
     VoiceEnded,
     /// The IELTS coach's microphone stopped by itself, or the person said no to macOS's question (`services::mic`).

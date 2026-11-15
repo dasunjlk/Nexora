@@ -1,5 +1,5 @@
 //! Meeting notes on the Mac, as in the Windows app (`../app.rs`): the page
-//! and its moments are `poni_core::notes` in `AppState`; the recording and
+//! and its moments are `nexora_core::notes` in `AppState`; the recording and
 //! the handing over are the shared `services::notes`, recording the
 //! microphone and the Mac's own sound (`mac/services/capture.rs`). A child
 //! of `app`, so it reaches the app's state.
@@ -9,8 +9,8 @@ use crate::commands::NotesCmd;
 use crate::icons::Icon;
 use crate::pages::PageKind;
 use crate::{paths, services};
-use poni_core::geom::palette;
-use poni_core::notes::{CaptureIssue, Problem, Reply};
+use nexora_core::geom::palette;
+use nexora_core::notes::{CaptureIssue, Problem, Reply};
 
 impl App {
     /// Each frame while a meeting is recorded: how loud each source is, for
@@ -48,7 +48,7 @@ impl App {
             }
             NotesCmd::Copy => {
                 if let Some(last) = &self.st.notes.last {
-                    let md = poni_core::notes::markdown(&last.notes, &last.started, false);
+                    let md = nexora_core::notes::markdown(&last.notes, &last.started, false);
                     services::clipboard::set_text(&md);
                     self.st.ui.notes_note = Some(("Copied".into(), now + 2.0));
                 }
@@ -106,7 +106,7 @@ impl App {
     fn notes_send(&mut self) {
         let Some(take) = self.notes_take.clone() else { return };
         self.st.notes.stopped(take.parts.len() as u32, take.secs);
-        let job = services::notes::Job { take, started: self.notes_started, lang: poni_core::notes::Lang::Auto, api: None, out: paths::notes_dir() };
+        let job = services::notes::Job { take, started: self.notes_started, lang: nexora_core::notes::Lang::Auto, api: None, out: paths::notes_dir() };
         services::notes::send(job, &self.sink);
     }
 

@@ -70,7 +70,7 @@ returns structured notes. The notes are saved as a **Markdown file** in
  pages/notes.rs (UI thread)            services/notes.rs                server
  ──────────────────────────           ───────────────────────          ────────
  Taker (nexora_core::notes)  ◄── AppEvent::Notes ──  Sender thread
-   phase, mic/pc levels, last      ▲        poni-nexora-send        api.nexora.app
+   phase, mic/pc levels, last      ▲        nexora-nexora-send        api.nexora.app
         ▲                          │        POST /island/notes      /island/notes
         │ user actions             │        …/part/n  …/finish      /island/notes/:id
         ▼                          │        GET  /island/notes/:id
@@ -407,10 +407,10 @@ and the app's side is exercised by the scripted self-test
 | | Upstream | Nexora |
 |---|---|---|
 | API base | `https://api.oyenza.app` (`crate::oyenza::API`) | `https://api.nexora.app` (`crate::nexora::API`) |
-| Auth key file | `%LOCALAPPDATA%\Poni\oyenza-link.bin` | `%LOCALAPPDATA%\Nexora\nexora-link.bin` |
+| Auth key file | `%LOCALAPPDATA%\Nexora\oyenza-link.bin` | `%LOCALAPPDATA%\Nexora\nexora-link.bin` |
 | Notes output folder | `Documents\Oyenza Studio\Notes` | `Documents\Nexora\Notes` |
-| Audio root | `%LOCALAPPDATA%\Poni\notes\` | `%LOCALAPPDATA%\Nexora\notes\` |
-| Threads | `poni-notes`, `poni-notes-send` | `nexora-notes`, `nexora-notes-send` |
-| App-data override | `PONI_HOME` | `NEXORA_HOME` |
+| Audio root | `%LOCALAPPDATA%\Nexora\notes\` | `%LOCALAPPDATA%\Nexora\notes\` |
+| Threads | `nexora-notes`, `nexora-notes-send` | `nexora-notes`, `nexora-notes-send` |
+| App-data override | `NEXORA_HOME` | `NEXORA_HOME` |
 | Copy/persona | "Oyen listens…", "Notes by Oyen, in Oyenza Studio" | "Nova listens…", "Notes by Nova, in Nexora" |
 | Server codename | catat-server | nexora notes server (contract unchanged apart from the base URL) |

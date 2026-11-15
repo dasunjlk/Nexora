@@ -1,5 +1,5 @@
 //! Power supplies that report over USB, for the System page's Power module
-//! (`poni_core::power` has their protocols). The sampler looks for one among
+//! (`nexora_core::power` has their protocols). The sampler looks for one among
 //! the HID devices when the page opens, reads it once a second while the
 //! page is open and closes it with the page: nothing runs at rest.
 //!
@@ -8,7 +8,7 @@
 //! report reaches every open handle: so the queue is flushed before each
 //! request, and a reply counts only when it echoes the request.
 
-use poni_core::power::{self, corsair, msi, MsiLayout, Protocol, PsuModel, PsuReading, REPORT};
+use nexora_core::power::{self, corsair, msi, MsiLayout, Protocol, PsuModel, PsuReading, REPORT};
 use std::time::{Duration, Instant};
 use windows::core::{GUID, HSTRING, PCWSTR};
 use windows::Win32::Devices::DeviceAndDriverInstallation::{

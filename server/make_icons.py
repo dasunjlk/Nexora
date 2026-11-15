@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Draws the phone page icons in server/public from docs/brand/oyen-poni-logo-512.png.
+"""Draws the phone page icons in server/public from docs/brand/nexora-logo-512.png.
 
   icon-192.png          the logo as it is (purpose "any")
   icon-512.png          full-bleed orange, the logo's tile at 66 % so the island and
@@ -13,7 +13,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-LOGO = ROOT / "docs" / "brand" / "oyen-poni-logo-512.png"
+LOGO = ROOT / "docs" / "brand" / "nexora-logo-512.png"
 OUT = ROOT / "server" / "public"
 ORANGE = (0xF0, 0x89, 0x2E, 255)  # the tile colour (#F0892E)
 

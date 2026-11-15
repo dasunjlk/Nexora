@@ -19,7 +19,7 @@ use objc2_app_kit::{
 };
 use objc2_foundation::{NSArray, NSDictionary, NSNumber, NSObject, NSObjectProtocol, NSPoint, NSRect, NSRunLoop, NSRunLoopCommonModes, NSSize, NSString, NSURL};
 use objc2_quartz_core::{CADisplayLink, CAFrameRateRange};
-use poni_core::geom::Rect;
+use nexora_core::geom::Rect;
 use std::cell::{Cell, RefCell};
 use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -110,7 +110,7 @@ define_class!(
     /// while a text field is focused.
     #[unsafe(super(NSPanel, NSWindow, NSResponder, NSObject))]
     #[thread_kind = MainThreadOnly]
-    #[name = "PoniIslandPanel"]
+    #[name = "NexoraIslandPanel"]
     pub struct IslandPanel;
 
     unsafe impl NSObjectProtocol for IslandPanel {}
@@ -150,7 +150,7 @@ define_class!(
     /// Draws the island (y down, like the Windows canvas) and forwards input.
     #[unsafe(super(NSView, NSResponder, NSObject))]
     #[thread_kind = MainThreadOnly]
-    #[name = "PoniIslandView"]
+    #[name = "NexoraIslandView"]
     pub struct IslandView;
 
     unsafe impl NSObjectProtocol for IslandView {}

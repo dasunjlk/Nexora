@@ -1,4 +1,4 @@
-//! Paired phone drop on Windows: runs `poni_core::pairdrop` with HTTPS
+//! Paired phone drop on Windows: runs `nexora_core::pairdrop` with HTTPS
 //! through Windows' own HTTP client, the pair list sealed with DPAPI at
 //! `paths::paired_phones_path()`, and the network addresses phone drop
 //! already knows how to pick.
@@ -10,8 +10,8 @@
 
 use crate::events::{AppEvent, EventSink};
 use crate::services::http::{Client, FetchError, Method, MtaGuard};
-use poni_core::pairdrop::keys::b64u;
-use poni_core::pairdrop::{self, Book, Meet, MeetCfg, Pair, Post, Secret};
+use nexora_core::pairdrop::keys::b64u;
+use nexora_core::pairdrop::{self, Book, Meet, MeetCfg, Pair, Post, Secret};
 use serde_json::Value;
 use std::cell::RefCell;
 use std::path::PathBuf;
@@ -78,9 +78,9 @@ impl PairDropService {
     }
 }
 
-/// The meeting server: `PONI_DROP_SERVER` (for self-hosting and tests), else Oyenza's.
+/// The meeting server: `NEXORA_DROP_SERVER` (for self-hosting and tests), else Oyenza's.
 fn server() -> String {
-    std::env::var("PONI_DROP_SERVER")
+    std::env::var("NEXORA_DROP_SERVER")
         .ok()
         .map(|s| s.trim().trim_end_matches('/').to_string())
         .filter(|s| s.starts_with("https://") || s.starts_with("http://127.0.0.1") || s.starts_with("http://localhost"))

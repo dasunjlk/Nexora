@@ -36,8 +36,8 @@ use crate::events::{AppEvent, AppleMusicStatus, EventSink, LyricsResult};
 use crate::services::applemusic::{AppleMusic, Check, Miss};
 use crate::services::http::{self, Client, FetchError, MtaGuard};
 use crate::state::MediaSession;
-use poni_core::lrclib::{self, LrclibRecord, TrackQuery};
-use poni_core::nowplaying;
+use nexora_core::lrclib::{self, LrclibRecord, TrackQuery};
+use nexora_core::nowplaying;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -91,7 +91,7 @@ impl LyricsService {
         let shared = Arc::new(Shared::default());
         let worker = shared.clone();
         std::thread::Builder::new()
-            .name("poni-lyrics".into())
+            .name("nexora-lyrics".into())
             .spawn(move || worker_main(worker, sink))
             .map_err(|e| io::Error::other(format!("could not start the lyrics thread: {e}")))?;
         Ok(Self { shared })
@@ -647,7 +647,7 @@ fn read_cache(path: &Path) -> Option<CacheEntry> {
 }
 
 fn write_cache(path: &Path, entry: &CacheEntry) {
-    if let Err(e) = poni_core::store::write_json_atomic(path, entry) {
+    if let Err(e) = nexora_core::store::write_json_atomic(path, entry) {
         crate::pwarn!("lyrics cache: cannot write {}: {e}", path.display());
     }
 }
@@ -681,8 +681,8 @@ fn prune_cache(dir: &Path) {
 
 /// OS-free helpers (unit-tested on any host).
 mod pure {
-    use poni_core::lrc::{parse_lrc, LyricLine, Lyrics};
-    use poni_core::lrclib::{timing_fits, LrclibRecord, MIN_LINES};
+    use nexora_core::lrc::{parse_lrc, LyricLine, Lyrics};
+    use nexora_core::lrclib::{timing_fits, LrclibRecord, MIN_LINES};
     use serde::{Deserialize, Serialize};
     use std::path::PathBuf;
     use std::time::{Duration, SystemTime};

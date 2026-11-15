@@ -101,7 +101,7 @@ impl UsageService {
         let shared = Arc::new(Shared { q: Mutex::new(Queue::default()), cv: Condvar::new() });
         let worker = shared.clone();
         std::thread::Builder::new()
-            .name("poni-usage".into())
+            .name("nexora-usage".into())
             .spawn(move || worker_main(worker, sink))
             .map_err(|e| format!("could not start the AI usage thread: {e}"))?;
         Ok(Self { shared })
@@ -380,7 +380,7 @@ impl Worker {
         let oy = &self.svcs[at(ProviderId::Oyenza)];
         let spent = oy.kept.as_ref().and_then(|s| s.balance.as_ref()).is_some_and(|b| b.micros <= 0);
         let inference = self.keys.contains(oyenza::SECRET) && !spent && !matches!(oy.trouble, Some(Trouble::Refused | Trouble::Disabled));
-        let offset_min = poni_core::oyenza::offset_minutes(&crate::clock::local_now(), crate::clock::unix_now());
+        let offset_min = nexora_core::oyenza::offset_minutes(&crate::clock::local_now(), crate::clock::unix_now());
         AlertCfg { near: pace::near(self.watch.near_pct), offset_min, use_24h: self.watch.use_24h, inference, ..AlertCfg::default() }
     }
 
@@ -635,7 +635,7 @@ impl Worker {
 
     // ------------------------------------------------------------ inference.oyenza.com
 
-    /// The server to ask (a test build's own through `PONI_INFERENCE_URL`).
+    /// The server to ask (a test build's own through `NEXORA_INFERENCE_URL`).
     fn base(&self) -> String {
         oyenza::base(self.dirs.var(oyenza::URL_VAR))
     }

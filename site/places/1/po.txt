@@ -458,7 +458,7 @@ P	Potirendaba		BR		-21.043	-49.377	12
 P	Pottanūr	pottanur	IN		11.110	77.989	17
 P	Pontalina		BR		-17.525	-49.447	12
 P	Port Colborne		CA	Ontario	42.900	-79.233	9
-P	Mitras Poniente		MX		25.776	-100.426	8
+P	Mitras Nexoraente		MX		25.776	-100.426	8
 P	Sokołów Podlaski	sokolow podlaski	PL		52.407	22.253	26
 P	San Po Kong		HK		22.335	114.197	15
 P	Ischia Porto		IT		40.739	13.951	26

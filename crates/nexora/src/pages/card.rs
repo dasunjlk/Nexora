@@ -7,8 +7,8 @@
 
 use crate::state::AppState;
 use crate::ui::Ui;
-use poni_core::geom::{Color, Rect};
-use poni_core::svgpath::Seg;
+use nexora_core::geom::{Color, Rect};
+use nexora_core::svgpath::Seg;
 
 /// Pill: the open card (`area`, the page's content rect, grown back by the
 /// padding and the header) and its corner radius, read from the island's own

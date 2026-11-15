@@ -15,7 +15,7 @@ use crate::island::Geom;
 use crate::pages::{self, PageKind, PageTransition, Tip};
 use crate::state::AppState;
 use crate::ui::Ui;
-use poni_core::geom::Rect;
+use nexora_core::geom::Rect;
 
 /// The card's corner radius, all four corners (spec 6.1: ref1's 0.25 x its
 /// height would be 44 at Pill's content scale; 40, so tall pages don't read
@@ -109,8 +109,8 @@ fn corner_inset(body: Rect, radius: f32, y0: f32, y1: f32) -> f32 {
 mod tests {
     use super::*;
     use crate::activities::{self, Mode};
-    use poni_core::settings::{Settings, Theme};
-    use poni_core::store::Store;
+    use nexora_core::settings::{Settings, Theme};
+    use nexora_core::store::Store;
 
     fn state(theme: Theme) -> AppState {
         AppState::new(Settings { theme, ..Settings::default() }, Store::default())

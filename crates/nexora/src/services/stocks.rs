@@ -1,5 +1,5 @@
 //! Stocks (an add-on, off unless switched on): the prices on the Stocks page,
-//! from oyenza.trade. Words, parsing and pacing live in `poni_core::stocks`;
+//! from oyenza.trade. Words, parsing and pacing live in `nexora_core::stocks`;
 //! this file does the HTTP on one worker thread, which the Mac app runs too
 //! (it shares this file as is).
 //!
@@ -21,7 +21,7 @@
 
 use crate::events::{AppEvent, EventSink};
 use crate::services::http::{Client, FetchError, MtaGuard, Response};
-use poni_core::stocks::{self, Board, History, Names};
+use nexora_core::stocks::{self, Board, History, Names};
 use std::collections::HashMap;
 use std::sync::{Arc, Condvar, Mutex, MutexGuard};
 use std::time::{Duration, Instant};
@@ -88,7 +88,7 @@ impl StocksService {
         let shared = Arc::new(Shared { q: Mutex::new(Queue::default()), cv: Condvar::new() });
         let worker = shared.clone();
         std::thread::Builder::new()
-            .name("poni-stocks".into())
+            .name("nexora-stocks".into())
             .spawn(move || worker_main(worker, sink))
             .map_err(|e| std::io::Error::other(format!("could not start the Stocks thread: {e}")))?;
         Ok(Self { shared })
@@ -133,10 +133,10 @@ impl Shared {
     }
 }
 
-/// Where answers come from: oyenza.trade, or `PONI_STOCKS_URL` (a copy of
+/// Where answers come from: oyenza.trade, or `NEXORA_STOCKS_URL` (a copy of
 /// its server, for testing).
 fn base_url() -> String {
-    match std::env::var("PONI_STOCKS_URL") {
+    match std::env::var("NEXORA_STOCKS_URL") {
         Ok(u) if u.starts_with("http") => {
             let u = u.trim().to_string();
             if u.ends_with('/') {

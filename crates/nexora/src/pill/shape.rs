@@ -4,8 +4,8 @@
 //! `Canvas` calls both of them have.
 
 use crate::gfx::Canvas;
-use poni_core::geom::{Color, Point, Rect};
-use poni_core::svgpath::Seg;
+use nexora_core::geom::{Color, Point, Rect};
+use nexora_core::svgpath::Seg;
 
 /// Room the window keeps beside and below the floating body: the shadow
 /// reaches 15 DIP beside it and 19 below (it drops [`SHADOW_DROP`]), plus a
@@ -153,7 +153,7 @@ const FRAME_UNLIT: f32 = 0.7;
 /// line. The frame's colours are drawn as they are (a look would repaint
 /// the lit frame's white as its ink), the pane and the line as the look
 /// paints them.
-pub fn draw_framed_body(c: &mut Canvas, body: Rect, radius: f32, fill: Color, border: Option<Color>, frame: &poni_core::look::Frame) {
+pub fn draw_framed_body(c: &mut Canvas, body: Rect, radius: f32, fill: Color, border: Option<Color>, frame: &nexora_core::look::Frame) {
     let s = c.scale();
     let body = snap(body, s);
     let r = radius.min(body.h / 2.0).min(body.w / 2.0).max(0.0);
@@ -296,7 +296,7 @@ fn ramp_at(ramp: &[(f32, f32)], d: f32) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use poni_core::svgpath::arc_to_cubics;
+    use nexora_core::svgpath::arc_to_cubics;
 
     const SCALES: [f32; 5] = [1.0, 1.25, 1.5, 1.75, 2.0];
 

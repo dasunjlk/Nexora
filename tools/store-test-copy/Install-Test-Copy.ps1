@@ -33,7 +33,7 @@ if (-not (Test-Path "Cert:\LocalMachine\TrustedPeople\$thumb")) {
 }
 
 # One island at a time: the test copy can't start while the usual one runs.
-$running = Get-Process -Name poni -ErrorAction SilentlyContinue
+$running = Get-Process -Name nexora -ErrorAction SilentlyContinue
 if ($running) {
     "Quitting the Oyenza Studio that's running (its settings stay)."
     $running | Stop-Process -Force
@@ -52,7 +52,7 @@ try {
 $pkg = Get-AppxPackage -Name "JatevoLabs.OyenzaStudio"
 if (-not $pkg) { throw "The test copy didn't install." }
 "Installed $($pkg.Version). Starting it."
-Start-Process "shell:AppsFolder\$($pkg.PackageFamilyName)!Poni"
+Start-Process "shell:AppsFolder\$($pkg.PackageFamilyName)!Nexora"
 ""
 "Next: open the island, open the bell tab (Notifications), press Allow and answer Windows' question."
 "WhatsApp, Telegram and Phone Link notifications then show on the island."

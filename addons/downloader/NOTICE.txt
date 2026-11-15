@@ -4,7 +4,7 @@ yt-dlp.exe
   yt-dlp, which reads a link and downloads its video or sound. Downloaded
   from yt-dlp's own release on GitHub, unchanged. Each version of Oyenza
   Studio names the release it takes and that file's size and SHA-256
-  (poni_core::addons::DOWNLOADER), and refuses any other file; a newer
+  (nexora_core::addons::DOWNLOADER), and refuses any other file; a newer
   yt-dlp comes with a newer Oyenza Studio.
 
 qjs.exe

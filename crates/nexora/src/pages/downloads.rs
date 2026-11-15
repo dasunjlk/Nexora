@@ -1,9 +1,9 @@
-//! Downloads page (the Downloader add-on, `poni_core::addons::DOWNLOADER`):
+//! Downloads page (the Downloader add-on, `nexora_core::addons::DOWNLOADER`):
 //! a link field with Paste, Video or Sound, and Download, the app's message
 //! under it for a few seconds ([`note`]), and a link copied before the page
 //! came up waiting above the list (`downloads_offer`). The list: the
 //! downloads, newest first, each with its site's letter, title, the line
-//! under it (`poni_core::downloads::line`), a bar while it comes in, and
+//! under it (`nexora_core::downloads::line`), a bar while it comes in, and
 //! Stop (Cancel while it waits its turn), or Open, Show in folder and
 //! remove; a finished file also drags out of its row, as from the Shelf.
 //! yt-dlp does the work (`services::downloader`); nothing runs at
@@ -15,9 +15,9 @@ use crate::gfx::{TextStyle, Weight};
 use crate::icons::Icon;
 use crate::state::AppState;
 use crate::ui::{wid, wid_n, CursorKind, PillStyle, Ui, PILL_GAP, PILL_SMALL};
-use poni_core::downloads::{self, Job, State};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::ytdlp::Mode;
+use nexora_core::downloads::{self, Job, State};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::ytdlp::Mode;
 
 /// The page's height: the window never grows for it.
 const HEIGHT: f32 = 256.0;
@@ -381,9 +381,9 @@ fn disabled_pill(ui: &mut Ui, r: Rect, label: &str, icon: Icon) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
-    use poni_core::ytdlp::Stage;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
+    use nexora_core::ytdlp::Stage;
 
     fn job(url: &str, site: Option<&str>) -> Job {
         Job { id: 1, url: url.into(), mode: Mode::Video, title: None, site: site.map(str::to_string), thumbnail: None, state: State::Queued, added: 0 }

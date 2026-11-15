@@ -24,25 +24,25 @@ upstream branding left.
    license). Copy `.gitignore` entries and `.gitattributes` from the
    reference; keep the `oyenza-studio-main/` ignore line.
 2. **File and directory renames** (git records them as renames):
-   `crates/poni → crates/nexora`, `crates/poni-core → crates/nexora-core`,
+   `crates/nexora → crates/nexora`, `crates/nexora-core → crates/nexora-core`,
    `crates/studio-usage → crates/nexora-usage`,
    `crates/studio-diorama → crates/nexora-diorama`,
    `src/oyen.rs → src/nova.rs`, `src/oyen/ → src/nova/`,
-   `res/poni.{ico,rc,manifest} → res/nexora.*`,
-   `installer/poni.{iss,nsi} → installer/nexora.*`,
-   brand asset filenames (`oyen-mark* → nova-mark*`, `oyen-poni-logo* →
+   `res/nexora.{ico,rc,manifest} → res/nexora.*`,
+   `installer/nexora.{iss,nsi} → installer/nexora.*`,
+   brand asset filenames (`oyen-mark* → nova-mark*`, `nexora-logo* →
    nexora-logo*`, mascot images `oyen-* → nova-*`).
 3. **Token replacements** across every text file, longest-first so compound
    names resolve once:
-   repo slug → `dasunjlk/Nexora`; `com.oyenza.poni` → `app.nexora.nexora`;
+   repo slug → `dasunjlk/Nexora`; `com.oyenza.nexora` → `app.nexora.nexora`;
    `Oyenza-Studio`/`oyenza-studio` → `Nexora`/`nexora`; service domains
    (`api.oyenza.app → api.nexora.app`, `drop.oyenza.com → drop.nexora.app`,
    `inference.oyenza.com → inference.nexora.app`, `oyenza.trade →
    nexora.trade`, `studio.oyenza.com → dasunjlk.github.io/Nexora`);
    `oyis_` → `nxis_`; `catat-server` → `nexora-notes-server`; then the
-   case variants `Oyenza Studio`, `Oyen Poni`, `oyen-poni`, `Oyenza`,
+   case variants `Oyenza Studio`, `Nexora`, `nexora`, `Oyenza`,
    `OYENZA`, `oyenza`, `Oyen`, `OYEN`, `oyen`, `studio-usage`/`studio_usage`,
-   `studio-diorama`/`studio_diorama`, `Poni`, `PONI`, `poni`.
+   `studio-diorama`/`studio_diorama`, `Nexora`, `NEXORA`, `nexora`.
 4. **Version reset**: workspace version `0.2.30 → 0.1.0` in `Cargo.toml`,
    the CI env, both installer scripts and the website's fallback version;
    regenerate `Cargo.lock`.
@@ -66,6 +66,6 @@ upstream branding left.
 
 ## Acceptance
 
-- `grep -ri "oyenza\|poni\|oyen" --include="*"` over tracked text files
+- `grep -ri "oyenza\|nexora\|oyen" --include="*"` over tracked text files
   returns only licence/attribution contexts.
 - Workspace tests pass; `nexora.exe` builds.

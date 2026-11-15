@@ -1,6 +1,6 @@
 //! What the System page shows: CPU, GPU, memory, drives, network and battery.
 //!
-//! The Windows sampler (`poni::services::sysmon`) reads the kernel's own
+//! The Windows sampler (`nexora::services::sysmon`) reads the kernel's own
 //! counters, the way Stats reads macOS's (`host_processor_info`,
 //! `host_statistics64`, IOKit), and hands them in raw; everything arithmetic
 //! lives here, so it is tested on any machine: each core's load from two
@@ -702,7 +702,7 @@ pub fn display_name(image: &str) -> String {
 // ---------------------------------------------------------------- process list layout
 
 // `SYSTEM_PROCESS_INFORMATION` as `NtQuerySystemInformation(SystemProcessInformation)`
-// fills it on 64-bit Windows (Poni ships x64 only). Offsets of the fields read:
+// fills it on 64-bit Windows (Nexora ships x64 only). Offsets of the fields read:
 const P_NEXT: usize = 0; // u32, bytes to the next entry, 0 on the last
 const P_PRIVATE_WS: usize = 8; // i64, private working set
 const P_USER_TIME: usize = 40; // i64, 100 ns

@@ -1,4 +1,4 @@
-//! `poni --render <dir> [--theme classic|oyen|glass|pill|diorama] [--notch]`: draw the island's
+//! `nexora --render <dir> [--theme classic|oyen|glass|pill|diorama] [--notch]`: draw the island's
 //! states with sample data into PNGs, offscreen, through the Mac renderer.
 //! CI runs it on a Mac with no notch and no person at the screen, so this is
 //! how the Mac drawing gets looked at: every page and activity, each theme,
@@ -36,22 +36,22 @@ use crate::state::{
     AppState, CityFile, Hud, HudKind, InlineAction, Locate, LyricsState, LyricsStatus, MediaSession, NoticeAction, OyenzaLink, OyenzaState, PowerState, SysStats, VolumeState,
 };
 use crate::ui::{Hit, Input};
-use poni_core::addons::{Status as AddonStatus, JAPANESE_READINGS, PRAYER_TIMES};
-use poni_core::datetime::LocalDateTime;
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::health::{HealthDay, HealthSnapshot, HealthSource};
-use poni_core::lrc::parse_lrc;
-use poni_core::oyenza::{Activity, Bill, Day, Seen, Txn, WalletRef};
-use poni_core::pomodoro::{Phase, RunState};
-use poni_core::power::PowerReading;
-use poni_core::prayer::{PlaceList, Prayer, World};
-use poni_core::settings::{IdleStyle, Settings, Theme};
-use poni_core::store::Store;
-use poni_core::sysmon::{
+use nexora_core::addons::{Status as AddonStatus, JAPANESE_READINGS, PRAYER_TIMES};
+use nexora_core::datetime::LocalDateTime;
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::health::{HealthDay, HealthSnapshot, HealthSource};
+use nexora_core::lrc::parse_lrc;
+use nexora_core::oyenza::{Activity, Bill, Day, Seen, Txn, WalletRef};
+use nexora_core::pomodoro::{Phase, RunState};
+use nexora_core::power::PowerReading;
+use nexora_core::prayer::{PlaceList, Prayer, World};
+use nexora_core::settings::{IdleStyle, Settings, Theme};
+use nexora_core::store::Store;
+use nexora_core::sysmon::{
     level_pressure, AppUse, BatteryReading, CoreKind, CoreLoad, CpuReading, DiskActivity, Drive, GpuReading, MemoryReading, Module, Monitor, NetReading,
     PressureLevel, Reading, HISTORY_LEN,
 };
-use poni_core::timeline::Timeline;
+use nexora_core::timeline::Timeline;
 use std::path::{Path, PathBuf};
 
 /// Pixels per DIP (a Retina screen).
@@ -95,7 +95,7 @@ pub const LYRICS_JA: &str = "\
 ";
 /// The Japanese readings add-on's dictionary in the repo (what the add-on's
 /// release holds), relative to the repo's root.
-const JA_DICT: &str = "crates/poni-core/data/ja-readings.dic.zst";
+const JA_DICT: &str = "crates/nexora-core/data/ja-readings.dic.zst";
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum Scene {
@@ -473,9 +473,9 @@ pub fn run(dir: &str, args: &[String]) -> i32 {
     };
     let suffix = format!("{name}{}", if notch.is_some() { "-notch" } else { "" });
     // A home of its own, so add-ons on this Mac don't change the pictures.
-    let home = std::env::temp_dir().join("poni-render-home");
+    let home = std::env::temp_dir().join("nexora-render-home");
     let _ = std::fs::remove_dir_all(&home);
-    std::env::set_var("PONI_HOME", &home);
+    std::env::set_var("NEXORA_HOME", &home);
     let mut failed = 0;
     let ja = read_japanese().map_err(|e| eprintln!("render: the Japanese song: {e}")).ok();
     let mut gfx = Gfx::new(SCALE);
@@ -603,7 +603,7 @@ fn render_settings(gfx: &mut Gfx, section: crate::settings_window::Section, them
     st.ui.autostart = Some(true);
     let mut view = crate::settings_window::View::new(section);
     let frame = crate::settings_window::Frame { card: Rect::new(0.0, 0.0, w, h), own_chrome: false, top: TITLEBAR, still: true };
-    gfx.set_look(poni_core::look::glass(light));
+    gfx.set_look(nexora_core::look::glass(light));
     {
         let mut c = gfx.canvas(bmp.ctx());
         let _ = view.draw(&mut c, &mut st, NOW_MONO, frame, light);
@@ -668,7 +668,7 @@ fn render_morph(gfx: &mut Gfx, theme: Theme, notch: Option<Notch>, path: &Path) 
             let geom = island.current();
             let shoulder = notch.map_or(SHOULDER, |n| notch::shoulder(n, geom.w));
             let detach = notch::detach(island.top(), notch);
-            gfx.set_look(&poni_core::look::CLASSIC);
+            gfx.set_look(&nexora_core::look::CLASSIC);
             {
                 let mut c = gfx.canvas(bmp.ctx());
                 c.translate(x, y);
@@ -746,7 +746,7 @@ fn render_peek(gfx: &mut Gfx, theme: Theme, n: Notch, path: &Path) -> Result<(),
     let frames = (WAY[WAY.len() - 1].0 * FPS).round() as usize + 1;
     let (w_px, h_px) = ((CELL.0 * SCALE).ceil() as usize, (frames as f32 * CELL.1 * SCALE).ceil() as usize);
     let bmp = Bitmap::new(w_px, h_px, SCALE).ok_or("no bitmap context")?;
-    let look = poni_core::look::around_notch(theme);
+    let look = nexora_core::look::around_notch(theme);
     let at = |t: f64| {
         let i = WAY.iter().rposition(|w| w.0 <= t).unwrap_or(0).min(WAY.len() - 2);
         let (a, b) = (WAY[i], WAY[i + 1]);
@@ -763,7 +763,7 @@ fn render_peek(gfx: &mut Gfx, theme: Theme, n: Notch, path: &Path) -> Result<(),
         let mut island = Island::new(g);
         island.snap(g);
         let body = island.body_rect_at(cx);
-        gfx.set_look(&poni_core::look::CLASSIC);
+        gfx.set_look(&nexora_core::look::CLASSIC);
         {
             let mut c = gfx.canvas(bmp.ctx());
             c.translate(x, y);
@@ -784,7 +784,7 @@ fn render_peek(gfx: &mut Gfx, theme: Theme, n: Notch, path: &Path) -> Result<(),
             c.translate(x, y);
             c.clip(Rect::new(0.0, 0.0, CELL.0, CELL.1));
             let shoulder = notch::shoulder(n, g.w);
-            if look.material == poni_core::look::Material::Glass {
+            if look.material == nexora_core::look::Material::Glass {
                 crate::glass::draw_body(&mut c, body, g.r, shoulder, Some(n), false, true);
             } else {
                 let border = Some(c.look().border);
@@ -807,7 +807,7 @@ fn render_peek(gfx: &mut Gfx, theme: Theme, n: Notch, path: &Path) -> Result<(),
 
 /// The Mac's arrow pointer, its tip at `tip`: black, outlined in white.
 fn pointer_arrow(c: &mut crate::gfx::Canvas, tip: Point) {
-    use poni_core::svgpath::Seg;
+    use nexora_core::svgpath::Seg;
     const ARROW: [(f32, f32); 7] = [(0.0, 0.0), (0.0, 16.0), (4.0, 12.3), (6.9, 18.6), (9.6, 17.4), (6.8, 11.3), (12.0, 11.3)];
     let mut segs: Vec<Seg> = ARROW
         .iter()
@@ -824,7 +824,7 @@ fn pointer_arrow(c: &mut crate::gfx::Canvas, tip: Point) {
 /// copy of its dictionary where the add-on keeps it (every line).
 fn read_japanese() -> Result<[Pronounced; 2], String> {
     let lyrics = parse_lrc(LYRICS_JA);
-    let needing = lyrics.lines.iter().filter(|l| poni_core::romanize::needs_roman(l.text.trim())).count();
+    let needing = lyrics.lines.iter().filter(|l| nexora_core::romanize::needs_roman(l.text.trim())).count();
     let read = |p: &Pronounced| p.ruby.iter().filter(|r| r.iter().any(|piece| !piece.roman.is_empty())).count();
     let without = romanize::pronounce(&lyrics);
     let file = &JAPANESE_READINGS.files[0];
@@ -847,7 +847,7 @@ fn read_japanese() -> Result<[Pronounced; 2], String> {
 /// Prayer times on, in Kota Jakarta (found by the location), its clock 8
 /// minutes before today's Ashar; `picking`: the place picker with "band"
 /// typed. Returns Jakarta's site and today's Ashar (UTC seconds).
-fn seed_prayer(st: &mut AppState, picking: bool) -> Result<(poni_core::prayer::Site, i64), String> {
+fn seed_prayer(st: &mut AppState, picking: bool) -> Result<(nexora_core::prayer::Site, i64), String> {
     st.settings.set_addon(PRAYER_TIMES.id, true);
     st.addons.insert(PRAYER_TIMES.id, AddonStatus::Ready);
     let list = PlaceList::parse(SAMPLE_PLACES)?;
@@ -859,10 +859,10 @@ fn seed_prayer(st: &mut AppState, picking: bool) -> Result<(poni_core::prayer::S
     st.prayer.picking = picking;
     st.prayer.query = if picking { "band".into() } else { String::new() };
     // The website's "ed" file, as if it had come.
-    let ed = World::parse(poni_core::prayer::world::SAMPLE.into())?;
+    let ed = World::parse(nexora_core::prayer::world::SAMPLE.into())?;
     st.prayer.cities = [("ed".to_string(), CityFile::Here(std::sync::Arc::new(ed)))].into();
     let site = st.prayer_site().ok_or("no site for Kota Jakarta")?;
-    let ashar = poni_core::prayer::day_times(&site, site.local_day(st.unix)).ok_or("no times today")?.ashar;
+    let ashar = nexora_core::prayer::day_times(&site, site.local_day(st.unix)).ok_or("no times today")?.ashar;
     st.prayer.clock_shift = ashar - 8 * 60 - st.unix;
     st.prayer.handled_until = Some(st.prayer_now());
     Ok((site, ashar))
@@ -883,7 +883,7 @@ fn seed_prayer_world(st: &mut AppState, picking: bool) -> Result<(), String> {
     st.settings.prayer.world_place = st.prayer.place.as_ref().and_then(|p| p.world_lines.clone());
     st.settings.prayer.follow_location = false;
     let site = st.prayer_site().ok_or("no site for Edinburgh")?;
-    let ashar = poni_core::prayer::day_times(&site, site.local_day(st.unix)).ok_or("no times in Edinburgh today")?.ashar;
+    let ashar = nexora_core::prayer::day_times(&site, site.local_day(st.unix)).ok_or("no times in Edinburgh today")?.ashar;
     st.prayer.clock_shift = ashar - 8 * 60 - st.unix;
     st.prayer.handled_until = Some(st.prayer_now());
     Ok(())
@@ -906,8 +906,8 @@ const SAMPLE_PLACES: &str = r#"{"places":[
 /// yt-dlp's lines as the app moves them, so the bar and the island's pill
 /// count the bytes as they do for real. No pictures, so nothing is fetched.
 fn seed_downloads(st: &mut AppState) {
-    use poni_core::downloads::{Jobs, State};
-    use poni_core::ytdlp::{Line, Mode as Get};
+    use nexora_core::downloads::{Jobs, State};
+    use nexora_core::ytdlp::{Line, Mode as Get};
     let unix = st.unix;
     let info = |title: &str, site: &str| Line::Info { title: title.into(), site: site.into(), thumbnail: None, duration_s: None };
     let mut jobs = Jobs::default();
@@ -934,8 +934,8 @@ fn seed_downloads(st: &mut AppState) {
 
 /// The Health add-on switched on, as its row in Add-ons does.
 fn health_on(st: &mut AppState) {
-    st.settings.set_addon(poni_core::addons::HEALTH.id, true);
-    st.addons.insert(poni_core::addons::HEALTH.id, AddonStatus::Ready);
+    st.settings.set_addon(nexora_core::addons::HEALTH.id, true);
+    st.addons.insert(nexora_core::addons::HEALTH.id, AddonStatus::Ready);
 }
 
 /// The Caffeine add-on switched on, its clock at 15:42 on the pictures' day,
@@ -946,9 +946,9 @@ fn health_on(st: &mut AppState) {
 /// (`store.caffeine`, `settings.caffeine`), so the page draws them however
 /// it lays them out.
 fn seed_caffeine(st: &mut AppState, drinks: bool) {
-    use poni_core::caffeine::{local_minute, Bean, Drink, Kind, Log, Prefs};
-    st.settings.set_addon(poni_core::addons::CAFFEINE.id, true);
-    st.addons.insert(poni_core::addons::CAFFEINE.id, AddonStatus::Ready);
+    use nexora_core::caffeine::{local_minute, Bean, Drink, Kind, Log, Prefs};
+    st.settings.set_addon(nexora_core::addons::CAFFEINE.id, true);
+    st.addons.insert(nexora_core::addons::CAFFEINE.id, AddonStatus::Ready);
     set_clock(st, 15, 42);
     st.settings.caffeine = Prefs { bedtime: 23 * 60, ..Prefs::default() };
     st.store.caffeine = Log::default();
@@ -971,7 +971,7 @@ fn base_state(theme: Theme) -> AppState {
     st.local = LocalDateTime { year: 2026, month: 10, day: 24, hour: 9, minute: 41, second: 0 };
     st.accent = match theme {
         Theme::Oyen => crate::oyen::ORANGE,
-        Theme::Diorama => poni_core::look::DIORAMA_ACCENT,
+        Theme::Diorama => nexora_core::look::DIORAMA_ACCENT,
         _ => palette::BLUE,
     };
     st.volume = VolumeState { level: 0.64, muted: false, known: true };
@@ -992,19 +992,19 @@ fn set_clock(st: &mut AppState, hour: u8, minute: u8) {
 }
 
 /// A later version than this build, with its DMG, for the Update sheet.
-fn fake_release() -> poni_core::update::Release {
+fn fake_release() -> nexora_core::update::Release {
     let mut parts: Vec<u64> = crate::version::VERSION.split('.').filter_map(|p| p.parse().ok()).collect();
     if let Some(last) = parts.last_mut() {
         *last += 1;
     }
     let version = parts.iter().map(u64::to_string).collect::<Vec<_>>().join(".");
     let repo = "https://github.com/lucacadalora/oyenza-studio/releases";
-    poni_core::update::Release {
+    nexora_core::update::Release {
         date: "2026-10-27".into(),
         headline: "Updates install themselves on a Mac".into(),
         notes: format!("{repo}/tag/v{version}"),
         windows: None,
-        mac: Some(poni_core::update::Download { url: format!("{repo}/download/v{version}/Oyenza-Studio-{version}-mac.dmg"), size: 4_300_000, sha256: "0".repeat(64) }),
+        mac: Some(nexora_core::update::Download { url: format!("{repo}/download/v{version}/Oyenza-Studio-{version}-mac.dmg"), size: 4_300_000, sha256: "0".repeat(64) }),
         version,
     }
 }
@@ -1014,7 +1014,7 @@ fn fake_release() -> poni_core::update::Release {
 /// tomorrow and later; or, signing in, the code to type in oyenza.app.
 pub(crate) fn fake_oyenza(st: &AppState, connecting: bool) -> OyenzaState {
     let iso = |t: i64| {
-        let (y, m, d) = poni_core::datetime::civil_from_days(t.div_euclid(86_400));
+        let (y, m, d) = nexora_core::datetime::civil_from_days(t.div_euclid(86_400));
         let s = t.rem_euclid(86_400);
         format!("{y:04}-{m:02}-{d:02}T{:02}:{:02}:{:02}Z", s / 3600, s % 3600 / 60, s % 60)
     };
@@ -1226,7 +1226,7 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
         }
         Scene::ShelfItems => {
             // Real files, with tiles from the Mac's own thumbnail code.
-            let dir = std::env::temp_dir().join("poni-render-shelf");
+            let dir = std::env::temp_dir().join("nexora-render-shelf");
             let folder = dir.join("Project assets");
             let _ = std::fs::create_dir_all(&folder);
             let notes = dir.join("Trip notes.txt");
@@ -1246,7 +1246,7 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
         }
         Scene::ShelfPhone => {
             let url = "http://192.168.1.20:53530/QK7WZ3MRN2D4XJ5T".to_string();
-            st.phone = Some(crate::state::PhoneDrop { qr: poni_core::phonedrop::QrMatrix::encode(&url), url, ..Default::default() });
+            st.phone = Some(crate::state::PhoneDrop { qr: nexora_core::phonedrop::QrMatrix::encode(&url), url, ..Default::default() });
             st.page = PageKind::Shelf;
             Mode::Expanded(PageKind::Shelf)
         }
@@ -1271,7 +1271,7 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
             Mode::Expanded(PageKind::Settings)
         }
         Scene::TodayDay | Scene::TodayNoApps | Scene::TodayTiles | Scene::TodayOff | Scene::TodayPicked => {
-            use poni_core::agenda::{day_num, sample, Answer, Source};
+            use nexora_core::agenda::{day_num, sample, Answer, Source};
             st.oyenza = fake_oyenza(&st, false);
             let today = st.day_key();
             let now_min = st.local.hour as i32 * 60 + st.local.minute as i32;
@@ -1304,10 +1304,10 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
         }
         Scene::Ielts => {
             // IELTS is an add-on, off by default: on for its own scene, signed in.
-            st.settings.set_addon(poni_core::addons::IELTS.id, true);
-            st.addons.insert(poni_core::addons::IELTS.id, AddonStatus::Ready);
+            st.settings.set_addon(nexora_core::addons::IELTS.id, true);
+            st.addons.insert(nexora_core::addons::IELTS.id, AddonStatus::Ready);
             st.oyenza = fake_oyenza(&st, false);
-            st.ielts = poni_core::ielts::Coach::sample(poni_core::ielts::Sample::Home, st.now);
+            st.ielts = nexora_core::ielts::Coach::sample(nexora_core::ielts::Sample::Home, st.now);
             st.page = PageKind::Ielts;
             Mode::Expanded(PageKind::Ielts)
         }
@@ -1317,8 +1317,8 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
             st.oyenza = fake_oyenza(&st, false);
             st.oyenza.pro = Some(true);
             st.downloader_offered = true;
-            st.settings.set_addon(poni_core::addons::DOWNLOADER.id, true);
-            st.addons.insert(poni_core::addons::DOWNLOADER.id, AddonStatus::Ready);
+            st.settings.set_addon(nexora_core::addons::DOWNLOADER.id, true);
+            st.addons.insert(nexora_core::addons::DOWNLOADER.id, AddonStatus::Ready);
             match scene {
                 Scene::AddonsDownloader => {
                     st.page = PageKind::Addons;
@@ -1340,7 +1340,7 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
             st.oyenza = fake_oyenza(&st, false);
             st.oyenza.pro = Some(true);
             st.downloader_offered = true;
-            for a in [poni_core::addons::MEETING_NOTES, poni_core::addons::IELTS, poni_core::addons::DOWNLOADER] {
+            for a in [nexora_core::addons::MEETING_NOTES, nexora_core::addons::IELTS, nexora_core::addons::DOWNLOADER] {
                 st.settings.set_addon(a.id, true);
                 st.addons.insert(a.id, AddonStatus::Ready);
             }
@@ -1365,8 +1365,8 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
         }
         Scene::Stocks(shows) => {
             // Stocks is an add-on, off by default: on for its own scenes.
-            st.settings.set_addon(poni_core::addons::STOCKS.id, true);
-            st.addons.insert(poni_core::addons::STOCKS.id, AddonStatus::Ready);
+            st.settings.set_addon(nexora_core::addons::STOCKS.id, true);
+            st.addons.insert(nexora_core::addons::STOCKS.id, AddonStatus::Ready);
             let now = st.now;
             crate::pages::stocks::picture(&mut st, shows, now);
             st.page = PageKind::Stocks;
@@ -1384,7 +1384,7 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
             Mode::Expanded(PageKind::Caffeine)
         }
         Scene::Record | Scene::RecordLive | Scene::RecordActivity | Scene::RecordPaused | Scene::AddonsRecorder => {
-            use poni_core::recorder::Phase as RecPhase;
+            use nexora_core::recorder::Phase as RecPhase;
             st.recorder = true;
             st.store.recorder_island = true;
             let (phase, elapsed_ms) = match scene {
@@ -1459,8 +1459,8 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
         }
         Scene::System(m) => {
             // System is an add-on, off by default: on for its own scenes.
-            st.settings.set_addon(poni_core::addons::SYSTEM.id, true);
-            st.addons.insert(poni_core::addons::SYSTEM.id, AddonStatus::Ready);
+            st.settings.set_addon(nexora_core::addons::SYSTEM.id, true);
+            st.addons.insert(nexora_core::addons::SYSTEM.id, AddonStatus::Ready);
             // Power is a desktop Mac's: no battery, the SMC's whole-Mac watts.
             st.system = sample_system(m == Module::Power);
             st.ui.system_module = m;
@@ -1567,7 +1567,7 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
     let body = island.body_rect_at(cx);
 
     // The desktop: wallpaper and the menu bar.
-    gfx.set_look(&poni_core::look::CLASSIC);
+    gfx.set_look(&nexora_core::look::CLASSIC);
     {
         let mut c = gfx.canvas(bmp.ctx());
         let steps = 48;
@@ -1588,7 +1588,7 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
         let mut c = gfx.canvas(bmp.ctx());
         let shoulder = notch.map_or(SHOULDER, |n| notch::shoulder(n, g.w));
         let inside = notch.is_some_and(|_| notch::fit(&mode, &st) == notch::Fit::Inside);
-        if look.material == poni_core::look::Material::Glass {
+        if look.material == nexora_core::look::Material::Glass {
             crate::glass::draw_body(&mut c, body, g.r, shoulder, notch, inside, true);
         } else {
             let border = if inside { None } else { Some(c.look().border) };
@@ -1861,7 +1861,7 @@ fn art_sample(u: f32, v: f32) -> [f32; 3] {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use poni_core::caffeine::{hhmm, local_minute, Today};
+    use nexora_core::caffeine::{hhmm, local_minute, Today};
 
     #[test]
     fn every_picture_has_a_name_of_its_own() {

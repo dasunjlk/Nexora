@@ -14,7 +14,7 @@
 # mouse. Diorama's resting pill is its picture, so it floats below the notch
 # too (notch-diorama).
 #
-# Usage: tools/mac-smoke.sh "<path to the app's poni binary>"
+# Usage: tools/mac-smoke.sh "<path to the app's nexora binary>"
 # Not -e: the report must print even when a check fails.
 set +e -u
 system_profiler SPDisplaysDataType | grep -E "Resolution|Retina|Main Display" || true
@@ -22,7 +22,7 @@ bin="$1"
 # A real wallpaper behind the island (the runner's desktop is plain black),
 # so the pictures show what Glass does over a bright, busy desktop: the
 # website's own picture, set through AppKit (no permission needed).
-cat > /tmp/poni-wallpaper.js <<'JXA'
+cat > /tmp/nexora-wallpaper.js <<'JXA'
 function run(argv) {
   ObjC.import("AppKit");
   var url = $.NSURL.fileURLWithPath(argv[0]);
@@ -33,7 +33,7 @@ function run(argv) {
   return "wallpaper: " + argv[0];
 }
 JXA
-osascript -l JavaScript /tmp/poni-wallpaper.js "$(pwd)/site/assets/wall/morning.jpg" || echo "(could not set the wallpaper)"
+osascript -l JavaScript /tmp/nexora-wallpaper.js "$(pwd)/site/assets/wall/morning.jpg" || echo "(could not set the wallpaper)"
 # Glass and blur draw flat under Reduce Transparency; say whether it's on,
 # and ask for it off (a runner image may not allow it).
 echo "reduce transparency: $(defaults read com.apple.universalaccess reduceTransparency 2>&1)"
@@ -41,24 +41,24 @@ defaults write com.apple.universalaccess reduceTransparency -bool false 2>&1 || 
 echo "reduce transparency now: $(defaults read com.apple.universalaccess reduceTransparency 2>&1)"
 # macOS's own now playing: the MediaRemote adapter's test player (mac.yml builds it) reports a track
 # there from the now-playing-start step on. The app's adapter leaves that player out unless
-# ADAPTER_TEST_MODE is set, and the app checks for its track only with PONI_SMOKE_NOW_PLAYING.
+# ADAPTER_TEST_MODE is set, and the app checks for its track only with NEXORA_SMOKE_NOW_PLAYING.
 client="${MEDIAREMOTE_TEST_CLIENT:-}"
 client_pid=""
 if [ -n "$client" ] && [ -x "$client" ]; then
-  export ADAPTER_TEST_MODE=1 PONI_SMOKE_NOW_PLAYING=1
+  export ADAPTER_TEST_MODE=1 NEXORA_SMOKE_NOW_PLAYING=1
 else
   echo "(no MediaRemote test player: the now-playing check is skipped)"
 fi
 # A real browser tab in macOS's own now playing, as YouTube in Edge reaches it: the runner's Edge
 # (else Chrome) plays tools/mac-browser-player.html from the now-playing-browser-start step on.
-# The app checks for its track only with PONI_SMOKE_BROWSER.
+# The app checks for its track only with NEXORA_SMOKE_BROWSER.
 browser=""
 for b in "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge" "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"; do
   if [ -x "$b" ]; then browser="$b"; break; fi
 done
 browser_pid=""
 if [ -n "$browser" ]; then
-  export PONI_SMOKE_BROWSER=1
+  export NEXORA_SMOKE_BROWSER=1
   echo "browser for the now-playing-browser step: $("$browser" --version 2>/dev/null || basename "$browser")"
 else
   echo "(no Edge or Chrome: the browser check is skipped)"
@@ -87,7 +87,7 @@ cf.CFDataGetLength.argtypes = [vp]
 cf.CFDataGetBytePtr.restype = vp
 cf.CFDataGetBytePtr.argtypes = [vp]
 utf8 = 0x08000100
-port = cf.CFMessagePortCreateRemote(None, cf.CFStringCreateWithCString(None, b"com.oyenza.poni.recorder", utf8))
+port = cf.CFMessagePortCreateRemote(None, cf.CFStringCreateWithCString(None, b"com.oyenza.nexora.recorder", utf8))
 if not port:
     sys.exit("no island port")
 body = sys.argv[1].encode()
@@ -107,14 +107,14 @@ PY
 # tool prints as hex); "absent" is never there. Made with that same tool, so
 # reading them asks nobody, in the first keychain of the search list (the
 # signing check puts its own there alone), where the reader's search finds
-# them. The app checks them only with PONI_SMOKE_KEYCHAIN.
+# them. The app checks them only with NEXORA_SMOKE_KEYCHAIN.
 kc_service="Oyenza Studio smoke"
 kc_file=$(security list-keychains -d user | head -1 | sed -e 's/^[[:space:]]*"//' -e 's/"[[:space:]]*$//')
 security delete-generic-password -s "$kc_service" -a absent > /dev/null 2>&1
 if security add-generic-password -U -s "$kc_service" -a plain -w '{"claudeAiOauth":{"accessToken":"test-token"}}' "$kc_file" \
   && security add-generic-password -U -s "$kc_service" -a accent -X 636166c3a90a6e657874 "$kc_file" \
   && security find-generic-password -s "$kc_service" -a accent > /dev/null 2>&1; then
-  export PONI_SMOKE_KEYCHAIN=1
+  export NEXORA_SMOKE_KEYCHAIN=1
   echo "keychain test items in $kc_file; security prints the accented one as: $(security find-generic-password -s "$kc_service" -a accent -w)"
 else
   echo "(could not add the keychain test items to $kc_file: the keychain check is skipped)"
@@ -122,7 +122,7 @@ fi
 # The IELTS coach's voice: a short mp3 like the ones its server sends (44.1 kHz mono, 128 kbps), for the
 # ielts-voice-mp3 step (the ielts-voice step writes its own WAV).
 if [ -f tools/mac-smoke-voice.mp3 ]; then
-  export PONI_SMOKE_MP3="$(pwd)/tools/mac-smoke-voice.mp3"
+  export NEXORA_SMOKE_MP3="$(pwd)/tools/mac-smoke-voice.mp3"
 fi
 sleep 1
 mkdir -p smoke
@@ -148,7 +148,7 @@ while kill -0 $pid 2>/dev/null && [ $SECONDS -lt $deadline ]; do
         sleep 1.5 ;;
       # A player that only macOS's own now playing knows (as a browser tab is).
       *now-playing-start)
-        if [ -n "${PONI_SMOKE_NOW_PLAYING:-}" ]; then
+        if [ -n "${NEXORA_SMOKE_NOW_PLAYING:-}" ]; then
           "$client" > smoke/test-player.txt 2>&1 &
           client_pid=$!
           echo "the MediaRemote adapter's test player: pid $client_pid"
@@ -159,7 +159,7 @@ while kill -0 $pid 2>/dev/null && [ $SECONDS -lt $deadline ]; do
       *now-playing-browser-start)
         if [ -n "$browser" ]; then
           if [ -n "$client_pid" ]; then kill "$client_pid" 2>/dev/null; client_pid=""; fi
-          "$browser" --user-data-dir="${RUNNER_TEMP:-/tmp}/poni-smoke-browser" --no-first-run --no-default-browser-check \
+          "$browser" --user-data-dir="${RUNNER_TEMP:-/tmp}/nexora-smoke-browser" --no-first-run --no-default-browser-check \
             --use-mock-keychain --password-store=basic --autoplay-policy=no-user-gesture-required \
             "file://$(pwd)/tools/mac-browser-player.html" > smoke/browser.txt 2>&1 &
           browser_pid=$!
@@ -208,5 +208,5 @@ fi
 for a in plain accent; do security delete-generic-password -s "$kc_service" -a "$a" > /dev/null 2>&1; done
 echo "smoke exit code: $code ($shots screenshots)"
 echo "---- report.json"; cat smoke/report.json || echo "(missing)"
-echo "---- poni.log"; tail -80 smoke/home/poni.log || true
+echo "---- nexora.log"; tail -80 smoke/home/nexora.log || true
 exit $code

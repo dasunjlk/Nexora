@@ -1,16 +1,16 @@
-//! Where Poni keeps its files on a Mac.
+//! Where Nexora keeps its files on a Mac.
 //!
-//! - Settings + data: `~/Library/Application Support/Poni/`
-//! - Cache:           `~/Library/Caches/Poni/`
-//! - Log:             `~/Library/Logs/Poni/poni.log` (Console.app lists it)
+//! - Settings + data: `~/Library/Application Support/Nexora/`
+//! - Cache:           `~/Library/Caches/Nexora/`
+//! - Log:             `~/Library/Logs/Nexora/nexora.log` (Console.app lists it)
 //!
-//! `PONI_HOME` overrides all three (used by `--render` and `--smoke` to stay
+//! `NEXORA_HOME` overrides all three (used by `--render` and `--smoke` to stay
 //! isolated).
 
 use std::path::PathBuf;
 
 fn home_override() -> Option<PathBuf> {
-    std::env::var_os("PONI_HOME").map(PathBuf::from)
+    std::env::var_os("NEXORA_HOME").map(PathBuf::from)
 }
 
 fn library() -> PathBuf {
@@ -18,11 +18,11 @@ fn library() -> PathBuf {
 }
 
 pub fn data_dir() -> PathBuf {
-    home_override().unwrap_or_else(|| library().join("Application Support").join("Poni"))
+    home_override().unwrap_or_else(|| library().join("Application Support").join("Nexora"))
 }
 
 pub fn cache_dir() -> PathBuf {
-    home_override().map(|h| h.join("cache")).unwrap_or_else(|| library().join("Caches").join("Poni"))
+    home_override().map(|h| h.join("cache")).unwrap_or_else(|| library().join("Caches").join("Nexora"))
 }
 
 pub fn settings_path() -> PathBuf {
@@ -34,29 +34,29 @@ pub fn store_path() -> PathBuf {
 }
 
 pub fn log_path() -> PathBuf {
-    home_override().map(|h| h.join("poni.log")).unwrap_or_else(|| library().join("Logs").join("Poni").join("poni.log"))
+    home_override().map(|h| h.join("nexora.log")).unwrap_or_else(|| library().join("Logs").join("Nexora").join("nexora.log"))
 }
 
-/// Held while Poni runs, so a second copy quits at start.
+/// Held while Nexora runs, so a second copy quits at start.
 pub fn lock_path() -> PathBuf {
-    cache_dir().join("poni.lock")
+    cache_dir().join("nexora.lock")
 }
 
 /// Where files from a phone land (Phone drop): `~/Downloads/Oyenza Studio`, or
-/// `~/Downloads/Oyen Poni` where a copy from before the rename made it: Shelf
+/// `~/Downloads/Nexora` where a copy from before the rename made it: Shelf
 /// items link to the files in it.
 pub fn phone_inbox_dir() -> PathBuf {
     if let Some(h) = home_override() {
         return h.join("phone-drop");
     }
     let downloads = std::env::var_os("HOME").map(PathBuf::from).unwrap_or_else(|| PathBuf::from(".")).join("Downloads");
-    let before_rename = downloads.join("Oyen Poni");
+    let before_rename = downloads.join("Nexora");
     if before_rename.is_dir() { before_rename } else { downloads.join("Oyenza Studio") }
 }
 
 /// Where the Downloader saves videos and sound: `~/Downloads`, as a browser
 /// would. An app may create files there without asking (macOS asks before
-/// it reads one it didn't make). Under `PONI_HOME` for the smoke run.
+/// it reads one it didn't make). Under `NEXORA_HOME` for the smoke run.
 pub fn media_downloads_dir() -> PathBuf {
     if let Some(h) = home_override() {
         return h.join("downloads");
@@ -71,7 +71,7 @@ pub fn notes_audio_dir() -> PathBuf {
 }
 
 /// Where meeting notes are saved, as Markdown: `~/Documents/Oyenza Studio/Notes`.
-/// Under `PONI_HOME` for the smoke run.
+/// Under `NEXORA_HOME` for the smoke run.
 pub fn notes_dir() -> PathBuf {
     if let Some(h) = home_override() {
         return h.join("notes-saved");

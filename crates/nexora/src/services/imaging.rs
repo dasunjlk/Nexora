@@ -513,7 +513,7 @@ pub fn load_thumb_async(path: String, sink: EventSink) {
         }
     }
     let (tx, rx) = mpsc::channel();
-    match std::thread::Builder::new().name("poni-thumbs".into()).spawn(move || thumb_worker(rx)) {
+    match std::thread::Builder::new().name("nexora-thumbs".into()).spawn(move || thumb_worker(rx)) {
         Ok(_) => {
             // Cannot fail while the new worker holds `rx`; if it does, the
             // job handed back is dropped here, which answers it.
@@ -633,7 +633,7 @@ impl ThumbWorker {
                 Some(image)
             }
             Err(e) => {
-                crate::pinfo!("no thumbnail for {}: {e}", poni_core::shelf::display_name(path));
+                crate::pinfo!("no thumbnail for {}: {e}", nexora_core::shelf::display_name(path));
                 if let Some(root) = &net {
                     note_net_failure(&key, root, win32_code(e.code()), started.elapsed());
                 }

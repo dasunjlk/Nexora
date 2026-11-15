@@ -393,7 +393,7 @@ pub fn parts(icon: Icon) -> &'static [Part] {
 // github.com/steipete/CodexBar 0.74.1, Sources/CodexBar/Resources/
 // ProviderIcon-*.svg): moved onto the grid, rounded to 0.1, holes turned round
 // for the non-zero rule and OpenRouter's strokes outlined. OYENZA is the
-// Oyenza mark (`poni_core::oyen::mark`) with its small cut's eyes; a test below
+// Oyenza mark (`nexora_core::oyen::mark`) with its small cut's eyes; a test below
 // keeps it the same as the mark.
 const OPENAI: &str = "M20.4 10.2c.2-.6.2-1.3.2-2-.1-.7-.3-1.4-.7-2-1-1.8-3.2-2.8-5.3-2.3-.5-.7-1.3-1.1-2.1-1.4\
     c-.8-.3-1.7-.3-2.5-.1-.9.1-1.7.5-2.3 1.1-.7.6-1.1 1.3-1.4 2.1-.7.2-1.3.5-1.9.9-.5.4-1 .9-1.4 1.5\
@@ -500,7 +500,7 @@ mod tests {
     fn every_icon_parses() {
         for &i in ALL {
             for p in parts(i) {
-                poni_core::svgpath::parse(p.d).unwrap_or_else(|e| panic!("{i:?}: {}", e.0));
+                nexora_core::svgpath::parse(p.d).unwrap_or_else(|e| panic!("{i:?}: {}", e.0));
             }
         }
     }
@@ -531,8 +531,8 @@ mod tests {
     /// the small cut's eyes as circles. If the mark changes, make it again so.
     #[test]
     fn oyenza_is_the_oyenza_mark() {
-        use poni_core::oyen::mark;
-        use poni_core::svgpath::{parse, Seg};
+        use nexora_core::oyen::mark;
+        use nexora_core::svgpath::{parse, Seg};
         // Each figure's end points' bounds, on the grid.
         let figures = |d: &str, on_grid: bool| -> Vec<[f32; 4]> {
             let mut out: Vec<[f32; 4]> = Vec::new();

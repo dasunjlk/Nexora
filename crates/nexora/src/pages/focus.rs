@@ -14,9 +14,9 @@ use crate::gfx::{ts, TextStyle, Weight};
 use crate::icons::Icon;
 use crate::state::{AppState, InlineAction, NoticeAction};
 use crate::ui::{wid, wid_n, PillStyle, Ui, PILL_GAP, PILL_REGULAR, PILL_SMALL};
-use poni_core::datetime::{fmt_clock, fmt_countdown, LocalDateTime};
-use poni_core::geom::{lerp, palette, Color, Point, Rect};
-use poni_core::pomodoro::{Phase, PhaseEnded, RunState};
+use nexora_core::datetime::{fmt_clock, fmt_countdown, LocalDateTime};
+use nexora_core::geom::{lerp, palette, Color, Point, Rect};
+use nexora_core::pomodoro::{Phase, PhaseEnded, RunState};
 use std::cell::Cell;
 
 const HEIGHT: f32 = 144.0;

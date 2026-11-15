@@ -1,6 +1,6 @@
 //! The Downloads page's commands (`commands::DownloadCmd`) and yt-dlp's
 //! reports (`services::downloader`). A child of `app`, so it reaches the
-//! app's state: jobs start here when a place is free (`poni_core::downloads`),
+//! app's state: jobs start here when a place is free (`nexora_core::downloads`),
 //! finished files go to the Shelf, and the island's pill follows them.
 
 use super::App;
@@ -9,9 +9,9 @@ use crate::icons::Icon;
 use crate::pages::{self, PageKind};
 use crate::state::NoticeAction;
 use crate::{paths, services, shell};
-use poni_core::downloads::{link_in, State};
-use poni_core::geom::palette;
-use poni_core::ytdlp::{Line, Request};
+use nexora_core::downloads::{link_in, State};
+use nexora_core::geom::palette;
+use nexora_core::ytdlp::{Line, Request};
 
 impl App {
     /// The Downloads page came up: the island opened on it or its tab was
@@ -25,7 +25,7 @@ impl App {
         if self.selftest.is_some() || !self.st.downloader_on() {
             return;
         }
-        let Some(link) = crate::services::clipboard::read_text(self.hwnd).and_then(|t| poni_core::downloads::link_in(&t)) else { return };
+        let Some(link) = crate::services::clipboard::read_text(self.hwnd).and_then(|t| nexora_core::downloads::link_in(&t)) else { return };
         let ui = &mut self.st.ui.downloads;
         let known = ui.link.trim() == link || self.st.downloads.list.iter().any(|j| j.url == link);
         if !known && ui.offered != link {

@@ -535,7 +535,7 @@ P	Mitake		JP		35.417	137.133	25
 P	Midlothian		US	Virginia	37.506	-77.649	15
 P	Parque Industrial Ciudad Mitras		MX		25.789	-100.448	8
 P	Milpa Alta		MX		19.193	-99.023	8
-P	Mitras Poniente		MX		25.776	-100.426	8
+P	Mitras Nexoraente		MX		25.776	-100.426	8
 P	Mignouré	mignoure	CI		7.487	-6.788	0
 P	Rancho Mirage		US	California	33.740	-116.413	10
 P	Mililani Mauka / Launani Valley	mililani mauka launani valley	US	Hawaii	21.479	-157.988	34

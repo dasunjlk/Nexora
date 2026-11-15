@@ -1,4 +1,4 @@
-//! New versions: reads the update file (`poni_core::update::FEED_URL`, about
+//! New versions: reads the update file (`nexora_core::update::FEED_URL`, about
 //! 1 KB) and believes it only when its signature checks out with a built-in
 //! key. The check uses the system's own crypto: CNG on Windows, and on a Mac
 //! the P-256 code the app already carries for phone drop. It runs as a job on
@@ -17,7 +17,7 @@
 use crate::events::{AppEvent, EventSink};
 use crate::services::addons::Job;
 use crate::services::http::Client;
-use poni_core::update::{self, Release};
+use nexora_core::update::{self, Release};
 #[cfg(target_os = "macos")]
 use std::path::{Path, PathBuf};
 #[cfg(target_os = "macos")]
@@ -113,7 +113,7 @@ fn download(client: Result<&Client, &str>, d: &update::Download, path: &std::pat
 /// Run the Setup at `setup` silently, once it still matches `d`. Like any
 /// install it closes this copy (it saves first); it keeps Start with
 /// Windows as it is and opens the new version when done (`/reopen`,
-/// installer/poni.nsi).
+/// installer/nexora.nsi).
 #[cfg(windows)]
 pub fn install(setup: &std::path::Path, d: &update::Download) -> Result<(), String> {
     if !std::fs::read(setup).is_ok_and(|b| d.matches(&b)) {
@@ -133,14 +133,14 @@ pub fn install(setup: &std::path::Path, d: &update::Download) -> Result<(), Stri
 
 /// The bundle id every copy of the Mac app has (installer/mac/Info.plist).
 #[cfg(target_os = "macos")]
-const BUNDLE_ID: &str = "com.oyenza.poni";
+const BUNDLE_ID: &str = "com.oyenza.nexora";
 
 /// The app bundle this copy runs from ("/Applications/Oyenza Studio.app"),
 /// if it runs from one.
 #[cfg(target_os = "macos")]
 fn running_bundle() -> Option<PathBuf> {
     let exe = std::env::current_exe().ok()?;
-    // Contents/MacOS/poni
+    // Contents/MacOS/nexora
     let bundle = exe.parent()?.parent()?.parent()?.to_path_buf();
     (bundle.extension()? == "app").then_some(bundle)
 }
@@ -351,7 +351,7 @@ fn verify(message: &[u8], signature: &[u8; 64], key: &[u8; 65]) -> bool {
     blob.extend_from_slice(&BCRYPT_ECDSA_PUBLIC_P256_MAGIC.to_le_bytes());
     blob.extend_from_slice(&32u32.to_le_bytes());
     blob.extend_from_slice(&key[1..]);
-    let hash = poni_core::sha256::sha256(message);
+    let hash = nexora_core::sha256::sha256(message);
     unsafe {
         let mut alg = BCRYPT_ALG_HANDLE::default();
         if BCryptOpenAlgorithmProvider(&mut alg, BCRYPT_ECDSA_P256_ALGORITHM, None, BCRYPT_OPEN_ALGORITHM_PROVIDER_FLAGS(0)).is_err() {
@@ -382,7 +382,7 @@ mod tests {
     use super::*;
 
     /// A real file, signed with the signing key for v0.2.3.
-    const SAMPLE: &str = include_str!("../../../poni-core/data/update-sample.json");
+    const SAMPLE: &str = include_str!("../../../nexora-core/data/update-sample.json");
 
     #[test]
     fn a_signed_file_is_believed() {

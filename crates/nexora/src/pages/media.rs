@@ -23,13 +23,13 @@ use crate::gfx::{ts, TextStyle, Weight};
 use crate::icons::Icon;
 use crate::state::{AppState, LyricsState, LyricsStatus, MediaSession, PageUiState};
 use crate::ui::{wid, wid_n, Ui, WidgetId};
-use poni_core::addons;
-use poni_core::datetime::fmt_duration;
-use poni_core::geom::{lerp, palette, Color, Point, Rect};
-use poni_core::lrc::Lyrics;
-use poni_core::nowplaying::lyrics_lead_s;
-use poni_core::romanize::Ruby;
-use poni_core::timeline::LyricClock;
+use nexora_core::addons;
+use nexora_core::datetime::fmt_duration;
+use nexora_core::geom::{lerp, palette, Color, Point, Rect};
+use nexora_core::lrc::Lyrics;
+use nexora_core::nowplaying::lyrics_lead_s;
+use nexora_core::romanize::Ruby;
+use nexora_core::timeline::LyricClock;
 use std::cell::Cell;
 use std::collections::HashMap;
 
@@ -596,7 +596,7 @@ pub(crate) struct LyricsCtx<'a> {
     /// Show the pronunciation pieces (`LyricsState::ruby`) under lines.
     pub(crate) pronounce: bool,
     /// In the credit's place, always shown: the Japanese readings add-on's
-    /// line (`poni_core::addons::ja_offer`) and whether a click gets it.
+    /// line (`nexora_core::addons::ja_offer`) and whether a click gets it.
     pub(crate) offer: Option<(String, bool)>,
 }
 

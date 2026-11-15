@@ -4,7 +4,7 @@
 //! Signing in is a device code, the way a TV signs in: the island shows 8
 //! letters, the person approves them in oyenza.app (where they are signed in
 //! anyway), and the island gets a key of its own (`oyzd_…`). No password is
-//! ever typed into Poni, and the key opens only the island's routes on
+//! ever typed into Nexora, and the key opens only the island's routes on
 //! api.oyenza.app (catat-server `routes/island.ts`): money in and out that
 //! arrived by itself in the last 2 hours (the notices), the last 7 days of
 //! transactions by day (the Oyenza page's live view), bills due in the next
@@ -25,7 +25,7 @@ use serde::{Deserialize, Serialize};
 
 pub const API: &str = "https://api.oyenza.app";
 pub const WEB: &str = "https://oyenza.app";
-pub const APP: &str = "poni";
+pub const APP: &str = "nexora";
 
 /// Money is asked for this often while the PC is in use on mains power...
 pub const MONEY_EVERY_S: u64 = 60;
@@ -64,8 +64,8 @@ pub const NOTE_MAX_CHARS: usize = 300;
 // ---------------------------------------------------------------- the link
 
 /// What the PC keeps after signing in, sealed with Windows (DPAPI) under
-/// `%LOCALAPPDATA%\Poni\` (on a Mac, a file only its account can read, in
-/// `~/Library/Application Support/Poni/`). The key is never logged or shown.
+/// `%LOCALAPPDATA%\Nexora\` (on a Mac, a file only its account can read, in
+/// `~/Library/Application Support/Nexora/`). The key is never logged or shown.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Link {
     pub key: String,
@@ -943,7 +943,7 @@ mod tests {
         assert_eq!(bills_url("-03:30"), "https://api.oyenza.app/island/bills?tz=-03%3A30&days=35");
         assert_eq!(undo_url("abc 1/2"), "https://api.oyenza.app/island/note/abc%201%2F2");
         let b: serde_json::Value = serde_json::from_str(&start_body("DESKTOP-7Q2K", "0.1.5", "windows")).unwrap();
-        assert_eq!(b, serde_json::json!({ "app": "poni", "name": "DESKTOP-7Q2K", "version": "0.1.5", "platform": "windows" }));
+        assert_eq!(b, serde_json::json!({ "app": "nexora", "name": "DESKTOP-7Q2K", "version": "0.1.5", "platform": "windows" }));
         assert_eq!(PLATFORM, if cfg!(target_os = "macos") { "macos" } else { "windows" });
         let n: serde_json::Value = serde_json::from_str(&note_body("kopi \"25rb\"", "+07:00")).unwrap();
         assert_eq!(n["text"], "kopi \"25rb\"");

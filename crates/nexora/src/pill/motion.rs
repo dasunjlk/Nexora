@@ -8,7 +8,7 @@
 //! runs: nothing here adds a frame at rest.
 
 use crate::island::Geom;
-use poni_core::geom::{Point, Rect};
+use nexora_core::geom::{Point, Rect};
 
 /// Spring tunings (stiffness, damping) while the island floats, picked per
 /// axis by the way that axis moves (Classic picks both by the area).

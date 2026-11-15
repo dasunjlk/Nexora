@@ -53,7 +53,7 @@ public static class TouchNative {
     // The island's window, in screen pixels (empty if it isn't there).
     public static RECT IslandRect() {
         RECT r = new RECT();
-        IntPtr h = FindWindow("Poni.Island", null);
+        IntPtr h = FindWindow("Nexora.Island", null);
         if (h != IntPtr.Zero) GetWindowRect(h, out r);
         return r;
     }
@@ -166,10 +166,10 @@ public static class Probe {
         wc.hInstance = inst;
         wc.hCursor = LoadCursor(IntPtr.Zero, (IntPtr)32512);
         wc.hbrBackground = CreateSolidBrush(0x008C5430);
-        wc.lpszClassName = "PoniTouchProbe";
+        wc.lpszClassName = "NexoraTouchProbe";
         if (RegisterClassEx(ref wc) == 0) return "RegisterClassEx failed (error " + Marshal.GetLastWin32Error() + ")";
         // WS_POPUP | WS_VISIBLE: an ordinary window at the top left, under the island.
-        hwnd = CreateWindowEx(0, "PoniTouchProbe", "Touch probe", 0x90000000, 0, 0, w, h, IntPtr.Zero, IntPtr.Zero, inst, IntPtr.Zero);
+        hwnd = CreateWindowEx(0, "NexoraTouchProbe", "Touch probe", 0x90000000, 0, 0, w, h, IntPtr.Zero, IntPtr.Zero, inst, IntPtr.Zero);
         if (hwnd == IntPtr.Zero) return "CreateWindowEx failed (error " + Marshal.GetLastWin32Error() + ")";
         SetForegroundWindow(hwnd);
         return null;
@@ -216,15 +216,15 @@ $g.Dispose()
 function Px([double]$dip) { [int][Math]::Round($dip * $scale) }
 $cx = [int]($bounds.Width / 2)
 $pill = $Theme -eq "pill"
-"screen: $($bounds.Width)x$($bounds.Height), scale $scale, theme $Theme$(if ($env:PONI_RENDERER) { ", renderer $env:PONI_RENDERER" })" | Tee-Object -FilePath $metrics
+"screen: $($bounds.Width)x$($bounds.Height), scale $scale, theme $Theme$(if ($env:NEXORA_RENDERER) { ", renderer $env:NEXORA_RENDERER" })" | Tee-Object -FilePath $metrics
 
 # The mouse waits far below the island, so only the finger moves it.
 $park = @($cx, [int]($bounds.Height * 0.92))
 [TouchNative]::SetCursorPos($park[0], $park[1]) | Out-Null
 
-$env:PONI_HOME = Join-Path (Resolve-Path ".").Path "$(Split-Path $Out -Leaf)-home"
-New-Item -ItemType Directory -Force -Path $env:PONI_HOME | Out-Null
-if ($pill) { '{"theme":"pill"}' | Set-Content -Path (Join-Path $env:PONI_HOME "settings.json") -Encoding ascii }
+$env:NEXORA_HOME = Join-Path (Resolve-Path ".").Path "$(Split-Path $Out -Leaf)-home"
+New-Item -ItemType Directory -Force -Path $env:NEXORA_HOME | Out-Null
+if ($pill) { '{"theme":"pill"}' | Set-Content -Path (Join-Path $env:NEXORA_HOME "settings.json") -Encoding ascii }
 $p = Start-Process -FilePath $Exe -PassThru
 Start-Sleep -Seconds 4
 
@@ -242,7 +242,7 @@ $wr = [TouchNative]::IslandRect()
 Expect "island-window" (($wr.Right - $wr.Left) -gt (Px 100)) "$($wr.Right - $wr.Left)x$($wr.Bottom - $wr.Top) px"
 
 # Open = the open card takes the mouse 200 DIPs right of centre, 100 down.
-function IsOpen { [TouchNative]::ClassAt($cx + (Px 200), (Px 100)) -eq "Poni.Island" }
+function IsOpen { [TouchNative]::ClassAt($cx + (Px 200), (Px 100)) -eq "Nexora.Island" }
 
 # One tap; returns what the probe got (empty: nothing reached it).
 function Tap([int]$x, [int]$y) {
@@ -294,6 +294,6 @@ $alive = -not $p.HasExited
 "still running: $alive" | Tee-Object -FilePath $metrics -Append
 if ($alive) { Stop-Process -Id $p.Id -Force; $p.WaitForExit(10000) | Out-Null }
 [Probe]::Close()
-Copy-Item -Path (Join-Path $env:PONI_HOME "cache\poni.log") -Destination (Join-Path $Out "poni.log") -ErrorAction SilentlyContinue
-if (-not $alive) { Write-Error "Poni exited during the touch smoke test"; exit 1 }
+Copy-Item -Path (Join-Path $env:NEXORA_HOME "cache\nexora.log") -Destination (Join-Path $Out "nexora.log") -ErrorAction SilentlyContinue
+if (-not $alive) { Write-Error "Nexora exited during the touch smoke test"; exit 1 }
 if ($failures.Count -gt 0) { Write-Error "touch checks failed: $($failures -join ', ')"; exit 1 }

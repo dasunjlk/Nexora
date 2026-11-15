@@ -118,7 +118,7 @@ pub const CLASSIC: Look = Look {
 };
 
 /// Oyen: warm cream paper, espresso ink, Oyen's orange, and Outfit (the Oyen
-/// Poni website's typeface) for every Latin letter.
+/// Nexora website's typeface) for every Latin letter.
 pub const OYEN: Look = Look {
     ground: Color::hex(0xFFF1DE),
     ink: Color::hex(0x2B1B10),

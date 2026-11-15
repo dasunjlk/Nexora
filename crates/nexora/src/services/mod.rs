@@ -45,8 +45,8 @@ pub mod voice;
 use crate::commands::{MediaCmd, OyenzaCmd, UsageCmd};
 use crate::events::EventSink;
 use crate::state::MediaSession;
-use poni_core::geom::Color;
-use poni_core::settings::Settings;
+use nexora_core::geom::Color;
+use nexora_core::settings::Settings;
 use windows::Win32::Foundation::{HWND, LPARAM, RECT, WPARAM};
 
 pub struct Services {
@@ -98,9 +98,9 @@ impl Services {
         // would delete the Downloader's tools at every start, before the
         // server's answer, and fetch them again after it.
         let store = crate::autostart::packaged();
-        let on = poni_core::addons::ALL
+        let on = nexora_core::addons::ALL
             .iter()
-            .filter(|a| settings.addon_on(a.id) && !(store && a.id == poni_core::addons::DOWNLOADER.id))
+            .filter(|a| settings.addon_on(a.id) && !(store && a.id == nexora_core::addons::DOWNLOADER.id))
             .map(|a| a.id)
             .collect();
         let addons = started("add-ons", addons::AddonService::start(sink.clone(), on));
@@ -131,7 +131,7 @@ impl Services {
     }
 
     /// Run yt-dlp for `req` (the Downloader add-on's tools are in place).
-    pub fn download(&self, req: poni_core::ytdlp::Request) {
+    pub fn download(&self, req: nexora_core::ytdlp::Request) {
         if let Some(d) = self.downloader.get_or_init(|| started("downloader", downloader::DownloaderService::start(self.sink.clone()))) {
             d.run(req);
         }
@@ -247,7 +247,7 @@ impl Services {
         }
     }
 
-    pub fn pairs(&self) -> Vec<poni_core::pairdrop::Pair> {
+    pub fn pairs(&self) -> Vec<nexora_core::pairdrop::Pair> {
         self.pairdrop.as_ref().map(|p| p.pairs()).unwrap_or_default()
     }
 

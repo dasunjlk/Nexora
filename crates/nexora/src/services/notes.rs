@@ -1,5 +1,5 @@
 //! Meeting notes on this PC (the Meeting notes add-on): the recording and
-//! the handing over. The page and its moments are `poni_core::notes`. The
+//! the handing over. The page and its moments are `nexora_core::notes`. The
 //! Mac app runs this file too, with its own two sources
 //! (`mac/services/capture.rs`: the microphone, and the Mac's own sound
 //! through a Core Audio tap); everything else here is the same.
@@ -8,17 +8,17 @@
 //! device's own sound (WASAPI loopback: whatever the PC plays, so the voices
 //! of a call in Meet, Zoom or Teams, with no bot joining it), each in shared
 //! mode as `services/mic.rs` opens them, mixed onto one 16 kHz mono track
-//! (`poni_core::notes::Mixer`) and written as five-minute WAV parts in
-//! `%LOCALAPPDATA%\Poni\notes\<meeting>\`. One source missing is fine (no
+//! (`nexora_core::notes::Mixer`) and written as five-minute WAV parts in
+//! `%LOCALAPPDATA%\Nexora\notes\<meeting>\`. One source missing is fine (no
 //! microphone, or nothing to play through); both missing is an error. When
 //! Windows' default device changes mid-meeting (a headset plugged in), the
 //! recording moves to the new one.
 //!
-//! Its thread, `poni-notes`, exists only while recording, waking every 40 ms
+//! Its thread, `nexora-notes`, exists only while recording, waking every 40 ms
 //! (a 500 ms device buffer leaves room for a late wake-up). After Stop, a
-//! second thread, `poni-notes-send`, exists only while a meeting is handed
+//! second thread, `nexora-notes-send`, exists only while a meeting is handed
 //! over: it sends the parts, says it's over, asks every few seconds until
-//! the notes are written (`poni_core::notes::POLL_S`), saves them as
+//! the notes are written (`nexora_core::notes::POLL_S`), saves them as
 //! Markdown in `Documents\Oyenza Studio\Notes` and deletes the audio. The
 //! calls carry the PC's Oyenza key, read from its sealed file on that thread
 //! only, never the UI's or the log.
@@ -30,12 +30,12 @@ use crate::services::http::{Client, Method, MtaGuard};
 use crate::services::mic::MicError;
 #[cfg(windows)]
 use crate::services::mic::{self, Device};
-use poni_core::datetime::LocalDateTime;
+use nexora_core::datetime::LocalDateTime;
 #[cfg(windows)]
-use poni_core::ielts::peak;
-use poni_core::ielts::WavWriter;
-use poni_core::notes::{self, CaptureIssue, Lang, Mixer, Problem, Reply, Saved, View, PART_SECS, RATE};
-use poni_core::oyenza;
+use nexora_core::ielts::peak;
+use nexora_core::ielts::WavWriter;
+use nexora_core::notes::{self, CaptureIssue, Lang, Mixer, Problem, Reply, Saved, View, PART_SECS, RATE};
+use nexora_core::oyenza;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::{mpsc, Arc};
@@ -99,7 +99,7 @@ impl Recording {
         let (ready_tx, ready_rx) = mpsc::channel();
         let (worker, folder, sink) = (shared.clone(), dir.clone(), sink.clone());
         let thread = std::thread::Builder::new()
-            .name("poni-notes".into())
+            .name("nexora-notes".into())
             .spawn(move || capture(&folder, &worker, &sink, ready_tx))
             .map_err(|_| CaptureIssue::Failed)?;
         match ready_rx.recv_timeout(OPEN_TIMEOUT) {
@@ -279,7 +279,7 @@ impl Parts {
     }
 }
 
-/// The `poni-notes` thread: open both sources, say which did, then record
+/// The `nexora-notes` thread: open both sources, say which did, then record
 /// until told to stop (or the longest meeting the server takes).
 fn capture(dir: &Path, shared: &Shared, sink: &EventSink, ready: mpsc::Sender<Result<(bool, bool), CaptureIssue>>) -> Result<Take, CaptureIssue> {
     #[cfg(windows)]
@@ -439,7 +439,7 @@ pub struct Job {
 /// and ends with the notes saved or a problem.
 pub fn send(job: Job, sink: &EventSink) {
     let sink = sink.clone();
-    let spawned = std::thread::Builder::new().name("poni-notes-send".into()).spawn(move || {
+    let spawned = std::thread::Builder::new().name("nexora-notes-send".into()).spawn(move || {
         let _com = MtaGuard::new();
         let reply = match Client::uncached(USER_AGENT) {
             Ok(client) => Sender { client, job: &job, sink: &sink }.run(),

@@ -31,9 +31,9 @@ use objc2_core_text::{
     kCTFontAttributeName, kCTForegroundColorFromContextAttributeName, CTFont, CTFontDescriptor, CTFontManagerCreateFontDescriptorsFromData, CTLine,
     CTLineTruncationType, CTTypesetter,
 };
-use poni_core::geom::{Color, Point, Rect};
-use poni_core::look::{self, Look};
-use poni_core::svgpath::Seg;
+use nexora_core::geom::{Color, Point, Rect};
+use nexora_core::look::{self, Look};
+use nexora_core::svgpath::Seg;
 use std::collections::HashMap;
 use std::ptr::{self, NonNull};
 use std::rc::Rc;
@@ -163,7 +163,7 @@ pub struct TextStyle {
 #[allow(dead_code)]
 impl TextStyle {
     pub fn new(size: f32) -> Self {
-        Self { size, weight: Weight::Regular, color: poni_core::geom::palette::TEXT, align: Align::Left, tabular: false, wrap: false, vcenter: true, line: 0.0 }
+        Self { size, weight: Weight::Regular, color: nexora_core::geom::palette::TEXT, align: Align::Left, tabular: false, wrap: false, vcenter: true, line: 0.0 }
     }
     pub fn caption() -> Self {
         Self::new(ts::CAPTION)
@@ -561,7 +561,7 @@ impl Gfx {
         }
         let mut out = Vec::new();
         for part in icons::parts(icon) {
-            match poni_core::svgpath::parse(part.d) {
+            match nexora_core::svgpath::parse(part.d) {
                 Ok(segs) => out.push((cg_path(&segs), part.fill)),
                 Err(e) => pwarn!("icon {icon:?} path parse failed: {}", e.0),
             }
@@ -634,7 +634,7 @@ pub fn cg_path(segs: &[Seg]) -> CFRetained<CGMutablePath> {
                         CGMutablePath::move_to_point(Some(&p), ptr::null(), f(cur.0), f(cur.1));
                         open = true;
                     }
-                    for c in poni_core::svgpath::arc_to_cubics(cur.0, cur.1, rx, ry, rot, large, sweep, x, y) {
+                    for c in nexora_core::svgpath::arc_to_cubics(cur.0, cur.1, rx, ry, rot, large, sweep, x, y) {
                         CGMutablePath::add_curve_to_point(Some(&p), ptr::null(), f(c[0]), f(c[1]), f(c[2]), f(c[3]), f(c[4]), f(c[5]));
                     }
                     cur = (x, y);

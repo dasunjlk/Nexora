@@ -96,7 +96,7 @@ pub mod voice;
 
 use objc2_app_kit::{NSColor, NSColorSpace, NSSound, NSWorkspace};
 use objc2_foundation::{NSArray, NSFileManager, NSString, NSURL};
-use poni_core::geom::Color;
+use nexora_core::geom::Color;
 
 pub mod imaging {
     //! What the Shelf page asks about its files.
@@ -136,9 +136,9 @@ pub fn reveal(path: &str) {
     NSWorkspace::sharedWorkspace().activateFileViewerSelectingURLs(&NSArray::from_retained_slice(&[url]));
 }
 
-/// The app was called Oyen Poni before 0.2.0, and a copy from then has the same
+/// The app was called Nexora before 0.2.0, and a copy from then has the same
 /// bundle id, so Spotlight or the login item could start it instead of this one.
-/// Moves "Oyen Poni.app" from /Applications or ~/Applications to the Trash, where
+/// Moves "Nexora.app" from /Applications or ~/Applications to the Trash, where
 /// it can be put back, and returns the folder it was in.
 pub fn trash_app_from_before_rename() -> Option<String> {
     let running = std::env::current_exe().ok()?;
@@ -147,12 +147,12 @@ pub fn trash_app_from_before_rename() -> Option<String> {
         dirs.push(std::path::PathBuf::from(home).join("Applications"));
     }
     for dir in dirs {
-        let old = dir.join("Oyen Poni.app");
+        let old = dir.join("Nexora.app");
         if running.starts_with(&old) {
             continue;
         }
         let plist = std::fs::read_to_string(old.join("Contents/Info.plist")).unwrap_or_default();
-        if !plist.contains("<string>com.oyenza.poni</string>") {
+        if !plist.contains("<string>com.oyenza.nexora</string>") {
             continue;
         }
         let url = NSURL::fileURLWithPath(&NSString::from_str(&old.to_string_lossy()));

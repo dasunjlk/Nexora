@@ -35,8 +35,8 @@ use objc2::runtime::AnyObject;
 use objc2::{define_class, msg_send, sel, MainThreadMarker, MainThreadOnly};
 use objc2_app_kit::NSRunningApplication;
 use objc2_foundation::{NSDistributedNotificationCenter, NSNotification, NSNotificationSuspensionBehavior, NSNumber, NSObject, NSObjectProtocol, NSString};
-use poni_core::mediaremote;
-use poni_core::timeline::Timeline;
+use nexora_core::mediaremote;
+use nexora_core::timeline::Timeline;
 use std::io::Read;
 use std::process::{Child, Command, Stdio};
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, Sender};
@@ -66,7 +66,7 @@ const FIRST_WORD: Duration = Duration::from_secs(2);
 /// of those the app stops asking for the run.
 const FAILED_START: Duration = Duration::from_secs(5);
 const MAX_FAILS: u32 = 3;
-const USER_AGENT: &str = "Poni/0.1 (+https://github.com/lucacadalora/oyenza-studio)";
+const USER_AGENT: &str = "Nexora/0.1 (+https://github.com/lucacadalora/oyenza-studio)";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Player {
@@ -181,7 +181,7 @@ impl MediaService {
             };
         }
         let own = tx.clone();
-        if let Err(e) = std::thread::Builder::new().name("poni-media".into()).spawn(move || Worker::new(sink, own).run(rx)) {
+        if let Err(e) = std::thread::Builder::new().name("nexora-media".into()).spawn(move || Worker::new(sink, own).run(rx)) {
             pwarn!("media: could not start its thread ({e})");
         }
         MediaService { tx, _observer: observer }
@@ -226,7 +226,7 @@ define_class!(
     /// Receives the players' distributed notifications (main thread).
     #[unsafe(super(NSObject))]
     #[thread_kind = MainThreadOnly]
-    #[name = "PoniNowPlayingObserver"]
+    #[name = "NexoraNowPlayingObserver"]
     struct NowPlayingObserver;
 
     unsafe impl NSObjectProtocol for NowPlayingObserver {}
@@ -356,7 +356,7 @@ impl Worker {
         if self.adapter.is_none() {
             pinfo!("media: this build has no reader for macOS's now playing; Music and Spotify only");
         }
-        // Whatever already plays when Poni starts: the service names it (a
+        // Whatever already plays when Nexora starts: the service names it (a
         // paused track too); Music and Spotify are asked themselves where
         // there is no service to ask, or once it had its moment.
         self.sound = super::audio::sound_running();

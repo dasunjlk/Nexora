@@ -3,8 +3,8 @@
 Run the self-test at 200 % in one theme, then cut its pictures into
 site/assets/shots/<theme>/ (island only, real alpha, lossless WebP):
 
-    PONI_SELFTEST_DPI=192 tools/run-selftest-wine.sh target/.../poni.exe out-classic
-    PONI_SELFTEST_DPI=192 PONI_SELFTEST_THEME=oyen tools/run-selftest-wine.sh target/.../poni.exe out-oyen
+    NEXORA_SELFTEST_DPI=192 tools/run-selftest-wine.sh target/.../nexora.exe out-classic
+    NEXORA_SELFTEST_DPI=192 NEXORA_SELFTEST_THEME=oyen tools/run-selftest-wine.sh target/.../nexora.exe out-oyen
     python3 tools/site_shots.py out-classic classic
     python3 tools/site_shots.py out-oyen oyen
 
@@ -12,7 +12,7 @@ The read-along picture (the Music page with the pronunciation under Korean
 lyrics) comes from a run with the sample song in Korean. Give the language as
 a third argument and only that page is cut, as page-media-ko.webp:
 
-    PONI_SELFTEST_DPI=192 PONI_SELFTEST_LYRICS=ko tools/run-selftest-wine.sh target/.../poni.exe out-classic-ko
+    NEXORA_SELFTEST_DPI=192 NEXORA_SELFTEST_LYRICS=ko tools/run-selftest-wine.sh target/.../nexora.exe out-classic-ko
     python3 tools/site_shots.py out-classic-ko classic ko
 
 Shoot both themes in the same minute (run them side by side) so the island's
@@ -22,7 +22,7 @@ The Pill theme has its own section on the page, so only the states it shows
 are cut (PILL_KEEP), into site/assets/shots/pill/. Pill floats below the top
 edge, so its pictures keep that gap above the island:
 
-    PONI_SELFTEST_DPI=192 PONI_SELFTEST_THEME=pill tools/run-selftest-wine.sh target/.../poni.exe out-pill
+    NEXORA_SELFTEST_DPI=192 NEXORA_SELFTEST_THEME=pill tools/run-selftest-wine.sh target/.../nexora.exe out-pill
     python3 tools/site_shots.py out-pill pill
 
 The Diorama theme is Pill's island with a picture as its resting pill, and
@@ -30,38 +30,38 @@ that pill has pictures of its own (DIORAMA_KEEP: at dawn, in the morning, at
 the golden hour, at night, and the glass ball held halfway by hand). A
 Diorama run takes those pictures after its scenes, each at a set
 time of day whenever the run is (diorama-<what>.png, no number), and with
-PONI_SELFTEST_DIORAMA=only it takes them alone, in a few seconds. They go
+NEXORA_SELFTEST_DIORAMA=only it takes them alone, in a few seconds. They go
 into site/assets/shots/diorama/<what>.webp with the gap above them, like
 Pill's:
 
-    PONI_SELFTEST_DPI=192 PONI_SELFTEST_THEME=diorama PONI_SELFTEST_DIORAMA=only tools/run-selftest-wine.sh target/.../poni.exe out-diorama
+    NEXORA_SELFTEST_DPI=192 NEXORA_SELFTEST_THEME=diorama NEXORA_SELFTEST_DIORAMA=only tools/run-selftest-wine.sh target/.../nexora.exe out-diorama
     python3 tools/site_shots.py out-diorama diorama
 
 The rest of Diorama's island wears the resting pill's frame, cream by day
 and indigo at night, so the states the page shows of it (DIORAMA_PAGES) are
 cut from a whole Diorama run, which holds its scenes at 10:08, or at 21:30
-with PONI_SELFTEST_DIORAMA=night. They go into
+with NEXORA_SELFTEST_DIORAMA=night. They go into
 site/assets/shots/diorama/<state>-day.webp and <state>-night.webp, with the
 gap above them:
 
-    PONI_SELFTEST_DPI=192 PONI_SELFTEST_THEME=diorama tools/run-selftest-wine.sh target/.../poni.exe out-diorama-day
-    PONI_SELFTEST_DPI=192 PONI_SELFTEST_THEME=diorama PONI_SELFTEST_DIORAMA=night tools/run-selftest-wine.sh target/.../poni.exe out-diorama-night
+    NEXORA_SELFTEST_DPI=192 NEXORA_SELFTEST_THEME=diorama tools/run-selftest-wine.sh target/.../nexora.exe out-diorama-day
+    NEXORA_SELFTEST_DPI=192 NEXORA_SELFTEST_THEME=diorama NEXORA_SELFTEST_DIORAMA=night tools/run-selftest-wine.sh target/.../nexora.exe out-diorama-night
     python3 tools/site_shots.py out-diorama-day diorama day
     python3 tools/site_shots.py out-diorama-night diorama night
 
 In the Oyen theme, music notes float up beside Oyen on the beat, and the
 scene's single frame may fall between notes. Record the media pill frame by
-frame (PONI_SELFTEST_LOOP=1 writes loop-media-NNN.png), pick a frame with
+frame (NEXORA_SELFTEST_LOOP=1 writes loop-media-NNN.png), pick a frame with
 notes in the air and give its name as the third argument; it becomes
 media-activity.webp:
 
-    PONI_SELFTEST_DPI=192 PONI_SELFTEST_THEME=oyen PONI_SELFTEST_LOOP=1 tools/run-selftest-wine.sh target/.../poni.exe out-oyen-loop
+    NEXORA_SELFTEST_DPI=192 NEXORA_SELFTEST_THEME=oyen NEXORA_SELFTEST_LOOP=1 tools/run-selftest-wine.sh target/.../nexora.exe out-oyen-loop
     python3 tools/site_shots.py out-oyen-loop oyen loop-media-006
 
 The Glass pictures come from Windows: Wine has no DirectComposition, so under
 Wine Glass only draws its smoked-glass fallback. Run the Glass self-test at
-200 % on Windows (PONI_SELFTEST_THEME=glass, PONI_SELFTEST_DPI=192 and
-PONI_SELFTEST_GLASS=light, dark or flip, which picks the page under the
+200 % on Windows (NEXORA_SELFTEST_THEME=glass, NEXORA_SELFTEST_DPI=192 and
+NEXORA_SELFTEST_GLASS=light, dark or flip, which picks the page under the
 island). Its pictures show the island over that page, which is what the
 glass is made of, so they are kept whole, as glass/<run>-<state>.webp:
 
@@ -91,15 +91,15 @@ per point get pictures from a 400 % run there, cut into
 site/assets/shots/zoom/<theme>/ (ZOOM_KEEP). A 400 % island needs a bigger
 virtual screen than Wine's default:
 
-    PONI_SELFTEST_DPI=384 PONI_SELFTEST_SCREEN=4096x2400x24 tools/run-selftest-wine.sh target/.../poni.exe out-classic-4x
-    PONI_SELFTEST_DPI=384 PONI_SELFTEST_SCREEN=4096x2400x24 PONI_SELFTEST_THEME=oyen tools/run-selftest-wine.sh target/.../poni.exe out-oyen-4x
+    NEXORA_SELFTEST_DPI=384 NEXORA_SELFTEST_SCREEN=4096x2400x24 tools/run-selftest-wine.sh target/.../nexora.exe out-classic-4x
+    NEXORA_SELFTEST_DPI=384 NEXORA_SELFTEST_SCREEN=4096x2400x24 NEXORA_SELFTEST_THEME=oyen tools/run-selftest-wine.sh target/.../nexora.exe out-oyen-4x
     python3 tools/site_shots.py out-classic-4x classic zoom
     python3 tools/site_shots.py out-oyen-4x oyen zoom
 
 Diorama's resting pill at twice its size comes from a 400 % Diorama run the
 same way (zoom/diorama/<what>.webp):
 
-    PONI_SELFTEST_DPI=384 PONI_SELFTEST_SCREEN=4096x2400x24 PONI_SELFTEST_THEME=diorama PONI_SELFTEST_DIORAMA=only tools/run-selftest-wine.sh target/.../poni.exe out-diorama-4x
+    NEXORA_SELFTEST_DPI=384 NEXORA_SELFTEST_SCREEN=4096x2400x24 NEXORA_SELFTEST_THEME=diorama NEXORA_SELFTEST_DIORAMA=only tools/run-selftest-wine.sh target/.../nexora.exe out-diorama-4x
     python3 tools/site_shots.py out-diorama-4x diorama zoom
 
 At 400 % the frame-time checks fail under Wine (drawing is slower); the
@@ -236,7 +236,7 @@ def diorama(src: Path, zoom: bool) -> None:
         shot = src / f"diorama-{name}.png"
         alpha = src / f"diorama-{name}-alpha.png"
         if not shot.exists() or not alpha.exists():
-            sys.exit(f"{shot} or its -alpha.png is missing: is {src} a PONI_SELFTEST_THEME=diorama run?")
+            sys.exit(f"{shot} or its -alpha.png is missing: is {src} a NEXORA_SELFTEST_THEME=diorama run?")
         # It floats below the top edge, like Pill: the gap above it is kept.
         img = cut(shot, alpha, floating=True)
         img.save(dst / f"{name}.webp", lossless=True, method=6)
@@ -247,7 +247,7 @@ def diorama_pages(src: Path, when: str) -> None:
     dst = ROOT / "site" / "assets" / "shots" / "diorama"
     dst.mkdir(parents=True, exist_ok=True)
     if not (src / "diorama-morning.png").exists():
-        sys.exit(f"{src} has no diorama-morning.png: is it a PONI_SELFTEST_THEME=diorama run?")
+        sys.exit(f"{src} has no diorama-morning.png: is it a NEXORA_SELFTEST_THEME=diorama run?")
     for shot in sorted(src.glob("[0-9][0-9]*-*.png")):
         name = re.sub(r"^\d+-", "", shot.stem)
         alpha = shot.with_name(shot.stem + "-alpha.png")

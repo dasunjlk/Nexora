@@ -937,7 +937,7 @@ P	San Felice A Cancello		IT		41.017	14.487	27
 P	Plácido de Castro	placido de castro	BR		-10.335	-67.186	5
 P	Cabaceiras do Paraguaçu	cabaceiras do paraguacu	BR		-12.536	-39.191	16
 P	Cabayangan		PH		7.407	125.733	21
-P	Caiapônia	caiaponia	BR		-16.957	-51.810	16
+P	Caiapônia	caianexoraa	BR		-16.957	-51.810	16
 P	Camaná	camana	PE		-16.624	-72.711	5
 P	Cajari		BR		-3.321	-45.011	16
 P	Cañon City	canon city	US	Colorado	38.441	-105.242	8

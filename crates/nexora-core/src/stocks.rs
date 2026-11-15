@@ -25,7 +25,7 @@ use crate::datetime::{civil_from_days, days_from_civil, weekday_from_days};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-/// Where the answers come from. The apps read `PONI_STOCKS_URL` to point a
+/// Where the answers come from. The apps read `NEXORA_STOCKS_URL` to point a
 /// test build at another copy of the server.
 pub const BASE: &str = "https://oyenza.trade/dashboard/api/live/";
 /// The most stocks a list holds, besides the IHSG.

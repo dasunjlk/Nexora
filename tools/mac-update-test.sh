@@ -7,7 +7,7 @@
 #
 # The newer version is this build with a higher version in its Info.plist (signed ad hoc again), in a DMG made
 # the way releases make theirs (tools/make_mac_dmg.sh). The installed copy is this build as it is, in a temporary
-# Applications folder. Its data folder (PONI_HOME) holds what a look at the update file, a download and Install
+# Applications folder. Its data folder (NEXORA_HOME) holds what a look at the update file, a download and Install
 # on next start would have left: update.json naming that version, and the DMG in cache/update. Nothing goes
 # online. CI's Macs can't show what macOS's App Management does on a person's Mac (nothing there was opened
 # through Gatekeeper); that takes one try on a real one.
@@ -17,7 +17,7 @@ set -euo pipefail
 
 app="$1"
 root="$(cd "$(dirname "$0")/.." && pwd)"
-work="${RUNNER_TEMP:-$(mktemp -d)}/poni-update-test"
+work="${RUNNER_TEMP:-$(mktemp -d)}/nexora-update-test"
 next=99.0.0
 rm -rf "$work"
 mkdir -p "$work/Applications" "$work/home/cache/update" "$work/new"
@@ -58,12 +58,12 @@ JSON
 ditto "$app" "$installed"
 fail() {
   echo "::error title=Mac update test::$1"
-  echo "--- poni.log"; cat "$work/home/poni.log" 2> /dev/null || true
+  echo "--- nexora.log"; cat "$work/home/nexora.log" 2> /dev/null || true
   echo "--- stdout"; cat "$work/stdout.txt" 2> /dev/null || true
-  pkill -f "$installed/Contents/MacOS/poni" 2> /dev/null || true
+  pkill -f "$installed/Contents/MacOS/nexora" 2> /dev/null || true
   exit 1
 }
-PONI_HOME="$work/home" "$installed/Contents/MacOS/poni" > "$work/stdout.txt" 2>&1 &
+NEXORA_HOME="$work/home" "$installed/Contents/MacOS/nexora" > "$work/stdout.txt" 2>&1 &
 pid=$!
 for _ in $(seq 1 600); do kill -0 "$pid" 2> /dev/null || break; sleep 0.1; done
 kill -0 "$pid" 2> /dev/null && fail "the installed copy didn't install and quit within 60 s"
@@ -82,12 +82,12 @@ for _ in $(seq 1 150); do [ -e "$work/Applications/.Oyenza Studio update.app" ] 
 [ -e "$work/Applications/.Oyenza Studio update.app" ] && fail "the old copy is still next to the new one"
 opened=""
 for _ in $(seq 1 150); do
-  opened="$(pgrep -f "$installed/Contents/MacOS/poni" || true)"
+  opened="$(pgrep -f "$installed/Contents/MacOS/nexora" || true)"
   [ -n "$opened" ] && break
   sleep 0.2
 done
 [ -n "$opened" ] || fail "the new version didn't open"
 ls -la "$work/Applications"
-echo "--- poni.log"; cat "$work/home/poni.log"
-pkill -f "$installed/Contents/MacOS/poni" || true
+echo "--- nexora.log"; cat "$work/home/nexora.log"
+pkill -f "$installed/Contents/MacOS/nexora" || true
 echo "The installed $running copy put $next in its own place and opened it."

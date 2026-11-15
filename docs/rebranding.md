@@ -9,8 +9,8 @@ user-visible was rebranded to Nexora. This page is the mapping and the rules.
 | Upstream | Nexora | Where |
 |---|---|---|
 | Oyenza Studio (product) | **Nexora** | all user-visible strings, docs, installers, site |
-| Oyen Poni / Poni (old product names) | removed | history notes |
-| `poni` / `Poni` (internal codename) | `nexora` / `Nexora` | crates (`nexora`, `nexora-core`, `nexora-usage`, `nexora-diorama`), `nexora.exe`, `NEXORA_*` env vars, `%APPDATA%\Nexora`, `%LOCALAPPDATA%\Nexora`, `Local\Nexora.Island`, Mac bundle id `app.nexora.nexora`, uninstall key, Run value, threads (`nexora-notes`), self-test vars |
+| Nexora / Nexora (old product names) | removed | history notes |
+| `nexora` / `Nexora` (internal codename) | `nexora` / `Nexora` | crates (`nexora`, `nexora-core`, `nexora-usage`, `nexora-diorama`), `nexora.exe`, `NEXORA_*` env vars, `%APPDATA%\Nexora`, `%LOCALAPPDATA%\Nexora`, `Local\Nexora.Island`, Mac bundle id `app.nexora.nexora`, uninstall key, Run value, threads (`nexora-notes`), self-test vars |
 | Oyen (mascot cat) | **Nova** | `nexora_core::nova` (`src/nova/`), `src/nova.rs`, the "Nova" theme, `Nova's notes`, docs |
 | `oyenza.app` (account) | `nexora.app` | sign-in, money/agenda features (service placeholder) |
 | `api.oyenza.app` | `api.nexora.app` | account API, meeting notes API (`/island/notes`) |
@@ -27,7 +27,7 @@ user-visible was rebranded to Nexora. This page is the mapping and the rules.
 ## Rename policy
 
 **Renamed** (mechanically, case-preserving): `oyenza→nexora`, `Oyenza→Nexora`,
-`OYENZA→NEXORA`, `poni→nexora`, `Poni→Nexora`, `PONI→NEXORA`, `oyen→nova`,
+`OYENZA→NEXORA`, `nexora→nexora`, `Nexora→Nexora`, `NEXORA→NEXORA`, `oyen→nova`,
 `Oyen→Nova`, `OYEN→NOVA`, plus domains and repo slugs above.
 
 **Never renamed** (would break third-party contracts, not branding):

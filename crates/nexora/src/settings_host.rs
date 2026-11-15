@@ -9,7 +9,7 @@
 use crate::gfx::Gfx;
 use crate::settings_window::{Frame, Key, Painted, Section, View, CARD_H, CARD_W};
 use crate::state::AppState;
-use poni_core::geom::{Point, Rect};
+use nexora_core::geom::{Point, Rect};
 use windows::core::{w, Result, PCWSTR};
 use windows::Win32::Foundation::{HWND, RECT};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
@@ -178,7 +178,7 @@ impl SettingsWindow {
             return Painted::default();
         }
         let light = self.light;
-        self.gfx.set_look(poni_core::look::glass(light));
+        self.gfx.set_look(nexora_core::look::glass(light));
         let full = RECT { left: 0, top: 0, right: w, bottom: h };
         if capture {
             self.gfx.request_capture(full);

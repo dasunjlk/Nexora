@@ -10,8 +10,8 @@ use crate::gfx::{TextStyle, Weight};
 use crate::icons::Icon;
 use crate::state::AppState;
 use crate::ui::{wid, PillStyle, Ui, PILL_GAP, PILL_SMALL};
-use poni_core::geom::{palette, Point, Rect};
-use poni_core::ytdlp::Mode;
+use nexora_core::geom::{palette, Point, Rect};
+use nexora_core::ytdlp::Mode;
 
 /// The chip's height, and the gap under it before the list.
 const CHIP_H: f32 = 44.0;

@@ -49,7 +49,7 @@ pub enum Theme {
 #[serde(rename_all = "snake_case")]
 pub enum MonitorChoice {
     Primary,
-    /// The monitor under the cursor when Poni starts.
+    /// The monitor under the cursor when Nexora starts.
     Cursor,
 }
 
@@ -116,8 +116,8 @@ pub struct Settings {
     /// of the kernel counters once a second), so they're full when it opens.
     /// Only while the System add-on is on ([`Settings::system_history_on`]).
     pub system_history: bool,
-    /// Add-ons switched on, by id (`poni_core::addons`). Ids this version
-    /// doesn't know are kept, so a newer Poni's choices survive a save.
+    /// Add-ons switched on, by id (`nexora_core::addons`). Ids this version
+    /// doesn't know are kept, so a newer Nexora's choices survive a save.
     pub addons: BTreeMap<String, bool>,
     /// The Prayer times add-on's choices.
     pub prayer: PrayerSettings,
@@ -424,7 +424,7 @@ mod tests {
         assert!(!s.addon_on("sholat"));
         s.set_addon("sholat", true);
         assert!(s.addon_on("sholat"));
-        // A newer Poni's add-on stays in the file when this one saves it.
+        // A newer Nexora's add-on stays in the file when this one saves it.
         let s: Settings = serde_json::from_str(r#"{"addons":{"sholat":true,"future":true}}"#).unwrap();
         assert!(s.addon_on("sholat"));
         let back: Settings = serde_json::from_str(&serde_json::to_string(&s).unwrap()).unwrap();
@@ -562,7 +562,7 @@ mod tests {
         let s: Settings = serde_json::from_str(r#"{"settings_version":3,"collapse_delay_ms":380}"#).unwrap();
         assert_eq!(s.sanitized().collapse_delay_ms, 380);
         assert_eq!(Settings::default().sanitized().collapse_delay_ms, 0);
-        // A file from a newer Poni keeps its version.
+        // A file from a newer Nexora keeps its version.
         let s: Settings = serde_json::from_str(r#"{"settings_version":9}"#).unwrap();
         assert_eq!(s.sanitized().settings_version, 9);
     }

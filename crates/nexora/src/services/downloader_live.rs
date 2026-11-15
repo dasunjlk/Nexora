@@ -1,14 +1,14 @@
 //! The Downloader add-on for real, on a real Windows or Mac (CI's Unit tests
 //! job and mac.yml's Mac job run it with `--ignored`): the tools come from
-//! where the add-on gets them, exactly as `poni_core::addons::DOWNLOADER`
+//! where the add-on gets them, exactly as `nexora_core::addons::DOWNLOADER`
 //! pins them for this app, checked by size and SHA-256 and made runnable as
 //! the add-on does both. yt-dlp then saves a short Blender Studio film from
 //! Blender's own PeerTube, as video and as sound, with the arguments the
-//! island gives it (`poni_core::ytdlp::args`), and every line it prints goes
-//! through `poni_core::ytdlp::parse`, as the Downloads page reads them:
+//! island gives it (`nexora_core::ytdlp::args`), and every line it prints goes
+//! through `nexora_core::ytdlp::parse`, as the Downloads page reads them:
 //!
 //! ```text
-//! cargo test -p poni --release the_pinned_tools_download_a_real_link -- --ignored --nocapture
+//! cargo test -p nexora --release the_pinned_tools_download_a_real_link -- --ignored --nocapture
 //! ```
 //!
 //! A tool this build doesn't pin yet is left out: FFmpeg's absence (yt-dlp
@@ -18,9 +18,9 @@
 //! else that goes wrong fails.
 
 use crate::services::http::{Client, MtaGuard};
-use poni_core::addons::{self, DOWNLOADER};
-use poni_core::sha256;
-use poni_core::ytdlp::{self, Line, Mode, Problem, Request, Tools};
+use nexora_core::addons::{self, DOWNLOADER};
+use nexora_core::sha256;
+use nexora_core::ytdlp::{self, Line, Mode, Problem, Request, Tools};
 use std::fs;
 use std::io::{BufRead, BufReader, Read};
 use std::path::{Path, PathBuf};
@@ -41,7 +41,7 @@ const RUN_TIMEOUT: Duration = Duration::from_secs(240);
 #[test]
 #[ignore = "downloads yt-dlp, QuickJS and a short film; CI runs it on a real Windows and Mac"]
 fn the_pinned_tools_download_a_real_link() {
-    let dir = std::env::temp_dir().join("poni-downloader-live");
+    let dir = std::env::temp_dir().join("nexora-downloader-live");
     let _ = fs::remove_dir_all(&dir);
     // The tools, and yt-dlp's cache as the add-on keeps one in its own data.
     let (bin, cache) = (dir.join("tools"), dir.join("cache"));
@@ -203,16 +203,16 @@ fn needs_ffmpeg(line: &str) -> bool {
 /// The same film through the island's own runner (`services::downloader`):
 /// the job object and windowless start (the process group on a Mac), the
 /// reader thread and the events the Downloads page gets. Its tools go where the add-on keeps them, under a
-/// `PONI_HOME` of its own. A second download, stopped at its first bytes,
+/// `NEXORA_HOME` of its own. A second download, stopped at its first bytes,
 /// must end as stopped and leave no unfinished file behind. CI's filter
 /// (`the_pinned_tools_download_a_real_link`) runs this one too.
 #[test]
 #[ignore = "downloads yt-dlp, QuickJS and a short film; CI runs it on a real Windows and Mac"]
 fn the_pinned_tools_download_a_real_link_through_the_runner() {
     use crate::events::{AppEvent, EventSink};
-    let home = std::env::temp_dir().join("poni-downloader-runner");
+    let home = std::env::temp_dir().join("nexora-downloader-runner");
     let _ = fs::remove_dir_all(&home);
-    std::env::set_var("PONI_HOME", &home);
+    std::env::set_var("NEXORA_HOME", &home);
     let tools = crate::services::addons::file_path(&DOWNLOADER, addons::YTDLP_EXE).parent().expect("the add-on's folder").to_path_buf();
     fs::create_dir_all(&tools).expect("the add-on's folder");
     let ffmpeg = fetch(&tools);

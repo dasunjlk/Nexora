@@ -5,7 +5,7 @@ latest QuickJS-ng.
 The Downloader takes yt-dlp.exe and qjs.exe on Windows, and yt-dlp_macos on
 the Mac, from their own GitHub releases, unchanged, and keeps each only if
 its size and SHA-256 are the ones built into the app (`DOWNLOADER_WINDOWS`
-and `DOWNLOADER_MAC` in crates/poni-core/src/addons.rs). yt-dlp ships
+and `DOWNLOADER_MAC` in crates/nexora-core/src/addons.rs). yt-dlp ships
 fixes most weeks, as sites (YouTube most of all) keep changing, so the
 Downloader pins workflow (.github/workflows/ytdlp-pin.yml) runs this every
 week and opens a pull request when the pin moves (docs/downloader-pins.md).
@@ -46,7 +46,7 @@ import urllib.error
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ADDONS = os.path.join(ROOT, "crates", "poni-core", "src", "addons.rs")
+ADDONS = os.path.join(ROOT, "crates", "nexora-core", "src", "addons.rs")
 API = "https://api.github.com/repos/"
 
 # Each pin: whose releases it follows, the file it takes from them, the add-on

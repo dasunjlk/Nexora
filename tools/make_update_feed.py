@@ -8,7 +8,7 @@ line of its notes as a headline, and the Windows installer and Mac DMG with
 their sizes and SHA-256. That description (the payload) is signed with ECDSA
 P-256 over SHA-256 with the key in UPDATE_FEED_KEY. The app believes none of
 it until the signature checks out against a key in
-crates/poni-core/data/update-keys.txt, and this script refuses to sign with a
+crates/nexora-core/data/update-keys.txt, and this script refuses to sign with a
 key that isn't listed there.
 
 Usage:
@@ -37,7 +37,7 @@ import urllib.error
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-KEYS = os.path.join(ROOT, "crates", "poni-core", "data", "update-keys.txt")
+KEYS = os.path.join(ROOT, "crates", "nexora-core", "data", "update-keys.txt")
 REPO = os.environ.get("GITHUB_REPOSITORY") or "lucacadalora/oyenza-studio"
 API = "https://api.github.com/repos/" + REPO
 SCHEMA = 1

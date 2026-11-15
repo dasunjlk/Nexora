@@ -182,7 +182,7 @@ pub fn run(cli: Cli, home: &Path) -> Result<Reply, NetFail> {
     // hold agy up meanwhile. Chunks arrive as they come, so what agy printed
     // is there even if something it started keeps the pipe open.
     let (tx, rx) = mpsc::channel::<Vec<u8>>();
-    let reader = std::thread::Builder::new().name("poni-agy".into()).spawn(move || {
+    let reader = std::thread::Builder::new().name("nexora-agy".into()).spawn(move || {
         let mut out = out.take(OUTPUT_MAX);
         let mut chunk = [0u8; 16 * 1024];
         while let Ok(n) = out.read(&mut chunk) {

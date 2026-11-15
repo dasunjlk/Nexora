@@ -856,7 +856,7 @@ pub fn parse_time(s: &str) -> Option<i64> {
         }
         _ => return None,
     };
-    let days = poni_core::datetime::days_from_civil(y as i32, mo as u8, d as u8);
+    let days = nexora_core::datetime::days_from_civil(y as i32, mo as u8, d as u8);
     Some(days * 86_400 + h * 3600 + mi * 60 + sec - offset)
 }
 
@@ -889,7 +889,7 @@ fn unix_s(x: f64) -> i64 {
 
 /// Sorts a short list (a few windows, a month of days) so that `after(a, b)`
 /// holds for no two neighbours, keeping equal ones in their order. The
-/// standard stable sort adds about 6 KB to poni.exe for each type it sorts;
+/// standard stable sort adds about 6 KB to nexora.exe for each type it sorts;
 /// these lists hold a few dozen at most, where moving each one back into
 /// place is just as quick.
 pub fn sort_small_by<T>(v: &mut [T], after: impl Fn(&T, &T) -> bool) {

@@ -42,7 +42,7 @@ const TRANSFER_STALE: Duration = Duration::from_secs(90);
 /// Progress events at most this often.
 const PROGRESS_EVERY: Duration = Duration::from_millis(200);
 /// Staging folders in the inbox: `<prefix><transfer id>`.
-const STAGING_PREFIX: &str = ".oyen-poni-incoming-";
+const STAGING_PREFIX: &str = ".nexora-incoming-";
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -682,7 +682,7 @@ mod tests {
         }
 
         fn with(name: &str, ask_timeout: Duration) -> Fixture {
-            let dir = std::env::temp_dir().join(format!("poni-phonedrop-{name}-{}", std::process::id()));
+            let dir = std::env::temp_dir().join(format!("nexora-phonedrop-{name}-{}", std::process::id()));
             let _ = fs::remove_dir_all(&dir);
             let (tx, rx) = channel();
             let tx = Mutex::new(tx);
@@ -928,10 +928,10 @@ mod tests {
 
     #[test]
     fn clears_leftovers_of_an_interrupted_send() {
-        let dir = std::env::temp_dir().join(format!("poni-phonedrop-leftover-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("nexora-phonedrop-leftover-{}", std::process::id()));
         let inbox = dir.join("inbox");
-        fs::create_dir_all(inbox.join(".oyen-poni-incoming-3")).unwrap();
-        fs::write(inbox.join(".oyen-poni-incoming-3").join("0.part"), b"half").unwrap();
+        fs::create_dir_all(inbox.join(".nexora-incoming-3")).unwrap();
+        fs::write(inbox.join(".nexora-incoming-3").join("0.part"), b"half").unwrap();
         fs::write(inbox.join("kept.jpg"), b"a photo").unwrap();
         let s = Server::start(Config::new("127.0.0.1:0".parse().unwrap(), TOKEN.into(), "PC".into(), inbox.clone()), |_| {}).unwrap();
         let left: Vec<String> = fs::read_dir(&inbox).unwrap().flatten().map(|e| e.file_name().to_string_lossy().into_owned()).collect();

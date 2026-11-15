@@ -1,10 +1,10 @@
 //! Oyenza Studio Recorder: the separate recorder app built from Cap. The
 //! island starts, pauses and stops its recordings through the recorder's own
-//! links (`poni_core::recorder`), and the recorder tells the island how they
+//! links (`nexora_core::recorder`), and the recorder tells the island how they
 //! go with `WM_COPYDATA` (read in `app.rs`). Nothing here runs at rest:
 //! [`installed`] is read at start, as the island opens and when the menu opens.
 
-use poni_core::recorder;
+use nexora_core::recorder;
 use windows::core::{HSTRING, PCWSTR};
 use windows::Win32::Foundation::HWND;
 use windows::Win32::Graphics::Gdi::{EnumDisplayDevicesW, GetMonitorInfoW, MonitorFromWindow, DISPLAY_DEVICEW, MONITORINFO, MONITORINFOEXW, MONITOR_DEFAULTTONEAREST};

@@ -1,6 +1,6 @@
 //! Small secrets on disk (the Apple Music token), sealed with DPAPI so only
 //! the same Windows user on this PC can read them back. Kept under
-//! `%LOCALAPPDATA%\Poni\`: never roams, and uninstalling removes it.
+//! `%LOCALAPPDATA%\Nexora\`: never roams, and uninstalling removes it.
 //!
 //! Also opens what other Electron apps sealed the same way, for the AI tab
 //! ([`open_electron`]).
@@ -18,7 +18,7 @@ use windows::Win32::Security::Cryptography::{
 
 pub fn save(path: &Path, secret: &str) -> io::Result<()> {
     let sealed = protect(secret.as_bytes())?;
-    poni_core::store::write_bytes_atomic(path, &sealed)
+    nexora_core::store::write_bytes_atomic(path, &sealed)
 }
 
 /// The secret at `path`; `None` when there is none or it can't be unsealed
@@ -72,7 +72,7 @@ fn unprotect(data: &[u8]) -> io::Result<Vec<u8>> {
 /// then AES-256-GCM with the 16-byte tag last, under `key` (the DPAPI blob
 /// from the app's `Local State`); anything else is a DPAPI blob alone. None
 /// when it doesn't open (another user's, or changed). Windows' own AES, so
-/// poni.exe carries none.
+/// nexora.exe carries none.
 pub fn open_electron(sealed: &[u8], key: Option<&[u8]>) -> Option<Vec<u8>> {
     let Some(body) = sealed.strip_prefix(b"v10") else { return unprotect(sealed).ok() };
     let key = unprotect(key?).ok()?;

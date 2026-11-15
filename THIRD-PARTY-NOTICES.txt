@@ -7,7 +7,7 @@ from others and keep their own terms.
 mecab-ipadic 2.7.0-20070801
 
 Used for: Oyenza Studio's own Japanese reading dictionary,
-crates/poni-core/data/ja-readings.dic.zst, which Windows downloads as the
+crates/nexora-core/data/ja-readings.dic.zst, which Windows downloads as the
 Japanese readings add-on (with this notice in its NOTICE.txt) and the Mac
 app carries built in. It is a modified copy, made by
 tools/make_ja_dict.py: trimmed for lyrics (person and company names and rare
@@ -94,7 +94,7 @@ above as far as the program is concerned.
 Unicode Character Database 18.0.0 (Unihan)
 
 Used for: the pinyin under Chinese lyrics
-(crates/poni-core/src/romanize/pinyin_data.rs, made by tools/make_pinyin.py
+(crates/nexora-core/src/romanize/pinyin_data.rs, made by tools/make_pinyin.py
 from Unihan_Readings.txt).
 
 Source: https://www.unicode.org/Public/UCD/latest/ucd/Unihan.zip
@@ -182,7 +182,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Adhan (adhan-js 4.4.6)
 
 Used for: the sun's position and the moments behind prayer times
-(crates/poni-core/src/prayer/adhan.rs, a Rust port of the parts the Prayer
+(crates/nexora-core/src/prayer/adhan.rs, a Rust port of the parts the Prayer
 times add-on needs).
 
 Source: https://github.com/batoulapps/adhan-js
@@ -284,7 +284,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ------------------------------------------------------------------------------
-Rust crates built into poni.exe
+Rust crates built into nexora.exe
 
 Written by tools/make_notices.py from Cargo.lock. Each of these crates offers the
 MIT license (some also Apache-2.0 or the Unlicense), and Oyenza Studio uses each one

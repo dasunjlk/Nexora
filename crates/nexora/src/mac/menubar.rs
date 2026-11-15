@@ -13,7 +13,7 @@ use objc2_core_graphics::{CGBlendMode, CGContext};
 use objc2_foundation::{NSObject, NSObjectProtocol, NSSize, NSString};
 use crate::state::OyenzaLink;
 use crate::updates::UpdateLine;
-use poni_core::settings::{IdleStyle, Settings, Theme};
+use nexora_core::settings::{IdleStyle, Settings, Theme};
 use std::cell::RefCell;
 
 pub use crate::services::login::Status as Login;
@@ -171,7 +171,7 @@ define_class!(
     /// Receives the menu's clicks; each item's tag indexes the built commands.
     #[unsafe(super(NSObject))]
     #[thread_kind = MainThreadOnly]
-    #[name = "PoniMenuTarget"]
+    #[name = "NexoraMenuTarget"]
     pub struct MenuTarget;
 
     unsafe impl NSObjectProtocol for MenuTarget {}
@@ -216,7 +216,7 @@ impl MenuBar {
         if let Some(button) = item.button(mtm) {
             match mark_image(mtm) {
                 Some(img) => button.setImage(Some(&img)),
-                None => button.setTitle(&NSString::from_str("Poni")),
+                None => button.setTitle(&NSString::from_str("Nexora")),
             }
             button.setToolTip(Some(&NSString::from_str(&format!("Oyenza Studio {}", crate::version::VERSION))));
         }
@@ -283,8 +283,8 @@ fn mark_image(mtm: MainThreadMarker) -> Option<Retained<NSImage>> {
     let px = (PT as f32 * SCALE) as usize;
     let bmp = crate::gfx::Bitmap::new(px, px, SCALE)?;
     let ctx: &CGContext = bmp.ctx();
-    let parse = |d: &str| poni_core::svgpath::parse(d).ok().map(|segs| crate::gfx::cg_path(&segs));
-    let (head, fold, eyes) = (parse(poni_core::oyen::mark::HEAD)?, parse(poni_core::oyen::mark::FOLD)?, parse(poni_core::oyen::mark::EYES_SMALL)?);
+    let parse = |d: &str| nexora_core::svgpath::parse(d).ok().map(|segs| crate::gfx::cg_path(&segs));
+    let (head, fold, eyes) = (parse(nexora_core::oyen::mark::HEAD)?, parse(nexora_core::oyen::mark::FOLD)?, parse(nexora_core::oyen::mark::EYES_SMALL)?);
     // The mark is 104 units wide, centred on y -11.04 in its own units.
     let s = 16.5 / 104.0;
     CGContext::translate_ctm(Some(ctx), PT / 2.0, PT / 2.0 + 11.04 * s);

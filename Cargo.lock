@@ -1140,7 +1140,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "poni"
+name = "nexora"
 version = "0.2.30"
 dependencies = [
  "block2",
@@ -1156,7 +1156,7 @@ dependencies = [
  "objc2-foundation",
  "objc2-quartz-core",
  "p256",
- "poni-core",
+ "nexora-core",
  "serde",
  "serde_json",
  "studio-diorama",
@@ -1166,7 +1166,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "poni-core"
+name = "nexora-core"
 version = "0.2.30"
 dependencies = [
  "hmac",
@@ -1587,7 +1587,7 @@ version = "0.2.30"
 dependencies = [
  "aes",
  "hmac",
- "poni-core",
+ "nexora-core",
  "serde",
  "serde_json",
  "sha1",

@@ -1,5 +1,5 @@
 //! Add-ons page, the "+" at the end of the tab row: features only the people
-//! who switch them on get (`poni_core::addons`). Most download then; Script
+//! who switch them on get (`nexora_core::addons`). Most download then; Script
 //! reader, System, Health, Stocks, IELTS and Meeting notes are already in
 //! the app and only show their pages (System's readings, Health's steps and
 //! Stocks' prices also run only while they are on; IELTS only while a
@@ -27,9 +27,9 @@ use crate::gfx::{TextStyle, Weight};
 use crate::icons::Icon;
 use crate::state::AppState;
 use crate::ui::{wid, wid_n, PillStyle, Ui, PILL_GAP, PILL_SMALL};
-use poni_core::addons::{self, Addon, Status};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::phonedrop::fmt_bytes;
+use nexora_core::addons::{self, Addon, Status};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::phonedrop::fmt_bytes;
 
 const INTRO_H: f32 = 18.0;
 const ROWS_Y: f32 = 28.0;
@@ -294,8 +294,8 @@ fn addon_row(ui: &mut Ui, st: &AppState, r: Rect, i: usize, a: &Addon, card: Opt
 #[cfg(test)]
 mod tests {
     use super::*;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
     use crate::state::OyenzaLink;
 
     #[test]
@@ -318,7 +318,7 @@ mod tests {
 
     #[test]
     fn pro_add_ons_show_for_everyone_and_say_what_they_do_without_pro() {
-        use poni_core::addons::{AI_USAGE, DOWNLOADER, IELTS, MEETING_NOTES, STOCKS};
+        use nexora_core::addons::{AI_USAGE, DOWNLOADER, IELTS, MEETING_NOTES, STOCKS};
         let connected = || OyenzaLink::Connected { account: "a\u{2022}\u{2022}\u{2022}@example.com".into() };
         let listed = |st: &AppState, id: &str| rows(st).iter().any(|a| a.id == id);
         let mut st = AppState::new(Settings::default(), Store::default());
@@ -364,7 +364,7 @@ mod tests {
 
     #[test]
     fn the_island_asks_about_pro_at_sign_in_for_what_needs_it() {
-        use poni_core::addons::{AI_USAGE, DOWNLOADER};
+        use nexora_core::addons::{AI_USAGE, DOWNLOADER};
         let mut st = AppState::new(Settings::default(), Store::default());
         assert!(pro_wanted(&st), "AI usage's tab waits on it");
         st.settings.set_addon(AI_USAGE.id, false);

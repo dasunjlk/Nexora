@@ -1,7 +1,7 @@
 //! The Downloads page's commands (`commands::DownloadCmd`) and yt-dlp's
 //! reports (`services::downloader`), as in the Windows app
 //! (`../app_downloads.rs`): jobs start here when a place is free
-//! (`poni_core::downloads`), finished files go to the Shelf, and the island's
+//! (`nexora_core::downloads`), finished files go to the Shelf, and the island's
 //! pill follows them. Only the clipboard, opening a file and starting the
 //! runner are the Mac's own. A child of `app`, so it reaches the app's state.
 
@@ -11,9 +11,9 @@ use crate::icons::Icon;
 use crate::pages::{self, PageKind};
 use crate::state::NoticeAction;
 use crate::{paths, services};
-use poni_core::downloads::{link_in, State};
-use poni_core::geom::palette;
-use poni_core::ytdlp::{Line, Request};
+use nexora_core::downloads::{link_in, State};
+use nexora_core::geom::palette;
+use nexora_core::ytdlp::{Line, Request};
 
 impl App {
     /// The Downloads page came up: the island opened on it or its tab was

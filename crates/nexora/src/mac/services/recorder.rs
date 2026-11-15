@@ -1,6 +1,6 @@
 //! Oyenza Studio Recorder on the Mac: the separate recorder app built from
 //! Cap. The island starts, pauses and stops its recordings through the
-//! recorder's own links (`poni_core::recorder`), and the recorder tells the
+//! recorder's own links (`nexora_core::recorder`), and the recorder tells the
 //! island how they go through the island's message port ([`listen`]): the
 //! same messages and 1/0 replies as `WM_COPYDATA` on Windows.
 //!
@@ -12,11 +12,11 @@ use objc2::MainThreadMarker;
 use objc2_app_kit::{NSRunningApplication, NSScreen, NSWorkspace};
 use objc2_core_foundation::{kCFRunLoopCommonModes, CFData, CFMessagePort, CFRetained, CFRunLoop, CFRunLoopSource, CFString};
 use objc2_foundation::{NSString, NSURL};
-use poni_core::recorder;
+use nexora_core::recorder;
 use std::ffi::c_void;
 
 /// The island's message port, which the recorder looks up by this name.
-const PORT: &str = "com.oyenza.poni.recorder";
+const PORT: &str = "com.oyenza.nexora.recorder";
 /// The recorder's bundle identifier (its `branding/apply.py`).
 const RECORDER_ID: &str = "com.oyenza.studio.recorder";
 

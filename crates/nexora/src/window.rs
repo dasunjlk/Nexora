@@ -2,8 +2,8 @@
 
 use crate::clock;
 use crate::events::{SendHwnd, WM_APP_FRAME};
-use poni_core::frametime::{period_for_hz, VsyncTimeline, OFF_RHYTHM_LIMIT};
-use poni_core::settings::MonitorChoice;
+use nexora_core::frametime::{period_for_hz, VsyncTimeline, OFF_RHYTHM_LIMIT};
+use nexora_core::settings::MonitorChoice;
 use std::sync::atomic::{AtomicBool, AtomicIsize, AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, Condvar, Mutex};
 use std::time::Duration;
@@ -19,9 +19,9 @@ use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::UI::HiDpi::{GetDpiForMonitor, MDT_EFFECTIVE_DPI};
 use windows::Win32::UI::WindowsAndMessaging::*;
 
-pub const ISLAND_CLASS: PCWSTR = w!("Poni.Island");
-pub const HELPER_CLASS: PCWSTR = w!("Poni.Helper");
-pub const VISUAL_CLASS: PCWSTR = w!("Poni.Visual");
+pub const ISLAND_CLASS: PCWSTR = w!("Nexora.Island");
+pub const HELPER_CLASS: PCWSTR = w!("Nexora.Helper");
+pub const VISUAL_CLASS: PCWSTR = w!("Nexora.Visual");
 
 pub type WndProc = unsafe extern "system" fn(HWND, u32, WPARAM, LPARAM) -> windows::Win32::Foundation::LRESULT;
 
@@ -90,7 +90,7 @@ pub fn create_island_window() -> Result<HWND> {
         CreateWindowExW(
             WS_EX_LAYERED | WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
             ISLAND_CLASS,
-            w!("Poni"),
+            w!("Nexora"),
             WS_POPUP,
             0,
             0,
@@ -117,7 +117,7 @@ pub fn create_visual_window(island: HWND) -> Result<HWND> {
         CreateWindowExW(
             WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
             VISUAL_CLASS,
-            w!("Poni"),
+            w!("Nexora"),
             WS_POPUP,
             0,
             0,
@@ -238,7 +238,7 @@ pub fn windows_build() -> Option<u32> {
 pub fn create_helper_window() -> Result<HWND> {
     unsafe {
         let hinst = GetModuleHandleW(None)?;
-        CreateWindowExW(WS_EX_TOOLWINDOW, HELPER_CLASS, w!("Poni Helper"), WS_POPUP, 0, 0, 0, 0, None, None, hinst, None)
+        CreateWindowExW(WS_EX_TOOLWINDOW, HELPER_CLASS, w!("Nexora Helper"), WS_POPUP, 0, 0, 0, 0, None, None, hinst, None)
     }
 }
 
@@ -494,7 +494,7 @@ impl FrameClock {
         });
         let s = shared.clone();
         std::thread::Builder::new()
-            .name("poni-frame-clock".into())
+            .name("nexora-frame-clock".into())
             .spawn(move || clock_thread(s, hwnd))
             .expect("spawn frame clock");
         Self { shared }

@@ -1,5 +1,5 @@
 //! IELTS page, the IELTS add-on's (off until switched on): Oyen as a
-//! GoPrep-style IELTS Speaking examiner (`poni_core::ielts`).
+//! GoPrep-style IELTS Speaking examiner (`nexora_core::ielts`).
 //!
 //! - Signed out: the Oyenza sign-in card, saying what the coach does.
 //! - Home: the five levels (open ones can be picked, each with its target
@@ -26,8 +26,8 @@ use crate::icons::Icon;
 use crate::oyen::{self, Coach as Oyen};
 use crate::state::{AppState, OyenzaLink};
 use crate::ui::{wid, wid_n, PillStyle, Resp, Ui, PILL_GAP, PILL_SMALL};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::ielts::{self, MicIssue, Phase, Problem, Spice};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::ielts::{self, MicIssue, Phase, Problem, Spice};
 
 /// Every state is this tall (under System's 256, the island's tallest), so
 /// the island never grows, or jumps between them.

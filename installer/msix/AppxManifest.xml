@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Microsoft Store package (MSIX) for Oyenza Studio. tools/make_msix.ps1 fills in
-  the $...$ values, adds poni.exe, the images and resources.pri, and packs it.
+  the $...$ values, adds nexora.exe, the images and resources.pri, and packs it.
   The Store signs the package after review, so the upload is unsigned.
 
   Identity Name, Publisher and PublisherDisplayName must be the values on
@@ -25,7 +25,7 @@
 
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
-    <!-- poni.exe is built with MSVC and loads vcruntime140.dll; the Store installs this framework with the app. -->
+    <!-- nexora.exe is built with MSVC and loads vcruntime140.dll; the Store installs this framework with the app. -->
     <PackageDependency Name="Microsoft.VCLibs.140.00.UWPDesktop" MinVersion="14.0.24217.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
   </Dependencies>
 
@@ -34,7 +34,7 @@
   </Resources>
 
   <Applications>
-    <Application Id="Poni" Executable="poni.exe" EntryPoint="Windows.FullTrustApplication">
+    <Application Id="Nexora" Executable="nexora.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
         DisplayName="Oyenza Studio"
         Description="A living notch for Windows: music with synced lyrics, your day, a focus timer, your steps, a file shelf and tasks."
@@ -42,9 +42,9 @@
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png" />
       <Extensions>
-        <!-- "Start with Windows". TaskId must match TASK_ID in crates/poni/src/autostart.rs. -->
-        <uap5:Extension Category="windows.startupTask" Executable="poni.exe" EntryPoint="Windows.FullTrustApplication">
-          <uap5:StartupTask TaskId="PoniStartup" Enabled="true" DisplayName="Oyenza Studio" />
+        <!-- "Start with Windows". TaskId must match TASK_ID in crates/nexora/src/autostart.rs. -->
+        <uap5:Extension Category="windows.startupTask" Executable="nexora.exe" EntryPoint="Windows.FullTrustApplication">
+          <uap5:StartupTask TaskId="NexoraStartup" Enabled="true" DisplayName="Oyenza Studio" />
         </uap5:Extension>
       </Extensions>
     </Application>

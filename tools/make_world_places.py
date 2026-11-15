@@ -117,7 +117,7 @@ APOSTROPHES = "'’‘ʻʼʿʾ`´"
 
 
 def fold(s: str) -> str:
-    """Lowercase ASCII words, as `poni_core::prayer::world::fold` folds what is typed."""
+    """Lowercase ASCII words, as `nexora_core::prayer::world::fold` folds what is typed."""
     out = []
     for ch in s:
         if ch in APOSTROPHES:

@@ -1,9 +1,9 @@
 //! The Downloader add-on's runner: one yt-dlp per download
-//! (`poni_core::ytdlp::args`), started without a window in a group of its
+//! (`nexora_core::ytdlp::args`), started without a window in a group of its
 //! own (a job object on Windows, a process group on the Mac), so stopping a
 //! download (or the app quitting) ends yt-dlp and the FFmpeg and QuickJS it
 //! started. Each job has a reader thread for its output, which
-//! `poni_core::ytdlp::parse` turns into `AppEvent::Download`; the thread ends
+//! `nexora_core::ytdlp::parse` turns into `AppEvent::Download`; the thread ends
 //! with the process (`AppEvent::DownloadEnded`). Nothing runs at rest: the
 //! service starts at the first download and holds no thread of its own
 //! between downloads. The Mac app runs this file too (`mac/services.rs`).
@@ -12,7 +12,7 @@
 //! temporary folder and runs it as a second process. On Windows yt-dlp
 //! starts suspended and only runs once it is in the job, which nothing it
 //! starts can leave; the job also ends all of it when its last handle
-//! closes, even if Poni itself is ended. On the Mac yt-dlp leads a process
+//! closes, even if Nexora itself is ended. On the Mac yt-dlp leads a process
 //! group from its first instruction, which what it starts joins: a stop
 //! signals the whole group, SIGTERM first so the loader deletes what it
 //! unpacked and FFmpeg closes its file, SIGKILL for what is left 2 s later.
@@ -23,14 +23,14 @@
 //!
 //! When the person stops a download, its thread deletes the files yt-dlp was
 //! writing in the Downloads folder (`….part`, `….ytdl` and the fragments,
-//! `poni_core::ytdlp_partial`) once yt-dlp has ended, found by the video's id
+//! `nexora_core::ytdlp_partial`) once yt-dlp has ended, found by the video's id
 //! from yt-dlp's info line. Not when the app quits: those stay, as after a
 //! failure.
 
 use crate::events::{AppEvent, EventSink};
-use poni_core::addons::{DOWNLOADER, FFMPEG_EXE, QJS_EXE, YTDLP_EXE};
-use poni_core::ytdlp::{self, Line, Problem, Request, Tools};
-use poni_core::ytdlp_partial;
+use nexora_core::addons::{DOWNLOADER, FFMPEG_EXE, QJS_EXE, YTDLP_EXE};
+use nexora_core::ytdlp::{self, Line, Problem, Request, Tools};
+use nexora_core::ytdlp_partial;
 use std::collections::HashMap;
 use std::fs;
 use std::io::{self, PipeReader, Read};
@@ -82,7 +82,7 @@ impl DownloaderService {
             let run = Arc::new(Run::new(job));
             self.runs.lock().insert(id, run.clone());
             let (runs, sink) = (self.runs.clone(), self.sink.clone());
-            std::thread::Builder::new().name(format!("poni-dl-{id}")).spawn(move || {
+            std::thread::Builder::new().name(format!("nexora-dl-{id}")).spawn(move || {
                 let mut ended = Ended { id, ok: false, runs: &runs, sink: &sink };
                 ended.ok = download(&req, &run, &runs, &sink);
             })
@@ -417,7 +417,7 @@ fn not_started(id: u64) -> AppEvent {
 }
 
 /// Delete the temporary folders of downloads that aren't running: left when
-/// Poni was ended during one, or when deleting one failed.
+/// Nexora was ended during one, or when deleting one failed.
 fn sweep(temps: &Path, runs: &Runs) {
     let Ok(entries) = fs::read_dir(temps) else { return };
     for e in entries.flatten() {
@@ -476,7 +476,7 @@ fn tidy(folder: &Path, video: &str, id: u64, runs: &Runs) {
 
 /// A job object whose processes all end with it: when `end` is called, or
 /// when its last handle closes (`JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE`), even if
-/// Poni itself is ended. What yt-dlp starts joins it on its own.
+/// Nexora itself is ended. What yt-dlp starts joins it on its own.
 #[cfg(windows)]
 struct Job(HANDLE);
 
@@ -565,7 +565,7 @@ impl Job {
             return;
         }
         unsafe { killpg(group, SIGTERM) };
-        let _ = std::thread::Builder::new().name("poni-dl-stop".into()).spawn(move || {
+        let _ = std::thread::Builder::new().name("nexora-dl-stop".into()).spawn(move || {
             std::thread::sleep(STOP_GRACE);
             unsafe { killpg(group, SIGKILL) };
         });
@@ -581,7 +581,7 @@ mod tests {
 
     /// An empty folder of the test's own, as the Downloads folder.
     fn folder(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("poni-downloader-{name}-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("nexora-downloader-{name}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).expect("a temp folder");
         dir

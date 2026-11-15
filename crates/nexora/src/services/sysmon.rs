@@ -17,7 +17,7 @@
 //!   manager's lists (standby, modified, free, nonpaged pool, page file);
 //!   compressed memory is the Memory Compression process's working set.
 //! * Apps: the kernel's process list (`SystemProcessInformation`), grouped
-//!   per executable by `poni_core::sysmon::AppTracker`; names from each
+//!   per executable by `nexora_core::sysmon::AppTracker`; names from each
 //!   file's version info, icons from its path.
 //! * Drives, network and battery: fixed drives' space and the physical
 //!   disks' counters; `GetIfTable2` per adapter plus the route's adapter,
@@ -25,7 +25,7 @@
 //! * Power, on a desktop while the page is open: a power supply that
 //!   reports over USB (`services::psu`), else an estimate from the CPU
 //!   package's energy counter and the graphics card's own reading (NVML,
-//!   the NVIDIA driver's library), as `poni_core::power` adds them up. Both
+//!   the NVIDIA driver's library), as `nexora_core::power` adds them up. Both
 //!   readers open with the page and close with it.
 //!
 //! The thread keeps the charts' minute while the page is closed (Settings ›
@@ -38,8 +38,8 @@
 //! source that fails is left out of the reading and logged once.
 
 use crate::events::{AppEvent, EventSink};
-use poni_core::power::PowerReading;
-use poni_core::sysmon::{
+use nexora_core::power::PowerReading;
+use nexora_core::sysmon::{
     core_kinds, core_split, cpu_split, display_name, gpu_busy, parse_core_times, parse_process_list, reads, top_cpu, top_io, top_memory, AppTracker,
     AppUse, BatteryReading, CoreKind, CoreLoad, CoreTimes, CpuReading, CpuTimes, DiskActivity, Drive, Engine, GpuReading, MemoryReading, Monitor,
     NetReading, ProcSample, Reading, Rest, TOP_APPS,
@@ -146,7 +146,7 @@ enum Msg {
 impl SysMon {
     pub fn start(sink: EventSink, background: bool, rest: Rest) -> std::io::Result<Self> {
         let (tx, rx) = mpsc::channel();
-        let thread = std::thread::Builder::new().name("poni-sysmon".into()).spawn(move || worker(sink, rx, background, rest))?;
+        let thread = std::thread::Builder::new().name("nexora-sysmon".into()).spawn(move || worker(sink, rx, background, rest))?;
         Ok(Self { tx, thread: Some(thread) })
     }
 

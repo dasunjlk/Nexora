@@ -14,7 +14,7 @@ use crate::icons::Icon;
 use crate::island::Geom;
 use crate::state::{AppState, InlineAction, Notice};
 use crate::ui::{wid, PillStyle, Ui, PILL_SMALL};
-use poni_core::geom::{palette, Color, Point, Rect};
+use nexora_core::geom::{palette, Color, Point, Rect};
 use std::cell::{Cell, RefCell};
 
 /// Two lines (title and subtitle) in a capsule: r = h / 2.

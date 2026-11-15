@@ -6,7 +6,7 @@
 //! modal `DoDragDrop` loop from a deferred command.
 
 use crate::events::{AppEvent, EventSink};
-use poni_core::shelf::MAX_SHELF_ITEMS;
+use nexora_core::shelf::MAX_SHELF_ITEMS;
 use std::cell::Cell;
 use std::sync::atomic::{AtomicBool, AtomicIsize, Ordering};
 use windows::core::{implement, Interface, Result, HRESULT, HSTRING};
@@ -258,7 +258,7 @@ pub fn drag_out(paths: &[String]) -> windows::core::Result<()> {
             match SHParseDisplayName(&HSTRING::from(p.as_str()), None, &mut pidl, 0, None) {
                 Ok(()) if !pidl.is_null() => pidls.0.push(pidl),
                 Ok(()) => {}
-                Err(e) => crate::pinfo!("drag out: skipping {} ({e})", poni_core::shelf::display_name(p)),
+                Err(e) => crate::pinfo!("drag out: skipping {} ({e})", nexora_core::shelf::display_name(p)),
             }
         }
         if pidls.0.is_empty() {

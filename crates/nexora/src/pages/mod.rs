@@ -37,8 +37,8 @@ use crate::gfx::{TextStyle, Weight};
 use crate::icons::Icon;
 use crate::state::AppState;
 use crate::ui::{wid, wid_n, Input, Ui};
-use poni_core::datetime::{fmt_clock, fmt_date_short};
-use poni_core::geom::{lerp, palette, Color, Point, Rect};
+use nexora_core::datetime::{fmt_clock, fmt_date_short};
+use nexora_core::geom::{lerp, palette, Color, Point, Rect};
 
 /// Height of the header band (tabs + clock) above the page content. The
 /// header row itself is a fixed 36 DIPs ([`header_rect`]); the rest is the
@@ -98,7 +98,7 @@ pub enum PageKind {
     /// on ([`tabs`]; Windows' Store copy only).
     Notifications,
     /// The "+" at the end of the tab row: features to switch on, each of
-    /// which downloads only then (`poni_core::addons`).
+    /// which downloads only then (`nexora_core::addons`).
     Addons,
     /// Behind the gear on the right of the header, never in the tab row.
     Settings,
@@ -760,8 +760,8 @@ pub fn empty_state(ui: &mut Ui, area: Rect, icon: Icon, title: &str, hint: &str)
 mod tests {
     use super::*;
     use crate::state::OyenzaLink;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
 
     fn state() -> AppState {
         AppState::new(Settings::default(), Store::default())
@@ -780,7 +780,7 @@ mod tests {
         assert_eq!(tabs(&st), [Media, Today, Shelf, Tasks, Focus, Ai, Oyenza, Addons]);
         // The add-ons' pages come after Oyenza (Health, Oyenza's steps, first), before the "+".
         for id in ["system", "script", "health"] {
-            st.addons.insert(id, poni_core::addons::Status::Ready);
+            st.addons.insert(id, nexora_core::addons::Status::Ready);
         }
         assert_eq!(&tabs(&st)[6..], [Oyenza, Health, System, Script, Addons]);
         // Clipboard left the app: an island last open there opens on Music.
@@ -809,7 +809,7 @@ mod tests {
         assert_eq!(tabs(&st), [Oyenza, Addons]);
         assert_eq!(first_tab(&st), Oyenza);
         // A start on a hidden page opens on the first tab instead.
-        let mut settings = poni_core::settings::Settings::default();
+        let mut settings = nexora_core::settings::Settings::default();
         settings.start_page = "today".into();
         settings.remember_page = false;
         settings.hidden_tabs = vec!["media".into(), "today".into()];
@@ -851,7 +851,7 @@ mod tests {
         assert!(content_height(PageKind::Stocks, &st) <= content_height(PageKind::System, &st));
         assert!(content_height(PageKind::Caffeine, &st) <= content_height(PageKind::System, &st));
         // Notifications with as many apps as it lists.
-        for i in 0..poni_core::notifications::MAX_APPS {
+        for i in 0..nexora_core::notifications::MAX_APPS {
             st.settings.notifications.remember(&format!("App.{i}"), &format!("App {i}"));
         }
         assert!(content_height(PageKind::Notifications, &st) <= content_height(PageKind::System, &st));
@@ -873,7 +873,7 @@ mod tests {
         assert!(!tabs(&st).contains(&PageKind::Ai), "an account without Pro");
         st.oyenza.pro = Some(true);
         assert!(tabs(&st).contains(&PageKind::Ai), "on with Pro, nothing to switch on");
-        st.settings.set_addon(poni_core::addons::AI_USAGE.id, false);
+        st.settings.set_addon(nexora_core::addons::AI_USAGE.id, false);
         assert!(!tabs(&st).contains(&PageKind::Ai), "switched off under Add-ons");
         assert_eq!(PageKind::from_key("ai"), PageKind::Ai);
         // Pro isn't known yet at start: an island last open on the AI tab opens on the first tab.
@@ -885,15 +885,15 @@ mod tests {
     #[test]
     fn system_health_and_stocks_have_a_tab_only_while_their_add_ons_are_on() {
         for (page, addon) in [
-            (PageKind::System, poni_core::addons::SYSTEM),
-            (PageKind::Health, poni_core::addons::HEALTH),
-            (PageKind::Stocks, poni_core::addons::STOCKS),
-            (PageKind::Caffeine, poni_core::addons::CAFFEINE),
+            (PageKind::System, nexora_core::addons::SYSTEM),
+            (PageKind::Health, nexora_core::addons::HEALTH),
+            (PageKind::Stocks, nexora_core::addons::STOCKS),
+            (PageKind::Caffeine, nexora_core::addons::CAFFEINE),
         ] {
             let mut st = state();
             assert!(!tabs(&st).contains(&page), "{} is off for everyone until switched on", addon.id);
             st.settings.set_addon(addon.id, true);
-            st.addons.insert(addon.id, poni_core::addons::Status::Ready);
+            st.addons.insert(addon.id, nexora_core::addons::Status::Ready);
             assert!(tabs(&st).contains(&page));
             // An island last open on its page opens on the first tab while it's off.
             let store = Store { last_page: page.key().into(), ..Store::default() };
@@ -924,11 +924,11 @@ mod tests {
 
     #[test]
     fn downloads_has_a_tab_only_with_studio_pro() {
-        for (page, addon) in [(PageKind::Downloads, poni_core::addons::DOWNLOADER)] {
+        for (page, addon) in [(PageKind::Downloads, nexora_core::addons::DOWNLOADER)] {
             let mut st = state();
             st.downloader_offered = true;
             st.settings.set_addon(addon.id, true);
-            st.addons.insert(addon.id, poni_core::addons::Status::Ready);
+            st.addons.insert(addon.id, nexora_core::addons::Status::Ready);
             assert!(!tabs(&st).contains(&page), "{}: signed out", addon.id);
             st.oyenza.link = OyenzaLink::Connected { account: "a•••@example.com".into() };
             assert!(!tabs(&st).contains(&page), "{}: before the server's answer", addon.id);
@@ -959,7 +959,7 @@ mod tests {
         assert!(today::shows_tiles(&st));
         // The day for today, Calendar switched on: the day, and a look at the next minute.
         let today = st.day_key();
-        st.oyenza.agenda = Some(poni_core::agenda::sample(&today, 600));
+        st.oyenza.agenda = Some(nexora_core::agenda::sample(&today, 600));
         st.oyenza.agenda_state = AgendaState::Ready;
         assert!(!today::shows_tiles(&st));
         assert!(today::next_wake(&st).is_some_and(|t| t > st.now && t <= st.now + 60.0));
@@ -969,14 +969,14 @@ mod tests {
     fn prayer_has_a_tab_only_while_its_add_on_is_on_and_ready() {
         let mut st = state();
         assert!(!tabs(&st).contains(&PageKind::Prayer));
-        st.addons.insert("sholat", poni_core::addons::Status::Ready);
+        st.addons.insert("sholat", nexora_core::addons::Status::Ready);
         assert!(!tabs(&st).contains(&PageKind::Prayer), "no places read yet");
-        let list = poni_core::prayer::PlaceList::parse(r#"{"places":[]}"#).unwrap();
+        let list = nexora_core::prayer::PlaceList::parse(r#"{"places":[]}"#).unwrap();
         st.prayer.places = Some(std::sync::Arc::new(list));
         let row = tabs(&st);
         assert_eq!(&row[row.len() - 2..], &[PageKind::Prayer, PageKind::Addons]);
         assert!(content_height(PageKind::Prayer, &st) <= content_height(PageKind::Tasks, &st));
-        st.addons.insert("sholat", poni_core::addons::Status::Downloading { done: 1, total: 2 });
+        st.addons.insert("sholat", nexora_core::addons::Status::Downloading { done: 1, total: 2 });
         assert!(!tabs(&st).contains(&PageKind::Prayer));
     }
 
@@ -985,8 +985,8 @@ mod tests {
         use PageKind::{Addons, Health, Ielts, Oyenza};
         let mut st = state();
         assert!(!tabs(&st).contains(&Ielts), "off for everyone until switched on");
-        st.addons.insert("ielts", poni_core::addons::Status::Ready);
-        st.addons.insert("health", poni_core::addons::Status::Ready);
+        st.addons.insert("ielts", nexora_core::addons::Status::Ready);
+        st.addons.insert("health", nexora_core::addons::Status::Ready);
         assert_eq!(&tabs(&st)[5..], [Oyenza, Health, Ielts, Addons]);
         // Signed out it shows the sign-in card; signed in, every state is as
         // tall, and never taller than System: the window keeps its size.
@@ -994,8 +994,8 @@ mod tests {
         st.oyenza.link = OyenzaLink::Connected { account: "a•••@example.com".into() };
         let h = content_height(Ielts, &st);
         assert!(signed_out < h && h <= content_height(PageKind::System, &st), "{signed_out} {h}");
-        for s in [poni_core::ielts::Sample::Talking, poni_core::ielts::Sample::Result, poni_core::ielts::Sample::MicDenied] {
-            st.ielts = poni_core::ielts::Coach::sample(s, 10.0);
+        for s in [nexora_core::ielts::Sample::Talking, nexora_core::ielts::Sample::Result, nexora_core::ielts::Sample::MicDenied] {
+            st.ielts = nexora_core::ielts::Coach::sample(s, 10.0);
             assert_eq!(content_height(Ielts, &st), h);
         }
         // An island last open on it opens on the first tab once it's off.
@@ -1010,7 +1010,7 @@ mod tests {
     fn script_has_a_tab_only_while_its_add_on_is_on() {
         let mut st = state();
         assert!(!tabs(&st).contains(&PageKind::Script), "off for everyone until switched on");
-        st.addons.insert("script", poni_core::addons::Status::Ready);
+        st.addons.insert("script", nexora_core::addons::Status::Ready);
         assert!(tabs(&st).contains(&PageKind::Script));
         assert_eq!(tabs(&st).last(), Some(&PageKind::Addons));
     }
@@ -1032,7 +1032,7 @@ mod tests {
         st.settings.set_addon("recorder", false);
         assert!(!tabs(&st).contains(&PageKind::Record), "switched off: gone");
         st.settings.set_addon("recorder", true);
-        st.addons.insert("script", poni_core::addons::Status::Ready);
+        st.addons.insert("script", nexora_core::addons::Status::Ready);
         let row = tabs(&st);
         let at = |p| row.iter().position(|t| *t == p).unwrap();
         assert_eq!(at(PageKind::Record), at(PageKind::Script) + 1, "beside the Script page");
@@ -1064,7 +1064,7 @@ mod tests {
         let mut st = state();
         assert!(content_height(PageKind::Settings, &st) <= content_height(PageKind::System, &st));
         // Nor its new version's row, nor the Update sheet in its place.
-        let rel = poni_core::update::Release {
+        let rel = nexora_core::update::Release {
             version: "9.9.9".into(),
             date: String::new(),
             headline: "Something new".into(),

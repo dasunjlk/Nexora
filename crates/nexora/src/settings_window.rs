@@ -28,9 +28,9 @@ use crate::pill::status;
 use crate::state::AppState;
 use crate::ui::{wid, wid_n, CursorKind, Hit, Input, MouseButton, PillStyle, Ui, PILL_GAP, PILL_SMALL};
 use crate::version::VERSION;
-use poni_core::caffeine;
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::settings::{IdleStyle, MonitorChoice, PrayerFollow, PrayerSound, Theme};
+use nexora_core::caffeine;
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::settings::{IdleStyle, MonitorChoice, PrayerFollow, PrayerSound, Theme};
 use std::cell::RefCell;
 use std::collections::HashMap;
 
@@ -1793,8 +1793,8 @@ fn draw_theme_preview(c: &mut Canvas, theme: Theme, screen: Rect) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
 
     fn state() -> AppState {
         AppState::new(Settings::default(), Store::default())
@@ -1939,7 +1939,7 @@ mod tests {
     /// Caffeine switched on, as its switch on the Add-ons page leaves it.
     fn with_caffeine() -> AppState {
         let mut s = Settings::default();
-        s.set_addon(poni_core::addons::CAFFEINE.id, true);
+        s.set_addon(nexora_core::addons::CAFFEINE.id, true);
         AppState::new(s, Store::default())
     }
 
@@ -1953,7 +1953,7 @@ mod tests {
         assert_eq!((list[at - 1], list.last()), (Section::Focus, Some(&Section::About)));
         assert_eq!((Section::Caffeine.title(), Section::Caffeine.key(), Section::Caffeine.icon()), ("Caffeine", "caffeine", Icon::Coffee));
         // Switched off, it goes from the sidebar (an open window shows General).
-        st.addons.insert(poni_core::addons::CAFFEINE.id, poni_core::addons::Status::Off);
+        st.addons.insert(nexora_core::addons::CAFFEINE.id, nexora_core::addons::Status::Off);
         assert!(!sections(&st).contains(&Section::Caffeine));
     }
 

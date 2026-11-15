@@ -32,7 +32,7 @@
 
 use super::safe_storage::{self, Open};
 use super::{b64url, mask_email, micros, num, reply_json, time, Ctx, Dirs, Got, Money, NetFail, Os, Outcome, Provider, ProviderId, Reach, Reply, Request, Snapshot, Source, Spend, Step, Trouble, Want, Window, WindowKind};
-use poni_core::sha256::{hex, sha256};
+use nexora_core::sha256::{hex, sha256};
 use serde::Deserialize;
 use serde_json::Value;
 

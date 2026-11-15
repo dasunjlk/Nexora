@@ -31,7 +31,7 @@ def main() -> None:
                 page.goto(f"{SRC.as_uri()}#{variant}", wait_until="networkidle")
                 page.evaluate("document.fonts.ready.then(() => true)")
                 if not page.evaluate("document.fonts.check('600 27px Outfit')"):
-                    raise SystemExit("Outfit did not load (crates/poni/res/fonts)")
+                    raise SystemExit("Outfit did not load (crates/nexora/res/fonts)")
                 broken = page.evaluate("[...document.images].filter(i => !i.naturalWidth).map(i => i.src)")
                 if broken:
                     raise SystemExit(f"images did not load: {broken}")

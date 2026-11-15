@@ -1,5 +1,5 @@
 //! Caffeine's reminder before the day's last call, the app's side (the
-//! numbers are `poni_core::caffeine`'s): while the add-on and its "Remind me
+//! numbers are `nexora_core::caffeine`'s): while the add-on and its "Remind me
 //! before last call" switch are on, the island shows one notice a day,
 //! `caffeine::REMIND_BEFORE` (30) minutes before the usual drink's last call
 //! (`caffeine::reminder_at`), in the words of `caffeine::reminder_text`. A
@@ -24,8 +24,8 @@
 use crate::icons::Icon;
 use crate::pages::PageKind;
 use crate::state::{AppState, Notice, NoticeAction};
-use poni_core::caffeine::{day_start, hhmm, local_minute, reminder_at, reminder_text, LocalMinute, Log, Prefs, REMIND_BEFORE};
-use poni_core::geom::palette;
+use nexora_core::caffeine::{day_start, hhmm, local_minute, reminder_at, reminder_text, LocalMinute, Log, Prefs, REMIND_BEFORE};
+use nexora_core::geom::palette;
 
 /// How long the notice stays (seconds): it comes once a day, so it stays
 /// long enough for someone who looked away.
@@ -144,10 +144,10 @@ fn basis(log: &Log, prefs: &Prefs, day: LocalMinute) -> u64 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use poni_core::caffeine::{clock, Bean, Drink, Kind, Today, DAY};
-    use poni_core::datetime::{civil_from_days, LocalDateTime};
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
+    use nexora_core::caffeine::{clock, Bean, Drink, Kind, Today, DAY};
+    use nexora_core::datetime::{civil_from_days, LocalDateTime};
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
 
     /// Midnight on 10 Nov 2026.
     fn day0() -> LocalMinute {
@@ -171,7 +171,7 @@ mod tests {
     /// 23:00 bed is about 12:07, so the reminder is about 11:37.
     fn state() -> AppState {
         let mut s = Settings::default();
-        s.set_addon(poni_core::addons::CAFFEINE.id, true);
+        s.set_addon(nexora_core::addons::CAFFEINE.id, true);
         let mut st = AppState::new(s, Store::default());
         st.store.caffeine.add(Drink { id: 0, at: at(8, 30), kind: Kind::Americano, amount: 2, bean: Some(Bean::Arabica), mg: 150.0, name: String::new() });
         set_clock(&mut st, at(9, 0), 0);
@@ -231,7 +231,7 @@ mod tests {
         let mut st = state();
         let due = reminder(&st);
         let mut off = st.settings.clone();
-        off.set_addon(poni_core::addons::CAFFEINE.id, false);
+        off.set_addon(nexora_core::addons::CAFFEINE.id, false);
         let mut st_off = AppState::new(off, st.store.clone());
         let mut r = Reminder::default();
         assert!(!run(&mut r, &mut st_off, at(9, 0), due + 10, true));
@@ -353,7 +353,7 @@ mod tests {
         set_clock(&mut st, sooner, 0);
         assert!(r.tick(&mut st, true));
         let n = st.notice.expect("the reminder");
-        assert_eq!(n.title, format!("Last call for coffee: {}", hhmm(sooner + poni_core::caffeine::REMIND_BEFORE)));
+        assert_eq!(n.title, format!("Last call for coffee: {}", hhmm(sooner + nexora_core::caffeine::REMIND_BEFORE)));
         assert_eq!(n.subtitle, "After that, more than 35 mg is left at 23:00");
     }
 
@@ -382,8 +382,8 @@ mod tests {
         let mut r = Reminder::default();
         r.tick(&mut st, true);
         assert!(r.wake(&st).is_some());
-        st.settings.set_addon(poni_core::addons::CAFFEINE.id, false);
-        st.addons.insert(poni_core::addons::CAFFEINE.id, poni_core::addons::Status::Off);
+        st.settings.set_addon(nexora_core::addons::CAFFEINE.id, false);
+        st.addons.insert(nexora_core::addons::CAFFEINE.id, nexora_core::addons::Status::Off);
         assert_eq!(r.wake(&st), None);
         r.tick(&mut st, true);
         assert_eq!((r.ahead, r.basis), (None, None));

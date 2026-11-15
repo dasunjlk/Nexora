@@ -13,13 +13,13 @@ use crate::oyen;
 use crate::pages::{self, PageKind};
 use crate::state::{AppState, FpsAccess, HudKind, InlineAction, Notice};
 use crate::ui::{wid, PillStyle, Ui, PILL_SMALL};
-use poni_core::datetime::{fmt_clock, fmt_countdown};
-use poni_core::frames::fmt_fps;
-use poni_core::geom::{clamp01, palette, Color, Point, Rect};
-use poni_core::pomodoro::Phase;
-use poni_core::settings::IdleStyle;
-use poni_core::svgpath::Seg;
-use poni_core::sysmon::fmt_pct;
+use nexora_core::datetime::{fmt_clock, fmt_countdown};
+use nexora_core::frames::fmt_fps;
+use nexora_core::geom::{clamp01, palette, Color, Point, Rect};
+use nexora_core::pomodoro::Phase;
+use nexora_core::settings::IdleStyle;
+use nexora_core::svgpath::Seg;
+use nexora_core::sysmon::fmt_pct;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Activity {
@@ -161,12 +161,12 @@ fn media_grace_end(st: &AppState) -> Option<f64> {
 
 /// The prayer coming up and the minutes left, while its countdown runs and
 /// its OK wasn't clicked.
-pub fn prayer_countdown(st: &AppState) -> Option<(poni_core::prayer::Prayer, i64)> {
+pub fn prayer_countdown(st: &AppState) -> Option<(nexora_core::prayer::Prayer, i64)> {
     if !st.prayer_on() {
         return None;
     }
     let site = st.prayer_site()?;
-    poni_core::prayer::countdown(&site, st.prayer_now(), st.settings.prayer.remind_before_min)
+    nexora_core::prayer::countdown(&site, st.prayer_now(), st.settings.prayer.remind_before_min)
         .filter(|(m, _)| st.prayer.countdown_ok != Some(m.at))
         .map(|(m, left)| (m.prayer, left))
 }
@@ -664,8 +664,8 @@ pub(crate) fn draw_prayer_ok(ui: &mut Ui, body: Rect) -> f32 {
 /// notes on their way.
 fn notes_w(st: &AppState) -> f32 {
     match st.notes.phase {
-        poni_core::notes::Phase::Listening { .. } if st.notes.elapsed(st.now) >= 3600.0 => NOTES_LONG_W,
-        poni_core::notes::Phase::Listening { .. } => NOTES_W,
+        nexora_core::notes::Phase::Listening { .. } if st.notes.elapsed(st.now) >= 3600.0 => NOTES_LONG_W,
+        nexora_core::notes::Phase::Listening { .. } => NOTES_W,
         _ => NOTES_WRITING_W,
     }
 }
@@ -684,7 +684,7 @@ fn draw_notes(ui: &mut Ui, st: &AppState, body: Rect) {
     if listening {
         ui.c.fill_circle(Point::new(x + 5.0, cy), 5.0, palette::RED);
         let ts = TextStyle::body().weight(Weight::Semibold).tabular().color(palette::TEXT);
-        let text = poni_core::notes::fmt_length(st.notes.elapsed(st.now));
+        let text = nexora_core::notes::fmt_length(st.notes.elapsed(st.now));
         ui.c.text(&text, Rect::new(x + 14.0, body.y, body.right() - 14.0 - x - 14.0, body.h), &ts.right());
     } else {
         let ts = TextStyle::footnote().weight(Weight::Semibold).color(palette::TEXT_DIM);
@@ -713,8 +713,8 @@ fn draw_recording(ui: &mut Ui, st: &AppState, body: Rect) {
 /// while it starts or saves. Shared with the notch's left ear.
 pub(crate) fn recording_mark(ui: &mut Ui, st: &AppState, c: Point) {
     match st.rec.phase {
-        Some(poni_core::recorder::Phase::Recording) => ui.c.fill_circle(c, 5.0, palette::RED),
-        Some(poni_core::recorder::Phase::Paused) => ui.c.icon(Icon::Pause, Rect::from_center(c, 11.0, 11.0), palette::TEXT),
+        Some(nexora_core::recorder::Phase::Recording) => ui.c.fill_circle(c, 5.0, palette::RED),
+        Some(nexora_core::recorder::Phase::Paused) => ui.c.icon(Icon::Pause, Rect::from_center(c, 11.0, 11.0), palette::TEXT),
         _ => ui.c.stroke_circle(c, 4.4, palette::TEXT_DIM, 1.4),
     }
 }
@@ -722,9 +722,9 @@ pub(crate) fn recording_mark(ui: &mut Ui, st: &AppState, c: Point) {
 /// The recording's time and its style (dimmed unless it records), for the
 /// caller to align. Shared with the notch's right ear.
 pub(crate) fn recording_time(st: &AppState) -> (String, TextStyle) {
-    let recording = st.rec.phase == Some(poni_core::recorder::Phase::Recording);
+    let recording = st.rec.phase == Some(nexora_core::recorder::Phase::Recording);
     let ts = TextStyle::body().weight(Weight::Semibold).tabular().color(if recording { palette::TEXT } else { palette::TEXT_DIM });
-    (poni_core::recorder::fmt_length(st.rec_elapsed()), ts)
+    (nexora_core::recorder::fmt_length(st.rec_elapsed()), ts)
 }
 
 /// What the download pill shows (`Activity::Download`, every theme): how far
@@ -751,7 +751,7 @@ pub(crate) fn download_many(st: &AppState) -> bool {
 /// "37%": the whole percent the Downloads page's bar shows too
 /// (`downloads::percent`).
 pub(crate) fn download_pct(fraction: f32) -> String {
-    format!("{}%", poni_core::downloads::percent(fraction))
+    format!("{}%", nexora_core::downloads::percent(fraction))
 }
 
 /// The download count on a grey capsule `h` tall, its left end at `x`
@@ -799,7 +799,7 @@ fn game_temp(st: &AppState) -> Option<f32> {
 }
 
 /// "144 fps | GPU 97% · 71° | CPU 38%", centred. The frame rate is a dim
-/// dash until Windows lets Poni read frames and while the game isn't
+/// dash until Windows lets Nexora read frames and while the game isn't
 /// drawing; the rest comes from the System page's readers.
 fn draw_game(ui: &mut Ui, st: &AppState, body: Rect) {
     let reading = st.system.latest.as_ref();
@@ -1042,10 +1042,10 @@ pub(crate) fn text_with_dim_width(ui: &mut Ui, text: &str, dim: &str, style: &Te
 mod tests {
     use super::*;
     use crate::state::{LyricsState, LyricsStatus, MediaSession};
-    use poni_core::lrc::parse_lrc;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
-    use poni_core::timeline::Timeline;
+    use nexora_core::lrc::parse_lrc;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
+    use nexora_core::timeline::Timeline;
 
     /// Music playing 12 s into a song, with these lyrics found for it.
     fn playing(lrc: Option<&str>) -> AppState {
@@ -1094,8 +1094,8 @@ mod tests {
 
     #[test]
     fn music_with_readings_is_two_rows_tall_in_every_theme() {
-        use poni_core::romanize::Ruby;
-        use poni_core::settings::Theme;
+        use nexora_core::romanize::Ruby;
+        use nexora_core::settings::Theme;
         let media = Mode::Activity(Activity::Media);
         let mut st = playing(Some("[00:10.00]紙の舟よ\n[00:14.00]Paper boats\n"));
         assert_eq!(geom(&media, &st).h, 32.0, "no readings: one row");
@@ -1111,25 +1111,25 @@ mod tests {
 
     /// Prayer times on in Kota Jakarta with a song singing its line, the
     /// prayer clock `secs` before today's Ashar; and today's times there.
-    fn before_ashar(secs: i64) -> (AppState, poni_core::prayer::DayTimes) {
-        use poni_core::addons::{Status, PRAYER_TIMES};
+    fn before_ashar(secs: i64) -> (AppState, nexora_core::prayer::DayTimes) {
+        use nexora_core::addons::{Status, PRAYER_TIMES};
         let mut st = playing(Some("[00:10.00]Paper lanterns on the line\n[00:14.00]Count the windows\n"));
         st.addons.insert(PRAYER_TIMES.id, Status::Ready);
-        let list = poni_core::prayer::PlaceList::parse(
+        let list = nexora_core::prayer::PlaceList::parse(
             r#"{"places":[{"id":"jakarta","label":"Kota Jakarta","kind":"kota","prov":"DKI Jakarta","lat":-6.1833,"lng":106.8333,"tz":"Asia/Jakarta"}]}"#,
         )
         .expect("the place");
         st.prayer.place = list.find("jakarta").cloned();
         st.prayer.places = Some(std::sync::Arc::new(list));
         let site = st.prayer_site().expect("its site");
-        let times = poni_core::prayer::day_times(&site, site.local_day(st.unix)).expect("today's times");
+        let times = nexora_core::prayer::day_times(&site, site.local_day(st.unix)).expect("today's times");
         st.prayer.clock_shift = times.ashar - secs - st.unix;
         (st, times)
     }
 
     #[test]
     fn ok_on_the_prayer_countdown_gives_the_island_back_until_that_prayer() {
-        use poni_core::prayer::Prayer;
+        use nexora_core::prayer::Prayer;
         let (mut st, times) = before_ashar(8 * 60);
         // The countdown comes before the song...
         assert_eq!(prayer_countdown(&st), Some((Prayer::Ashar, 8)));
@@ -1154,7 +1154,7 @@ mod tests {
         assert_eq!(st.prayer.countdown_ok, None);
         // Ashar's countdown still comes in its time.
         st.prayer.clock_shift += 25 * 60;
-        assert_eq!(prayer_countdown(&st).map(|(p, _)| p), Some(poni_core::prayer::Prayer::Ashar));
+        assert_eq!(prayer_countdown(&st).map(|(p, _)| p), Some(nexora_core::prayer::Prayer::Ashar));
     }
 
     #[test]
@@ -1183,14 +1183,14 @@ mod tests {
         st.recorder = true;
         st.store.recorder_island = true;
         st.notify(Icon::Download, palette::GREEN, "Update available", "", f64::INFINITY, None);
-        st.rec.phase = Some(poni_core::recorder::Phase::Recording);
+        st.rec.phase = Some(nexora_core::recorder::Phase::Recording);
         assert_eq!(collapsed_mode(&st), Mode::Activity(Activity::Recording), "Stop stays one click away");
-        st.rec.phase = Some(poni_core::recorder::Phase::Paused);
+        st.rec.phase = Some(nexora_core::recorder::Phase::Paused);
         assert_eq!(collapsed_mode(&st), Mode::Activity(Activity::Recording));
         st.rec.phase = None;
         assert_eq!(collapsed_mode(&st), Mode::Notice, "and back once the recording ends");
         // A notice with a time limit still shows over it.
-        st.rec.phase = Some(poni_core::recorder::Phase::Recording);
+        st.rec.phase = Some(nexora_core::recorder::Phase::Recording);
         st.notify(Icon::Download, palette::GREEN, "Saved", "", 5.0, None);
         assert_eq!(collapsed_mode(&st), Mode::Notice);
     }
@@ -1228,7 +1228,7 @@ mod tests {
 
     /// A download of `url` added to the list (queued).
     fn add(st: &mut AppState, url: &str) -> u64 {
-        st.downloads.add(url.into(), poni_core::ytdlp::Mode::Video, 0)
+        st.downloads.add(url.into(), nexora_core::ytdlp::Mode::Video, 0)
     }
 
     /// The Downloader on for an account with Studio Pro, with `n` downloads
@@ -1237,7 +1237,7 @@ mod tests {
         st.downloader_offered = true;
         st.oyenza.link = crate::state::OyenzaLink::Connected { account: "a•••@example.com".into() };
         st.oyenza.pro = Some(true);
-        st.addons.insert(poni_core::addons::DOWNLOADER.id, poni_core::addons::Status::Ready);
+        st.addons.insert(nexora_core::addons::DOWNLOADER.id, nexora_core::addons::Status::Ready);
         for i in 0..n {
             let id = add(&mut st, &format!("https://video.blender.org/w/{i}"));
             st.downloads.starting(id);
@@ -1257,7 +1257,7 @@ mod tests {
         // So do a recording and a game's readout.
         st.recorder = true;
         st.store.recorder_island = true;
-        st.rec.phase = Some(poni_core::recorder::Phase::Recording);
+        st.rec.phase = Some(nexora_core::recorder::Phase::Recording);
         assert_eq!(current_activity(&st), Some(Activity::Recording));
         st.rec.phase = None;
         st.game.active = true;
@@ -1274,7 +1274,7 @@ mod tests {
 
     #[test]
     fn the_download_pill_never_moves_and_goes_once_its_file_is_saved() {
-        use poni_core::settings::Theme;
+        use nexora_core::settings::Theme;
         let m = Mode::Activity(Activity::Download);
         let mut st = with_downloads(AppState::new(Settings::default(), Store::default()), 1);
         for theme in [Theme::Classic, Theme::Oyen, Theme::Glass, Theme::Pill, Theme::Diorama] {
@@ -1286,14 +1286,14 @@ mod tests {
         }
         // Saved: the app's notice says so (`App::saved`), the pill has nothing left to show.
         let id = st.downloads.list[0].id;
-        st.downloads.apply(id, poni_core::ytdlp::Line::Done { path: "Sprite Fright.mp4".into() });
+        st.downloads.apply(id, nexora_core::ytdlp::Line::Done { path: "Sprite Fright.mp4".into() });
         assert_eq!(current_activity(&st), None);
     }
 
     #[test]
     fn the_pill_shows_how_far_and_widens_for_the_count() {
-        use poni_core::settings::Theme;
-        use poni_core::ytdlp::Line;
+        use nexora_core::settings::Theme;
+        use nexora_core::ytdlp::Line;
         let m = Mode::Activity(Activity::Download);
         let mut st = with_downloads(AppState::new(Settings::default(), Store::default()), 0);
         let id = add(&mut st, "https://video.blender.org/w/sprite-fright");
@@ -1314,14 +1314,14 @@ mod tests {
             assert_eq!(geom(&m, &st).w, DOWNLOAD_MANY_W, "{theme:?}");
         }
         // Joining the picture and the sound: all its bytes are in.
-        st.downloads.apply(id, Line::Stage(poni_core::ytdlp::Stage::Merging));
+        st.downloads.apply(id, Line::Stage(nexora_core::ytdlp::Stage::Merging));
         let DownloadView { fraction: Some(f), count: 2 } = download_view(&st) else { panic!("{:?}", download_view(&st)) };
         assert_eq!(download_pct(f), "100%");
     }
 
     #[test]
     fn diorama_rests_as_its_picture_and_is_pill_in_everything_else() {
-        use poni_core::settings::Theme;
+        use nexora_core::settings::Theme;
         let state = |theme| {
             let mut st = AppState::new(Settings { theme, ..Settings::default() }, Store::default());
             st.power.has_battery = false;

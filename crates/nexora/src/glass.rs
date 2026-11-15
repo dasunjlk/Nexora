@@ -11,7 +11,7 @@
 //! from System32 (the way gfx.rs loads dcomp.dll). Anything that fails here
 //! leaves the island in smoked glass (gfx::Canvas::glass), never blank.
 
-use poni_core::geom::{Color, Rect};
+use nexora_core::geom::{Color, Rect};
 use std::ffi::c_void;
 use std::mem::ManuallyDrop;
 use windows::core::{s, w, Interface, Result, HRESULT, PCSTR};
@@ -36,7 +36,7 @@ pub struct GlassParams {
     pub body: Rect,
     pub radius: f32,
     pub shoulder: f32,
-    /// Rim band width and how far its edge looks inward (poni_core::glass).
+    /// Rim band width and how far its edge looks inward (nexora_core::glass).
     pub bevel: f32,
     pub mag: f32,
     /// 0 = light frost (thin glass) .. 1 = heavy frost (thick glass).
@@ -376,13 +376,13 @@ impl GlassPass {
         let k = Consts {
             body: [b.x * scale, b.y * scale, (b.x + b.w) * scale, (b.y + b.h) * scale],
             shape: [r * scale, p.shoulder.max(0.0) * scale, scale, if use_copy { 1.0 } else { 0.0 }],
-            lens: [(p.bevel * scale).max(1.0), p.mag * scale, poni_core::glass::RIM_POWER, p.frost_mix.clamp(0.0, 1.0)],
+            lens: [(p.bevel * scale).max(1.0), p.mag * scale, nexora_core::glass::RIM_POWER, p.frost_mix.clamp(0.0, 1.0)],
             tint_dark: [p.ground_dark.r, p.ground_dark.g, p.ground_dark.b, p.tint_dark],
             tint_light: [p.ground_light.r, p.ground_light.g, p.ground_light.b, p.tint_light],
             light: [p.light_dir.0, p.light_dir.1, p.rim, p.glow],
             shadow: [p.shadow_alpha, (p.shadow_reach * scale).max(1.0), p.shadow_drop * scale, p.light_mix.clamp(0.0, 1.0)],
             copy: [cw as f32, ch as f32, p.saturation, p.dispersion],
-            probe: [p.probe_x as f32, if p.probe { 1.0 } else { 0.0 }, p.lens, if use_copy { 1.0 } else { poni_core::glass::SMOKED_OPACITY }],
+            probe: [p.probe_x as f32, if p.probe { 1.0 } else { 0.0 }, p.lens, if use_copy { 1.0 } else { nexora_core::glass::SMOKED_OPACITY }],
             origin: [p.copy_origin.0, p.copy_origin.1, 0.0, 0.0],
         };
         ctx.UpdateSubresource(&self.cb, 0, None, &k as *const Consts as *const c_void, 0, 0);
@@ -426,8 +426,8 @@ use crate::events::EventSink;
 use crate::gfx::Gfx;
 use crate::services::backdrop::{Backdrop, Frame, Status};
 use crate::window;
-use poni_core::glass::{shadow_alpha, thickness, tint_for_contrast, Flip, TEXT_CONTRAST};
-use poni_core::look::{GLASS_DARK, GLASS_LIGHT};
+use nexora_core::glass::{shadow_alpha, thickness, tint_for_contrast, Flip, TEXT_CONTRAST};
+use nexora_core::look::{GLASS_DARK, GLASS_LIGHT};
 use std::sync::Arc;
 use windows::Win32::Foundation::HWND;
 
@@ -449,7 +449,7 @@ pub struct Glass {
     /// The newest copy, kept to look at what's under the island and to upload
     /// again after a GPU reset.
     frame: Option<Arc<Frame>>,
-    under: Option<poni_core::glass::Backdrop>,
+    under: Option<nexora_core::glass::Backdrop>,
     under_px: RECT,
     flip: Flip,
     flip_seeded: bool,
@@ -636,7 +636,7 @@ impl Glass {
             bottom: ((body.y + body.h) * scale).ceil() as i32 - origin.1,
         };
         if self.under.is_none() || px != self.under_px {
-            self.under = self.frame.as_ref().and_then(|f| poni_core::glass::sample_backdrop(&f.px, f.w as usize * 4, (px.left, px.top, px.right, px.bottom), (2.0 * scale).max(2.0) as usize));
+            self.under = self.frame.as_ref().and_then(|f| nexora_core::glass::sample_backdrop(&f.px, f.w as usize * 4, (px.left, px.top, px.right, px.bottom), (2.0 * scale).max(2.0) as usize));
             self.under_px = px;
         }
         let under = self.under.filter(|_| has_copy || self.frame.is_some());

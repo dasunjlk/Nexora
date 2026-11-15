@@ -26,7 +26,7 @@ if ($thumb -and (Test-Path "Cert:\LocalMachine\TrustedPeople\$thumb")) {
     Start-Process powershell -Verb RunAs -Wait -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -UntrustOnly" | Out-Null
 }
 
-$usual = Join-Path $env:LOCALAPPDATA "Programs\Poni\poni.exe"
+$usual = Join-Path $env:LOCALAPPDATA "Programs\Nexora\nexora.exe"
 if (Test-Path $usual) {
     "Starting your usual Oyenza Studio."
     Start-Process $usual

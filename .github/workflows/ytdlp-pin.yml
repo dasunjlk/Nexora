@@ -1,7 +1,7 @@
 # yt-dlp ships fixes most weeks, as sites (YouTube most of all) keep changing,
 # and the Downloader add-on takes only the yt-dlp whose size and SHA-256 are
 # built into the app: yt-dlp.exe on Windows, yt-dlp_macos on the Mac
-# (DOWNLOADER_WINDOWS and DOWNLOADER_MAC in crates/poni-core/src/addons.rs).
+# (DOWNLOADER_WINDOWS and DOWNLOADER_MAC in crates/nexora-core/src/addons.rs).
 # Every Monday, and by hand, tools/pin_ytdlp.py pins yt-dlp's latest release,
 # both files together, on main.
 # When that moves the pin, the change goes to the downloader/ytdlp-pin branch,
@@ -66,11 +66,11 @@ jobs:
           fi
 
           git switch -q -c "$BRANCH"
-          git add crates/poni-core/src/addons.rs
+          git add crates/nexora-core/src/addons.rs
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -q -m "$title" -m "$LINE" -m "Pinned by the Downloader pins workflow (tools/pin_ytdlp.py)."
           # The branch is this workflow's own: rewritten from main whenever it carries another pin.
-          if git fetch -q --depth=1 origin "$BRANCH" 2> /dev/null && git diff --quiet FETCH_HEAD HEAD -- crates/poni-core/src/addons.rs; then
+          if git fetch -q --depth=1 origin "$BRANCH" 2> /dev/null && git diff --quiet FETCH_HEAD HEAD -- crates/nexora-core/src/addons.rs; then
             echo "$BRANCH already carries this pin."
           else
             git push -q --force origin "HEAD:refs/heads/$BRANCH"

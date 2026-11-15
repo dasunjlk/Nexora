@@ -34,11 +34,11 @@
 use crate::gfx::{Canvas, TextStyle, Weight};
 use crate::state::{AppState, LyricsStatus};
 use crate::ui::Ui;
-use poni_core::geom::{palette, Point, Rect};
-use poni_core::lrc::{LyricLine, Lyrics};
-use poni_core::nowplaying::lyrics_lead_s;
-use poni_core::romanize;
-use poni_core::timeline::LyricClock;
+use nexora_core::geom::{palette, Point, Rect};
+use nexora_core::lrc::{LyricLine, Lyrics};
+use nexora_core::nowplaying::lyrics_lead_s;
+use nexora_core::romanize;
+use nexora_core::timeline::LyricClock;
 use std::cell::RefCell;
 
 /// As on the Music page: a line turns current this early, so the change
@@ -485,11 +485,11 @@ fn words(c: &mut Canvas, text: &str, reading: Option<&str>, area: Rect) {
 mod tests {
     use super::*;
     use crate::state::{LyricsState, MediaSession};
-    use poni_core::lrc::parse_lrc;
-    use poni_core::romanize::Ruby;
-    use poni_core::settings::Settings;
-    use poni_core::store::Store;
-    use poni_core::timeline::Timeline;
+    use nexora_core::lrc::parse_lrc;
+    use nexora_core::romanize::Ruby;
+    use nexora_core::settings::Settings;
+    use nexora_core::store::Store;
+    use nexora_core::timeline::Timeline;
 
     // Original placeholder text, not real song lyrics: a late first line, a
     // long break, a pause too short to show, and a last line.

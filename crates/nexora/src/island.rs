@@ -1,8 +1,8 @@
 //! Island geometry and its spring animation.
 
 use crate::pill::motion;
-use poni_core::geom::Rect;
-use poni_core::spring::Spring;
+use nexora_core::geom::Rect;
+use nexora_core::spring::Spring;
 
 /// Concave flare where the island meets the top screen edge.
 pub const SHOULDER: f32 = 9.0;

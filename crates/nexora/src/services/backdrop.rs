@@ -13,9 +13,9 @@
 //! logged, never sent. Interruptions (the secure desktop of a UAC prompt, a
 //! display mode change or reconnect, a GPU reset) are waited out. Only what
 //! can't change gives up for good, and the island then draws smoked glass:
-//! a rotated display, or a display this PC never let Poni copy (Remote
+//! a rotated display, or a display this PC never let Nexora copy (Remote
 //! Desktop, or no adapter that shows it can copy it). A display in HDR is
-//! copied in half floats and mapped to 8-bit sRGB here (poni_core::hdr);
+//! copied in half floats and mapped to 8-bit sRGB here (nexora_core::hdr);
 //! any other display is asked for 8 bits, which Windows converts to even
 //! when its colour management composes the desktop in 16 bits. The log
 //! says why.
@@ -26,7 +26,7 @@ use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
 use windows::core::{Interface, Result};
-use poni_core::hdr::{white_from_level, HalfToSrgb, DEFAULT_WHITE};
+use nexora_core::hdr::{white_from_level, HalfToSrgb, DEFAULT_WHITE};
 use windows::Win32::Devices::Display::*;
 use windows::Win32::Foundation::{HMODULE, RECT};
 use windows::Win32::Graphics::Direct3D::*;
@@ -86,7 +86,7 @@ impl Backdrop {
         let s = shared.clone();
         let tell = sink.clone();
         let thread = std::thread::Builder::new()
-            .name("poni-backdrop".into())
+            .name("nexora-backdrop".into())
             .spawn(move || {
                 let status = match run(&s, &sink, monitor) {
                     Ok(()) => return,

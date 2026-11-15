@@ -127,7 +127,7 @@ impl std::fmt::Debug for UsageCmd {
     }
 }
 
-/// The IELTS page's buttons; `poni_core::ielts::Coach` decides what each
+/// The IELTS page's buttons; `nexora_core::ielts::Coach` decides what each
 /// does in the moment.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum IeltsCmd {
@@ -217,10 +217,10 @@ pub enum Command {
     /// Start with Windows on or off (the Settings page's switch).
     SetAutostart(bool),
     /// Open the System page on this module (a Today ring was clicked).
-    OpenSystem(poni_core::sysmon::Module),
+    OpenSystem(nexora_core::sysmon::Module),
     /// Request an app's icon for the System page (arrives in `AppState::app_icons`).
     LoadAppIcon(String),
-    /// Show over games: find out whether Windows lets Poni read frames
+    /// Show over games: find out whether Windows lets Nexora read frames
     /// (the answer lands in `AppState::game.access`).
     CheckFps,
     /// Show over games: ask Windows once for the right to read frames.
@@ -244,7 +244,7 @@ pub enum Command {
 #[derive(Clone, Debug, PartialEq)]
 pub enum DownloadCmd {
     /// Download `url`'s video or sound.
-    Start { url: String, mode: poni_core::ytdlp::Mode },
+    Start { url: String, mode: nexora_core::ytdlp::Mode },
     /// Stop a download; one still waiting its turn leaves the list (Cancel).
     Stop(u64),
     /// Take a finished, failed or stopped job off the list.

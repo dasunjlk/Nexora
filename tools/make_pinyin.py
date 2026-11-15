@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate crates/poni-core/src/romanize/pinyin_data.rs from the Unihan database.
+"""Generate crates/nexora-core/src/romanize/pinyin_data.rs from the Unihan database.
 
 Usage:
     curl -O https://www.unicode.org/Public/UCD/latest/ucd/Unihan.zip
@@ -117,7 +117,7 @@ def main():
     out.append("];")
 
     here = os.path.dirname(os.path.abspath(__file__))
-    dest = os.path.join(here, "..", "crates", "poni-core", "src", "romanize", "pinyin_data.rs")
+    dest = os.path.join(here, "..", "crates", "nexora-core", "src", "romanize", "pinyin_data.rs")
     with open(dest, "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(out) + "\n")
     print(f"{dest}: {len(reading)} code points, {len(syllables)} syllables, {os.path.getsize(dest)} bytes")

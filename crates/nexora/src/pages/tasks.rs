@@ -16,8 +16,8 @@ use crate::gfx::TextStyle;
 use crate::icons::Icon;
 use crate::state::AppState;
 use crate::ui::{wid, wid_n, PillStyle, Ui, WidgetId, PILL_SMALL};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::todo::{Task, MAX_TASKS, MAX_TASK_LEN};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::todo::{Task, MAX_TASKS, MAX_TASK_LEN};
 use std::cell::Cell;
 use std::collections::HashMap;
 
@@ -393,7 +393,7 @@ fn draw_row(ui: &mut Ui, row: Rect, hit: Rect, view: Rect, id: u64, done: bool, 
 /// Glass has no one island colour to fade into, so the list just ends there.
 /// Also the Downloads page's list.
 pub(crate) fn fade(ui: &mut Ui, r: Rect, top: bool) {
-    if ui.c.look().material == poni_core::look::Material::Glass {
+    if ui.c.look().material == nexora_core::look::Material::Glass {
         return;
     }
     let step = r.h / FADE_STEPS as f32;

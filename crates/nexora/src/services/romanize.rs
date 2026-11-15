@@ -4,24 +4,24 @@
 //! Japanese kanji have no single reading, so Japanese goes through Windows'
 //! own morphological analyzer (`Windows.Globalization.JapanesePhoneticAnalyzer`):
 //! it splits a line into words with their readings in kana, which
-//! `poni_core::romanize` spells in romaji. Where Windows has no Japanese
+//! `nexora_core::romanize` spells in romaji. Where Windows has no Japanese
 //! reading data (Windows 11 keeps it in the Japanese typing feature, which
 //! most PCs outside Japan don't have) or the analyzer fails, the song is read
-//! with Oyenza Studio's own dictionary instead (`poni_core::romanize::JaDict`),
-//! which the Japanese readings add-on brings (`poni_core::addons::
+//! with Oyenza Studio's own dictionary instead (`nexora_core::romanize::JaDict`),
+//! which the Japanese readings add-on brings (`nexora_core::addons::
 //! JAPANESE_READINGS`, loaded only for that song). Without the add-on, kana
 //! lines still read, and the song says so (`wants_ja_readings`): the app
 //! switches the add-on on the first time, or the Music page offers it once
 //! it was switched off by hand. Korean and Chinese need no analyzer
-//! (`poni_core::romanize`). Called on the lyrics worker thread.
+//! (`nexora_core::romanize`). Called on the lyrics worker thread.
 //!
 //! The analyzer is a single-threaded (STA) class. From the lyrics worker's
 //! multithreaded apartment every call fails with RO_E_UNSUPPORTED_FROM_MTA
 //! (0x8000001D), so a Japanese song is read on a short-lived STA thread.
 
-use poni_core::addons::{JAPANESE_READINGS, JA_READINGS_FILE};
-use poni_core::lrc::Lyrics;
-use poni_core::romanize::{self, JaWord, Ruby, Script};
+use nexora_core::addons::{JAPANESE_READINGS, JA_READINGS_FILE};
+use nexora_core::lrc::Lyrics;
+use nexora_core::romanize::{self, JaWord, Ruby, Script};
 use windows::core::HSTRING;
 use windows::Globalization::JapanesePhoneticAnalyzer;
 use windows::Win32::System::Com::{CoInitializeEx, CoUninitialize, COINIT_APARTMENTTHREADED, COINIT_DISABLE_OLE1DDE};
@@ -158,7 +158,7 @@ fn read_dictionary(path: &std::path::Path) -> std::io::Result<Vec<u8>> {
 
 #[cfg(test)]
 fn read_dictionary(_path: &std::path::Path) -> std::io::Result<Vec<u8>> {
-    Ok(include_bytes!("../../../poni-core/data/ja-readings.dic.zst").to_vec())
+    Ok(include_bytes!("../../../nexora-core/data/ja-readings.dic.zst").to_vec())
 }
 
 /// Whether Windows' analyzer reads Japanese on this PC (the self-test's
@@ -281,7 +281,7 @@ pub(super) fn on_sta<R: Send>(f: impl FnOnce() -> R + Send) -> Option<R> {
         }
     }
     std::thread::scope(|s| {
-        let t = std::thread::Builder::new().name("poni-romaji".into()).spawn_scoped(s, || {
+        let t = std::thread::Builder::new().name("nexora-romaji".into()).spawn_scoped(s, || {
             let _com = Sta(unsafe { CoInitializeEx(None, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE) }.is_ok());
             f()
         });
@@ -355,7 +355,7 @@ mod tests {
     fn every_japanese_line_reads_with_or_without_windows_data() {
         // Windows' analyzer where it has its data (Windows CI), Oyenza Studio's own
         // dictionary where it doesn't (Wine, most Windows 11 PCs outside Japan).
-        let lyrics = poni_core::lrc::parse_lrc("[00:01.00]朝の光を浴びて\n[00:02.00]遠くへ行こう\n[00:03.00]la la la\n");
+        let lyrics = nexora_core::lrc::parse_lrc("[00:01.00]朝の光を浴びて\n[00:02.00]遠くへ行こう\n[00:03.00]la la la\n");
         let song = pronounce(&lyrics);
         assert!(!song.wants_ja_readings);
         let read = &song.ruby;

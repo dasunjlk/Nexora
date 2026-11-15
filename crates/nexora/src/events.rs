@@ -5,12 +5,12 @@
 
 use crate::gfx::Image;
 use crate::state::{MediaSession, PowerState, SysStats};
-use poni_core::health::HealthSnapshot;
-use poni_core::lrc::Lyrics;
-use poni_core::agenda;
-use poni_core::oyenza::{Activity, Arrival, Bill, Saved};
-use poni_core::romanize::Ruby;
-use poni_core::timeline::Timeline;
+use nexora_core::health::HealthSnapshot;
+use nexora_core::lrc::Lyrics;
+use nexora_core::agenda;
+use nexora_core::oyenza::{Activity, Arrival, Bill, Saved};
+use nexora_core::romanize::Ruby;
+use nexora_core::timeline::Timeline;
 use std::sync::mpsc::Sender;
 use windows::Win32::Foundation::{HWND, LPARAM, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{PostMessageW, WM_APP};
@@ -159,27 +159,27 @@ pub enum AppEvent {
     Stats(SysStats),
     /// The System page's latest reading and the minute behind it
     /// (`services::sysmon`, each second while the page is open).
-    System(Box<poni_core::sysmon::Monitor>),
-    /// Show over games: whether Windows lets Poni read frames (a check, or
+    System(Box<nexora_core::sysmon::Monitor>),
+    /// Show over games: whether Windows lets Nexora read frames (a check, or
     /// the one-time OK's outcome).
     FpsAccess(crate::state::FpsAccess),
     /// Phone drop's server: a phone opened the page, asked, sent, gave up.
-    Phone(poni_core::phonedrop::Event),
+    Phone(nexora_core::phonedrop::Event),
     /// Paired phones: pairing done, the list changed, files from a phone.
-    Paired(poni_core::pairdrop::MeetEvent),
+    Paired(nexora_core::pairdrop::MeetEvent),
     Oyenza(OyenzaEvent),
     /// Where an add-on's files stand (`services::addons`).
-    Addon { id: &'static str, status: poni_core::addons::Status },
+    Addon { id: &'static str, status: nexora_core::addons::Status },
     /// What the update file said (`services::update`).
     Update(crate::services::update::UpdateEvent),
     /// Where Windows says the PC is (`services::location`), for prayer times.
     Located(crate::services::location::Located),
     /// One of prayer times' online city files (`services::cities`).
-    Cities { file: String, got: Result<poni_core::prayer::World, String> },
+    Cities { file: String, got: Result<nexora_core::prayer::World, String> },
     /// The Stocks page's prices, names and years (`services::stocks`).
     Stocks(crate::services::stocks::StocksEvent),
     /// One of yt-dlp's lines for download `id` (`services::downloader`).
-    Download { id: u64, line: poni_core::ytdlp::Line },
+    Download { id: u64, line: nexora_core::ytdlp::Line },
     /// yt-dlp for download `id` ended (`ok`: it exited with 0).
     DownloadEnded { id: u64, ok: bool },
     /// Notifications: what Windows allows, and new notifications
@@ -197,14 +197,14 @@ pub enum AppEvent {
     /// The Glass theme's screen copy has new pixels (or stopped).
     Backdrop,
     /// The IELTS worker's answer (`services::ielts`).
-    Ielts(Box<poni_core::ielts::Reply>),
+    Ielts(Box<nexora_core::ielts::Reply>),
     /// Oyen's clip finished playing, or couldn't play on (`services::voice`).
     VoiceEnded,
     /// The microphone stopped mid-answer (`services::mic`): why, for the log.
     MicFailed(String),
     /// The meeting being handed over, as it goes (`services::notes`).
-    Notes(Box<poni_core::notes::Reply>),
+    Notes(Box<nexora_core::notes::Reply>),
     /// The meeting's recording stopped by itself: the longest meeting taken,
     /// or the disk wouldn't take more (`services::notes`).
-    NotesStopped(poni_core::notes::CaptureIssue),
+    NotesStopped(nexora_core::notes::CaptureIssue),
 }

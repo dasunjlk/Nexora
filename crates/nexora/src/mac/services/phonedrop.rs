@@ -1,11 +1,11 @@
 //! Phone drop on the Mac: picks the Mac's Wi-Fi or wired address, makes the
 //! session secret and the inbox folder (`~/Downloads/Oyenza Studio`), and runs
-//! `poni_core::phonedrop`'s web server while the Shelf's phone panel is open
+//! `nexora_core::phonedrop`'s web server while the Shelf's phone panel is open
 //! (the same server the Windows app runs; only this glue differs).
 
 use crate::events::{AppEvent, EventSink};
 use objc2_core_foundation::{CFRetained, CFString};
-use poni_core::phonedrop::{token, Config, Server};
+use nexora_core::phonedrop::{token, Config, Server};
 use std::ffi::{c_char, c_void, CStr};
 use std::io::Read;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr, UdpSocket};
@@ -29,7 +29,7 @@ impl PhoneDrop {
         std::fs::create_dir_all(&inbox).map_err(|e| format!("Couldn't make the folder {} ({e}).", inbox.display()))?;
         let secret = random_token().ok_or_else(|| "macOS couldn't make a secret link.".to_string())?;
         let sink = Mutex::new(sink);
-        let send: Arc<dyn Fn(poni_core::phonedrop::Event) + Send + Sync> = Arc::new(move |e| {
+        let send: Arc<dyn Fn(nexora_core::phonedrop::Event) + Send + Sync> = Arc::new(move |e| {
             if let Ok(s) = sink.lock() {
                 s.send(AppEvent::Phone(e));
             }

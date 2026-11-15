@@ -14,7 +14,7 @@
 //!   see whether somebody is signed in (a refresh token) and who; the tokens
 //!   are never used or sent. The sign-in file `~/.gemini/jetski-...` is a
 //!   leftover and is not read. Windows keeps it elsewhere: not read yet, so
-//!   the reader below isn't built there at all (poni.exe keeps to its size
+//!   the reader below isn't built there at all (nexora.exe keeps to its size
 //!   budget) and a look on Windows always ends in [`Trouble::NotFound`], as
 //!   it would with nothing to read.
 //! - Numbers: [`Cli::AgyUsage`] (`agy -p /usage --output-format json`) only
@@ -83,7 +83,7 @@ impl Provider for Antigravity {
 }
 
 /// Windows: nothing is read there yet (`wants` is empty), so a look ends as
-/// it would with no sign-in found, without the reader in poni.exe.
+/// it would with no sign-in found, without the reader in nexora.exe.
 #[cfg(windows)]
 fn step(_cx: &Ctx, _replies: &[Result<Reply, NetFail>]) -> Result<Step, Trouble> {
     Err(Trouble::NotFound)

@@ -1,18 +1,18 @@
 //! Pronunciation lines for lyrics: how Japanese, Korean and Chinese lines
 //! read in Latin letters, the way Apple Music's "Show Pronunciation" sets them.
 //!
-//! Korean and Chinese need nothing from the system (`poni_core::romanize`).
+//! Korean and Chinese need nothing from the system (`nexora_core::romanize`).
 //! Japanese kanji have no single reading: Windows asks its own analyzer and
-//! falls back to Oyenza Studio's dictionary (`poni_core::romanize::JaDict`); the
+//! falls back to Oyenza Studio's dictionary (`nexora_core::romanize::JaDict`); the
 //! Mac reads every Japanese song with that dictionary, which the Japanese
-//! readings add-on brings (`poni_core::addons::JAPANESE_READINGS`, loaded
+//! readings add-on brings (`nexora_core::addons::JAPANESE_READINGS`, loaded
 //! only for that song). Without the add-on, kana lines still read and the
 //! Music page offers it. Called on the lyrics worker thread.
 
 use super::addons;
-use poni_core::addons::{JAPANESE_READINGS, JA_READINGS_FILE};
-use poni_core::lrc::Lyrics;
-use poni_core::romanize::{self, Ruby, Script};
+use nexora_core::addons::{JAPANESE_READINGS, JA_READINGS_FILE};
+use nexora_core::lrc::Lyrics;
+use nexora_core::romanize::{self, Ruby, Script};
 
 /// Chinese runs longer than this are cut so a piece always fits the column.
 const HAN_PIECE_MAX: usize = 8;

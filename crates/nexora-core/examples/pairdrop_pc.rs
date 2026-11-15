@@ -1,9 +1,9 @@
 //! The PC side of paired phone drop, on any OS, for testing the phone page
 //! and the meeting server end to end with the real Rust code (Oyenza Studio
-//! itself runs the same `poni_core::pairdrop` behind its island).
+//! itself runs the same `nexora_core::pairdrop` behind its island).
 //!
 //! ```text
-//! cargo run -p poni-core --example pairdrop_pc -- \
+//! cargo run -p nexora-core --example pairdrop_pc -- \
 //!     --server http://127.0.0.1:8797 --inbox /tmp/inbox [--book pairs.json] \
 //!     [--pair] [--shelf FILE]... [--name "Test PC"] [--stun host:port]
 //! ```
@@ -11,8 +11,8 @@
 //! Prints `LINK <url>` for a pairing code and one `EVENT <json>` line per
 //! event on stdout; runs until killed.
 
-use poni_core::pairdrop::plainhttp::PlainHttp;
-use poni_core::pairdrop::{Book, Meet, MeetCfg, MeetEvent, PeerEvent, Secret};
+use nexora_core::pairdrop::plainhttp::PlainHttp;
+use nexora_core::pairdrop::{Book, Meet, MeetCfg, MeetEvent, PeerEvent, Secret};
 use serde_json::json;
 use std::io::{Read, Write};
 use std::net::{IpAddr, Ipv4Addr, UdpSocket};
@@ -42,7 +42,7 @@ fn main() {
     }
     let post = Arc::new(PlainHttp::new(&server).expect("--server must be http://host:port"));
     std::fs::create_dir_all(&inbox).expect("inbox");
-    poni_core::pairdrop::set_logger(|l| eprintln!("{l}"));
+    nexora_core::pairdrop::set_logger(|l| eprintln!("{l}"));
     let book = book_path.as_ref().and_then(|p| std::fs::read_to_string(p).ok()).map(|s| Book::from_json(&s)).unwrap_or_default();
     let save_to = book_path.clone();
     let save = Arc::new(move |b: &Book| {
@@ -87,7 +87,7 @@ fn random_bytes(n: usize) -> Vec<u8> {
 }
 
 fn random_id() -> String {
-    poni_core::pairdrop::keys::b64u(&random_bytes(16))
+    nexora_core::pairdrop::keys::b64u(&random_bytes(16))
 }
 
 /// Loopback plus the address this machine uses for the internet.

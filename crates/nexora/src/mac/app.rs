@@ -42,17 +42,17 @@ use objc2_app_kit::{NSApplication, NSApplicationActivationPolicy, NSApplicationD
 use objc2_core_foundation::{CGPoint, CGRect, CGSize};
 use objc2_core_graphics::CGContext;
 use objc2_foundation::{NSNotification, NSNotificationCenter, NSRunLoop, NSRunLoopCommonModes, NSTimer};
-use poni_core::addons::{Status as AddonStatus, DOWNLOADER, HEALTH, JAPANESE_READINGS, PRAYER_TIMES, SYSTEM};
-use poni_core::frametime::MotionStats;
-use poni_core::phonedrop::{Event as PhoneEvent, QrMatrix};
-use poni_core::geom::{palette, Color, Point, Rect};
-use poni_core::look::{Look, Material};
-use poni_core::oyenza;
-use poni_core::prayer::{Due, PlaceList, Prayer, PrayerMoment};
-use poni_core::settings::{IdleStyle, PrayerSound, Settings, Theme};
-use poni_core::spot;
-use poni_core::sysmon::{CoreKind, Module};
-use poni_core::store::{load_json, parse_json, save_json_atomic, LoadOutcome, Store};
+use nexora_core::addons::{Status as AddonStatus, DOWNLOADER, HEALTH, JAPANESE_READINGS, PRAYER_TIMES, SYSTEM};
+use nexora_core::frametime::MotionStats;
+use nexora_core::phonedrop::{Event as PhoneEvent, QrMatrix};
+use nexora_core::geom::{palette, Color, Point, Rect};
+use nexora_core::look::{Look, Material};
+use nexora_core::oyenza;
+use nexora_core::prayer::{Due, PlaceList, Prayer, PrayerMoment};
+use nexora_core::settings::{IdleStyle, PrayerSound, Settings, Theme};
+use nexora_core::spot;
+use nexora_core::sysmon::{CoreKind, Module};
+use nexora_core::store::{load_json, parse_json, save_json_atomic, LoadOutcome, Store};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::ptr::NonNull;
@@ -118,7 +118,7 @@ thread_local! {
     static KEEP: RefCell<Vec<Retained<AnyObject>>> = const { RefCell::new(Vec::new()) };
     /// Recorder messages that came while the app was busy (re-entered): the
     /// next `drain_events` hands them over.
-    static REC_MISSED: RefCell<Vec<poni_core::recorder::Message>> = const { RefCell::new(Vec::new()) };
+    static REC_MISSED: RefCell<Vec<nexora_core::recorder::Message>> = const { RefCell::new(Vec::new()) };
 }
 
 /// Work that must run without the app borrowed (AppKit may call back in).
@@ -172,7 +172,7 @@ fn enter<R>(f: impl FnOnce(&mut App) -> R) -> Option<R> {
 
 pub fn main_entry() -> i32 {
     let args: Vec<String> = std::env::args().collect();
-    let arg_after = |flag: &str| args.iter().position(|a| a == flag).map(|i| args.get(i + 1).cloned().unwrap_or_else(|| "poni-out".into()));
+    let arg_after = |flag: &str| args.iter().position(|a| a == flag).map(|i| args.get(i + 1).cloned().unwrap_or_else(|| "nexora-out".into()));
     if let Some(dir) = arg_after("--render") {
         return crate::render::run(&dir, &args);
     }
@@ -187,7 +187,7 @@ pub fn main_entry() -> i32 {
         // Absolute: Finder icons and file URLs need full paths.
         let home = std::path::absolute(dir.join("home")).unwrap_or_else(|_| dir.join("home"));
         let _ = std::fs::remove_dir_all(&home);
-        std::env::set_var("PONI_HOME", &home);
+        std::env::set_var("NEXORA_HOME", &home);
     }
     crate::plog::init(paths::log_path());
     pinfo!("Oyenza Studio {} starting on macOS (args: {:?})", env!("CARGO_PKG_VERSION"), &args[1..]);
@@ -224,7 +224,7 @@ pub fn main_entry() -> i32 {
     0
 }
 
-/// Hold a lock file for as long as Poni runs. `Err` = another copy holds it.
+/// Hold a lock file for as long as Nexora runs. `Err` = another copy holds it.
 fn single_instance() -> Result<Option<std::fs::File>, ()> {
     use std::os::fd::AsRawFd;
     extern "C" {
@@ -371,7 +371,7 @@ pub fn drain_events() {
 /// reply: true tells it the island shows the recording (or its Record page),
 /// so it keeps its own bar and controls hidden; false, that it should show
 /// them.
-pub fn recorder_message(m: poni_core::recorder::Message) -> bool {
+pub fn recorder_message(m: nexora_core::recorder::Message) -> bool {
     match enter(|a| a.on_recorder_message(m.clone())) {
         Some(taken) => taken,
         None => {
@@ -525,7 +525,7 @@ pub struct App {
     /// it is thrown away), for Try again.
     notes_take: Option<services::notes::Take>,
     /// When the meeting being taken down began (local time, for its notes).
-    notes_started: poni_core::datetime::LocalDateTime,
+    notes_started: nexora_core::datetime::LocalDateTime,
     /// The Stocks page's prices: started the first time the page opens.
     stocks: Option<services::stocks::StocksService>,
     /// The Stocks page was on screen at the last look (`set_stocks_watch`).
@@ -552,7 +552,7 @@ pub struct App {
     /// The smoke run: drawing cost at rest, a timer set aside while the
     /// music pill is measured, and where the ear step points.
     cost: DrawCost,
-    smoke_timer: Option<poni_core::pomodoro::Pomodoro>,
+    smoke_timer: Option<nexora_core::pomodoro::Pomodoro>,
     smoke_point: Option<Point>,
     /// The headphones step: device list changes heard before it, and how
     /// adding and removing its test device went.
@@ -569,7 +569,7 @@ pub struct App {
     smoke_mic_stop: Option<(bool, String)>,
     /// Meeting notes' recording step: the recording (or why none), then
     /// what stopping it gave.
-    smoke_notes: Option<Result<(services::notes::Recording, bool, bool), poni_core::notes::CaptureIssue>>,
+    smoke_notes: Option<Result<(services::notes::Recording, bool, bool), nexora_core::notes::CaptureIssue>>,
     smoke_notes_stop: Option<(bool, String)>,
     /// The Caffeine steps: the drinks in the log before the one they add.
     smoke_drinks: Option<usize>,
@@ -783,7 +783,7 @@ impl App {
         }
         if self.smoke.is_none() {
             if let Some(dir) = services::trash_app_from_before_rename() {
-                self.st.notify(Icon::Trash, self.st.accent, "Oyen Poni is now Oyenza Studio", format!("The old copy in {dir} is in the Trash"), 8.0, None);
+                self.st.notify(Icon::Trash, self.st.accent, "Nexora is now Oyenza Studio", format!("The old copy in {dir} is in the Trash"), 8.0, None);
             }
         }
         if self.smoke.is_some() {
@@ -955,7 +955,7 @@ impl App {
         if let Some(b) = self.st.rec_next_second().filter(|_| watched_rec) {
             consider(now + b + 0.005);
         }
-        if let poni_core::pomodoro::RunState::Running { ends_at } = self.st.pomodoro.run {
+        if let nexora_core::pomodoro::RunState::Running { ends_at } = self.st.pomodoro.run {
             consider(ends_at + 0.005);
         }
         if let Some(t) = activities::next_wake(&self.mode, &self.st) {
@@ -1071,12 +1071,12 @@ impl App {
             self.downloads_off();
         }
         // IELTS off: a session ends, the microphone and voice stop, the files go.
-        let ielts_id = poni_core::addons::IELTS.id;
+        let ielts_id = nexora_core::addons::IELTS.id;
         if before.addon_on(ielts_id) && !self.st.settings.addon_on(ielts_id) {
             self.ielts_off();
         }
         // Meeting notes off: a recording stops and its audio goes.
-        let notes_id = poni_core::addons::MEETING_NOTES.id;
+        let notes_id = nexora_core::addons::MEETING_NOTES.id;
         if before.addon_on(notes_id) && !self.st.settings.addon_on(notes_id) {
             self.notes_off();
         }
@@ -1174,7 +1174,7 @@ impl App {
         let Some(ui) = self.settings_ui.as_mut() else { return };
         let light = settings_host::is_light();
         ui.gfx.set_scale(settings_host::scale());
-        ui.gfx.set_look(poni_core::look::glass(light));
+        ui.gfx.set_look(nexora_core::look::glass(light));
         self.st.now = self.st.now.max(ui.frame_t.take().unwrap_or_else(clock::mono));
         let now = self.st.now;
         let frame = settings_window::Frame {
@@ -1320,7 +1320,7 @@ impl App {
                     }
                     Err(e) => {
                         pwarn!("settings.json not reloaded: {e}");
-                        self.st.notify(Icon::Sliders, palette::ORANGE, "Settings not reloaded", "settings.json has an error; see poni.log", 5.0, None);
+                        self.st.notify(Icon::Sliders, palette::ORANGE, "Settings not reloaded", "settings.json has an error; see nexora.log", 5.0, None);
                     }
                 }
             }
@@ -1394,13 +1394,13 @@ impl App {
     /// the clipboard.
     fn use_apple_music_token(&mut self) {
         let text = services::clipboard::read_text().unwrap_or_default();
-        let Some(token) = poni_core::applemusic::clean_user_token(&text) else {
+        let Some(token) = nexora_core::applemusic::clean_user_token(&text) else {
             self.st.notify(Icon::Lyrics, palette::ORANGE, "No Apple Music token copied", "Copy media-user-token first", 6.0, None);
             return;
         };
         if let Err(e) = services::secret::save(&paths::apple_music_token_path(), &token) {
             pwarn!("apple music: cannot save the token ({e})");
-            self.st.notify(Icon::Lyrics, palette::ORANGE, "Couldn't save the token", "Details in poni.log", 5.0, None);
+            self.st.notify(Icon::Lyrics, palette::ORANGE, "Couldn't save the token", "Details in nexora.log", 5.0, None);
             return;
         }
         pinfo!("apple music: token saved");
@@ -1415,7 +1415,7 @@ impl App {
     fn forget_apple_music_token(&mut self) {
         if let Err(e) = services::secret::delete(&paths::apple_music_token_path()) {
             pwarn!("apple music: cannot remove the token ({e})");
-            self.st.notify(Icon::Lyrics, palette::ORANGE, "Couldn't remove the token", "Details in poni.log", 5.0, None);
+            self.st.notify(Icon::Lyrics, palette::ORANGE, "Couldn't remove the token", "Details in nexora.log", 5.0, None);
             return;
         }
         pinfo!("apple music: token removed");
@@ -1660,7 +1660,7 @@ impl App {
         // A download's bytes coming in while nobody can see the island (locked,
         // displays asleep) wait for the next frame something else asks for:
         // the pill catches up then, as nothing else of it moves on its own.
-        let unseen = matches!(ev, AppEvent::Download { line: poni_core::ytdlp::Line::Progress { .. }, .. }) && (self.away.0 || self.away.1);
+        let unseen = matches!(ev, AppEvent::Download { line: nexora_core::ytdlp::Line::Progress { .. }, .. }) && (self.away.0 || self.away.1);
         match ev {
             AppEvent::Media(session) => {
                 let prev_key = self.st.media.as_ref().map(|m| m.track_key.clone());
@@ -1720,7 +1720,7 @@ impl App {
                             // The first Japanese song whose kanji went unread
                             // switches Japanese readings on, as on Windows
                             // (app.rs): switched off by hand, they stay off.
-                            if poni_core::addons::ja_switches_on(&self.st.settings, wants_ja_readings) {
+                            if nexora_core::addons::ja_switches_on(&self.st.settings, wants_ja_readings) {
                                 pinfo!("lyrics: a Japanese song's kanji went unread; switching Japanese readings on");
                                 self.st.settings.set_addon(JAPANESE_READINGS.id, true);
                                 self.st.cmds.push(Command::SaveSettings);
@@ -1937,11 +1937,11 @@ impl App {
         let Some(list) = self.st.prayer.places.clone() else { return };
         let chosen = match self.st.settings.prayer.place.as_deref() {
             Some(id) if self.st.prayer.place.as_ref().is_some_and(|p| p.id == id) => self.st.prayer.place.clone(),
-            Some(id) => poni_core::prayer::find(&list, self.st.settings.prayer.world_place.as_deref(), id),
+            Some(id) => nexora_core::prayer::find(&list, self.st.settings.prayer.world_place.as_deref(), id),
             None => None,
         };
         let suggested = chosen.is_none();
-        let place = chosen.or_else(|| poni_core::prayer::suggested_place_id(self.utc_offset_min()).and_then(|id| list.find(id)).cloned());
+        let place = chosen.or_else(|| nexora_core::prayer::suggested_place_id(self.utc_offset_min()).and_then(|id| list.find(id)).cloned());
         let changed = place.as_ref().map(|p| &p.id) != self.st.prayer.place.as_ref().map(|p| &p.id);
         self.st.prayer.place = place;
         self.st.prayer.suggested = suggested;
@@ -1955,7 +1955,7 @@ impl App {
     /// The Mac's UTC offset in minutes, from its clock.
     fn utc_offset_min(&self) -> i32 {
         let l = &self.st.local;
-        let local = poni_core::datetime::days_from_civil(l.year, l.month, l.day) * 86_400 + l.hour as i64 * 3600 + l.minute as i64 * 60 + l.second as i64;
+        let local = nexora_core::datetime::days_from_civil(l.year, l.month, l.day) * 86_400 + l.hour as i64 * 3600 + l.minute as i64 * 60 + l.second as i64;
         (((local - self.st.unix) as f64 / 900.0).round() * 15.0) as i32
     }
 
@@ -2000,8 +2000,8 @@ impl App {
             return;
         }
         self.st.prayer.handled_until = Some(now);
-        for m in poni_core::prayer::prayers_between(&site, from, now) {
-            match poni_core::prayer::due(m.at, now) {
+        for m in nexora_core::prayer::prayers_between(&site, from, now) {
+            match nexora_core::prayer::due(m.at, now) {
                 Due::Ring => self.prayer_moment(m, true),
                 Due::Quiet => self.prayer_moment(m, false),
                 Due::Skip => {}
@@ -2699,8 +2699,8 @@ impl App {
     /// Oyenza Studio Recorder's word on its recording, or "show yourself"
     /// (`recorder_message`). True when the island takes it: it shows the
     /// recording, or opened on its Record page.
-    fn on_recorder_message(&mut self, m: poni_core::recorder::Message) -> bool {
-        use poni_core::recorder::{Message, Phase};
+    fn on_recorder_message(&mut self, m: nexora_core::recorder::Message) -> bool {
+        use nexora_core::recorder::{Message, Phase};
         let now = clock::mono();
         self.st.now = now;
         // Only an installed recorder that reads the Record page's links
@@ -2874,7 +2874,7 @@ impl App {
         }
         if a == InlineAction::ShowAmount {
             // The sum and sender take the subtitle's place for a few seconds.
-            let until = st.now + poni_core::oyenza::SHOWN_S;
+            let until = st.now + nexora_core::oyenza::SHOWN_S;
             if let Some(n) = st.notice.as_mut() {
                 if let Some(text) = n.reveal.take() {
                     n.subtitle = text;
@@ -2936,7 +2936,7 @@ impl App {
                     self.st.rec.error = None;
                     // A window or an area is picked on the recorder's overlay:
                     // the open island would sit over it.
-                    if rec.target != poni_core::recorder::Target::Screen {
+                    if rec.target != nexora_core::recorder::Target::Screen {
                         self.collapse();
                     }
                 }
@@ -2944,7 +2944,7 @@ impl App {
                 Command::RecordResume => services::recorder::resume(),
                 Command::RecordStop => services::recorder::stop(),
                 Command::ScriptPaste => {
-                    let text = services::clipboard::read_text().map(|t| poni_core::script::clean(&t)).filter(|t| !t.is_empty());
+                    let text = services::clipboard::read_text().map(|t| nexora_core::script::clean(&t)).filter(|t| !t.is_empty());
                     match text {
                         Some(text) => pages::script::set_text(&mut self.st, text),
                         None => pages::script::note(&mut self.st, "Copy your script first"),
@@ -2963,7 +2963,7 @@ impl App {
                 }
                 // The System page's app icons, from Finder (on the main thread). The
                 // first can take a tenth of a second (Finder's icons starting up in
-                // Poni), so none starts while the island moves: the page asks again
+                // Nexora), so none starts while the island moves: the page asks again
                 // with its next frame.
                 Command::LoadAppIcon(p) => {
                     if !self.st.app_icons.contains_key(&p) && self.island.settled() {
@@ -4199,7 +4199,7 @@ impl App {
             // OK (what a click on it does). The next step's adzan still comes.
             "prayer-ok" => {
                 let unix = clock::unix_now();
-                if let Some(ashar) = self.st.prayer_site().and_then(|s| poni_core::prayer::day_times(&s, s.local_day(unix)).map(|t| t.ashar)) {
+                if let Some(ashar) = self.st.prayer_site().and_then(|s| nexora_core::prayer::day_times(&s, s.local_day(unix)).map(|t| t.ashar)) {
                     self.st.prayer.clock_shift = ashar - 5 * 60 - unix;
                     self.st.prayer.handled_until = Some(ashar - 5 * 60);
                 }
@@ -4210,7 +4210,7 @@ impl App {
                 self.st.settings.prayer.sound = PrayerSound::Adzan;
                 self.st.cmds.push(Command::SaveSettings);
                 let unix = clock::unix_now();
-                if let Some((site, ashar)) = self.st.prayer_site().and_then(|s| poni_core::prayer::day_times(&s, s.local_day(unix)).map(|t| (s, t.ashar))) {
+                if let Some((site, ashar)) = self.st.prayer_site().and_then(|s| nexora_core::prayer::day_times(&s, s.local_day(unix)).map(|t| (s, t.ashar))) {
                     self.st.prayer.clock_shift = ashar - 2 - unix;
                     self.st.prayer.handled_until = Some(ashar - 2);
                     pinfo!("smoke: Ashar in {} is {}", site.hhmm(ashar), self.st.prayer.place.as_ref().map_or("", |p| p.label.as_str()));
@@ -4236,7 +4236,7 @@ impl App {
             // 2-shot Americano at the minute the Mac's clock shows; data.json
             // saves it.
             "caffeine-on" => {
-                self.st.settings.set_addon(poni_core::addons::CAFFEINE.id, true);
+                self.st.settings.set_addon(nexora_core::addons::CAFFEINE.id, true);
                 self.st.cmds.push(Command::SaveSettings);
             }
             "caffeine-page" => {
@@ -4244,7 +4244,7 @@ impl App {
                 self.expand();
             }
             "caffeine-add" => {
-                use poni_core::caffeine::{local_minute, Bean, Drink, Kind};
+                use nexora_core::caffeine::{local_minute, Bean, Drink, Kind};
                 self.smoke_drinks = Some(self.st.store.caffeine.drinks.len());
                 let (kind, amount, bean) = (Kind::Americano, 2, Bean::Arabica);
                 let at = local_minute(&clock::local_now());
@@ -4252,7 +4252,7 @@ impl App {
                 self.st.cmds.push(Command::SaveStore);
             }
             "caffeine-off" => {
-                self.st.settings.set_addon(poni_core::addons::CAFFEINE.id, false);
+                self.st.settings.set_addon(nexora_core::addons::CAFFEINE.id, false);
                 self.st.cmds.push(Command::SaveSettings);
             }
             // A plain window goes full screen in a Space of its own (a second
@@ -4310,8 +4310,8 @@ impl App {
             }
             "oyenza-money" => {
                 self.collapse();
-                let wallet = Some(poni_core::oyenza::WalletRef { name: "BCA".into(), color: "#0060AF".into() });
-                let arrived = vec![poni_core::oyenza::Arrival {
+                let wallet = Some(nexora_core::oyenza::WalletRef { name: "BCA".into(), color: "#0060AF".into() });
+                let arrived = vec![nexora_core::oyenza::Arrival {
                     id: "smoke-1".into(),
                     kind: "income".into(),
                     amount: 1_250_000.0,
@@ -4348,7 +4348,7 @@ impl App {
                 // The reader's gate as the island has it again (the keychain
                 // step set its own, and a resting island draws no frame).
                 self.set_usage_watch();
-                if std::env::var_os("PONI_SMOKE_KEYCHAIN").is_some() {
+                if std::env::var_os("NEXORA_SMOKE_KEYCHAIN").is_some() {
                     let _ = services::keychain::read(SMOKE_KEYCHAIN.0, Some("plain"));
                 }
                 self.set_away(None, Some(true));
@@ -4526,7 +4526,7 @@ impl App {
                     let p = paths::data_dir().join("ielts").join("smoke-voice.wav");
                     smoke_tone_wav(&p, 0.5).map(|()| Some(p)).map_err(|e| e.to_string())
                 } else {
-                    Ok(std::env::var_os("PONI_SMOKE_MP3").map(PathBuf::from))
+                    Ok(std::env::var_os("NEXORA_SMOKE_MP3").map(PathBuf::from))
                 };
                 let started = clock::mono();
                 self.smoke_voice = match file {
@@ -4633,8 +4633,8 @@ impl App {
             "oyenza-code" | "oyenza-page" => (self.expanded && self.st.page == PageKind::Oyenza && waited > 0.6) || waited > 4.0,
             "oyenza-money" => self.st.notice.is_some() || waited > 4.0,
             "ai-page" | "ai-back" => (self.expanded && self.st.page == PageKind::Ai && waited > 0.6) || waited > 4.0,
-            "now-playing" => self.st.media.as_ref().is_some_and(|m| m.title == SMOKE_SERVICE_TRACK) || std::env::var_os("PONI_SMOKE_NOW_PLAYING").is_none() || waited > 15.0,
-            "now-playing-browser" => self.st.media.as_ref().is_some_and(|m| m.title == SMOKE_BROWSER_TRACK) || std::env::var_os("PONI_SMOKE_BROWSER").is_none() || waited > 25.0,
+            "now-playing" => self.st.media.as_ref().is_some_and(|m| m.title == SMOKE_SERVICE_TRACK) || std::env::var_os("NEXORA_SMOKE_NOW_PLAYING").is_none() || waited > 15.0,
+            "now-playing-browser" => self.st.media.as_ref().is_some_and(|m| m.title == SMOKE_BROWSER_TRACK) || std::env::var_os("NEXORA_SMOKE_BROWSER").is_none() || waited > 25.0,
             "menu" => waited > 1.0,
             // The line plays to its end (half a second).
             "ielts-voice" | "ielts-voice-mp3" => self.smoke_voice.as_ref().is_none_or(|v| v.ended.is_some() || v.played.is_err()) || waited > 5.0,
@@ -4709,8 +4709,8 @@ impl App {
         let body = self.island.body_rect_at(self.cx);
         // Pill's own look, or Diorama's of the side of the day its ball rests on.
         let want = match self.st.settings.theme {
-            Theme::Diorama => poni_core::look::diorama(pill::diorama::night(&self.st)),
-            _ => &poni_core::look::PILL,
+            Theme::Diorama => nexora_core::look::diorama(pill::diorama::night(&self.st)),
+            _ => &nexora_core::look::PILL,
         };
         let look = self.look() == want && !glass::shown();
         let look_name = if self.st.settings.theme == Theme::Diorama { "Diorama's look" } else { "Pill's look" };
@@ -4771,7 +4771,7 @@ impl App {
             }
             "record-check" | "record-gone" => {
                 let showing = self.mode == Mode::Activity(activities::Activity::Recording);
-                let recording = self.st.rec.phase == Some(poni_core::recorder::Phase::Recording);
+                let recording = self.st.rec.phase == Some(nexora_core::recorder::Phase::Recording);
                 let g = self.island.current();
                 let d = format!(
                     "{:?}, {:.0}x{:.0} DIP, recorder said {:?} at {}, Record tab {}, notch {:?}",
@@ -4779,7 +4779,7 @@ impl App {
                     g.w,
                     g.h,
                     self.st.rec.phase,
-                    poni_core::recorder::fmt_length(self.st.rec_elapsed()),
+                    nexora_core::recorder::fmt_length(self.st.rec_elapsed()),
                     if self.st.record_on() { "on" } else { "off" },
                     self.screen.notch
                 );
@@ -4860,7 +4860,7 @@ impl App {
             }
             "notch-oyen-open" | "notch-oyen-collapsed" => {
                 let look = self.look();
-                let ok = self.screen.notch.is_some() && *look == poni_core::look::OYEN_NIGHT && !glass::shown();
+                let ok = self.screen.notch.is_some() && *look == nexora_core::look::OYEN_NIGHT && !glass::shown();
                 Some(("oyen-around-notch", ok, format!("ground {:?}, ink {:?}, font {:?}", look.ground, look.ink, look.font)))
             }
             "pill-open" | "pill-collapsed" | "notch-pill-open" | "notch-pill-collapsed" => Some(self.pill_report()),
@@ -4929,7 +4929,7 @@ impl App {
                 Some(("draw-cost", c.frames > 0, d))
             }
             "now-playing" => {
-                if std::env::var_os("PONI_SMOKE_NOW_PLAYING").is_none() {
+                if std::env::var_os("NEXORA_SMOKE_NOW_PLAYING").is_none() {
                     return Some(("now-playing-service", true, "skipped: no test player on this run".into()));
                 }
                 let m = self.st.media.as_ref();
@@ -4938,11 +4938,11 @@ impl App {
                 Some(("now-playing-service", ok, format!("macOS's now playing through the adapter: {d}")))
             }
             "now-playing-browser" => {
-                if std::env::var_os("PONI_SMOKE_BROWSER").is_none() {
+                if std::env::var_os("NEXORA_SMOKE_BROWSER").is_none() {
                     return Some(("now-playing-browser", true, "skipped: no Edge or Chrome on this run".into()));
                 }
                 let m = self.st.media.as_ref();
-                let ok = m.is_some_and(|m| m.title == SMOKE_BROWSER_TRACK && poni_core::nowplaying::is_browser(&m.app_id));
+                let ok = m.is_some_and(|m| m.title == SMOKE_BROWSER_TRACK && nexora_core::nowplaying::is_browser(&m.app_id));
                 let d = m.map_or("nothing".to_string(), |m| format!("{} by {} in {} ({:?}, {})", m.title, m.artist, m.app_name, m.app_id, if m.is_playing() { "playing" } else { "paused" }));
                 Some(("now-playing-browser", ok, format!("a browser tab in macOS's now playing: {d}")))
             }
@@ -5037,7 +5037,7 @@ impl App {
             }
             "ja-get" => {
                 let status = self.st.addon(JAPANESE_READINGS.id);
-                let checked = |f: &poni_core::addons::AddonFile| {
+                let checked = |f: &nexora_core::addons::AddonFile| {
                     std::fs::read(services::addons::file_path(&JAPANESE_READINGS, f.name)).is_ok_and(|b| f.matches(&b))
                 };
                 let files: Vec<String> = JAPANESE_READINGS.files.iter().map(|f| format!("{} {}", f.name, if checked(f) { "checked" } else { "missing or different" })).collect();
@@ -5055,7 +5055,7 @@ impl App {
             "prayer-get" => {
                 let status = self.st.addon(PRAYER_TIMES.id);
                 let checked =
-                    |f: &poni_core::addons::AddonFile| std::fs::read(services::addons::file_path(&PRAYER_TIMES, f.name)).is_ok_and(|b| f.matches(&b));
+                    |f: &nexora_core::addons::AddonFile| std::fs::read(services::addons::file_path(&PRAYER_TIMES, f.name)).is_ok_and(|b| f.matches(&b));
                 let files: Vec<String> = PRAYER_TIMES.files.iter().map(|f| format!("{} {}", f.name, if checked(f) { "checked" } else { "missing or different" })).collect();
                 let places = self.st.prayer.places.as_ref().map_or(0, |l| l.places.len());
                 let place = self.st.prayer.place.as_ref().map_or("none", |p| p.id.as_str());
@@ -5065,12 +5065,12 @@ impl App {
             "prayer-page" => {
                 let tabs = pages::tabs(&self.st);
                 let now = self.st.prayer_now();
-                let next = self.st.prayer_site().and_then(|s| poni_core::prayer::next_prayer(&s, now).map(|m| format!("{} at {}", m.prayer.name(), s.hhmm(m.at))));
+                let next = self.st.prayer_site().and_then(|s| nexora_core::prayer::next_prayer(&s, now).map(|m| format!("{} at {}", m.prayer.name(), s.hhmm(m.at))));
                 let ok = self.st.page == PageKind::Prayer && tabs.contains(&PageKind::Prayer) && next.is_some();
                 Some(("prayer-page", ok, format!("{} tabs; next: {}", tabs.len(), next.unwrap_or_else(|| "none".into()))))
             }
             "prayer-ok" => {
-                let running = self.st.prayer_site().and_then(|s| poni_core::prayer::countdown(&s, self.st.prayer_now(), self.st.settings.prayer.remind_before_min));
+                let running = self.st.prayer_site().and_then(|s| nexora_core::prayer::countdown(&s, self.st.prayer_now(), self.st.settings.prayer.remind_before_min));
                 let shown = activities::prayer_countdown(&self.st);
                 let ok = running.is_some() && shown.is_none() && self.st.prayer.countdown_ok == running.map(|(m, _)| m.at);
                 Some(("prayer-ok", ok, format!("countdown {:?}, on the island: {shown:?}", running.map(|(m, left)| (m.prayer, left)))))
@@ -5100,7 +5100,7 @@ impl App {
             // Built in, so switching it on starts nothing: no download, and
             // the add-ons' downloader (stopped with Prayer times) stays so.
             "caffeine-on" => {
-                let addon = &poni_core::addons::CAFFEINE;
+                let addon = &nexora_core::addons::CAFFEINE;
                 let status = self.st.addon(addon.id);
                 let tab = pages::tabs(&self.st).contains(&PageKind::Caffeine);
                 let ok = status == AddonStatus::Ready && tab && self.addons.is_none();
@@ -5121,7 +5121,7 @@ impl App {
             // The drink is in the log and today's count, data.json (saved a
             // moment later) holds the same log, and the page draws it.
             "caffeine-add" => {
-                use poni_core::caffeine::{local_minute, Today};
+                use nexora_core::caffeine::{local_minute, Today};
                 let lit = self.smoke_page_pixels(PageKind::Caffeine);
                 let before = self.smoke_drinks.unwrap_or(0);
                 let log = &self.st.store.caffeine;
@@ -5138,7 +5138,7 @@ impl App {
                 Some(("caffeine-drink", ok, d))
             }
             "caffeine-off" => {
-                let status = self.st.addon(poni_core::addons::CAFFEINE.id);
+                let status = self.st.addon(nexora_core::addons::CAFFEINE.id);
                 let tab = pages::tabs(&self.st).contains(&PageKind::Caffeine);
                 let ok = status == AddonStatus::Off && !tab && self.st.page != PageKind::Caffeine && self.mode != Mode::Expanded(PageKind::Caffeine);
                 let d = format!("{status:?}; Caffeine tab: {tab}; {:?}; {} drinks in the log", self.mode, self.st.store.caffeine.drinks.len());
@@ -5195,7 +5195,7 @@ impl App {
                 let before = services::keychain::asked();
                 let read = services::keychain::read(SMOKE_KEYCHAIN.0, Some("plain"));
                 let asked = services::keychain::asked() - before;
-                let kept = std::env::var_os("PONI_SMOKE_KEYCHAIN").is_none() || read == studio_usage::Got::Text(SMOKE_KEYCHAIN.1.into());
+                let kept = std::env::var_os("NEXORA_SMOKE_KEYCHAIN").is_none() || read == studio_usage::Got::Text(SMOKE_KEYCHAIN.1.into());
                 let ok = self.away.1 && !ask && keep && kept && asked == 0;
                 Some(("keychain-locked", ok, format!("locked, notices on: may ask macOS {ask}, keeps what it read {keep}; a read now: {read:?}, macOS asked {asked} times")))
             }
@@ -5299,7 +5299,7 @@ impl App {
             }
             // No microphone, or macOS saying no, is the runner's business; a
             // recording that fails to start (a source hanging) is ours.
-            Some(Err(issue)) => (issue != poni_core::notes::CaptureIssue::Failed, format!("no recording: {issue:?}")),
+            Some(Err(issue)) => (issue != nexora_core::notes::CaptureIssue::Failed, format!("no recording: {issue:?}")),
             None => (false, "Recording::start didn't run".into()),
         }
     }
@@ -5378,7 +5378,7 @@ const SMOKE_KEYCHAIN: (&str, &str, &str) = ("Oyenza Studio smoke", "{\"claudeAiO
 fn smoke_keychain() -> (bool, String) {
     use studio_usage::Got;
     use services::keychain as k;
-    if std::env::var_os("PONI_SMOKE_KEYCHAIN").is_none() {
+    if std::env::var_os("NEXORA_SMOKE_KEYCHAIN").is_none() {
         return (true, "skipped: no test items in the keychain".into());
     }
     let (svc, plain, accent) = SMOKE_KEYCHAIN;
@@ -5484,7 +5484,7 @@ fn smoke_post() -> (bool, String) {
         let _ = c.write_all(format!("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).as_bytes());
         String::from_utf8_lossy(&buf).into_owned()
     });
-    let json = "{\"app\":\"poni\",\"name\":\"Smoke Mac\"}";
+    let json = "{\"app\":\"nexora\",\"name\":\"Smoke Mac\"}";
     let answer = services::http::Client::new("OyenzaStudio smoke").and_then(|c| {
         c.send(services::http::Method::Post, &format!("http://127.0.0.1:{port}/connect/start"), &[("Authorization", "Bearer oyzd_smoke")], Some(json), Duration::from_secs(5))
     });
@@ -5504,7 +5504,7 @@ fn lrclib_failed(status: &LyricsStatus) -> bool {
 
 /// Lines of these lyrics that have romaji, and lines that need it.
 fn romaji_lines(l: &LyricsState) -> (usize, usize) {
-    let needing = l.lyrics.as_ref().map_or(0, |x| x.lines.iter().filter(|line| poni_core::romanize::needs_roman(line.text.trim())).count());
+    let needing = l.lyrics.as_ref().map_or(0, |x| x.lines.iter().filter(|line| nexora_core::romanize::needs_roman(line.text.trim())).count());
     (l.ruby.iter().filter(|p| p.iter().any(|r| !r.roman.is_empty())).count(), needing)
 }
 
@@ -5522,7 +5522,7 @@ fn prayer_folder() -> PathBuf {
 /// it looked up before. The entry is `services/lyrics.rs`'s `CacheEntry`
 /// (format 1); a new format makes the ja-auto check fail.
 fn seed_japanese_lyrics() {
-    use poni_core::lrclib::{self, LrclibRecord, TrackQuery};
+    use nexora_core::lrclib::{self, LrclibRecord, TrackQuery};
     let (title, artist, album, duration_s) = SMOKE_JA_TRACK;
     let q = lrclib::normalize_query(&TrackQuery { title: title.into(), artist: artist.into(), album: album.into(), duration_s });
     let record = LrclibRecord {
@@ -5545,7 +5545,7 @@ fn seed_japanese_lyrics() {
 /// memory, a drive and a network interface must be there; the GPU and the
 /// battery are reported (CI's Mac is a virtual one, and has no battery).
 fn system_report(st: &AppState) -> (bool, String) {
-    use poni_core::sysmon::{fmt_app_cpu, fmt_bytes, fmt_link, fmt_rate, pressure_word, AppUse};
+    use nexora_core::sysmon::{fmt_app_cpu, fmt_bytes, fmt_link, fmt_rate, pressure_word, AppUse};
     let Some(r) = st.system.latest.as_ref() else { return (false, "no reading arrived".into()) };
     let cpu = r.cpu.as_ref().filter(|c| c.logical > 0 && !c.cores.is_empty() && (0.0..=1.0).contains(&c.load));
     let mem = r.memory.as_ref().filter(|m| m.total > 0 && m.used <= m.total);
@@ -5627,7 +5627,7 @@ pub(crate) fn theme_accent(theme: Theme) -> Color {
         oyen::ORANGE
     } else if theme == Theme::Diorama {
         // Its own, which its day and night looks paint as theirs.
-        poni_core::look::DIORAMA_ACCENT
+        nexora_core::look::DIORAMA_ACCENT
     } else {
         services::system_accent().unwrap_or(palette::BLUE)
     }

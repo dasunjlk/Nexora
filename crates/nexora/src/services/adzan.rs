@@ -64,7 +64,7 @@ pub(crate) fn file_uri(path: &Path) -> String {
         .split(['\\', '/'])
         .filter(|s| !s.is_empty())
         .enumerate()
-        .map(|(i, s)| if i == 0 && s.ends_with(':') { s.to_string() } else { poni_core::urlenc::encode(s) })
+        .map(|(i, s)| if i == 0 && s.ends_with(':') { s.to_string() } else { nexora_core::urlenc::encode(s) })
         .collect();
     format!("file:///{}", parts.join("/"))
 }
@@ -76,8 +76,8 @@ mod tests {
     #[test]
     fn file_uris_keep_the_drive_and_encode_the_rest() {
         assert_eq!(
-            file_uri(Path::new(r"C:\Users\Luca Cada\AppData\Local\Poni\addons\sholat\addon-sholat-1\adzan.m4a")),
-            "file:///C:/Users/Luca%20Cada/AppData/Local/Poni/addons/sholat/addon-sholat-1/adzan.m4a"
+            file_uri(Path::new(r"C:\Users\Luca Cada\AppData\Local\Nexora\addons\sholat\addon-sholat-1\adzan.m4a")),
+            "file:///C:/Users/Luca%20Cada/AppData/Local/Nexora/addons/sholat/addon-sholat-1/adzan.m4a"
         );
         assert_eq!(file_uri(Path::new(r"D:\Müzik\a.m4a")), "file:///D:/M%C3%BCzik/a.m4a");
     }

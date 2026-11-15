@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/poni-core", "crates/studio-usage", "crates/studio-diorama", "crates/poni"]
+members = ["crates/nexora-core", "crates/studio-usage", "crates/studio-diorama", "crates/nexora"]
 
 [workspace.package]
 version = "0.2.30"
@@ -23,7 +23,7 @@ strip = true
 # Libraries that run for moments and never in a frame, built for size instead
 # of speed (AGENTS.md, Keep it light): paired phone drop's WebRTC (str0m and
 # what it pulls in), the Japanese dictionary's tokenizer and unpacker, JSON
-# and QR codes. Poni's own code keeps opt-level 3.
+# and QR codes. Nexora's own code keeps opt-level 3.
 [profile.release.package.str0m]
 opt-level = "s"
 [profile.release.package.str0m-proto]

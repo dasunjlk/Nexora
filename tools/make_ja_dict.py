@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build crates/poni-core/data/ja-readings.dic.zst, Oyenza Studio's own Japanese
+"""Build crates/nexora-core/data/ja-readings.dic.zst, Oyenza Studio's own Japanese
 reading dictionary, from mecab-ipadic 2.7.0-20070801.
 
 Usage:
@@ -46,7 +46,7 @@ import urllib.request
 SOURCE = "https://deb.debian.org/debian/pool/main/m/mecab-ipadic/mecab-ipadic_2.7.0-20070801+main.orig.tar.gz"
 SHA256 = "b62f527d881c504576baed9c6ef6561554658b175ce6ae0096a60307e49e3523"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "crates", "poni-core", "data", "ja-readings.dic.zst")
+OUT = os.path.join(ROOT, "crates", "nexora-core", "data", "ja-readings.dic.zst")
 FIXES = os.path.join(ROOT, "tools", "ja_dict_fixes.csv")
 
 # Person and company names: rare in lyrics, a quarter of the entries.

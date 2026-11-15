@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Phone page against the real PC code: the meeting server, the phone page in a
 headless browser, and Oyenza Studio's own Rust side through the pairdrop_pc example
-(crates/poni-core/examples/pairdrop_pc.rs). Pairs, sends two files, saves a
+(crates/nexora-core/examples/pairdrop_pc.rs). Pairs, sends two files, saves a
 Shelf file, then checks the PC going offline.
 
 Needs the example built first (this script never builds anything):
-    cargo build -p poni-core --example pairdrop_pc
+    cargo build -p nexora-core --example pairdrop_pc
 Run (browsers through the VM gate):
     vm-gate run -- python3 tools/pairdrop-e2e/run_interop.py [--webkit] [--pc PATH]
 """
@@ -172,7 +172,7 @@ def main() -> int:
     args = ap.parse_args()
     binary = Path(args.pc)
     if not binary.is_file():
-        print(f"{binary} is missing: cargo build -p poni-core --example pairdrop_pc")
+        print(f"{binary} is missing: cargo build -p nexora-core --example pairdrop_pc")
         return 2
     SHOTS.mkdir(parents=True, exist_ok=True)
     data_dir = tempfile.mkdtemp(prefix="pairdrop-interop-server-")
