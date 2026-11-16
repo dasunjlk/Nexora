@@ -114,7 +114,7 @@ pub(crate) fn guess(s: &str, size: f32) -> f32 {
 fn inline_done(st: &AppState, n: &Notice, a: InlineAction) -> bool {
     match a {
         InlineAction::StartFocus => st.pomodoro.is_active(),
-        // Oyenza: the sum is in place once Show took it.
+        // Nexora: the sum is in place once Show took it.
         InlineAction::ShowAmount => n.reveal.is_none(),
         InlineAction::StopAdzan => !st.prayer.adzan,
         // Done once clicked: the app puts the check in the notice's icon.

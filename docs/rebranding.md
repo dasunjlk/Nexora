@@ -8,26 +8,26 @@ user-visible was rebranded to Nexora. This page is the mapping and the rules.
 
 | Upstream | Nexora | Where |
 |---|---|---|
-| Oyenza Studio (product) | **Nexora** | all user-visible strings, docs, installers, site |
+| Nexora (product) | **Nexora** | all user-visible strings, docs, installers, site |
 | Nexora / Nexora (old product names) | removed | history notes |
 | `nexora` / `Nexora` (internal codename) | `nexora` / `Nexora` | crates (`nexora`, `nexora-core`, `nexora-usage`, `nexora-diorama`), `nexora.exe`, `NEXORA_*` env vars, `%APPDATA%\Nexora`, `%LOCALAPPDATA%\Nexora`, `Local\Nexora.Island`, Mac bundle id `app.nexora.nexora`, uninstall key, Run value, threads (`nexora-notes`), self-test vars |
 | Oyen (mascot cat) | **Nova** | `nexora_core::nova` (`src/nova/`), `src/nova.rs`, the "Nova" theme, `Nova's notes`, docs |
-| `oyenza.app` (account) | `nexora.app` | sign-in, money/agenda features (service placeholder) |
-| `api.oyenza.app` | `api.nexora.app` | account API, meeting notes API (`/island/notes`) |
-| `drop.oyenza.com` | `drop.nexora.app` | paired phone drop relay (`server/`) |
-| `inference.oyenza.com` | `inference.nexora.app` | AI tab's inference balance |
-| `oyenza.trade` | `nexora.trade` | Stocks page prices |
-| `studio.oyenza.com` | `dasunjlk.github.io/Nexora/` | website, update feed |
-| `lucacadalora/oyenza-studio` | `dasunjlk/Nexora` | repo URLs, release/download links, badges |
+| `nexora.app` (account) | `nexora.app` | sign-in, money/agenda features (service placeholder) |
+| `api.nexora.app` | `api.nexora.app` | account API, meeting notes API (`/island/notes`) |
+| `drop.nexora.app` | `drop.nexora.app` | paired phone drop relay (`server/`) |
+| `inference.nexora.app` | `inference.nexora.app` | AI tab's inference balance |
+| `nexora.trade` | `nexora.trade` | Stocks page prices |
+| `dasunjlk.github.io/Nexora` | `dasunjlk.github.io/Nexora/` | website, update feed |
+| `dasunjlk/Nexora` | `dasunjlk/Nexora` | repo URLs, release/download links, badges |
 | `oyen-drop-server` (npm name) | `nexora-drop-server` | `server/package.json` |
-| `catat-server` (notes backend codename) | `nexora notes server` | docs only |
+| `nexora-notes-server` (notes backend codename) | `nexora notes server` | docs only |
 | Jatevo Labs (upstream copyright) | kept as upstream attribution only | `THIRD-PARTY-NOTICES.txt` |
 | Oyen drop-server paths/images (`oyen-*.webp`) | `nova-*.webp` | `server/public/` |
 
 ## Rename policy
 
-**Renamed** (mechanically, case-preserving): `oyenza→nexora`, `Oyenza→Nexora`,
-`OYENZA→NEXORA`, `nexora→nexora`, `Nexora→Nexora`, `NEXORA→NEXORA`, `oyen→nova`,
+**Renamed** (mechanically, case-preserving): `nexora→nexora`, `Nexora→Nexora`,
+`NEXORA→NEXORA`, `nexora→nexora`, `Nexora→Nexora`, `NEXORA→NEXORA`, `oyen→nova`,
 `Oyen→Nova`, `OYEN→NOVA`, plus domains and repo slugs above.
 
 **Never renamed** (would break third-party contracts, not branding):

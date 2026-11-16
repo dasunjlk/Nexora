@@ -1,7 +1,7 @@
 //! Notification-area icon and its menu (also shown on right-click of the island).
 
 use crate::events::WM_APP_TRAY;
-use crate::state::OyenzaLink;
+use crate::state::NexoraLink;
 use crate::updates::UpdateLine;
 use nexora_core::settings::{IdleStyle, Settings, Theme};
 use windows::core::{Result, PCWSTR};
@@ -34,7 +34,7 @@ impl Tray {
                 hIcon: icon,
                 ..Default::default()
             };
-            let tip: Vec<u16> = format!("Oyenza Studio {}", crate::version::VERSION).encode_utf16().collect();
+            let tip: Vec<u16> = format!("Nexora {}", crate::version::VERSION).encode_utf16().collect();
             nid.szTip[..tip.len()].copy_from_slice(&tip);
             if !Shell_NotifyIconW(NIM_ADD, &nid).as_bool() {
                 return Err(windows::core::Error::from_win32());
@@ -74,20 +74,20 @@ pub enum MenuCmd {
     OpenSettings,
     ReloadSettings,
     OpenDataFolder,
-    /// "About Oyenza Studio 0.2.3 (…)": opens this version's release notes.
+    /// "About Nexora 0.2.3 (…)": opens this version's release notes.
     About,
     /// "Lyrics by LRCLIB": opens lrclib.net.
     LyricsCredit,
     AppleMusicToken,
     AppleMusicHelp,
     AppleMusicForget,
-    OyenzaSignIn,
-    OyenzaCancel,
-    OyenzaDisconnect,
-    OyenzaOpen,
-    ToggleOyenzaAmounts,
+    NexoraSignIn,
+    NexoraCancel,
+    NexoraDisconnect,
+    NexoraOpen,
+    ToggleNexoraAmounts,
     RecordScreen,
-    /// "Update to Oyenza Studio 0.2.5…" (`crate::updates`).
+    /// "Update to Nexora 0.2.5…" (`crate::updates`).
     Update,
     /// "Check for updates…": read the update file now (`crate::updates`).
     CheckForUpdates,
@@ -120,7 +120,7 @@ fn idle_label(s: IdleStyle, theme: Theme) -> &'static str {
 
 /// `update`: a later version the update file offers, or Check for updates…
 /// (`crate::updates::menu_line`).
-pub fn menu_items(s: &Settings, pinned: bool, oyenza: &OyenzaLink, recorder: bool, update: UpdateLine) -> Vec<MenuItem> {
+pub fn menu_items(s: &Settings, pinned: bool, nexora: &NexoraLink, recorder: bool, update: UpdateLine) -> Vec<MenuItem> {
     // The look the theme draws is the one checked: outside Pill, Status shows the clock.
     let shown = crate::pill::status::shown(s.theme, s.idle_style);
     let style = |st: IdleStyle| item(idle_label(st, s.theme), MenuCmd::ToggleIdleStyle(st), shown == st);
@@ -141,7 +141,7 @@ pub fn menu_items(s: &Settings, pinned: bool, oyenza: &OyenzaLink, recorder: boo
         item("Synced lyrics", MenuCmd::ToggleLyrics, s.lyrics),
         item("Lyrics pronunciation (romaji, pinyin, Korean)", MenuCmd::TogglePronunciation, s.lyrics_pronunciation),
         apple_music_menu(),
-        oyenza_menu(s, oyenza),
+        nexora_menu(s, nexora),
         item("Sounds", MenuCmd::ToggleSounds, s.sounds),
         MenuItem::Sub {
             label: "In full-screen apps".into(),
@@ -162,7 +162,7 @@ pub fn menu_items(s: &Settings, pinned: bool, oyenza: &OyenzaLink, recorder: boo
         // Which version and build this is, as the Mac menu says it.
         item(&crate::version::about_label(), MenuCmd::About, false),
         MenuItem::Separator,
-        item("Quit Oyenza Studio", MenuCmd::Quit, false),
+        item("Quit Nexora", MenuCmd::Quit, false),
     ];
     // Only once the island was dragged off the middle: the way back, under Keep island open.
     if s.island_x.is_some() {
@@ -182,7 +182,7 @@ pub fn menu_items(s: &Settings, pinned: bool, oyenza: &OyenzaLink, recorder: boo
     match update {
         // A new version first, until it is installed.
         UpdateLine::Offer(v) => {
-            items.splice(0..0, [item(&format!("Update to Oyenza Studio {v}…"), MenuCmd::Update, false), MenuItem::Separator]);
+            items.splice(0..0, [item(&format!("Update to Nexora {v}…"), MenuCmd::Update, false), MenuItem::Separator]);
         }
         // Otherwise a look on request, under the version line.
         UpdateLine::Check => {
@@ -208,21 +208,21 @@ fn apple_music_menu() -> MenuItem {
     MenuItem::Sub { label: if on { "Apple Music lyrics: on".into() } else { "Apple Music lyrics".into() }, items }
 }
 
-/// Oyenza, optional: sign in with a code from oyenza.app, then what the
+/// Nexora, optional: sign in with a code from nexora.app, then what the
 /// island may show, and signing out.
-fn oyenza_menu(s: &Settings, link: &OyenzaLink) -> MenuItem {
+fn nexora_menu(s: &Settings, link: &NexoraLink) -> MenuItem {
     let items = match link {
-        OyenzaLink::Off => vec![item("Sign in to Oyenza…", MenuCmd::OyenzaSignIn, false)],
-        OyenzaLink::Connecting { .. } => vec![item("Cancel sign-in", MenuCmd::OyenzaCancel, false)],
-        OyenzaLink::Connected { account } => vec![
+        NexoraLink::Off => vec![item("Sign in to Nexora…", MenuCmd::NexoraSignIn, false)],
+        NexoraLink::Connecting { .. } => vec![item("Cancel sign-in", MenuCmd::NexoraCancel, false)],
+        NexoraLink::Connected { account } => vec![
             MenuItem::Info { label: format!("Connected as {account}") },
-            item("Show amounts on the island", MenuCmd::ToggleOyenzaAmounts, s.oyenza_show_amounts),
-            item("Open oyenza.app", MenuCmd::OyenzaOpen, false),
+            item("Show amounts on the island", MenuCmd::ToggleNexoraAmounts, s.nexora_show_amounts),
+            item("Open nexora.app", MenuCmd::NexoraOpen, false),
             MenuItem::Separator,
-            item("Disconnect", MenuCmd::OyenzaDisconnect, false),
+            item("Disconnect", MenuCmd::NexoraDisconnect, false),
         ],
     };
-    MenuItem::Sub { label: "Oyenza".into(), items }
+    MenuItem::Sub { label: "Nexora".into(), items }
 }
 
 fn build(menu: HMENU, items: &[MenuItem], cmds: &mut Vec<MenuCmd>) {
@@ -272,7 +272,7 @@ pub fn show_menu(owner: HWND, pt: POINT, items: &[MenuItem]) -> Option<MenuCmd> 
         let cmd = if idx == 0 { None } else { cmds.get(idx - 1).copied() };
         let launches = matches!(
             cmd,
-            Some(MenuCmd::ShowSettings | MenuCmd::OpenSettings | MenuCmd::OpenDataFolder | MenuCmd::About | MenuCmd::LyricsCredit | MenuCmd::AppleMusicHelp | MenuCmd::OyenzaOpen)
+            Some(MenuCmd::ShowSettings | MenuCmd::OpenSettings | MenuCmd::OpenDataFolder | MenuCmd::About | MenuCmd::LyricsCredit | MenuCmd::AppleMusicHelp | MenuCmd::NexoraOpen)
         );
         if !launches && !prev.is_invalid() && prev != owner && IsWindow(prev).as_bool() && GetForegroundWindow() == owner {
             let _ = SetForegroundWindow(prev);
@@ -286,7 +286,7 @@ mod tests {
     use super::*;
 
     fn fullscreen_choices(s: &Settings) -> Vec<(String, MenuCmd, bool)> {
-        let items = menu_items(s, false, &OyenzaLink::Off, false, UpdateLine::None);
+        let items = menu_items(s, false, &NexoraLink::Off, false, UpdateLine::None);
         let Some(MenuItem::Sub { items, .. }) = items.into_iter().find(|i| matches!(i, MenuItem::Sub { label, .. } if label == "In full-screen apps")) else {
             panic!("no full-screen submenu");
         };
@@ -301,7 +301,7 @@ mod tests {
 
     #[test]
     fn the_menu_says_which_version_this_is() {
-        let items = menu_items(&Settings::default(), false, &OyenzaLink::Off, false, UpdateLine::None);
+        let items = menu_items(&Settings::default(), false, &NexoraLink::Off, false, UpdateLine::None);
         let labels: Vec<(String, MenuCmd)> = items
             .into_iter()
             .filter_map(|i| match i {
@@ -311,7 +311,7 @@ mod tests {
             .collect();
         let at = |cmd: MenuCmd| labels.iter().position(|l| l.1 == cmd);
         let about = at(MenuCmd::About).expect("no About line");
-        assert!(labels[about].0.starts_with(&format!("About Oyenza Studio {}", env!("CARGO_PKG_VERSION"))), "{}", labels[about].0);
+        assert!(labels[about].0.starts_with(&format!("About Nexora {}", env!("CARGO_PKG_VERSION"))), "{}", labels[about].0);
         // Right above Quit, with the lyrics credit kept above it.
         assert_eq!(at(MenuCmd::Quit), Some(about + 1));
         assert_eq!(at(MenuCmd::LyricsCredit), Some(about - 1));
@@ -320,11 +320,11 @@ mod tests {
     #[test]
     fn a_new_version_comes_first_until_it_is_installed() {
         let s = Settings::default();
-        let first = |update: UpdateLine| match menu_items(&s, false, &OyenzaLink::Off, true, update).into_iter().next() {
+        let first = |update: UpdateLine| match menu_items(&s, false, &NexoraLink::Off, true, update).into_iter().next() {
             Some(MenuItem::Item { label, cmd, .. }) => Some((label, cmd)),
             _ => None,
         };
-        assert_eq!(first(UpdateLine::Offer("0.2.5".into())), Some(("Update to Oyenza Studio 0.2.5…".to_string(), MenuCmd::Update)));
+        assert_eq!(first(UpdateLine::Offer("0.2.5".into())), Some(("Update to Nexora 0.2.5…".to_string(), MenuCmd::Update)));
         assert_eq!(first(UpdateLine::None).map(|(_, cmd)| cmd), Some(MenuCmd::RecordScreen));
         assert_eq!(first(UpdateLine::Check).map(|(_, cmd)| cmd), Some(MenuCmd::RecordScreen));
     }
@@ -332,7 +332,7 @@ mod tests {
     #[test]
     fn check_for_updates_sits_under_the_version_line() {
         let cmds = |update: UpdateLine| -> Vec<MenuCmd> {
-            menu_items(&Settings::default(), false, &OyenzaLink::Off, false, update)
+            menu_items(&Settings::default(), false, &NexoraLink::Off, false, update)
                 .into_iter()
                 .filter_map(|i| match i {
                     MenuItem::Item { cmd, .. } => Some(cmd),
@@ -351,7 +351,7 @@ mod tests {
     #[test]
     fn the_way_back_to_the_centre_shows_once_the_island_moved() {
         let cmds = |s: &Settings| -> Vec<MenuCmd> {
-            menu_items(s, false, &OyenzaLink::Off, false, UpdateLine::None)
+            menu_items(s, false, &NexoraLink::Off, false, UpdateLine::None)
                 .into_iter()
                 .filter_map(|i| match i {
                     MenuItem::Item { cmd, .. } => Some(cmd),
@@ -367,20 +367,20 @@ mod tests {
 
     #[test]
     fn system_history_is_in_the_menu_only_while_system_is_on() {
-        let has = |s: &Settings| menu_items(s, false, &OyenzaLink::Off, false, UpdateLine::None).iter().position(|i| matches!(i, MenuItem::Item { cmd: MenuCmd::ToggleSystemHistory, .. }));
+        let has = |s: &Settings| menu_items(s, false, &NexoraLink::Off, false, UpdateLine::None).iter().position(|i| matches!(i, MenuItem::Item { cmd: MenuCmd::ToggleSystemHistory, .. }));
         let mut s = Settings::default();
         assert_eq!(has(&s), None, "System is off by default");
         s.set_addon(nexora_core::addons::SYSTEM.id, true);
         let at = has(&s).expect("no System history item");
         // Right above Sounds, where it always was.
-        let items = menu_items(&s, false, &OyenzaLink::Off, false, UpdateLine::None);
+        let items = menu_items(&s, false, &NexoraLink::Off, false, UpdateLine::None);
         assert!(matches!(&items[at + 1], MenuItem::Item { cmd: MenuCmd::ToggleSounds, .. }));
     }
 
     #[test]
     fn record_this_screen_shows_only_with_the_recorder() {
         let s = Settings::default();
-        let first = |recorder: bool| match menu_items(&s, false, &OyenzaLink::Off, recorder, UpdateLine::None).into_iter().next() {
+        let first = |recorder: bool| match menu_items(&s, false, &NexoraLink::Off, recorder, UpdateLine::None).into_iter().next() {
             Some(MenuItem::Item { label, cmd, .. }) => Some((label, cmd)),
             _ => None,
         };
@@ -389,7 +389,7 @@ mod tests {
     }
 
     fn idle_choices(s: &Settings) -> Vec<(String, bool)> {
-        let items = menu_items(s, false, &OyenzaLink::Off, false, UpdateLine::None);
+        let items = menu_items(s, false, &NexoraLink::Off, false, UpdateLine::None);
         let Some(MenuItem::Sub { items, .. }) = items.into_iter().find(|i| matches!(i, MenuItem::Sub { label, .. } if label == "Idle look")) else {
             panic!("no idle look submenu");
         };
@@ -441,7 +441,7 @@ mod tests {
     }
 
     fn theme_choices(s: &Settings) -> Vec<(String, MenuCmd, bool)> {
-        let items = menu_items(s, false, &OyenzaLink::Off, false, UpdateLine::None);
+        let items = menu_items(s, false, &NexoraLink::Off, false, UpdateLine::None);
         let Some(MenuItem::Sub { items, .. }) = items.into_iter().find(|i| matches!(i, MenuItem::Sub { label, .. } if label == "Theme")) else {
             panic!("no theme submenu");
         };
@@ -471,7 +471,7 @@ mod tests {
     #[test]
     fn start_with_windows_follows_the_full_screen_submenu() {
         // Over maximized windows (Step aside) is gone: nothing sits between them.
-        let items = menu_items(&Settings::default(), false, &OyenzaLink::Off, false, UpdateLine::None);
+        let items = menu_items(&Settings::default(), false, &NexoraLink::Off, false, UpdateLine::None);
         let fs = items.iter().position(|i| matches!(i, MenuItem::Sub { label, .. } if label == "In full-screen apps")).expect("full-screen submenu");
         assert!(matches!(items.get(fs + 1), Some(MenuItem::Item { cmd: MenuCmd::ToggleAutostart, .. })));
     }

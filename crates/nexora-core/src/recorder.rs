@@ -1,7 +1,7 @@
-//! Oyenza Studio Recorder, the screen recorder built from Cap, ships as its
+//! Nexora Recorder, the screen recorder built from Cap, ships as its
 //! own app (its recording engine is about 120 MB, the island 2.5 MB). The
 //! island is its face: the Record page starts recordings through the
-//! recorder's own `oyenza-recorder:` links, built here the same way on
+//! recorder's own `nexora-recorder:` links, built here the same way on
 //! Windows and the Mac, and the recorder tells the island how the recording
 //! goes with the small messages [`parse_message`] reads (on Windows a
 //! `WM_COPYDATA` to the island's window). While an island answers them, the
@@ -14,7 +14,7 @@ use crate::urlenc;
 use serde::{Deserialize, Serialize};
 
 /// The link scheme the recorder's installer registers.
-pub const SCHEME: &str = "oyenza-recorder";
+pub const SCHEME: &str = "nexora-recorder";
 
 /// A Studio recording of the named screen, with the camera, microphone and
 /// system sound the recorder used last time. `screen` is the name the system
@@ -207,7 +207,7 @@ mod tests {
         // (apps/desktop-gpui/src/deeplink.rs in lucacadalora/oyen-rekam).
         assert_eq!(
             record_screen_link("Odyssey G93SC"),
-            "oyenza-recorder://action?value=%7B%22record_screen%22%3A%7B%22screen%22%3A%22Odyssey%20G93SC%22%7D%7D"
+            "nexora-recorder://action?value=%7B%22record_screen%22%3A%7B%22screen%22%3A%22Odyssey%20G93SC%22%7D%7D"
         );
     }
 
@@ -222,15 +222,15 @@ mod tests {
 
     #[test]
     fn only_our_shape_passes() {
-        assert!(is_action_link("oyenza-recorder://action?value=%22stop_recording%22"));
+        assert!(is_action_link("nexora-recorder://action?value=%22stop_recording%22"));
         for bad in [
             "",
             "https://example.com/?value=%22stop_recording%22",
             "cap-desktop://action?value=%22stop_recording%22",
-            "oyenza-recorder://action?value=",
-            "oyenza-recorder://action?value=%22stop%22&next=1",
-            "oyenza-recorder://action?value=a b",
-            "oyenza-recorder://auth?value=%22x%22",
+            "nexora-recorder://action?value=",
+            "nexora-recorder://action?value=%22stop%22&next=1",
+            "nexora-recorder://action?value=a b",
+            "nexora-recorder://auth?value=%22x%22",
         ] {
             assert!(!is_action_link(bad), "{bad:?} should be refused");
         }

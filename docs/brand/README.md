@@ -1,10 +1,10 @@
-# Oyenza Studio brand files
+# Nexora brand files
 
-Oyenza Studio belongs to the Oyen family. Oyen is the orange cat of the Oyenza logo.
+Nexora belongs to the Oyen family. Oyen is the orange cat of the Nexora logo.
 
 | File | What |
 |---|---|
-| `oyen-mark.svg`, `oyen-mark-white.svg` | Oyen's head in colour and in white, copied unchanged from the Oyenza brand kit |
+| `oyen-mark.svg`, `oyen-mark-white.svg` | Oyen's head in colour and in white, copied unchanged from the Nexora brand kit |
 | `nexora-logo.svg`, `nexora-logo-512.png` | The logo: an orange tile, the island hanging from its top edge playing music (album cover and equalizer, as on the real island), the white Oyen below |
 | `art/nexora-sit.webp` | Oyen sitting on the island while it plays music (the installer's welcome and finish picture) |
 | `art/nexora-peek.webp` | Oyen peeking over the island while it plays music (README, link preview) |

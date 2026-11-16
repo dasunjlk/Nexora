@@ -1,4 +1,4 @@
-# The keys Oyenza Studio trusts for its update file, studio.oyenza.com/latest.json
+# The keys Nexora trusts for its update file, dasunjlk.github.io/Nexora/latest.json
 # (docs/updates.md). The app reads this file when it is built; tools/make_update_feed.py
 # refuses to sign with a key that isn't listed here.
 #

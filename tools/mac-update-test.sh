@@ -3,7 +3,7 @@
 # waiting with Install on next start, takes the app out of its DMG, checks it, swaps it into its own place, quits,
 # and the new version opens.
 #
-#   tools/mac-update-test.sh <built "Oyenza Studio.app">
+#   tools/mac-update-test.sh <built "Nexora.app">
 #
 # The newer version is this build with a higher version in its Info.plist (signed ad hoc again), in a DMG made
 # the way releases make theirs (tools/make_mac_dmg.sh). The installed copy is this build as it is, in a temporary
@@ -21,22 +21,22 @@ work="${RUNNER_TEMP:-$(mktemp -d)}/nexora-update-test"
 next=99.0.0
 rm -rf "$work"
 mkdir -p "$work/Applications" "$work/home/cache/update" "$work/new"
-installed="$work/Applications/Oyenza Studio.app"
+installed="$work/Applications/Nexora.app"
 running="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")"
 
 # The newer version: this build, numbered $next, sealed again.
-ditto "$app" "$work/new/Oyenza Studio.app"
+ditto "$app" "$work/new/Nexora.app"
 for key in CFBundleShortVersionString CFBundleVersion; do
-  plutil -replace "$key" -string "$next" "$work/new/Oyenza Studio.app/Contents/Info.plist"
+  plutil -replace "$key" -string "$next" "$work/new/Nexora.app/Contents/Info.plist"
 done
-codesign --force --deep --sign - "$work/new/Oyenza Studio.app"
-dmg="$work/home/cache/update/Oyenza-Studio-$next-mac.dmg"
-bash "$root/tools/make_mac_dmg.sh" "$work/new/Oyenza Studio.app" "$dmg" test
+codesign --force --deep --sign - "$work/new/Nexora.app"
+dmg="$work/home/cache/update/Nexora-$next-mac.dmg"
+bash "$root/tools/make_mac_dmg.sh" "$work/new/Nexora.app" "$dmg" test
 size="$(stat -f %z "$dmg")"
 sha="$(shasum -a 256 "$dmg" | cut -d ' ' -f 1)"
 
 # What a look, the download and Install on next start leave behind.
-release="https://github.com/lucacadalora/oyenza-studio/releases"
+release="https://github.com/dasunjlk/Nexora/releases"
 cat > "$work/home/update.json" << JSON
 {
   "checked": $(date +%s),
@@ -46,7 +46,7 @@ cat > "$work/home/update.json" << JSON
     "headline": "The update test",
     "notes": "$release/tag/v$next",
     "windows": null,
-    "mac": { "url": "$release/download/v$next/Oyenza-Studio-$next-mac.dmg", "size": $size, "sha256": "$sha" }
+    "mac": { "url": "$release/download/v$next/Nexora-$next-mac.dmg", "size": $size, "sha256": "$sha" }
   },
   "announced": "$next",
   "ran": "$running",
@@ -78,8 +78,8 @@ codesign --verify --deep --strict "$installed" || fail "the installed app's sign
 grep -q '"install_on_start": ""' "$work/home/update.json" || fail "update.json still asks to install on next start"
 
 # Once the old copy has quit, the little shell deletes it and opens the new one.
-for _ in $(seq 1 150); do [ -e "$work/Applications/.Oyenza Studio update.app" ] || break; sleep 0.2; done
-[ -e "$work/Applications/.Oyenza Studio update.app" ] && fail "the old copy is still next to the new one"
+for _ in $(seq 1 150); do [ -e "$work/Applications/.Nexora update.app" ] || break; sleep 0.2; done
+[ -e "$work/Applications/.Nexora update.app" ] && fail "the old copy is still next to the new one"
 opened=""
 for _ in $(seq 1 150); do
   opened="$(pgrep -f "$installed/Contents/MacOS/nexora" || true)"

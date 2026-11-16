@@ -1,4 +1,4 @@
-//! Oyenza Studio's Diorama theme: the resting pill as a small window onto a
+//! Nexora's Diorama theme: the resting pill as a small window onto a
 //! pixel-art place that keeps the day's hours.
 //!
 //! A raised frame holds a pane with a house, a tree and a sky behind it,

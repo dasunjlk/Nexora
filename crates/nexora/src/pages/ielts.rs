@@ -1,7 +1,7 @@
 //! IELTS page, the IELTS add-on's (off until switched on): Oyen as a
 //! GoPrep-style IELTS Speaking examiner (`nexora_core::ielts`).
 //!
-//! - Signed out: the Oyenza sign-in card, saying what the coach does.
+//! - Signed out: the Nexora sign-in card, saying what the coach does.
 //! - Home: the five levels (open ones can be picked, each with its target
 //!   band and the best so far), today's sessions, how Oyen talks (Sopan,
 //!   Gaul, Ngegas) and Mulai.
@@ -24,7 +24,7 @@ use crate::commands::{Command, IeltsCmd};
 use crate::gfx::{TextStyle, Weight};
 use crate::icons::Icon;
 use crate::oyen::{self, Coach as Oyen};
-use crate::state::{AppState, OyenzaLink};
+use crate::state::{AppState, NexoraLink};
 use crate::ui::{wid, wid_n, PillStyle, Resp, Ui, PILL_GAP, PILL_SMALL};
 use nexora_core::geom::{palette, Color, Point, Rect};
 use nexora_core::ielts::{self, MicIssue, Phase, Problem, Spice};
@@ -32,7 +32,7 @@ use nexora_core::ielts::{self, MicIssue, Phase, Problem, Spice};
 /// Every state is this tall (under System's 256, the island's tallest), so
 /// the island never grows, or jumps between them.
 const HEIGHT: f32 = 248.0;
-/// Signed out: the Oyenza sign-in card's height.
+/// Signed out: the Nexora sign-in card's height.
 const SIGNED_OUT_H: f32 = 156.0;
 /// Oyen's column, and the gap to the right one.
 const LEFT_W: f32 = 168.0;
@@ -51,7 +51,7 @@ const DISCLAIMER: &str = "IELTS\u{ae} is a trademark of the IELTS partners. Not 
 const MIC_SETTINGS: &str =
     if cfg!(target_os = "macos") { "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone" } else { "ms-settings:privacy-microphone" };
 const SIGN_IN_TITLE: &str = "Latihan IELTS Speaking bareng Oyen";
-const SIGN_IN_BODY: &str = "Oyen jadi examiner IELTS kamu: nanya Part 1 sampai 3, dengerin jawabanmu, kasih band score, terus nge-roast. Masuk ke Oyenza dulu buat mulai.";
+const SIGN_IN_BODY: &str = "Oyen jadi examiner IELTS kamu: nanya Part 1 sampai 3, dengerin jawabanmu, kasih band score, terus nge-roast. Masuk ke Nexora dulu buat mulai.";
 
 pub fn height(st: &AppState) -> f32 {
     if !signed_in(st) {
@@ -68,13 +68,13 @@ pub fn next_wake(st: &AppState) -> Option<f64> {
 }
 
 fn signed_in(st: &AppState) -> bool {
-    matches!(st.oyenza.link, OyenzaLink::Connected { .. })
+    matches!(st.nexora.link, NexoraLink::Connected { .. })
 }
 
 pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect) {
     if !signed_in(st) {
         let card = Rect::new(area.x, area.y, area.w, SIGNED_OUT_H);
-        super::oyenza::sign_in_card(ui, st, card, SIGN_IN_TITLE, SIGN_IN_BODY, "ielts.sign-in");
+        super::nexora::sign_in_card(ui, st, card, SIGN_IN_TITLE, SIGN_IN_BODY, "ielts.sign-in");
         return;
     }
     // Fixed layout height: the island's spring may still be opening.

@@ -19,8 +19,8 @@
 //! second thread, `nexora-notes-send`, exists only while a meeting is handed
 //! over: it sends the parts, says it's over, asks every few seconds until
 //! the notes are written (`nexora_core::notes::POLL_S`), saves them as
-//! Markdown in `Documents\Oyenza Studio\Notes` and deletes the audio. The
-//! calls carry the PC's Oyenza key, read from its sealed file on that thread
+//! Markdown in `Documents\Nexora\Notes` and deletes the audio. The
+//! calls carry the PC's Nexora key, read from its sealed file on that thread
 //! only, never the UI's or the log.
 
 use crate::events::{AppEvent, EventSink};
@@ -35,7 +35,7 @@ use nexora_core::datetime::LocalDateTime;
 use nexora_core::ielts::peak;
 use nexora_core::ielts::WavWriter;
 use nexora_core::notes::{self, CaptureIssue, Lang, Mixer, Problem, Reply, Saved, View, PART_SECS, RATE};
-use nexora_core::oyenza;
+use nexora_core::nexora;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::{mpsc, Arc};
@@ -46,7 +46,7 @@ use windows::Win32::Media::Audio::{eCapture, eConsole, eRender, EDataFlow, IMMDe
 #[cfg(windows)]
 use windows::Win32::System::Com::{CoCreateInstance, CoInitializeEx, CoTaskMemFree, CoUninitialize, CLSCTX_ALL, COINIT_MULTITHREADED};
 
-const USER_AGENT: &str = concat!("OyenzaStudio/", env!("CARGO_PKG_VERSION"), " (+https://github.com/lucacadalora/oyenza-studio)");
+const USER_AGENT: &str = concat!("NexoraStudio/", env!("CARGO_PKG_VERSION"), " (+https://github.com/dasunjlk/Nexora)");
 /// How long `start` waits for the devices to open.
 const OPEN_TIMEOUT: Duration = Duration::from_secs(5);
 /// How often the recording checks whether Windows' default devices changed.
@@ -428,7 +428,7 @@ pub struct Job {
     pub take: Take,
     pub started: LocalDateTime,
     pub lang: Lang,
-    /// The self-test's own server and key, in place of api.oyenza.app and
+    /// The self-test's own server and key, in place of api.nexora.app and
     /// this PC's sign-in.
     pub api: Option<(String, String)>,
     /// Where the notes go.
@@ -469,7 +469,7 @@ impl Sender<'_> {
     fn key(&self) -> Option<String> {
         match &self.job.api {
             Some((_, k)) => Some(k.clone()),
-            None => crate::services::secret::load(&crate::paths::oyenza_link_path()).and_then(|s| oyenza::parse_link(&s)).map(|l| l.key),
+            None => crate::services::secret::load(&crate::paths::nexora_link_path()).and_then(|s| nexora::parse_link(&s)).map(|l| l.key),
         }
     }
 

@@ -13,7 +13,7 @@ use crate::settings::Settings;
 use crate::sha256;
 
 /// Where the files live: `<RELEASES>/<tag>/<name>`.
-pub const RELEASES: &str = "https://github.com/lucacadalora/oyenza-studio/releases/download";
+pub const RELEASES: &str = "https://github.com/dasunjlk/Nexora/releases/download";
 
 /// One file an add-on downloads.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -76,7 +76,7 @@ pub struct Addon {
     /// The release that holds this version of the files.
     pub tag: &'static str,
     pub files: &'static [AddonFile],
-    /// Part of Oyenza Studio Pro: it works only for an Oyenza account the
+    /// Part of Nexora Pro: it works only for an Nexora account the
     /// server says has Pro (`GET /island/pro`; `AppState::pro`).
     pub pro: bool,
 }
@@ -134,7 +134,7 @@ pub const PRAYER_TIMES: Addon = Addon {
 /// The Japanese readings add-on's dictionary file (`romanize::JaDict`).
 pub const JA_READINGS_FILE: &str = "ja-readings.dic.zst";
 
-/// Japanese readings: Oyenza Studio's own reading dictionary, for romaji under
+/// Japanese readings: Nexora's own reading dictionary, for romaji under
 /// kanji on Macs and on PCs where Windows has no Japanese reading data (most
 /// PCs outside Japan). Only people who play Japanese songs need it: the first
 /// song whose kanji go unread switches it on ([`ja_switches_on`], once;
@@ -187,15 +187,15 @@ pub const SYSTEM: Addon = Addon {
 };
 
 /// Health: the Health page, today's steps against the goal and the week,
-/// which Oyenza on the phone sends once signed in (Apple Health or Health
+/// which Nexora on the phone sends once signed in (Apple Health or Health
 /// Connect). A tab for everyone up to 0.2.8; an add-on, off, in the versions
 /// after it, like System. Its code is in the app, so there is nothing to
-/// download. Off, there is no Health tab and the Oyenza worker never asks
+/// download. Off, there is no Health tab and the Nexora worker never asks
 /// for the steps.
 pub const HEALTH: Addon = Addon {
     id: "health",
     title: "Health",
-    blurb: "Your steps from Oyenza on your phone: today against your goal, and your week.",
+    blurb: "Your steps from Nexora on your phone: today against your goal, and your week.",
     mac_blurb: None,
     tag: "",
     files: &[],
@@ -203,13 +203,13 @@ pub const HEALTH: Addon = Addon {
 };
 
 /// Stocks: the Stocks page, the IHSG and up to ten IDX stocks with their
-/// day's line, from oyenza.trade (`nexora_core::stocks`). Its code is in the
+/// day's line, from nexora.trade (`nexora_core::stocks`). Its code is in the
 /// app, so there is nothing to download. Off, there is no Stocks tab; on, the
 /// prices are asked for only while its page is on screen.
 pub const STOCKS: Addon = Addon {
     id: "stocks",
     title: "Stocks",
-    blurb: "The IHSG and up to 10 IDX stocks from oyenza.trade, 10 minutes behind IDX.",
+    blurb: "The IHSG and up to 10 IDX stocks from nexora.trade, 10 minutes behind IDX.",
     mac_blurb: None,
     tag: "",
     files: &[],
@@ -232,7 +232,7 @@ pub const CAFFEINE: Addon = Addon {
 };
 
 /// Screen recorder: the Record page and the recording pill, the face of
-/// Oyenza Studio Recorder (its own install, about 120 MB). Its code is in the
+/// Nexora Recorder (its own install, about 120 MB). Its code is in the
 /// island, so there is nothing to download. It shows on the Add-ons page once
 /// the recorder is installed, and is on from then until switched off
 /// (`Settings::recorder_on`). Off, there is no Record tab, and the recorder
@@ -240,7 +240,7 @@ pub const CAFFEINE: Addon = Addon {
 pub const SCREEN_RECORDER: Addon = Addon {
     id: "recorder",
     title: "Screen recorder",
-    blurb: "Record your screen from the island, with Oyenza Studio Recorder.",
+    blurb: "Record your screen from the island, with Nexora Recorder.",
     mac_blurb: None,
     tag: "",
     files: &[],
@@ -339,7 +339,7 @@ pub const AI_USAGE: Addon = Addon {
 
 /// IELTS: Oyen's IELTS Speaking coach, the IELTS page (`crate::ielts`):
 /// Oyen asks the questions out loud, listens to the answers through the
-/// microphone and gives a band score, through the Oyenza account. Its code
+/// microphone and gives a band score, through the Nexora account. Its code
 /// is in the app, so there is nothing to download. Off, there is no IELTS
 /// tab, and nothing of it runs: no microphone, no player, no calls. Part of
 /// Studio Pro: it switches on only for an account the server says has Pro,
@@ -357,7 +357,7 @@ pub const IELTS: Addon = Addon {
 /// Meeting notes: the Notes page (`crate::notes`). One click and Oyen listens
 /// to the microphone and the computer's own sound (a call in Meet, Zoom,
 /// Teams; on a Mac through a Core Audio tap, macOS 14.2 and later), then the
-/// Oyenza account writes the notes. Its code is in the
+/// Nexora account writes the notes. Its code is in the
 /// app, so there is nothing to download. Off, there is no Notes tab and
 /// nothing of it runs: no recording, no calls. Part of Studio Pro: the page
 /// records only for an account the server says has Pro, and the server
@@ -560,7 +560,7 @@ mod tests {
             assert!(f.matches(bytes), "{name}: size {} sha256 {}", bytes.len(), sha256::hex(&sha256::sha256(bytes)));
         }
         let ja = Addon::find("ja").unwrap();
-        assert_eq!(ja.url(&ja.files[0]), "https://github.com/lucacadalora/oyenza-studio/releases/download/addon-ja-1/ja-readings.dic.zst");
+        assert_eq!(ja.url(&ja.files[0]), "https://github.com/dasunjlk/Nexora/releases/download/addon-ja-1/ja-readings.dic.zst");
         assert_eq!(Status::Off.line(ja, false), ja.blurb);
         assert_eq!(Status::Ready.line(ja, false), "On · 3.8 MB on this PC");
         // The Mac app has no Windows reason to give, and says Mac.
@@ -584,7 +584,7 @@ mod tests {
     #[test]
     fn files_come_from_the_release() {
         let a = Addon::find("sholat").unwrap();
-        assert_eq!(a.url(&a.files[1]), "https://github.com/lucacadalora/oyenza-studio/releases/download/addon-sholat-3/adzan.m4a");
+        assert_eq!(a.url(&a.files[1]), "https://github.com/dasunjlk/Nexora/releases/download/addon-sholat-3/adzan.m4a");
         assert_eq!(a.size(), 959_353);
         assert!(Addon::find("nope").is_none());
     }
@@ -654,7 +654,7 @@ mod tests {
         }
         assert_eq!(ytdlp_tags[0], ytdlp_tags[1], "yt-dlp: the same version on Windows and the Mac");
         // Our own builds and the notices: each add-on's own pre-release.
-        let ours = "https://github.com/lucacadalora/oyenza-studio/releases/download";
+        let ours = "https://github.com/dasunjlk/Nexora/releases/download";
         assert_eq!(w.url(&w.files[2]), format!("{ours}/addon-downloader-1/ffmpeg.exe"));
         assert_eq!(w.url(&w.files[3]), format!("{ours}/addon-downloader-1/NOTICE.txt"));
         for (f, name) in m.files[1..].iter().zip(["qjs", "ffmpeg", "NOTICE.txt"]) {
@@ -707,7 +707,7 @@ mod tests {
         for (d, bytes) in [(DOWNLOADER_WINDOWS, windows), (DOWNLOADER_MAC, mac)] {
             let notice = d.files.iter().find(|f| f.name == "NOTICE.txt").unwrap();
             assert!(notice.matches(bytes), "{}: size {} sha256 {}", d.tag, bytes.len(), sha256::hex(&sha256::sha256(bytes)));
-            assert_eq!(d.url(notice), format!("https://github.com/lucacadalora/oyenza-studio/releases/download/{}/NOTICE.txt", d.tag));
+            assert_eq!(d.url(notice), format!("https://github.com/dasunjlk/Nexora/releases/download/{}/NOTICE.txt", d.tag));
         }
     }
 

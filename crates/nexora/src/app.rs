@@ -3,8 +3,8 @@
 
 use crate::activities::{self, Mode};
 use crate::clock;
-use crate::commands::{Command, MediaCmd, NotifyCmd, OyenzaCmd, PairCmd, PhoneCmd, UsageCmd};
-use crate::events::{AppEvent, AppleMusicStatus, EventSink, OyenzaEvent, SendHwnd, WM_APP_APPBAR, WM_APP_EVENT, WM_APP_FRAME, WM_APP_TRAY};
+use crate::commands::{Command, MediaCmd, NotifyCmd, NexoraCmd, PairCmd, PhoneCmd, UsageCmd};
+use crate::events::{AppEvent, AppleMusicStatus, EventSink, NexoraEvent, SendHwnd, WM_APP_APPBAR, WM_APP_EVENT, WM_APP_FRAME, WM_APP_TRAY};
 use crate::gfx::{px_rect, px_union, scale_about, union_rect, Canvas, Gfx, HitMask};
 use crate::icons::Icon;
 use crate::island::{Geom, Island, SHOULDER};
@@ -17,7 +17,7 @@ use crate::services::{self, Services};
 use crate::settings_host::{self, SettingsWindow};
 use crate::settings_window::Section;
 use crate::state::{
-    AppState, FpsAccess, HudKind, InlineAction, Locate, LyricsState, LyricsStatus, Notice, NoticeAction, NotifyAccess, OyenzaLink, PairedPhone, PhoneAsk,
+    AppState, FpsAccess, HudKind, InlineAction, Locate, LyricsState, LyricsStatus, Notice, NoticeAction, NotifyAccess, NexoraLink, PairedPhone, PhoneAsk,
     PhoneDrop, PhoneTransfer, PhoneView, PrayerState,
 };
 use crate::tray::{self, Tray};
@@ -28,7 +28,7 @@ use nexora_core::spot;
 use nexora_core::addons::Status as AddonStatus;
 use nexora_core::frametime::{ambient_divisor, MotionStats};
 use nexora_core::geom::{palette, Color, Point, Rect};
-use nexora_core::oyenza;
+use nexora_core::nexora;
 use nexora_core::pairdrop::{MeetEvent, PeerEvent};
 use nexora_core::phonedrop::{Event as PhoneEvent, QrMatrix};
 use nexora_core::prayer::{Due, PlaceList, Prayer, PrayerMoment};
@@ -86,7 +86,7 @@ const WTS_SESSION_LOCK_: usize = 7;
 const WTS_SESSION_UNLOCK_: usize = 8;
 
 /// Steps for copying the Apple Music token (README).
-const APPLE_MUSIC_HELP_URL: &str = "https://github.com/lucacadalora/oyenza-studio#apple-music-lyrics";
+const APPLE_MUSIC_HELP_URL: &str = "https://github.com/dasunjlk/Nexora#apple-music-lyrics";
 /// Phone drop closes itself after this long without a request from a phone.
 const PHONE_IDLE_S: f64 = 600.0;
 
@@ -238,7 +238,7 @@ thread_local! {
     static REC_MISSED: RefCell<Vec<(nexora_core::recorder::Message, isize)>> = const { RefCell::new(Vec::new()) };
 }
 
-/// A message from Oyenza Studio Recorder (`nexora_core::recorder`), read while
+/// A message from Nexora Recorder (`nexora_core::recorder`), read while
 /// it waits in `SendMessageTimeout`: true tells it the island shows the
 /// recording (or its Record page), so it keeps its own bar and controls
 /// hidden; false, that it should show them.
@@ -344,7 +344,7 @@ fn run_deferred(d: Deferred) {
             let Some((helper, items)) = with_app(|app| {
                 // Right-clicked on the open island (the tray's menu leaves it as it is).
                 app.menu_open = app.expanded && app.hovering;
-                (app.helper, tray::menu_items(&app.st.settings, app.st.pinned, &app.st.oyenza.link, crate::services::recorder::installed(), crate::updates::menu_line(&app.st, app.updater.is_some())))
+                (app.helper, tray::menu_items(&app.st.settings, app.st.pinned, &app.st.nexora.link, crate::services::recorder::installed(), crate::updates::menu_line(&app.st, app.updater.is_some())))
             }) else {
                 return;
             };
@@ -401,7 +401,7 @@ pub struct App {
     notes_take: Option<services::notes::Take>,
     /// When the meeting being taken down began (local time, for its notes).
     notes_started: nexora_core::datetime::LocalDateTime,
-    /// The self-test's own notes server and key, in place of api.oyenza.app
+    /// The self-test's own notes server and key, in place of api.nexora.app
     /// and this PC's sign-in.
     pub(crate) notes_api: Option<(String, String)>,
     /// The self-test runs (for the whole run: `selftest` itself is taken out
@@ -463,11 +463,11 @@ pub struct App {
     sysmon_on: bool,
     /// What the System reader was last told about nobody being there and battery saver.
     sysmon_rest: nexora_core::sysmon::Rest,
-    /// The Oyenza page is on screen: its day list stays live (`services::oyenza`).
-    oyenza_watch: bool,
+    /// The Nexora page is on screen: its day list stays live (`services::nexora`).
+    nexora_watch: bool,
     /// The Stocks page was on screen at the last look (`set_stocks_watch`).
     stocks_open: bool,
-    /// The Today page is on screen: the worker asks for the day (`services::oyenza`).
+    /// The Today page is on screen: the worker asks for the day (`services::nexora`).
     today_watch: bool,
     /// What the AI tab's worker was last told (`set_usage_watch`).
     usage_watch: services::usage::Watch,
@@ -649,7 +649,7 @@ impl App {
         island.set_floating(pill::on(st.settings.theme).then_some(pill::TOP_GAP));
         let clock = FrameClock::start(SendHwnd::new(hwnd), monitor.handle);
         let taskbar_created_msg = unsafe { RegisterWindowMessageW(w!("TaskbarCreated")) };
-        // Oyenza Studio Recorder installed: the Record tab can show (one registry read).
+        // Nexora Recorder installed: the Record tab can show (one registry read).
         st.recorder = selftest_dir.is_none() && services::recorder::installed();
         // The Downloader: not in the Microsoft Store build.
         st.downloader_offered = !crate::autostart::packaged();
@@ -714,7 +714,7 @@ impl App {
             sysmon: None,
             sysmon_on: false,
             sysmon_rest: nexora_core::sysmon::Rest::default(),
-            oyenza_watch: false,
+            nexora_watch: false,
             stocks_open: false,
             today_watch: false,
             usage_watch: services::usage::Watch::default(),
@@ -768,7 +768,7 @@ impl App {
         self.st.power = services::power::query();
         services::power::register(self.helper);
         if !fake {
-            self.services = Some(Services::start(&self.sink, self.hwnd, self.helper, &self.st.settings, self.oyenza_activity()));
+            self.services = Some(Services::start(&self.sink, self.hwnd, self.helper, &self.st.settings, self.nexora_activity()));
             self.sync_top_watch();
             self.st.paired = self.services.as_ref().map(|s| paired_phones(s.pairs())).unwrap_or_default();
             self.sync_pair_offer();
@@ -1473,7 +1473,7 @@ impl App {
                 }
                 let p = services::power::query();
                 self.on_event(AppEvent::Power(p));
-                self.tell_oyenza_activity();
+                self.tell_nexora_activity();
                 self.tell_sysmon_rest();
                 self.set_stocks_watch();
                 self.set_usage_watch();
@@ -1487,7 +1487,7 @@ impl App {
                     WTS_SESSION_UNLOCK_ => self.locked = false,
                     _ => {}
                 }
-                self.tell_oyenza_activity();
+                self.tell_nexora_activity();
                 self.tell_sysmon_rest();
                 self.set_stocks_watch();
                 self.set_usage_watch();
@@ -1558,7 +1558,7 @@ impl App {
             },
         }
         if self.settings_win.as_ref().is_some_and(|w| w.view.section == Section::Addons) {
-            self.oyenza(OyenzaCmd::CheckPro);
+            self.nexora(NexoraCmd::CheckPro);
         }
         self.paint_settings(deferred);
     }
@@ -1586,7 +1586,7 @@ impl App {
             }
             // Add-ons lists IELTS and Meeting notes by the account's Pro, as its tab does.
             if after != before && after == Section::Addons {
-                self.oyenza(OyenzaCmd::CheckPro);
+                self.nexora(NexoraCmd::CheckPro);
             }
             let ran = !self.st.cmds.is_empty();
             if ran {
@@ -1958,27 +1958,27 @@ impl App {
         }
     }
 
-    // ------------------------------------------------------------ Oyenza
+    // ------------------------------------------------------------ Nexora
 
-    /// How the Oyenza worker should pace itself: in use (unlocked, display
+    /// How the Nexora worker should pace itself: in use (unlocked, display
     /// on) and the power source.
-    fn oyenza_activity(&self) -> services::oyenza::Activity {
+    fn nexora_activity(&self) -> services::nexora::Activity {
         let p = self.st.power;
-        services::oyenza::Activity {
+        services::nexora::Activity {
             in_use: !self.locked && !self.display_off,
             on_ac: p.on_ac || !p.has_battery,
             saver: p.saver,
-            watching: self.oyenza_watch,
+            watching: self.nexora_watch,
             today: self.today_watch,
             health: self.st.health_on(),
         }
     }
 
-    /// The Oyenza page came on screen or went: the worker keeps its list live only meanwhile.
-    fn set_oyenza_watch(&mut self, on: bool) {
-        if on != self.oyenza_watch {
-            self.oyenza_watch = on;
-            self.tell_oyenza_activity();
+    /// The Nexora page came on screen or went: the worker keeps its list live only meanwhile.
+    fn set_nexora_watch(&mut self, on: bool) {
+        if on != self.nexora_watch {
+            self.nexora_watch = on;
+            self.tell_nexora_activity();
         }
     }
 
@@ -1986,11 +1986,11 @@ impl App {
     fn set_today_watch(&mut self, on: bool) {
         if on != self.today_watch {
             self.today_watch = on;
-            self.tell_oyenza_activity();
+            self.tell_nexora_activity();
         }
     }
 
-    /// The Stocks page asks oyenza.trade for prices only while it is on
+    /// The Stocks page asks nexora.trade for prices only while it is on
     /// screen and someone is at the PC (`pages::stocks::watch`); the worker
     /// starts the first time it opens.
     fn set_stocks_watch(&mut self) {
@@ -2006,139 +2006,139 @@ impl App {
         }
     }
 
-    fn tell_oyenza_activity(&self) {
+    fn tell_nexora_activity(&self) {
         if let Some(s) = self.services.as_ref() {
-            s.oyenza_activity(self.oyenza_activity());
+            s.nexora_activity(self.nexora_activity());
         }
     }
 
-    fn oyenza(&self, c: OyenzaCmd) {
+    fn nexora(&self, c: NexoraCmd) {
         if let Some(s) = self.services.as_ref() {
-            s.oyenza(c);
+            s.nexora(c);
         }
     }
 
-    fn on_oyenza(&mut self, ev: OyenzaEvent) {
+    fn on_nexora(&mut self, ev: NexoraEvent) {
         let now = self.st.now;
-        let link_before = self.st.oyenza.link.clone();
+        let link_before = self.st.nexora.link.clone();
         let pro_before = self.st.studio_pro() == Some(true);
         match ev {
-            OyenzaEvent::Restored { account } => {
-                self.st.oyenza.link = OyenzaLink::Connected { account };
+            NexoraEvent::Restored { account } => {
+                self.st.nexora.link = NexoraLink::Connected { account };
                 self.ask_pro();
             }
-            OyenzaEvent::Connecting { code, url, expires_in_s } => {
-                self.st.oyenza.link = OyenzaLink::Connecting { code, url, until: now + expires_in_s as f64 };
-                // Keep the code on screen while the person goes to oyenza.app.
-                if self.st.oyenza.pinned_before.is_none() {
-                    self.st.oyenza.pinned_before = Some(self.st.pinned);
+            NexoraEvent::Connecting { code, url, expires_in_s } => {
+                self.st.nexora.link = NexoraLink::Connecting { code, url, until: now + expires_in_s as f64 };
+                // Keep the code on screen while the person goes to nexora.app.
+                if self.st.nexora.pinned_before.is_none() {
+                    self.st.nexora.pinned_before = Some(self.st.pinned);
                 }
                 self.st.pinned = true;
-                self.st.page = PageKind::Oyenza;
+                self.st.page = PageKind::Nexora;
                 self.expand();
             }
-            OyenzaEvent::Connected { account } => {
+            NexoraEvent::Connected { account } => {
                 self.end_sign_in();
-                self.st.notify(Icon::Check, palette::GREEN, "Connected to Oyenza", format!("as {account}"), 6.0, Some(NoticeAction::OpenPage(PageKind::Oyenza)));
-                self.st.oyenza.link = OyenzaLink::Connected { account };
+                self.st.notify(Icon::Check, palette::GREEN, "Connected to Nexora", format!("as {account}"), 6.0, Some(NoticeAction::OpenPage(PageKind::Nexora)));
+                self.st.nexora.link = NexoraLink::Connected { account };
                 self.ask_pro();
                 // Signed in from the Today page: back to it, where the day comes in.
-                if std::mem::take(&mut self.st.oyenza.from_today) {
+                if std::mem::take(&mut self.st.nexora.from_today) {
                     self.st.page = PageKind::Today;
                     self.expand();
                 }
             }
-            OyenzaEvent::ConnectFailed(code) => {
-                self.st.oyenza.from_today = false;
+            NexoraEvent::ConnectFailed(code) => {
+                self.st.nexora.from_today = false;
                 self.end_sign_in();
-                self.st.oyenza.link = OyenzaLink::Off;
-                let (title, subtitle) = oyenza::connect_failure_text(&code);
+                self.st.nexora.link = NexoraLink::Off;
+                let (title, subtitle) = nexora::connect_failure_text(&code);
                 self.st.notify(Icon::Unlink, palette::ORANGE, title, subtitle, 6.0, None);
             }
-            OyenzaEvent::ConnectCancelled => {
-                self.st.oyenza.from_today = false;
+            NexoraEvent::ConnectCancelled => {
+                self.st.nexora.from_today = false;
                 self.end_sign_in();
-                self.st.oyenza.link = OyenzaLink::Off;
+                self.st.nexora.link = NexoraLink::Off;
             }
-            OyenzaEvent::Money { arrived } => {
-                let o = &mut self.st.oyenza;
+            NexoraEvent::Money { arrived } => {
+                let o = &mut self.st.nexora;
                 o.updated_unix = Some(self.st.unix);
-                let fresh = oyenza::unseen(&mut o.shown, &arrived);
-                if let Some(n) = oyenza::money_notice(&fresh) {
+                let fresh = nexora::unseen(&mut o.shown, &arrived);
+                if let Some(n) = nexora::money_notice(&fresh) {
                     let (icon, color) = match n.flow {
-                        Some(oyenza::Flow::In) => (Icon::MoneyIn, palette::GREEN),
-                        Some(oyenza::Flow::Out) => (Icon::MoneyOut, palette::BLUE),
+                        Some(nexora::Flow::In) => (Icon::MoneyIn, palette::GREEN),
+                        Some(nexora::Flow::Out) => (Icon::MoneyOut, palette::BLUE),
                         _ => (Icon::Wallet, palette::BLUE),
                     };
-                    self.oyenza_notice(icon, color, n.title, n.shown, Some(n.hidden));
+                    self.nexora_notice(icon, color, n.title, n.shown, Some(n.hidden));
                 }
             }
-            OyenzaEvent::Activity(a) => {
-                let o = &mut self.st.oyenza;
+            NexoraEvent::Activity(a) => {
+                let o = &mut self.st.nexora;
                 o.seen.note(&a.days, now);
                 o.activity = Some(a);
                 o.updated_unix = Some(self.st.unix);
             }
-            OyenzaEvent::ActivityChecked => self.st.oyenza.updated_unix = Some(self.st.unix),
-            OyenzaEvent::Bills { today, bills } => {
+            NexoraEvent::ActivityChecked => self.st.nexora.updated_unix = Some(self.st.unix),
+            NexoraEvent::Bills { today, bills } => {
                 let day = if today.is_empty() { self.st.day_key() } else { today };
-                self.st.oyenza.bills = bills;
-                self.st.oyenza.bills_today = day.clone();
-                self.st.oyenza.updated_unix = Some(self.st.unix);
+                self.st.nexora.bills = bills;
+                self.st.nexora.bills_today = day.clone();
+                self.st.nexora.updated_unix = Some(self.st.unix);
                 self.remind_bills(&day);
             }
-            OyenzaEvent::Day(day) => {
-                let o = &mut self.st.oyenza;
+            NexoraEvent::Day(day) => {
+                let o = &mut self.st.nexora;
                 o.agenda = Some(day);
                 o.agenda_unix = Some(self.st.unix);
                 o.agenda_state = crate::state::AgendaState::Ready;
             }
-            OyenzaEvent::DayUnavailable => {
-                self.st.oyenza.agenda = None;
-                self.st.oyenza.agenda_state = crate::state::AgendaState::Unavailable;
+            NexoraEvent::DayUnavailable => {
+                self.st.nexora.agenda = None;
+                self.st.nexora.agenda_state = crate::state::AgendaState::Unavailable;
             }
-            OyenzaEvent::DayFailed => self.st.oyenza.agenda_state = crate::state::AgendaState::Failed,
-            OyenzaEvent::Pro(pro) => self.st.oyenza.pro = Some(pro),
+            NexoraEvent::DayFailed => self.st.nexora.agenda_state = crate::state::AgendaState::Failed,
+            NexoraEvent::Pro(pro) => self.st.nexora.pro = Some(pro),
             // Steps asked for before Health was switched off stay out.
-            OyenzaEvent::Health(next) if self.st.health_on() => {
+            NexoraEvent::Health(next) if self.st.health_on() => {
                 if let Some(steps) = self.st.take_health(next) {
                     self.steps_notice(steps);
                 }
             }
-            OyenzaEvent::Health(_) => {}
-            OyenzaEvent::NoteSaved(saved) => {
-                let o = &mut self.st.oyenza;
+            NexoraEvent::Health(_) => {}
+            NexoraEvent::NoteSaved(saved) => {
+                let o = &mut self.st.nexora;
                 o.saving = false;
                 o.input.clear();
                 o.error = None;
-                o.saved = Some((saved, now + oyenza::UNDO_S));
+                o.saved = Some((saved, now + nexora::UNDO_S));
             }
-            OyenzaEvent::NoteFailed { text, code } => {
-                let o = &mut self.st.oyenza;
+            NexoraEvent::NoteFailed { text, code } => {
+                let o = &mut self.st.nexora;
                 o.saving = false;
                 if o.input.trim().is_empty() {
                     o.input = text;
                 }
-                o.error = Some(oyenza::note_error_text(&code).into());
+                o.error = Some(nexora::note_error_text(&code).into());
             }
-            OyenzaEvent::Undone => self.st.oyenza.flash = Some(("Taken back".into(), now + 3.0)),
-            OyenzaEvent::UndoFailed(code) => {
-                let line = if code == "too_late" { "Too late to undo here. Change it in oyenza.app" } else { "Couldn't undo. Change it in oyenza.app" };
-                self.st.oyenza.flash = Some((line.into(), now + 5.0));
+            NexoraEvent::Undone => self.st.nexora.flash = Some(("Taken back".into(), now + 3.0)),
+            NexoraEvent::UndoFailed(code) => {
+                let line = if code == "too_late" { "Too late to undo here. Change it in nexora.app" } else { "Couldn't undo. Change it in nexora.app" };
+                self.st.nexora.flash = Some((line.into(), now + 5.0));
             }
-            OyenzaEvent::Disconnected { by_server } => {
+            NexoraEvent::Disconnected { by_server } => {
                 self.end_sign_in();
-                self.st.oyenza = crate::state::OyenzaState::default();
+                self.st.nexora = crate::state::NexoraState::default();
                 self.st.health = None;
                 // Signed out: an IELTS session ends, and the ladder was the account's.
                 self.ielts_off();
                 let (title, subtitle) =
-                    if by_server { ("Oyenza disconnected", "Sign in again in Settings") } else { ("Disconnected from Oyenza", "Sign in again any time in Settings") };
+                    if by_server { ("Nexora disconnected", "Sign in again in Settings") } else { ("Disconnected from Nexora", "Sign in again any time in Settings") };
                 self.st.notify(Icon::Unlink, palette::TEXT_DIM, title, subtitle, 6.0, None);
             }
         }
-        // Signed in or out, the Oyenza page's height changes: the window fits the tallest page again.
-        if self.st.oyenza.link != link_before {
+        // Signed in or out, the Nexora page's height changes: the window fits the tallest page again.
+        if self.st.nexora.link != link_before {
             self.layout_surface();
         }
         if (self.st.studio_pro() == Some(true)) != pro_before {
@@ -2151,7 +2151,7 @@ impl App {
     /// the Add-ons page to open (`pages::addons::pro_wanted`).
     fn ask_pro(&self) {
         if pages::addons::pro_wanted(&self.st) {
-            self.oyenza(OyenzaCmd::CheckPro);
+            self.nexora(NexoraCmd::CheckPro);
         }
     }
 
@@ -2172,7 +2172,7 @@ impl App {
     /// The code is gone (signed in, refused, cancelled): the island stops
     /// staying open for it.
     fn end_sign_in(&mut self) {
-        if let Some(p) = self.st.oyenza.pinned_before.take() {
+        if let Some(p) = self.st.nexora.pinned_before.take() {
             self.st.pinned = p;
             if !p {
                 self.maybe_schedule_collapse();
@@ -2184,22 +2184,22 @@ impl App {
     /// amounts on the island" is on (`hidden` None: nothing to hide). While a
     /// full-screen app hides the island it waits, and shows when the island
     /// is back if it isn't old by then.
-    fn oyenza_notice(&mut self, icon: Icon, color: Color, title: String, shown: String, hidden: Option<String>) {
+    fn nexora_notice(&mut self, icon: Icon, color: Color, title: String, shown: String, hidden: Option<String>) {
         let now = self.st.now;
-        let hide = hidden.is_some() && !self.st.settings.oyenza_show_amounts;
+        let hide = hidden.is_some() && !self.st.settings.nexora_show_amounts;
         let notice = Notice {
             icon,
             color,
             title,
             title_dim: String::new(),
             subtitle: if hide { hidden.unwrap_or_default() } else { shown.clone() },
-            until: now + oyenza::NOTICE_S,
-            action: Some(NoticeAction::OpenPage(PageKind::Oyenza)),
+            until: now + nexora::NOTICE_S,
+            action: Some(NoticeAction::OpenPage(PageKind::Nexora)),
             inline: hide.then_some(InlineAction::ShowAmount),
             reveal: hide.then_some(shown),
         };
         if self.fullscreen_hidden {
-            self.st.oyenza.held = Some((notice, now));
+            self.st.nexora.held = Some((notice, now));
         } else {
             self.st.notice = Some(notice);
         }
@@ -2209,14 +2209,14 @@ impl App {
     /// like a money notice (`AppState::show_or_hold`), and shows when the island
     /// is back if it isn't old by then.
     fn steps_notice(&mut self, steps: u32) {
-        let notice = pages::health::goal_notice(steps, self.st.now + oyenza::NOTICE_S);
+        let notice = pages::health::goal_notice(steps, self.st.now + nexora::NOTICE_S);
         self.st.show_or_hold(notice, self.fullscreen_hidden);
     }
 
     fn show_held_notice(&mut self, now: f64) {
-        if let Some((mut n, at)) = self.st.oyenza.held.take() {
-            if now - at <= oyenza::HELD_MAX_S {
-                n.until = now + oyenza::NOTICE_S;
+        if let Some((mut n, at)) = self.st.nexora.held.take() {
+            if now - at <= nexora::HELD_MAX_S {
+                n.until = now + nexora::NOTICE_S;
                 self.st.notice = Some(n);
             }
         }
@@ -2226,16 +2226,16 @@ impl App {
     /// off), from the morning on; the rest come with the next look.
     fn remind_bills(&mut self, today: &str) {
         let st = &mut self.st;
-        oyenza::prune_noticed(&mut st.store.oyenza_noticed, today);
-        if st.local.hour < oyenza::BILL_HOUR {
+        nexora::prune_noticed(&mut st.store.nexora_noticed, today);
+        if st.local.hour < nexora::BILL_HOUR {
             return;
         }
-        let Some(b) = oyenza::bills_to_remind(&st.oyenza.bills, today, &st.store.oyenza_noticed).first().map(|b| (*b).clone()) else { return };
-        st.store.oyenza_noticed.push(oyenza::notice_key(&b));
+        let Some(b) = nexora::bills_to_remind(&st.nexora.bills, today, &st.store.nexora_noticed).first().map(|b| (*b).clone()) else { return };
+        st.store.nexora_noticed.push(nexora::notice_key(&b));
         st.save();
-        let (shown, hidden) = oyenza::bill_subtitles(&b);
+        let (shown, hidden) = nexora::bill_subtitles(&b);
         let icon = if b.is_card() { Icon::Card } else { Icon::Calendar };
-        self.oyenza_notice(icon, palette::ORANGE, oyenza::bill_title(&b, today), shown, hidden);
+        self.nexora_notice(icon, palette::ORANGE, nexora::bill_title(&b, today), shown, hidden);
     }
 
     /// Look up the current track's lyrics again (the sources changed).
@@ -2326,14 +2326,14 @@ impl App {
         if before.addon_on(notes_id) && !self.st.settings.addon_on(notes_id) {
             self.notes_off();
         }
-        // Health on or off: the Oyenza worker asks for the steps only while
+        // Health on or off: the Nexora worker asks for the steps only while
         // it's on, and off forgets the ones it had.
         let health_id = nexora_core::addons::HEALTH.id;
         if before.addon_on(health_id) != self.st.settings.addon_on(health_id) {
             if !self.st.settings.addon_on(health_id) {
                 self.st.health = None;
             }
-            self.tell_oyenza_activity();
+            self.tell_nexora_activity();
         }
         if before.game_stats != self.st.settings.game_stats {
             if self.st.settings.game_stats && self.st.game.access == FpsAccess::Unknown {
@@ -2445,17 +2445,17 @@ impl App {
             AppleMusicToken => self.use_apple_music_token(),
             AppleMusicHelp => shell::open(APPLE_MUSIC_HELP_URL),
             AppleMusicForget => self.forget_apple_music_token(),
-            OyenzaSignIn => self.oyenza(OyenzaCmd::SignIn),
-            OyenzaCancel => self.oyenza(OyenzaCmd::Cancel),
-            OyenzaDisconnect => self.oyenza(OyenzaCmd::Disconnect),
-            OyenzaOpen => shell::open(oyenza::WEB),
+            NexoraSignIn => self.nexora(NexoraCmd::SignIn),
+            NexoraCancel => self.nexora(NexoraCmd::Cancel),
+            NexoraDisconnect => self.nexora(NexoraCmd::Disconnect),
+            NexoraOpen => shell::open(nexora::WEB),
             // "Update to x…": the island opens on the Update sheet.
             Update => {
                 self.st.open_update();
                 self.expand();
             }
             CheckForUpdates => self.check_for_updates(),
-            ToggleOyenzaAmounts => s.oyenza_show_amounts = !s.oyenza_show_amounts,
+            ToggleNexoraAmounts => s.nexora_show_amounts = !s.nexora_show_amounts,
             Quit => {
                 self.quit(0);
                 return;
@@ -2475,7 +2475,7 @@ impl App {
         // What the Settings window shows that a service reports.
         let shown = matches!(
             ev,
-            AppEvent::Autostart(_) | AppEvent::Update(_) | AppEvent::Oyenza(_) | AppEvent::Addon { .. } | AppEvent::Usage(_) | AppEvent::Located(_) | AppEvent::Notify(_)
+            AppEvent::Autostart(_) | AppEvent::Update(_) | AppEvent::Nexora(_) | AppEvent::Addon { .. } | AppEvent::Usage(_) | AppEvent::Located(_) | AppEvent::Notify(_)
         );
         if let Some(w) = self.settings_win.as_mut().filter(|_| shown) {
             w.view.dirty = true;
@@ -2678,7 +2678,7 @@ impl App {
             AppEvent::AppleMusic(status) => self.on_apple_music(status),
             AppEvent::Phone(e) => self.on_phone(e),
             AppEvent::Paired(e) => self.on_paired(e),
-            AppEvent::Oyenza(ev) => self.on_oyenza(ev),
+            AppEvent::Nexora(ev) => self.on_nexora(ev),
             AppEvent::Autostart(on) => self.st.ui.autostart = Some(on),
             AppEvent::Addon { id, status } => {
                 // A late report from before a switch-off doesn't bring it back.
@@ -2808,14 +2808,14 @@ impl App {
             } else if self.st.page == PageKind::Record && !self.st.record_on() {
                 self.st.page = pages::first_tab(&self.st);
             }
-            if self.st.page == PageKind::Oyenza {
-                self.oyenza(OyenzaCmd::Refresh);
+            if self.st.page == PageKind::Nexora {
+                self.nexora(NexoraCmd::Refresh);
             } else if self.st.page == PageKind::Health {
-                self.oyenza(OyenzaCmd::RefreshHealth);
+                self.nexora(NexoraCmd::RefreshHealth);
             } else if self.st.page == PageKind::Notifications {
                 self.notify_cmd(NotifyCmd::Check);
             } else if matches!(self.st.page, PageKind::Notes | PageKind::Ielts | PageKind::Addons | PageKind::Ai) {
-                self.oyenza(OyenzaCmd::CheckPro);
+                self.nexora(NexoraCmd::CheckPro);
             }
         }
         self.request_frame();
@@ -2846,10 +2846,10 @@ impl App {
             self.set_sysmon(false);
             // Oyen arrives in his tab again at the next opening.
             self.st.ui.oyen_tab = None;
-            // Sums shown in the Oyenza tab hide again, and it opens on Today next time.
-            self.st.oyenza.reveal = false;
-            self.st.oyenza.day = oyenza::DayPick::Today;
-            self.st.oyenza.scroll = 0.0;
+            // Sums shown in the Nexora tab hide again, and it opens on Today next time.
+            self.st.nexora.reveal = false;
+            self.st.nexora.day = nexora::DayPick::Today;
+            self.st.nexora.scroll = 0.0;
             // Settings closes with the island: it opens again on the page it was opened from.
             if self.st.page == PageKind::Settings {
                 self.st.page = self.st.ui.before_settings.take().filter(|p| pages::tabs(&self.st).contains(p)).unwrap_or_else(|| pages::first_tab(&self.st));
@@ -3140,7 +3140,7 @@ impl App {
         self.set_script_hotkey(can_read && self.selftest.is_none());
     }
 
-    /// Oyenza Studio Recorder's word on its recording, or "show yourself"
+    /// Nexora Recorder's word on its recording, or "show yourself"
     /// (`recorder_message`). True when the island takes it: it shows the
     /// recording, or opened on its Record page.
     fn on_recorder_message(&mut self, m: nexora_core::recorder::Message, sender: isize) -> bool {
@@ -3705,7 +3705,7 @@ impl App {
         // Today's tiles need the readings only while they show (signed out it has the sign-in card, signed in the day).
         self.set_stats(self.mode == Mode::Expanded(PageKind::Today) && pages::today::shows_tiles(&self.st));
         self.set_sysmon(self.mode == Mode::Expanded(PageKind::System));
-        self.set_oyenza_watch(self.mode == Mode::Expanded(PageKind::Oyenza));
+        self.set_nexora_watch(self.mode == Mode::Expanded(PageKind::Nexora));
         self.set_today_watch(self.mode == Mode::Expanded(PageKind::Today));
         self.set_stocks_watch();
         self.set_usage_watch();
@@ -4250,7 +4250,7 @@ impl App {
         if a == InlineAction::ShowAmount {
             // The sum and sender take the subtitle's place for a few seconds; the
             // pill turns into a check (activities.rs inline_done).
-            let until = st.now + oyenza::SHOWN_S;
+            let until = st.now + nexora::SHOWN_S;
             if let Some(n) = st.notice.as_mut() {
                 if let Some(text) = n.reveal.take() {
                     n.subtitle = text;
@@ -4450,7 +4450,7 @@ impl App {
             return;
         }
         let now = self.st.now;
-        let signed_in = matches!(self.st.oyenza.link, OyenzaLink::Connected { .. });
+        let signed_in = matches!(self.st.nexora.link, NexoraLink::Connected { .. });
         let shown = self.expanded && self.st.page == PageKind::Ielts && self.st.ielts_on() && signed_in && !self.locked && !self.display_off && !self.fullscreen_hidden;
         if shown != self.ielts_shown {
             self.ielts_shown = shown;
@@ -4760,14 +4760,14 @@ impl App {
             if self.text_focus {
                 self.blur_text();
             }
-            if p == PageKind::Oyenza {
-                self.oyenza(OyenzaCmd::Refresh);
+            if p == PageKind::Nexora {
+                self.nexora(NexoraCmd::Refresh);
             } else if p == PageKind::Health {
-                self.oyenza(OyenzaCmd::RefreshHealth);
+                self.nexora(NexoraCmd::RefreshHealth);
             } else if p == PageKind::Notifications {
                 self.notify_cmd(NotifyCmd::Check);
             } else if matches!(p, PageKind::Notes | PageKind::Ielts | PageKind::Addons | PageKind::Ai) {
-                self.oyenza(OyenzaCmd::CheckPro);
+                self.nexora(NexoraCmd::CheckPro);
             }
         }
     }
@@ -4880,7 +4880,7 @@ impl App {
                 }
                 Command::Phone(c) => self.phone_cmd(c),
                 Command::Pair(c) => self.pair_cmd(c),
-                Command::Oyenza(c) => self.oyenza(c),
+                Command::Nexora(c) => self.nexora(c),
                 Command::Usage(c) => self.usage_cmd(c),
                 Command::Ielts(c) => self.ielts_cmd(c),
                 Command::Notes(c) => self.notes_cmd(c),
@@ -5330,8 +5330,8 @@ impl App {
         self.ielts.api = Some((base, key));
         self.ielts.stand_in = Some(stand_in);
         self.st.ielts = Default::default();
-        self.st.oyenza = Default::default();
-        self.st.oyenza.link = OyenzaLink::Connected { account: "s\u{2022}\u{2022}\u{2022}@example.com".into() };
+        self.st.nexora = Default::default();
+        self.st.nexora.link = NexoraLink::Connected { account: "s\u{2022}\u{2022}\u{2022}@example.com".into() };
         self.st.settings.set_addon(nexora_core::addons::IELTS.id, true);
         self.st.addons.insert(nexora_core::addons::IELTS.id, AddonStatus::Ready);
         self.st.notice = None;
@@ -5382,7 +5382,7 @@ impl App {
         self.ielts = Default::default();
         self.st.settings.set_addon(nexora_core::addons::IELTS.id, false);
         self.st.addons.insert(nexora_core::addons::IELTS.id, AddonStatus::Off);
-        self.st.oyenza = Default::default();
+        self.st.nexora = Default::default();
         self.st.page = PageKind::ALL[0];
     }
 

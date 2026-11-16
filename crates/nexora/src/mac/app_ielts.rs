@@ -8,7 +8,7 @@ use super::App;
 use crate::commands::{IeltsCmd, MediaCmd};
 use crate::pages::PageKind;
 use crate::services;
-use crate::state::OyenzaLink;
+use crate::state::NexoraLink;
 use nexora_core::ielts::{Call, Effect, Reply};
 
 impl App {
@@ -21,7 +21,7 @@ impl App {
             return;
         }
         let now = self.st.now;
-        let signed_in = matches!(self.st.oyenza.link, OyenzaLink::Connected { .. });
+        let signed_in = matches!(self.st.nexora.link, NexoraLink::Connected { .. });
         let away = self.away.0 || self.away.1;
         let shown = self.expanded && self.st.page == PageKind::Ielts && self.st.ielts_on() && signed_in && !away && !self.fullscreen_hidden;
         if shown != self.ielts_shown {

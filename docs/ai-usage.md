@@ -1,6 +1,6 @@
 # AI usage
 
-**AI usage** is part of Studio Pro: the AI tab and its notices come with an account that has Pro, and switch off under Add-ons. The **AI** tab shows how much is left of the AI coding plans on your computer, and your Oyenza Inference balance once you connect it. This page says, for each service, what Oyenza Studio reads on your computer, which server it asks, how often, what the card shows, and whether it needs a key you type. [PRIVACY.md](../PRIVACY.md) has the short version.
+**AI usage** is part of Studio Pro: the AI tab and its notices come with an account that has Pro, and switch off under Add-ons. The **AI** tab shows how much is left of the AI coding plans on your computer, and your Nexora Inference balance once you connect it. This page says, for each service, what Nexora reads on your computer, which server it asks, how often, what the card shows, and whether it needs a key you type. [PRIVACY.md](../PRIVACY.md) has the short version.
 
 ## When it reads
 
@@ -15,10 +15,10 @@
 ## What every reader keeps to
 
 - **Read only.** It never writes another app's files and never renews another app's sign-in: a renewal can sign you out of that app. When a sign-in has run out, the card keeps the last numbers it had and asks you to open that app once.
-- **A sign-in goes only to its own service's server.** Never to Oyenza or anyone else, and never into the log, an error message or the numbers kept for the card.
-- **It asks as Oyenza Studio.** Every request carries the User-Agent `OyenzaStudio/<version> (+https://github.com/lucacadalora/oyenza-studio)`, never one that pretends to be the service's own app. A service that answers only its own app shows as refused; Oyenza Studio doesn't work around it. (Google's server answers Antigravity's limits only to Antigravity itself, so [Antigravity](#antigravity) is read by asking its own command line instead.)
+- **A sign-in goes only to its own service's server.** Never to Nexora or anyone else, and never into the log, an error message or the numbers kept for the card.
+- **It asks as Nexora.** Every request carries the User-Agent `NexoraStudio/<version> (+https://github.com/dasunjlk/Nexora)`, never one that pretends to be the service's own app. A service that answers only its own app shows as refused; Nexora doesn't work around it. (Google's server answers Antigravity's limits only to Antigravity itself, so [Antigravity](#antigravity) is read by asking its own command line instead.)
 - **Unknown is not zero.** A number the service doesn't give stays off the card.
-- **Nothing about your usage goes to Oyenza.** The numbers come from each service to your computer and stay in Oyenza Studio's memory.
+- **Nothing about your usage goes to Nexora.** The numbers come from each service to your computer and stay in Nexora's memory.
 
 ## The services
 
@@ -37,7 +37,7 @@
 | [Z.ai GLM](#zai-glm) | `Z_AI_API_KEY` | `api.z.ai` | 5 minutes | Needed, or the variable |
 | [MiniMax](#minimax) | `MINIMAX_CODING_API_KEY`, `MINIMAX_API_KEY` | `api.minimax.io` | 5 minutes | Needed, or a variable |
 | [OpenRouter](#openrouter) | `OPENROUTER_API_KEY` | `openrouter.ai` | 2 minutes | Needed, or the variable |
-| [Oyenza Inference](#oyenza-inference) | The key from **Connect** | `inference.oyenza.com` | 1 minute | No: **Connect** |
+| [Nexora Inference](#nexora-inference) | The key from **Connect** | `inference.nexora.app` | 1 minute | No: **Connect** |
 
 With the tab closed and notices on, every server is asked at most every 10 minutes (Antigravity not at all). A service that isn't on this computer and has no key gets no card and no request.
 
@@ -55,7 +55,7 @@ With the tab closed and notices on, every server is asked at most every 10 minut
 - **Reads:** Claude Code's claude.ai sign-in (its access token, when that runs out, and the plan): on a Mac from the `Claude Code-credentials` item in your keychain, else from `~/.claude/.credentials.json`, in the order Claude Code itself looks; on Windows, only the file. Also its settings, `~/.claude.json` (or `~/.claude/.config.json` while an older version's copy is there), for two things only: your account's email, shown masked, and whether Claude Code is installed, so the card can say you're signed out. With `CLAUDE_CONFIG_DIR` set, the files are read there and the keychain item is the one Claude Code names after that folder (`Claude Code-credentials-` and 8 letters and digits). The sign-in's refresh token is never read.
 - **Through the Claude app:** when Claude Code has no sign-in on this computer (you run it only from the Claude app, here or on another computer over SSH), the card uses the sign-in the Claude app made for Claude Code. The app keeps it in its `config.json` (`%APPDATA%\Claude\` on Windows, `~/Library/Application Support/Claude/` on a Mac), sealed with Electron's safe storage: on Windows, Windows opens it with the key in the app's `Local State`, without asking; on a Mac, the key is the keychain item `Claude Safe Storage`, which the app made itself, so macOS asks first (choose **Always Allow** so it doesn't ask again). It is used as it is and never renewed: when it has run out, the card asks you to open Claude Code once (a session in the app renews it).
 - **Asks:** `GET https://api.anthropic.com/api/oauth/usage`, the address Claude Code's own `/usage` reads, with the access token. One request a refresh.
-- **Sign in:** when the card says you're signed out, or the sign-in ran out or was refused, its **Sign in** starts Claude Code's own sign-in, `claude auth login`, in a terminal window (Terminal on a Mac, a console window on Windows), when Claude Code's program is where its installers put it (`~/.local/bin`, `~/.claude/local`, npm's or Homebrew's folder, WinGet's links). Otherwise it opens the Claude app, whose sign-in the card then reads; with neither found, it runs `claude auth login` as your shell finds it. Oyenza Studio never sees your password: the sign-in happens in Claude Code or the Claude app, and the card reads the result the next time you open the AI tab.
+- **Sign in:** when the card says you're signed out, or the sign-in ran out or was refused, its **Sign in** starts Claude Code's own sign-in, `claude auth login`, in a terminal window (Terminal on a Mac, a console window on Windows), when Claude Code's program is where its installers put it (`~/.local/bin`, `~/.claude/local`, npm's or Homebrew's folder, WinGet's links). Otherwise it opens the Claude app, whose sign-in the card then reads; with neither found, it runs `claude auth login` as your shell finds it. Nexora never sees your password: the sign-in happens in Claude Code or the Claude app, and the card reads the result the next time you open the AI tab.
 - **How often:** at most every 2 minutes while the tab is open. There is nothing to read offline.
 - **The card:** the plan (Pro, Max 5x, Ultra 10x, Team, Enterprise), the account's email (masked), **5-hour** and **Weekly** with when each resets, a weekly bar for each model your plan limits on its own (**Weekly · Opus**, **Weekly · Sonnet** and the like), extra usage this month against its cap when you've turned it on, and a credit balance for Claude's cloud sessions when Anthropic has given you one.
 - **Typed key:** none.
@@ -83,16 +83,16 @@ With the tab closed and notices on, every server is asked at most every 10 minut
 Google's Antigravity CLI (`agy`), which took over from Gemini CLI. Mac only for now.
 
 - **Reads:** its sign-in in your keychain, the item `gemini` of the account `antigravity` (where `agy` keeps it), only to see whether you are signed in (it holds a refresh token) and as whom (the email, masked). The tokens in it are never used or sent. Also, to run it, where `agy` is installed: `~/.local/bin/agy`, `/opt/homebrew/bin/agy` or `/usr/local/bin/agy`.
-- **Asks:** nothing itself. Google's server answers these limits to Antigravity only, so Oyenza Studio runs `agy --version` and then `agy -p /usage --output-format json`, the command that prints what `/usage` shows, and `agy` asks Google. `/usage` makes no model turn and spends no quota; an `agy` older than 1.1.11, which would send it to the model, is not asked, and neither is a reply that shows a model turn. Two programs a refresh.
+- **Asks:** nothing itself. Google's server answers these limits to Antigravity only, so Nexora runs `agy --version` and then `agy -p /usage --output-format json`, the command that prints what `/usage` shows, and `agy` asks Google. `/usage` makes no model turn and spends no quota; an `agy` older than 1.1.11, which would send it to the model, is not asked, and neither is a reply that shows a model turn. Two programs a refresh.
 - **How often:** only while the tab is open, at most every 15 minutes, and when you press **Refresh** (15 seconds after the last run at the soonest). A run is one process of `agy`: about 2 seconds of CPU and up to 250 MB of memory for 4 to 6 seconds, in `agy`'s own process, at lowered priority, with no window and its updater switched off. It is stopped after 30 seconds, and what it prints (at most 512 KB) is read and never logged. It runs after every other service, so their cards don't wait for it, in a private folder of its own that is removed when it ends, and anything it leaves running is ended. With the notices on and the tab closed, nothing is run.
-- **It never opens your browser.** When its saved sign-in has run out, `agy` would open your browser to sign in again. Oyenza Studio gives it an `open` of its own instead, which only says no, so nothing opens: the run is stopped at once, the card says you're signed out, and `agy` isn't run again until you press **Refresh**. To sign in again, run `agy` in Terminal.
+- **It never opens your browser.** When its saved sign-in has run out, `agy` would open your browser to sign in again. Nexora gives it an `open` of its own instead, which only says no, so nothing opens: the run is stopped at once, the card says you're signed out, and `agy` isn't run again until you press **Refresh**. To sign in again, run `agy` in Terminal.
 - **The card:** the account's email (masked), and for each group of models Antigravity limits (**Gemini Models**, **Claude and GPT models**, and a single model that has a limit of its own) a **5-hour** and a **Weekly** bar with when each resets. A limit Antigravity doesn't count is left out.
 - **Typed key:** none.
 - **Not shown:** Windows (it keeps its sign-in elsewhere; not read yet). Antigravity's IDE sign-in, and `~/.gemini/jetski-standalone-oauth-token`, a leftover.
 
 ### Cursor
 
-- **Reads:** Cursor's sign-in from its state database, `state.vscdb`, in `%APPDATA%\Cursor\User\globalStorage\` on Windows and `~/Library/Application Support/Cursor/User/globalStorage/` on a Mac (under `VSCODE_APPDATA` if you set it): the access token, the cached email and the plan. That file also keeps your Cursor chats and can grow to many gigabytes, so Oyenza Studio reads only the few small pieces of it (about ten, of 4 KB each) that lead to those entries, never the whole file or the chats, and without locking or writing it, so Cursor carries on undisturbed. Cursor 3.27 and later seal the access token with Electron's safe storage: on Windows, Windows opens it with the key in Cursor's `Local State`, without asking; on a Mac, the key is the keychain item `Cursor Safe Storage`, which Cursor made itself, so macOS asks first (choose **Always Allow** so it doesn't ask again).
+- **Reads:** Cursor's sign-in from its state database, `state.vscdb`, in `%APPDATA%\Cursor\User\globalStorage\` on Windows and `~/Library/Application Support/Cursor/User/globalStorage/` on a Mac (under `VSCODE_APPDATA` if you set it): the access token, the cached email and the plan. That file also keeps your Cursor chats and can grow to many gigabytes, so Nexora reads only the few small pieces of it (about ten, of 4 KB each) that lead to those entries, never the whole file or the chats, and without locking or writing it, so Cursor carries on undisturbed. Cursor 3.27 and later seal the access token with Electron's safe storage: on Windows, Windows opens it with the key in Cursor's `Local State`, without asking; on a Mac, the key is the keychain item `Cursor Safe Storage`, which Cursor made itself, so macOS asks first (choose **Always Allow** so it doesn't ask again).
 - **Asks:** `cursor.com`, with the sign-in as the cookie Cursor's own site uses: `GET /api/usage-summary`, then `GET /api/usage?user=<your id>` for the older plans counted in requests. Two requests a refresh.
 - **How often:** at most every 5 minutes while the tab is open.
 - **The card:** the plan (Free, Hobby, Pro, Pro+, Ultra, Team, Business, Enterprise and the rest), the account's email (masked), **Monthly** (with **Monthly · Auto** and **Monthly · API** where Cursor splits it) with when the billing month resets, or **Requests** used of how many on the older plans, and extra spend this month against its cap.
@@ -128,7 +128,7 @@ Google's Antigravity CLI (`agy`), which took over from Gemini CLI. Mac only for 
 ### MiniMax
 
 - **Reads:** nothing on disk: a key you typed, else the `MINIMAX_CODING_API_KEY` variable, else `MINIMAX_API_KEY`. Only a plan key can read the plan, so a standard API key (`sk-api-…`) is never sent: in a variable it is skipped, and typed in it shows as refused.
-- **Asks:** `api.minimax.io`, with the key: `GET /v1/token_plan/remains`, and for an older Coding Plan `GET /v1/api/openplatform/coding_plan/remains`. A key that api.minimax.io refuses is asked about the same way at `api.minimaxi.com`, MiniMax's server in mainland China, on each refresh while it is refused. Usually one request a refresh, at most four. The requests name Oyenza Studio (`MM-API-Source: Oyenza Studio`).
+- **Asks:** `api.minimax.io`, with the key: `GET /v1/token_plan/remains`, and for an older Coding Plan `GET /v1/api/openplatform/coding_plan/remains`. A key that api.minimax.io refuses is asked about the same way at `api.minimaxi.com`, MiniMax's server in mainland China, on each refresh while it is refused. Usually one request a refresh, at most four. The requests name Nexora (`MM-API-Source: Nexora`).
 - **How often:** at most every 5 minutes while the tab is open.
 - **The card:** the plan (Token Plan, Plus and so on, when MiniMax names it), **5-hour** and **Weekly** for text, and a bar for each other allowance your plan has (**Daily · Video**, **Daily · Speech**, **Daily · Images**, **Daily · Music**), counted where the plan counts.
 - **Typed key:** needed, unless one of the variables is set. Make one on [MiniMax's Coding Plan page](https://platform.minimax.io/user-center/payment/coding-plan).
@@ -141,25 +141,25 @@ Google's Antigravity CLI (`agy`), which took over from Gemini CLI. Mac only for 
 - **The card:** your credits left, what the key spent today, this week and this month (OpenRouter's days and weeks, in UTC) against its limit if it has one, and on the free tier, the free model requests used today. OpenRouter shows the credits left only to keys allowed to read them, so with an ordinary key the card has the spend without the balance.
 - **Typed key:** needed, unless `OPENROUTER_API_KEY` is set. Make one on [OpenRouter's keys page](https://openrouter.ai/settings/keys).
 
-### Oyenza Inference
+### Nexora Inference
 
 - **Reads:** the key this computer got when you connected it (below). It is never typed.
-- **Asks:** `GET https://inference.oyenza.com/v1/studio/summary` with that key. One request a refresh. A test server can be named in `NEXORA_INFERENCE_URL` instead: an `https://` address anywhere, or plain `http://` only on this computer (`localhost`, `127.0.0.1`, `[::1]`); anything else is ignored, so the key never crosses the network unencrypted.
+- **Asks:** `GET https://inference.nexora.app/v1/studio/summary` with that key. One request a refresh. A test server can be named in `NEXORA_INFERENCE_URL` instead: an `https://` address anywhere, or plain `http://` only on this computer (`localhost`, `127.0.0.1`, `[::1]`); anything else is ignored, so the key never crosses the network unencrypted.
 - **How often:** at most once a minute while the tab is open.
 - **The card:** your plan (Trial or Pay as you go), the account's email (masked), your balance, what you spent today and over the last 7 and 30 days, and the last 14 days as a small bar line.
 - **Typed key:** none: **Connect** instead.
 
-**Connecting.** **Connect** on the card shows 8 letters, such as `KPJX-TMNQ`, and **Open** takes you to inference.oyenza.com's page for them. Signed in there, check the computer's name and the letters, and choose **Approve**: the card fills in a few seconds later. The code works once, for 10 minutes. Approve only the letters your own Oyenza Studio shows: whoever made a code you approve can read your balance and spend until you revoke it. Connecting tells inference.oyenza.com this computer's name, whether it's Windows or a Mac, and Oyenza Studio's version.
+**Connecting.** **Connect** on the card shows 8 letters, such as `KPJX-TMNQ`, and **Open** takes you to inference.nexora.app's page for them. Signed in there, check the computer's name and the letters, and choose **Approve**: the card fills in a few seconds later. The code works once, for 10 minutes. Approve only the letters your own Nexora shows: whoever made a code you approve can read your balance and spend until you revoke it. Connecting tells inference.nexora.app this computer's name, whether it's Windows or a Mac, and Nexora's version.
 
-**What the key can do.** It reads your account's summary and nothing else: balance, plan, spend and number of requests today and over the last 7 and 30 days, each of the last 14 days, your top three models by spend, and the account's email, masked. It can't call the models, spend credit, or see your prompts, your API keys, your payments or your account's settings. inference.oyenza.com keeps only a fingerprint of it (SHA-256), never the key itself; each computer has its own, and an account has at most 10 (connecting an 11th disconnects the oldest). Nothing about your other AI services goes to inference.oyenza.com.
+**What the key can do.** It reads your account's summary and nothing else: balance, plan, spend and number of requests today and over the last 7 and 30 days, each of the last 14 days, your top three models by spend, and the account's email, masked. It can't call the models, spend credit, or see your prompts, your API keys, your payments or your account's settings. inference.nexora.app keeps only a fingerprint of it (SHA-256), never the key itself; each computer has its own, and an account has at most 10 (connecting an 11th disconnects the oldest). Nothing about your other AI services goes to inference.nexora.app.
 
-**Disconnecting.** **Disconnect** on the card revokes the key on inference.oyenza.com and deletes it here (if inference.oyenza.com can't be reached just then, revoke the computer in the dashboard too). You can also revoke the computer in your inference.oyenza.com dashboard, under Connected apps, and changing your password there disconnects every computer. A disconnected computer's card says so, with **Connect again**.
+**Disconnecting.** **Disconnect** on the card revokes the key on inference.nexora.app and deletes it here (if inference.nexora.app can't be reached just then, revoke the computer in the dashboard too). You can also revoke the computer in your inference.nexora.app dashboard, under Connected apps, and changing your password there disconnects every computer. A disconnected computer's card says so, with **Connect again**.
 
 ## Keys and variables
 
-- **Typed keys** go in the AI tab: open **Services**, choose **Add key** beside the service, paste the key and **Save**. Oyenza Studio keeps each one sealed with Windows' own protection (DPAPI), so only your Windows account on this PC can read it, in `%LOCALAPPDATA%\Nexora\`; on a Mac, in a file only your Mac account can read, in `~/Library/Application Support/Nexora/`. Never in your settings or the log. Uninstalling on Windows deletes them.
+- **Typed keys** go in the AI tab: open **Services**, choose **Add key** beside the service, paste the key and **Save**. Nexora keeps each one sealed with Windows' own protection (DPAPI), so only your Windows account on this PC can read it, in `%LOCALAPPDATA%\Nexora\`; on a Mac, in a file only your Mac account can read, in `~/Library/Application Support/Nexora/`. Never in your settings or the log. Uninstalling on Windows deletes them.
 - **A key with a space or line break inside it** (a paste that caught one) is refused before it is sent; spaces around it are trimmed.
-- **Variables** such as `OPENROUTER_API_KEY` or `CODEX_HOME` are the ones Oyenza Studio started with, so restart it after setting one. On a Mac, apps opened from the Dock or Finder don't see variables set in a shell profile such as `~/.zshrc`, so type the key in the AI tab there instead.
+- **Variables** such as `OPENROUTER_API_KEY` or `CODEX_HOME` are the ones Nexora started with, so restart it after setting one. On a Mac, apps opened from the Dock or Finder don't see variables set in a shell profile such as `~/.zshrc`, so type the key in the AI tab there instead.
 - **On a Mac, a sign-in kept in the keychain** is read with macOS's own `security` tool, only while the AI tab is open, and at most once each time you open it (the notices use that copy). Claude Code's and Antigravity's own items normally trust that tool, so macOS doesn't ask; the `Cursor Safe Storage` and `Claude Safe Storage` items, which those apps made, ask the first time. When it asks, its prompt names "security": say no to keep the item closed, and the card says so until you press **Refresh**, which asks once more.
 - **What you chose** (which services are hidden or added, the notices switch) is kept in your settings, `settings.json`, under `usage`.
 
@@ -167,9 +167,9 @@ Google's Antigravity CLI (`agy`), which took over from Gemini CLI. Mac only for 
 
 - **Hide** a service with its switch under **Services**, and it is no longer read.
 - **Remove** a key you typed and its sealed copy is deleted. To make the key useless everywhere, delete it on the service's own site too.
-- **Disconnect** Oyenza Inference, or revoke the computer in the dashboard.
+- **Disconnect** Nexora Inference, or revoke the computer in the dashboard.
 - **Switch off Tell me before I run out** and nothing is read while the tab is closed.
-- **Signing out** of a service in its own app works too: Oyenza Studio then has no sign-in to send.
+- **Signing out** of a service in its own app works too: Nexora then has no sign-in to send.
 
 ## Where this comes from
 

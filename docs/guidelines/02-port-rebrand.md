@@ -12,7 +12,7 @@ upstream branding left.
 
 ## Inputs
 
-- The gitignored local reference tree `oyenza-studio-main/oyenza-studio-main/`
+- The gitignored local reference tree `nexora-main/nexora-main/`
   (upstream MIT implementation, ~132k lines of Rust + Node server + website +
   installers + CI).
 - `docs/rebranding.md` — the mapping and rename policy (authoritative).
@@ -22,7 +22,7 @@ upstream branding left.
 1. **Copy** the reference tree into the repo root, excluding its `README.md`
    and `LICENSE` (Nexora's own already exist: concise README; Apache-2.0
    license). Copy `.gitignore` entries and `.gitattributes` from the
-   reference; keep the `oyenza-studio-main/` ignore line.
+   reference; keep the `nexora-main/` ignore line.
 2. **File and directory renames** (git records them as renames):
    `crates/nexora → crates/nexora`, `crates/nexora-core → crates/nexora-core`,
    `crates/nexora-usage → crates/nexora-usage`,
@@ -34,14 +34,14 @@ upstream branding left.
    nexora-logo*`, mascot images `oyen-* → nova-*`).
 3. **Token replacements** across every text file, longest-first so compound
    names resolve once:
-   repo slug → `dasunjlk/Nexora`; `com.oyenza.nexora` → `app.nexora.nexora`;
-   `Oyenza-Studio`/`oyenza-studio` → `Nexora`/`nexora`; service domains
-   (`api.oyenza.app → api.nexora.app`, `drop.oyenza.com → drop.nexora.app`,
-   `inference.oyenza.com → inference.nexora.app`, `oyenza.trade →
-   nexora.trade`, `studio.oyenza.com → dasunjlk.github.io/Nexora`);
-   `oyis_` → `nxis_`; `catat-server` → `nexora-notes-server`; then the
-   case variants `Oyenza Studio`, `Nexora`, `nexora`, `Oyenza`,
-   `OYENZA`, `oyenza`, `Oyen`, `OYEN`, `oyen`, `nexora-usage`/`nexora_usage`,
+   repo slug → `dasunjlk/Nexora`; `app.nexora.nexora` → `app.nexora.nexora`;
+   `Nexora`/`nexora` → `Nexora`/`nexora`; service domains
+   (`api.nexora.app → api.nexora.app`, `drop.nexora.app → drop.nexora.app`,
+   `inference.nexora.app → inference.nexora.app`, `nexora.trade →
+   nexora.trade`, `dasunjlk.github.io/Nexora → dasunjlk.github.io/Nexora`);
+   `nxis_` → `nxis_`; `nexora-notes-server` → `nexora-notes-server`; then the
+   case variants `Nexora`, `Nexora`, `nexora`, `Nexora`,
+   `NEXORA`, `nexora`, `Oyen`, `OYEN`, `oyen`, `nexora-usage`/`nexora_usage`,
    `nexora-diorama`/`nexora_diorama`, `Nexora`, `NEXORA`, `nexora`.
 4. **Version reset**: workspace version `0.2.30 → 0.1.0` in `Cargo.toml`,
    the CI env, both installer scripts and the website's fallback version;
@@ -66,6 +66,6 @@ upstream branding left.
 
 ## Acceptance
 
-- `grep -ri "oyenza\|nexora\|oyen" --include="*"` over tracked text files
+- `grep -ri "nexora\|nexora\|oyen" --include="*"` over tracked text files
   returns only licence/attribution contexts.
 - Workspace tests pass; `nexora.exe` builds.

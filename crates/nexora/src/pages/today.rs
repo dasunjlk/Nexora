@@ -1,7 +1,7 @@
 //! Today page: your days at a glance.
 //!
-//! Signed in to Oyenza, with Google Calendar or Gmail switched on for it in
-//! oyenza.app (`nexora_core::agenda`): on the left the date, the apps it reads
+//! Signed in to Nexora, with Google Calendar or Gmail switched on for it in
+//! nexora.app (`nexora_core::agenda`): on the left the date, the apps it reads
 //! (one switched off shows dimmed) and five weeks from this Monday, with a dot
 //! under each date for what's on it (a calendar event, a flight from Gmail, a
 //! bill due); on the right the schedule from now on: the meeting on now (or
@@ -11,10 +11,10 @@
 //! starts the list there, clicking an event opens it in Google Calendar. An
 //! app switched off, not connected or not loading says so on today's first
 //! lines, with the way to fix it; so do weeks the person hasn't agreed to in
-//! oyenza.app yet.
+//! nexora.app yet.
 //!
 //! Otherwise the same date and weeks (without dots), and beside them one card:
-//! sign in (signed out), pick the apps in oyenza.app (none switched on),
+//! sign in (signed out), pick the apps in nexora.app (none switched on),
 //! getting the day, or try again. A server without the day (from before it,
 //! or with it switched off) keeps the page's stat tiles (CPU, memory, disk,
 //! battery or uptime). On an island narrower than [`COMPACT_BELOW`] the weeks
@@ -22,15 +22,15 @@
 //! shows it.
 //!
 //! Stats are sampled once a second by the app only while the tiles show; the
-//! days are asked for by the Oyenza worker only while this page is open. The
+//! days are asked for by the Nexora worker only while this page is open. The
 //! page itself never asks for continuous frames: "48 min left" and what's
 //! still to come move once a minute, and the list jumps to where it scrolls.
 
-use crate::commands::{Command, OyenzaCmd};
+use crate::commands::{Command, NexoraCmd};
 use crate::gfx::{Image, TextStyle, Weight};
 use crate::icons::Icon;
 use crate::pages::PageKind;
-use crate::state::{AgendaState, AppState, OyenzaLink, PowerState, SysStats};
+use crate::state::{AgendaState, AppState, NexoraLink, PowerState, SysStats};
 use crate::ui::{wid, wid_n, PillStyle, Ui, PILL_SMALL};
 use nexora_core::agenda::{self, Answer, Mark, Source, Sources, Weeks};
 use nexora_core::datetime::{civil_from_days, days_from_civil, fmt_clock, weekday_from_days, LocalDateTime, MONTH_SHORT, WEEKDAY_SHORT};
@@ -69,9 +69,9 @@ const MONTH_LONG: [&str; 12] = ["January", "February", "March", "April", "May", 
 /// Monday-first initials.
 const INITIALS: [&str; 7] = ["M", "T", "W", "T", "F", "S", "S"];
 
-/// Where oyenza.app switches the apps on and agrees to the weeks (Connected
-/// apps › Oyenza Studio), opened at Studio's switches.
-const APPS_URL: &str = "https://oyenza.app/settings/integrations?show=studio";
+/// Where nexora.app switches the apps on and agrees to the weeks (Connected
+/// apps › Nexora), opened at Studio's switches.
+const APPS_URL: &str = "https://nexora.app/settings/integrations?show=studio";
 
 /// [`APPS_URL`] naming the app asked for: connected there, it switches on for
 /// Studio by itself.
@@ -117,7 +117,7 @@ enum Side {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Ask {
     SignIn,
-    /// Signing in: the code is on the Oyenza tab.
+    /// Signing in: the code is on the Nexora tab.
     Code,
     /// Signed in with no app switched on for Today.
     NoApps,
@@ -126,11 +126,11 @@ enum Ask {
 }
 
 fn side(st: &AppState) -> Side {
-    match st.oyenza.link {
-        OyenzaLink::Off => Side::Card(Ask::SignIn),
-        OyenzaLink::Connecting { .. } => Side::Card(Ask::Code),
-        OyenzaLink::Connected { .. } => {
-            let o = &st.oyenza;
+    match st.nexora.link {
+        NexoraLink::Off => Side::Card(Ask::SignIn),
+        NexoraLink::Connecting { .. } => Side::Card(Ask::Code),
+        NexoraLink::Connected { .. } => {
+            let o = &st.nexora;
             match (&o.agenda, o.agenda_state) {
                 (_, AgendaState::Unavailable) => Side::Tiles,
                 // Yesterday's answer, the page left open past midnight: the new day is on its way.
@@ -193,10 +193,10 @@ fn draw_ask(ui: &mut Ui, st: &mut AppState, r: Rect, card: Option<(Rect, f32)>, 
     super::card::fill_box(ui, card, r, TILE_RADIUS, palette::SURFACE);
     let inner = r.inset(16.0, 16.0);
     let (title, body) = match ask {
-        Ask::SignIn => ("Your weeks, right here", "Your meetings from Google Calendar and flights from Gmail, today and the next five weeks, through your Oyenza account."),
-        Ask::Code => ("Your weeks, right here", "Approve the sign-in code in oyenza.app, then your days show here."),
-        Ask::NoApps => ("Pick what Today shows", "Switch on Google Calendar or Gmail in oyenza.app, under Connected apps › Oyenza Studio."),
-        Ask::Waiting => ("Getting your days…", "From the apps you switched on in oyenza.app."),
+        Ask::SignIn => ("Your weeks, right here", "Your meetings from Google Calendar and flights from Gmail, today and the next five weeks, through your Nexora account."),
+        Ask::Code => ("Your weeks, right here", "Approve the sign-in code in nexora.app, then your days show here."),
+        Ask::NoApps => ("Pick what Today shows", "Switch on Google Calendar or Gmail in nexora.app, under Connected apps › Nexora."),
+        Ask::Waiting => ("Getting your days…", "From the apps you switched on in nexora.app."),
         Ask::Failed => ("Couldn't get your days", "Check the connection, then try again."),
     };
     let mut y = inner.y;
@@ -219,9 +219,9 @@ fn draw_ask(ui: &mut Ui, st: &mut AppState, r: Rect, card: Option<(Rect, f32)>, 
     ui.c.text(body, Rect::new(inner.x, y, inner.w, body_h + 1.0), &body_st);
     y += body_h + 10.0;
     let button = match ask {
-        Ask::SignIn => Some(("Sign in with Oyenza", None, PillStyle::Primary(palette::ORANGE))),
+        Ask::SignIn => Some(("Sign in with Nexora", None, PillStyle::Primary(palette::ORANGE))),
         Ask::Code => Some(("Show the sign-in code", None, PillStyle::Primary(palette::ORANGE))),
-        Ask::NoApps => Some(("Open oyenza.app", Some(Icon::Open), PillStyle::Primary(palette::ORANGE))),
+        Ask::NoApps => Some(("Open nexora.app", Some(Icon::Open), PillStyle::Primary(palette::ORANGE))),
         Ask::Failed => Some(("Try again", None, PillStyle::Utility)),
         Ask::Waiting => None,
     };
@@ -234,12 +234,12 @@ fn draw_ask(ui: &mut Ui, st: &mut AppState, r: Rect, card: Option<(Rect, f32)>, 
     }
     match ask {
         Ask::SignIn => {
-            st.oyenza.from_today = true;
-            st.cmd(Command::Oyenza(OyenzaCmd::SignIn));
+            st.nexora.from_today = true;
+            st.cmd(Command::Nexora(NexoraCmd::SignIn));
         }
-        Ask::Code => st.cmd(Command::SetPage(PageKind::Oyenza)),
+        Ask::Code => st.cmd(Command::SetPage(PageKind::Nexora)),
         Ask::NoApps => st.cmd(Command::OpenUrl(APPS_URL.into())),
-        Ask::Failed => st.cmd(Command::Oyenza(OyenzaCmd::RefreshDay)),
+        Ask::Failed => st.cmd(Command::Nexora(NexoraCmd::RefreshDay)),
         Ask::Waiting => {}
     }
 }
@@ -363,7 +363,7 @@ enum Notice {
     CalendarOff,
     Connect(Mark),
     Failed(Mark),
-    /// The person hasn't agreed to the weeks in oyenza.app yet.
+    /// The person hasn't agreed to the weeks in nexora.app yet.
     Weeks,
 }
 
@@ -450,7 +450,7 @@ fn top_day(lines: &[Placed], scroll: f32) -> Option<i64> {
 
 /// The weeks on the left, the list on the right.
 fn draw_days(ui: &mut Ui, st: &mut AppState, left: Rect, list: Rect, compact: bool) {
-    let Some(answer) = st.oyenza.agenda.clone() else { return };
+    let Some(answer) = st.nexora.agenda.clone() else { return };
     // Opened again after a while: from today (a jump just asked for, by a click or a self-test, goes ahead).
     if !st.ui.today_jump && st.now - st.ui.today_drawn > STALE_S {
         st.ui.today_scroll = 0.0;
@@ -458,9 +458,9 @@ fn draw_days(ui: &mut Ui, st: &mut AppState, left: Rect, list: Rect, compact: bo
         st.ui.today_jump = false;
     }
     st.ui.today_drawn = st.now;
-    let show = st.settings.oyenza_show_amounts || st.oyenza.reveal;
+    let show = st.settings.nexora_show_amounts || st.nexora.reveal;
     let now_min = st.local.hour as i32 * 60 + st.local.minute as i32;
-    let w = agenda::weeks(&answer, &st.oyenza.bills, &st.oyenza.bills_today, &st.day_key(), now_min, show, st.ui.today_pick);
+    let w = agenda::weeks(&answer, &st.nexora.bills, &st.nexora.bills_today, &st.day_key(), now_min, show, st.ui.today_pick);
     let lines = lay_out(&w, &answer);
     let max = max_scroll(&lines, st.ui.today_pick);
     if std::mem::take(&mut st.ui.today_jump) {
@@ -543,10 +543,10 @@ fn draw_head(ui: &mut Ui, st: &AppState, r: Rect, day: i64, today: i64) {
 
 /// "Updated 10:10", or "Offline" (in orange) when the last ask failed.
 fn day_status(st: &AppState) -> (String, bool) {
-    if st.oyenza.agenda_state == AgendaState::Failed {
+    if st.nexora.agenda_state == AgendaState::Failed {
         return ("Offline".into(), true);
     }
-    (st.oyenza.agenda_unix.map(|at| super::health::updated_text(st, at)).unwrap_or_default(), false)
+    (st.nexora.agenda_unix.map(|at| super::health::updated_text(st, at)).unwrap_or_default(), false)
 }
 
 /// A line that says what's wrong, with the way to fix it on its right.
@@ -554,11 +554,11 @@ fn draw_notice(ui: &mut Ui, st: &mut AppState, r: Rect, n: Notice, i: usize, who
     let open = |app: Option<Mark>| Command::OpenUrl(apps_url(app));
     let (mark, text, label, icon, style, cmd) = match n {
         Notice::CalendarOff => (Some(Mark::Calendar), "Google Calendar is off for Studio", "Turn on", Some(Icon::Open), PillStyle::Primary(palette::ORANGE), open(Some(Mark::Calendar))),
-        Notice::Connect(Mark::Calendar) => (Some(Mark::Calendar), "Connect Google Calendar in oyenza.app", "Connect", Some(Icon::Open), PillStyle::Primary(palette::ORANGE), open(Some(Mark::Calendar))),
-        Notice::Connect(m) => (Some(m), "Connect Gmail in oyenza.app", "Connect", Some(Icon::Open), PillStyle::Primary(palette::ORANGE), open(Some(m))),
+        Notice::Connect(Mark::Calendar) => (Some(Mark::Calendar), "Connect Google Calendar in nexora.app", "Connect", Some(Icon::Open), PillStyle::Primary(palette::ORANGE), open(Some(Mark::Calendar))),
+        Notice::Connect(m) => (Some(m), "Connect Gmail in nexora.app", "Connect", Some(Icon::Open), PillStyle::Primary(palette::ORANGE), open(Some(m))),
         Notice::Failed(m) => {
             let text = if m == Mark::Calendar { "Google Calendar didn't load" } else { "Gmail didn't load" };
-            (Some(m), text, "Try again", None, PillStyle::Utility, Command::Oyenza(OyenzaCmd::RefreshDay))
+            (Some(m), text, "Try again", None, PillStyle::Utility, Command::Nexora(NexoraCmd::RefreshDay))
         }
         Notice::Weeks => (None, "Your next five weeks can show here too", "Allow", Some(Icon::Open), PillStyle::Primary(palette::ORANGE), open(None)),
     };
@@ -670,7 +670,7 @@ fn fade(ui: &mut Ui, r: Rect, top: bool) {
 
 // ------------------------------------------------------------------ logos
 
-/// Google Calendar's and Gmail's own icons, the ones oyenza.app shows (64 px,
+/// Google Calendar's and Gmail's own icons, the ones nexora.app shows (64 px,
 /// about 5.6 KB together), decoded the first time a page draws one.
 const CALENDAR_PNG: &[u8] = include_bytes!("../../res/apps/googlecalendar.png");
 const GMAIL_PNG: &[u8] = include_bytes!("../../res/apps/gmail.png");
@@ -967,8 +967,8 @@ mod tests {
 
     #[test]
     fn studio_links_name_the_app_asked_for() {
-        assert_eq!(apps_url(Some(Mark::Calendar)), "https://oyenza.app/settings/integrations?show=studio&app=googlecalendar");
-        assert_eq!(apps_url(Some(Mark::Gmail)), "https://oyenza.app/settings/integrations?show=studio&app=gmail");
+        assert_eq!(apps_url(Some(Mark::Calendar)), "https://nexora.app/settings/integrations?show=studio&app=googlecalendar");
+        assert_eq!(apps_url(Some(Mark::Gmail)), "https://nexora.app/settings/integrations?show=studio&app=gmail");
         assert_eq!(apps_url(None), APPS_URL);
     }
 }

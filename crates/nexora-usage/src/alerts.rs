@@ -21,11 +21,11 @@ pub struct AlertCfg {
     /// Say so once a balance falls under this many US dollars (0: never).
     pub floor_usd: f64,
     /// Local time minus UTC, in minutes, for the reset time
-    /// (`oyenza::offset_minutes(&st.local, st.unix)`).
+    /// (`nexora::offset_minutes(&st.local, st.unix)`).
     pub offset_min: i32,
     /// "14:20" or "2:20 PM", as the app's clock (`settings.use_24h`).
     pub use_24h: bool,
-    /// Oyenza Inference is connected: a plan that runs out says it can carry
+    /// Nexora Inference is connected: a plan that runs out says it can carry
     /// on there ([`Alert::nudge`]).
     pub inference: bool,
 }
@@ -69,14 +69,14 @@ pub struct Alert {
     pub title: String,
     /// "Resets 14:20".
     pub subtitle: String,
-    /// One more line when a plan ran out and Oyenza Inference is connected
+    /// One more line when a plan ran out and Nexora Inference is connected
     /// ([`AlertCfg::inference`]).
     pub nudge: Option<String>,
 }
 
-/// Placeholder words until the Oyenza lane writes the real ones.
-/// The Oyenza Inference card's own words for it.
-const NUDGE: &str = super::oyenza::NUDGE;
+/// Placeholder words until the Nexora lane writes the real ones.
+/// The Nexora Inference card's own words for it.
+const NUDGE: &str = super::nexora::NUDGE;
 
 /// The longest title that keeps "of <window>" on its line: about what
 /// Classic's notice fits at 15 DIP (Pill's is wider), measured on the
@@ -200,7 +200,7 @@ fn step(before: Option<&Snapshot>, after: &Snapshot, now: i64, cfg: &AlertCfg) -
         // Out until the last of them resets: that one names the notice.
         seen.windows.iter().filter(|w| out(w)).max_by_key(|w| later(w)).map(|w| {
             let mut a = alert(AlertKind::Out, limit_words(format!("{name}: {} used up", w.label), format!("{name}: 100% used"), w, when(w, now, cfg, "None left for now")));
-            a.nudge = (cfg.inference && after.provider != ProviderId::Oyenza).then(|| NUDGE.to_string());
+            a.nudge = (cfg.inference && after.provider != ProviderId::Nexora).then(|| NUDGE.to_string());
             a
         })
     } else if let Some(left) = low {
@@ -484,26 +484,26 @@ mod tests {
     #[test]
     fn a_balance_under_the_floor_says_so_once() {
         let mut m = Memory::default();
-        let said = feed(&mut m, &[balance(Oyenza, 4.2), balance(Oyenza, 1.5), balance(Oyenza, 0.8), balance(Oyenza, 0.6)], &cfg());
+        let said = feed(&mut m, &[balance(Nexora, 4.2), balance(Nexora, 1.5), balance(Nexora, 0.8), balance(Nexora, 0.6)], &cfg());
         assert_eq!(said.iter().map(Vec::len).collect::<Vec<_>>(), [0, 0, 1, 0]);
-        assert_eq!(words(&said[2]), [(AlertKind::Low, "Oyenza Inference: $0.80 left", "Top up to keep going")]);
+        assert_eq!(words(&said[2]), [(AlertKind::Low, "Nexora Inference: $0.80 left", "Top up to keep going")]);
         assert_eq!(said[2][0].nudge, None);
         // A refund or a small top-up, then under again: nothing new.
-        let said = feed(&mut m, &[balance(Oyenza, 1.2), balance(Oyenza, 0.9)], &cfg());
+        let said = feed(&mut m, &[balance(Nexora, 1.2), balance(Nexora, 0.9)], &cfg());
         assert!(said.concat().is_empty());
         // Unknown is not zero: a reading without a balance says nothing and forgets nothing.
-        assert!(m.changes(&snap(Oyenza, Vec::new()), NOW, &cfg()).is_empty());
-        assert!(m.changes(&balance(Oyenza, 0.7), NOW, &cfg()).is_empty());
+        assert!(m.changes(&snap(Nexora, Vec::new()), NOW, &cfg()).is_empty());
+        assert!(m.changes(&balance(Nexora, 0.7), NOW, &cfg()).is_empty());
         // A real top-up, spent down again: said again.
-        let said = feed(&mut m, &[balance(Oyenza, 10.0), balance(Oyenza, 0.5)], &cfg());
-        assert_eq!(words(&said[1]), [(AlertKind::Low, "Oyenza Inference: $0.50 left", "Top up to keep going")]);
+        let said = feed(&mut m, &[balance(Nexora, 10.0), balance(Nexora, 0.5)], &cfg());
+        assert_eq!(words(&said[1]), [(AlertKind::Low, "Nexora Inference: $0.50 left", "Top up to keep going")]);
         // Overdrawn reads as nothing left.
         let mut m = Memory::default();
         let said = feed(&mut m, &[balance(OpenRouter, 3.0), balance(OpenRouter, -0.25)], &cfg());
         assert_eq!(words(&said[1]), [(AlertKind::Low, "OpenRouter: $0.00 left", "Top up to keep going")]);
         // No floor, no notice; and euros aren't dollars.
         let mut m = Memory::default();
-        assert!(feed(&mut m, &[balance(Oyenza, 4.2), balance(Oyenza, 0.1)], &AlertCfg { floor_usd: 0.0, ..cfg() }).concat().is_empty());
+        assert!(feed(&mut m, &[balance(Nexora, 4.2), balance(Nexora, 0.1)], &AlertCfg { floor_usd: 0.0, ..cfg() }).concat().is_empty());
         let eur = |v: f64| {
             let mut s = balance(MiniMax, v);
             s.balance.as_mut().unwrap().currency = "EUR".into();
@@ -555,16 +555,16 @@ mod tests {
     }
 
     #[test]
-    fn a_plan_running_out_points_to_oyenza_inference_when_connected() {
+    fn a_plan_running_out_points_to_nexora_inference_when_connected() {
         let on = AlertCfg { inference: true, ..cfg() };
         let mut m = Memory::default();
         let said = feed(&mut m, &[snap(Claude, vec![five(0.7)]), snap(Claude, vec![five(0.9)]), snap(Claude, vec![five(1.0)])], &on);
         assert_eq!(said[1][0].nudge, None);
         assert_eq!(said[2][0].nudge.as_deref(), Some(NUDGE));
-        // Never for Oyenza Inference itself.
+        // Never for Nexora Inference itself.
         let mut m = Memory::default();
         let w = |used| Window::new(WindowKind::Daily, "Daily", used).resets(Some(FIVE_RESET));
-        let said = feed(&mut m, &[snap(Oyenza, vec![w(0.5)]), snap(Oyenza, vec![w(1.0)])], &on);
+        let said = feed(&mut m, &[snap(Nexora, vec![w(0.5)]), snap(Nexora, vec![w(1.0)])], &on);
         assert_eq!((said[1][0].kind, said[1][0].nudge.as_deref()), (AlertKind::Out, None));
     }
 

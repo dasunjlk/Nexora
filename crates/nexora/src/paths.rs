@@ -53,7 +53,7 @@ pub fn apple_music_web_token_path() -> PathBuf {
     cache_dir().join("apple-music-web.json")
 }
 
-/// Where files sent from a phone land: `Downloads\Oyenza Studio` (wherever the
+/// Where files sent from a phone land: `Downloads\Nexora` (wherever the
 /// user moved Downloads to), or `Downloads\Nexora` where an install from
 /// before the rename made it: Shelf items link to the files in it. Under
 /// `NEXORA_HOME` for the self-test.
@@ -63,7 +63,7 @@ pub fn phone_inbox_dir() -> PathBuf {
     }
     let downloads = downloads_dir().unwrap_or_else(|| env_dir("USERPROFILE").join("Downloads"));
     let before_rename = downloads.join("Nexora");
-    if before_rename.is_dir() { before_rename } else { downloads.join("Oyenza Studio") }
+    if before_rename.is_dir() { before_rename } else { downloads.join("Nexora") }
 }
 
 /// Where the Downloader saves videos and sound: the user's Downloads folder
@@ -92,10 +92,10 @@ fn known_folder(id: &windows::core::GUID) -> Option<PathBuf> {
     }
 }
 
-/// The Oyenza sign-in (this PC's key and the masked account), sealed with
+/// The Nexora sign-in (this PC's key and the masked account), sealed with
 /// DPAPI. Signing out or uninstalling removes it.
-pub fn oyenza_link_path() -> PathBuf {
-    cache_dir().join("oyenza-link.bin")
+pub fn nexora_link_path() -> PathBuf {
+    cache_dir().join("nexora-link.bin")
 }
 
 /// Add-on files, one folder per add-on (`services::addons`). Local, never
@@ -118,14 +118,14 @@ pub fn notes_audio_dir() -> PathBuf {
     cache_dir().join("notes")
 }
 
-/// Where meeting notes are saved, as Markdown: `Documents\Oyenza Studio\Notes`
+/// Where meeting notes are saved, as Markdown: `Documents\Nexora\Notes`
 /// (wherever the user moved Documents to). Under `NEXORA_HOME` for the self-test.
 pub fn notes_dir() -> PathBuf {
     if let Some(h) = home_override() {
         return h.join("notes-saved");
     }
     let docs = known_folder(&windows::Win32::UI::Shell::FOLDERID_Documents).unwrap_or_else(|| env_dir("USERPROFILE").join("Documents"));
-    docs.join("Oyenza Studio").join("Notes")
+    docs.join("Nexora").join("Notes")
 }
 
 /// Paired phones (their pairing secrets and names), sealed with DPAPI.
@@ -134,13 +134,13 @@ pub fn paired_phones_path() -> PathBuf {
     cache_dir().join("paired-phones.bin")
 }
 
-/// A key signed out while Oyenza couldn't be reached, sealed, kept only to
+/// A key signed out while Nexora couldn't be reached, sealed, kept only to
 /// tell the server once it can.
-pub fn oyenza_revoke_path() -> PathBuf {
-    cache_dir().join("oyenza-revoke.bin")
+pub fn nexora_revoke_path() -> PathBuf {
+    cache_dir().join("nexora-revoke.bin")
 }
 
-/// A key typed into the AI tab for one service, or the inference.oyenza.com
+/// A key typed into the AI tab for one service, or the inference.nexora.app
 /// key (`usage-<name>.bin`), sealed with DPAPI: never roams, and removing the
 /// key or uninstalling deletes it.
 pub fn usage_key_path(name: &str) -> PathBuf {

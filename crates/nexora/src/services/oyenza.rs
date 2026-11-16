@@ -1,9 +1,9 @@
-//! Oyenza (oyenza.app), optional: signing in with a code, then asking for
+//! Nexora (nexora.app), optional: signing in with a code, then asking for
 //! money that arrived or went out by itself, the last 7 days of transactions
-//! while the Oyenza page is open, bills due soon, and the steps the phone
+//! while the Nexora page is open, bills due soon, and the steps the phone
 //! sent, and saving the spends typed in the island. Words, URLs and parsing
-//! live in `nexora_core::oyenza`; this file does the HTTP on one worker thread
-//! and keeps the key with `services::secret` at `paths::oyenza_link_path()`:
+//! live in `nexora_core::nexora`; this file does the HTTP on one worker thread
+//! and keeps the key with `services::secret` at `paths::nexora_link_path()`:
 //! sealed with DPAPI on Windows, a file only the Mac account can read on a
 //! Mac (which shares this file as is).
 //!
@@ -11,9 +11,9 @@
 //! - money every minute while the PC is in use on mains power, every 3
 //!   minutes on battery or battery saver, and not at all while the session is
 //!   locked or the display is off (one call as soon as it's back);
-//! - the day list every 15 seconds while the Oyenza page is on screen, and
+//! - the day list every 15 seconds while the Nexora page is on screen, and
 //!   never otherwise; an answer with nothing new is a few bytes;
-//! - bills every half hour, and all three again when the Oyenza tab opens;
+//! - bills every half hour, and all three again when the Nexora tab opens;
 //! - the steps, only while the Health add-on is on: every 15 minutes while
 //!   the PC is in use and battery saver is off, and when the Health tab opens
 //!   (at most once in 30 seconds, battery saver or not); a server from before
@@ -24,24 +24,24 @@
 //!   never otherwise; a server without it (404) or with it paused (503) is
 //!   asked again only after half an hour. It goes to the island only;
 //! - failures back off to 1, 2, 4 … 15 minutes, honouring `Retry-After`;
-//! - a 401 means the key was disconnected in oyenza.app (or ran out): the key
+//! - a 401 means the key was disconnected in nexora.app (or ran out): the key
 //!   is deleted and the island says so once.
 //!
 //! The thread sleeps on a condition variable between calls, so the island's
 //! idle stays at zero CPU. Calls block this thread only (8 s budget; a note,
 //! which the server reads with AI, 30 s).
 
-use crate::commands::OyenzaCmd;
-use crate::events::{AppEvent, EventSink, OyenzaEvent};
+use crate::commands::NexoraCmd;
+use crate::events::{AppEvent, EventSink, NexoraEvent};
 use crate::services::http::{Client, FetchError, Method, MtaGuard, Response};
 use nexora_core::agenda;
 use nexora_core::health::HealthSnapshot;
-use nexora_core::oyenza::{self, Claim, Link};
+use nexora_core::nexora::{self, Claim, Link};
 use std::collections::VecDeque;
 use std::sync::{Arc, Condvar, Mutex, MutexGuard};
 use std::time::{Duration, Instant};
 
-const USER_AGENT: &str = concat!("OyenzaStudio/", env!("CARGO_PKG_VERSION"), " (+https://github.com/lucacadalora/oyenza-studio)");
+const USER_AGENT: &str = concat!("NexoraStudio/", env!("CARGO_PKG_VERSION"), " (+https://github.com/dasunjlk/Nexora)");
 const TIMEOUT: Duration = Duration::from_secs(8);
 const NOTE_TIMEOUT: Duration = Duration::from_secs(30);
 /// Opening the tab again within this time asks for nothing new.
@@ -49,7 +49,7 @@ const REFRESH_GAP: Duration = Duration::from_secs(30);
 /// A disconnect that couldn't reach the server is retried this often.
 const REVOKE_EVERY: Duration = Duration::from_secs(3600);
 
-/// What oyenza.app lists this computer as: the PC's name, or the Mac's as
+/// What nexora.app lists this computer as: the PC's name, or the Mac's as
 /// System Settings › General › About shows it.
 #[cfg(windows)]
 fn computer_name() -> String {
@@ -61,23 +61,23 @@ fn computer_name() -> String {
     crate::services::phonedrop::computer_name().unwrap_or_default()
 }
 
-pub struct OyenzaService {
+pub struct NexoraService {
     shared: Arc<Shared>,
 }
 
-impl OyenzaService {
+impl NexoraService {
     pub fn start(sink: EventSink, activity: Activity) -> std::io::Result<Self> {
         let shared = Arc::new(Shared { q: Mutex::new(Queue { activity, ..Default::default() }), cv: Condvar::new() });
         let worker = shared.clone();
         std::thread::Builder::new()
-            .name("nexora-oyenza".into())
+            .name("nexora-nexora".into())
             .spawn(move || worker_main(worker, sink))
-            .map_err(|e| std::io::Error::other(format!("could not start the Oyenza thread: {e}")))?;
+            .map_err(|e| std::io::Error::other(format!("could not start the Nexora thread: {e}")))?;
         Ok(Self { shared })
     }
 
     /// Queue a command and return at once (UI thread safe).
-    pub fn send(&self, cmd: OyenzaCmd) {
+    pub fn send(&self, cmd: NexoraCmd) {
         self.shared.lock().cmds.push_back(cmd);
         self.shared.cv.notify_all();
     }
@@ -93,7 +93,7 @@ impl OyenzaService {
     }
 }
 
-impl Drop for OyenzaService {
+impl Drop for NexoraService {
     fn drop(&mut self) {
         // The worker exits at its next wait; a call in flight ends on its own
         // timeout. Never join from the UI thread.
@@ -109,7 +109,7 @@ pub struct Activity {
     pub in_use: bool,
     pub on_ac: bool,
     pub saver: bool,
-    /// The Oyenza page is on screen: its day list stays live.
+    /// The Nexora page is on screen: its day list stays live.
     pub watching: bool,
     /// The Today page is on screen: the day is asked for.
     pub today: bool,
@@ -119,7 +119,7 @@ pub struct Activity {
 
 #[derive(Default)]
 struct Queue {
-    cmds: VecDeque<OyenzaCmd>,
+    cmds: VecDeque<NexoraCmd>,
     activity: Activity,
     shutdown: bool,
 }
@@ -253,8 +253,8 @@ fn worker_main(shared: Arc<Shared>, sink: EventSink) {
 }
 
 impl Worker {
-    fn send(&self, ev: OyenzaEvent) {
-        self.sink.send(AppEvent::Oyenza(ev));
+    fn send(&self, ev: NexoraEvent) {
+        self.sink.send(AppEvent::Nexora(ev));
     }
 
     fn client(&mut self) -> Result<&Client, FetchError> {
@@ -272,12 +272,12 @@ impl Worker {
 
     /// The sign-in saved on this PC, and a disconnect still to tell the server.
     fn restore(&mut self) {
-        self.link = crate::services::secret::load(&crate::paths::oyenza_link_path()).and_then(|s| oyenza::parse_link(&s));
+        self.link = crate::services::secret::load(&crate::paths::nexora_link_path()).and_then(|s| nexora::parse_link(&s));
         if let Some(l) = &self.link {
-            crate::pinfo!("oyenza: signed in (this PC is {})", l.device_name);
-            self.send(OyenzaEvent::Restored { account: l.account.clone() });
+            crate::pinfo!("nexora: signed in (this PC is {})", l.device_name);
+            self.send(NexoraEvent::Restored { account: l.account.clone() });
         }
-        self.revoke = crate::services::secret::load(&crate::paths::oyenza_revoke_path()).filter(|k| k.starts_with("oyzd_"));
+        self.revoke = crate::services::secret::load(&crate::paths::nexora_revoke_path()).filter(|k| k.starts_with("oyzd_"));
     }
 
     /// When the worker next has something to do on its own.
@@ -329,19 +329,19 @@ impl Worker {
         next
     }
 
-    fn run(&mut self, cmd: OyenzaCmd) {
+    fn run(&mut self, cmd: NexoraCmd) {
         match cmd {
-            OyenzaCmd::SignIn => self.sign_in(),
-            OyenzaCmd::Cancel => {
+            NexoraCmd::SignIn => self.sign_in(),
+            NexoraCmd::Cancel => {
                 if self.pending.take().is_some() {
-                    crate::pinfo!("oyenza: sign-in cancelled");
-                    self.send(OyenzaEvent::ConnectCancelled);
+                    crate::pinfo!("nexora: sign-in cancelled");
+                    self.send(NexoraEvent::ConnectCancelled);
                 }
             }
-            OyenzaCmd::Disconnect => self.disconnect(),
-            OyenzaCmd::Note(text) => self.note(text),
-            OyenzaCmd::Undo(id) => self.undo(id),
-            OyenzaCmd::Refresh => {
+            NexoraCmd::Disconnect => self.disconnect(),
+            NexoraCmd::Note(text) => self.note(text),
+            NexoraCmd::Undo(id) => self.undo(id),
+            NexoraCmd::Refresh => {
                 let now = Instant::now();
                 if self.link.is_some() && self.last_refresh.is_none_or(|t| now - t >= REFRESH_GAP) {
                     self.last_refresh = Some(now);
@@ -350,20 +350,20 @@ impl Worker {
                 }
                 self.next_activity = now;
             }
-            OyenzaCmd::RefreshDay => {
+            NexoraCmd::RefreshDay => {
                 let now = Instant::now();
                 if self.link.is_some() && self.day_asked.is_none_or(|t| now - t >= REFRESH_GAP) {
                     self.next_day = now;
                 }
             }
-            OyenzaCmd::RefreshHealth => {
+            NexoraCmd::RefreshHealth => {
                 let now = Instant::now();
                 if self.link.is_some() && self.health_asked.is_none_or(|t| now - t >= REFRESH_GAP) {
                     self.next_health = now;
                     self.health_page = true;
                 }
             }
-            OyenzaCmd::CheckPro => {
+            NexoraCmd::CheckPro => {
                 let now = Instant::now();
                 if self.link.is_some() && self.pro_asked.is_none_or(|t| now - t >= REFRESH_GAP) {
                     self.next_pro = Some(now);
@@ -376,7 +376,7 @@ impl Worker {
         let now = Instant::now();
         if self.pending.as_ref().is_some_and(|p| now >= p.until) {
             self.pending = None;
-            self.send(OyenzaEvent::ConnectFailed("expired".into()));
+            self.send(NexoraEvent::ConnectFailed("expired".into()));
         } else if self.pending.as_ref().is_some_and(|p| now >= p.next_ask) {
             self.ask_for_key();
         }
@@ -410,20 +410,20 @@ impl Worker {
     fn sign_in(&mut self) {
         if let Some(l) = &self.link {
             // Already signed in: say so again.
-            self.send(OyenzaEvent::Restored { account: l.account.clone() });
+            self.send(NexoraEvent::Restored { account: l.account.clone() });
             return;
         }
-        let name = oyenza::pc_name(&computer_name());
-        let body = oyenza::start_body(&name, env!("CARGO_PKG_VERSION"), oyenza::PLATFORM);
-        match self.call(Method::Post, &oyenza::start_url(), None, Some(&body), TIMEOUT) {
-            Ok(r) if r.status == 200 => match oyenza::parse_started(&r.body) {
+        let name = nexora::pc_name(&computer_name());
+        let body = nexora::start_body(&name, env!("CARGO_PKG_VERSION"), nexora::PLATFORM);
+        match self.call(Method::Post, &nexora::start_url(), None, Some(&body), TIMEOUT) {
+            Ok(r) if r.status == 200 => match nexora::parse_started(&r.body) {
                 Some(s) => {
                     let now = Instant::now();
                     let every = Duration::from_secs(s.interval.clamp(2, 30));
                     self.pending =
                         Some(Pending { device_code: s.device_code, until: now + Duration::from_secs(s.expires_in.clamp(30, 1800)), next_ask: now + every, every });
-                    crate::pinfo!("oyenza: showing a sign-in code");
-                    self.send(OyenzaEvent::Connecting { code: s.user_code, url: s.verify_url_complete, expires_in_s: s.expires_in });
+                    crate::pinfo!("nexora: showing a sign-in code");
+                    self.send(NexoraEvent::Connecting { code: s.user_code, url: s.verify_url_complete, expires_in_s: s.expires_in });
                 }
                 None => self.sign_in_failed("other", "unreadable answer"),
             },
@@ -433,28 +433,28 @@ impl Worker {
     }
 
     fn sign_in_failed(&mut self, code: &str, detail: &str) {
-        crate::pwarn!("oyenza: sign-in didn't start ({detail})");
-        self.send(OyenzaEvent::ConnectFailed(code.into()));
+        crate::pwarn!("nexora: sign-in didn't start ({detail})");
+        self.send(NexoraEvent::ConnectFailed(code.into()));
     }
 
     fn ask_for_key(&mut self) {
         let Some(device_code) = self.pending.as_ref().map(|p| p.device_code.clone()) else { return };
-        let body = oyenza::token_body(&device_code);
-        let answer = self.call(Method::Post, &oyenza::token_url(), None, Some(&body), TIMEOUT);
+        let body = nexora::token_body(&device_code);
+        let answer = self.call(Method::Post, &nexora::token_url(), None, Some(&body), TIMEOUT);
         let now = Instant::now();
         let claim = match &answer {
-            Ok(r) => oyenza::parse_claim(r.status, &r.body),
+            Ok(r) => nexora::parse_claim(r.status, &r.body),
             Err(_) => None,
         };
         match claim {
             Some(Claim::Connected(link)) => {
                 self.pending = None;
-                if let Err(e) = crate::services::secret::save(&crate::paths::oyenza_link_path(), &oyenza::link_json(&link)) {
+                if let Err(e) = crate::services::secret::save(&crate::paths::nexora_link_path(), &nexora::link_json(&link)) {
                     // Still signed in for this run; it just won't survive a restart.
-                    crate::pwarn!("oyenza: cannot save the sign-in ({e})");
+                    crate::pwarn!("nexora: cannot save the sign-in ({e})");
                 }
-                crate::pinfo!("oyenza: signed in (this PC is {})", link.device_name);
-                self.send(OyenzaEvent::Connected { account: link.account.clone() });
+                crate::pinfo!("nexora: signed in (this PC is {})", link.device_name);
+                self.send(NexoraEvent::Connected { account: link.account.clone() });
                 self.link = Some(link);
                 self.cursor = None;
                 self.activity_cursor = None;
@@ -470,12 +470,12 @@ impl Worker {
             Some(Claim::SlowDown) => self.ask_again(now, true),
             Some(Claim::Expired | Claim::Invalid) => {
                 self.pending = None;
-                self.send(OyenzaEvent::ConnectFailed("expired".into()));
+                self.send(NexoraEvent::ConnectFailed("expired".into()));
             }
             Some(Claim::Denied) => {
                 self.pending = None;
-                crate::pinfo!("oyenza: the sign-in code was refused in oyenza.app");
-                self.send(OyenzaEvent::ConnectFailed("denied".into()));
+                crate::pinfo!("nexora: the sign-in code was refused in nexora.app");
+                self.send(NexoraEvent::ConnectFailed("denied".into()));
             }
             // A network hiccup or a server error: keep asking until the code runs out.
             None => self.ask_again(now, false),
@@ -494,35 +494,35 @@ impl Worker {
     fn disconnect(&mut self) {
         self.pending = None;
         let Some(link) = self.link.take() else {
-            self.send(OyenzaEvent::Disconnected { by_server: false });
+            self.send(NexoraEvent::Disconnected { by_server: false });
             return;
         };
-        let told = matches!(self.call(Method::Post, &oyenza::disconnect_url(), Some(&link.key), Some("{}"), TIMEOUT), Ok(r) if r.status == 200 || r.status == 401);
+        let told = matches!(self.call(Method::Post, &nexora::disconnect_url(), Some(&link.key), Some("{}"), TIMEOUT), Ok(r) if r.status == 200 || r.status == 401);
         if !told {
             // Keep the key only to tell the server later; it's no longer used for anything else.
-            crate::pwarn!("oyenza: couldn't reach Oyenza to disconnect; will retry");
-            let _ = crate::services::secret::save(&crate::paths::oyenza_revoke_path(), &link.key);
+            crate::pwarn!("nexora: couldn't reach Nexora to disconnect; will retry");
+            let _ = crate::services::secret::save(&crate::paths::nexora_revoke_path(), &link.key);
             self.revoke = Some(link.key.clone());
             self.next_revoke = Instant::now() + REVOKE_EVERY;
         }
         self.forget();
-        crate::pinfo!("oyenza: disconnected from this PC");
-        self.send(OyenzaEvent::Disconnected { by_server: false });
+        crate::pinfo!("nexora: disconnected from this PC");
+        self.send(NexoraEvent::Disconnected { by_server: false });
     }
 
     fn retry_revoke(&mut self) {
         let Some(key) = self.revoke.clone() else { return };
-        let done = matches!(self.call(Method::Post, &oyenza::disconnect_url(), Some(&key), Some("{}"), TIMEOUT), Ok(r) if r.status == 200 || r.status == 401);
+        let done = matches!(self.call(Method::Post, &nexora::disconnect_url(), Some(&key), Some("{}"), TIMEOUT), Ok(r) if r.status == 200 || r.status == 401);
         if done {
-            let _ = crate::services::secret::delete(&crate::paths::oyenza_revoke_path());
+            let _ = crate::services::secret::delete(&crate::paths::nexora_revoke_path());
             self.revoke = None;
-            crate::pinfo!("oyenza: the earlier disconnect reached Oyenza");
+            crate::pinfo!("nexora: the earlier disconnect reached Nexora");
         } else {
             self.next_revoke = Instant::now() + REVOKE_EVERY;
         }
     }
 
-    /// Drop the sign-in and everything kept from Oyenza.
+    /// Drop the sign-in and everything kept from Nexora.
     fn forget(&mut self) {
         self.link = None;
         self.cursor = None;
@@ -533,41 +533,41 @@ impl Worker {
         self.health_said = None;
         self.day_asked = None;
         self.fails = 0;
-        if let Err(e) = crate::services::secret::delete(&crate::paths::oyenza_link_path()) {
-            crate::pwarn!("oyenza: cannot remove the saved sign-in ({e})");
+        if let Err(e) = crate::services::secret::delete(&crate::paths::nexora_link_path()) {
+            crate::pwarn!("nexora: cannot remove the saved sign-in ({e})");
         }
     }
 
-    /// The server no longer takes the key (disconnected in oyenza.app, a
+    /// The server no longer takes the key (disconnected in nexora.app, a
     /// password reset, 90 days unused).
     fn signed_out_by_server(&mut self) {
         if self.link.is_none() {
             return;
         }
-        crate::pinfo!("oyenza: the key was disconnected in Oyenza");
+        crate::pinfo!("nexora: the key was disconnected in Nexora");
         self.forget();
-        self.send(OyenzaEvent::Disconnected { by_server: true });
+        self.send(NexoraEvent::Disconnected { by_server: true });
     }
 
     // ------------------------------------------------------------ reading
 
     fn failed(&mut self, what: &str, detail: String, retry_after_s: Option<u64>) -> Instant {
         self.fails = self.fails.saturating_add(1);
-        let wait = oyenza::backoff_s(self.fails, retry_after_s);
-        crate::pwarn!("oyenza: {what} failed ({detail}); next try in {wait} s");
+        let wait = nexora::backoff_s(self.fails, retry_after_s);
+        crate::pwarn!("nexora: {what} failed ({detail}); next try in {wait} s");
         Instant::now() + Duration::from_secs(wait)
     }
 
     fn poll_money(&mut self, a: Activity) {
         let Some(key) = self.link.as_ref().map(|l| l.key.clone()) else { return };
-        let url = oyenza::money_url(self.cursor.as_deref(), &tz_now());
+        let url = nexora::money_url(self.cursor.as_deref(), &tz_now());
         match self.call(Method::Get, &url, Some(&key), None, TIMEOUT) {
-            Ok(r) if r.status == 200 => match oyenza::parse_money(&r.body) {
+            Ok(r) if r.status == 200 => match nexora::parse_money(&r.body) {
                 Some(feed) => {
                     self.fails = 0;
                     self.cursor = Some(feed.cursor);
-                    self.next_money = Instant::now() + Duration::from_secs(oyenza::money_every_s(a.on_ac, a.saver));
-                    self.send(OyenzaEvent::Money { arrived: feed.arrived });
+                    self.next_money = Instant::now() + Duration::from_secs(nexora::money_every_s(a.on_ac, a.saver));
+                    self.send(NexoraEvent::Money { arrived: feed.arrived });
                 }
                 None => self.next_money = self.failed("money check", "unreadable answer".into(), None),
             },
@@ -584,10 +584,10 @@ impl Worker {
         let Some(key) = self.link.as_ref().map(|l| l.key.clone()) else { return };
         let today = local_day_now();
         let since = if self.activity_today == today { self.activity_cursor.clone() } else { None };
-        let every = Duration::from_secs(oyenza::ACTIVITY_EVERY_S);
-        match self.call(Method::Get, &oyenza::activity_url(&tz_now(), since.as_deref()), Some(&key), None, TIMEOUT) {
-            Ok(r) if r.status == 200 => match oyenza::parse_activity(&r.body) {
-                Some(oyenza::ActivityAnswer::Unchanged { cursor, today }) => {
+        let every = Duration::from_secs(nexora::ACTIVITY_EVERY_S);
+        match self.call(Method::Get, &nexora::activity_url(&tz_now(), since.as_deref()), Some(&key), None, TIMEOUT) {
+            Ok(r) if r.status == 200 => match nexora::parse_activity(&r.body) {
+                Some(nexora::ActivityAnswer::Unchanged { cursor, today }) => {
                     self.fails = 0;
                     self.activity_cursor = Some(cursor);
                     if today != self.activity_today {
@@ -597,14 +597,14 @@ impl Worker {
                     } else {
                         self.next_activity = Instant::now() + every;
                     }
-                    self.send(OyenzaEvent::ActivityChecked);
+                    self.send(NexoraEvent::ActivityChecked);
                 }
-                Some(oyenza::ActivityAnswer::Full(a)) => {
+                Some(nexora::ActivityAnswer::Full(a)) => {
                     self.fails = 0;
                     self.activity_cursor = Some(a.cursor.clone());
                     self.activity_today = a.today.clone();
                     self.next_activity = Instant::now() + every;
-                    self.send(OyenzaEvent::Activity(a));
+                    self.send(NexoraEvent::Activity(a));
                 }
                 None => self.next_activity = self.failed("day list", "unreadable answer".into(), None),
             },
@@ -616,11 +616,11 @@ impl Worker {
 
     fn poll_bills(&mut self) {
         let Some(key) = self.link.as_ref().map(|l| l.key.clone()) else { return };
-        match self.call(Method::Get, &oyenza::bills_url(&tz_now()), Some(&key), None, TIMEOUT) {
-            Ok(r) if r.status == 200 => match oyenza::parse_bills(&r.body) {
+        match self.call(Method::Get, &nexora::bills_url(&tz_now()), Some(&key), None, TIMEOUT) {
+            Ok(r) if r.status == 200 => match nexora::parse_bills(&r.body) {
                 Some(feed) => {
-                    self.next_bills = Instant::now() + Duration::from_secs(oyenza::BILLS_EVERY_S);
-                    self.send(OyenzaEvent::Bills { today: feed.today, bills: feed.bills });
+                    self.next_bills = Instant::now() + Duration::from_secs(nexora::BILLS_EVERY_S);
+                    self.send(NexoraEvent::Bills { today: feed.today, bills: feed.bills });
                 }
                 None => self.next_bills = self.failed("bills check", "unreadable answer".into(), None),
             },
@@ -635,10 +635,10 @@ impl Worker {
         let Some(key) = self.link.as_ref().map(|l| l.key.clone()) else { return };
         self.health_asked = Some(Instant::now());
         self.health_page = false;
-        match self.call(Method::Get, &oyenza::health_url(), Some(&key), None, TIMEOUT) {
-            Ok(r) if r.status == 200 => match oyenza::parse_health(&r.body) {
+        match self.call(Method::Get, &nexora::health_url(), Some(&key), None, TIMEOUT) {
+            Ok(r) if r.status == 200 => match nexora::parse_health(&r.body) {
                 Some(Some(h)) => self.got_health(Some(h), "steps from the phone came in"),
-                Some(None) => self.got_health(None, "no steps to show (off in Oyenza, or none sent yet)"),
+                Some(None) => self.got_health(None, "no steps to show (off in Nexora, or none sent yet)"),
                 None => self.next_health = self.failed("steps check", "unreadable answer".into(), None),
             },
             // A server from before steps came to the PC: none to show, and nothing wrong.
@@ -652,12 +652,12 @@ impl Worker {
     /// An answer (`said` goes to the log when it changes): the island gets it, and the next look is in 15 minutes.
     fn got_health(&mut self, health: Option<HealthSnapshot>, said: &'static str) {
         self.fails = 0;
-        self.next_health = Instant::now() + Duration::from_secs(oyenza::HEALTH_EVERY_S);
+        self.next_health = Instant::now() + Duration::from_secs(nexora::HEALTH_EVERY_S);
         if self.health_said != Some(said) {
             self.health_said = Some(said);
-            crate::pinfo!("oyenza: {said}");
+            crate::pinfo!("nexora: {said}");
         }
-        self.send(OyenzaEvent::Health(health));
+        self.send(NexoraEvent::Health(health));
     }
 
     /// Whether the account has Studio Pro: asked once a page needs it.
@@ -665,20 +665,20 @@ impl Worker {
         self.next_pro = None;
         let Some(key) = self.link.as_ref().map(|l| l.key.clone()) else { return };
         self.pro_asked = Some(Instant::now());
-        match self.call(Method::Get, &oyenza::pro_url(), Some(&key), None, TIMEOUT) {
-            Ok(r) if r.status == 200 => match oyenza::parse_pro(&r.body) {
-                Some(pro) => self.send(OyenzaEvent::Pro(pro)),
-                None => crate::pwarn!("oyenza: Pro check: unreadable answer"),
+        match self.call(Method::Get, &nexora::pro_url(), Some(&key), None, TIMEOUT) {
+            Ok(r) if r.status == 200 => match nexora::parse_pro(&r.body) {
+                Some(pro) => self.send(NexoraEvent::Pro(pro)),
+                None => crate::pwarn!("nexora: Pro check: unreadable answer"),
             },
             // A server from before Studio Pro: nobody has it there.
-            Ok(r) if r.status == 404 => self.send(OyenzaEvent::Pro(false)),
+            Ok(r) if r.status == 404 => self.send(NexoraEvent::Pro(false)),
             Ok(r) if r.status == 401 => self.signed_out_by_server(),
-            Ok(r) => crate::pwarn!("oyenza: Pro check: HTTP {}", r.status),
-            Err(e) => crate::pwarn!("oyenza: Pro check: {e}"),
+            Ok(r) => crate::pwarn!("nexora: Pro check: HTTP {}", r.status),
+            Err(e) => crate::pwarn!("nexora: Pro check: {e}"),
         }
     }
 
-    /// The Today page's day, from the apps switched on in oyenza.app.
+    /// The Today page's day, from the apps switched on in nexora.app.
     fn poll_day(&mut self) {
         let Some(key) = self.link.as_ref().map(|l| l.key.clone()) else { return };
         self.day_asked = Some(Instant::now());
@@ -687,27 +687,27 @@ impl Worker {
                 Some(day) => {
                     self.fails = 0;
                     self.next_day = Instant::now() + Duration::from_secs(agenda::EVERY_S);
-                    self.send(OyenzaEvent::Day(day));
+                    self.send(NexoraEvent::Day(day));
                 }
                 None => {
                     self.next_day = self.failed("day for Today", "unreadable answer".into(), None);
-                    self.send(OyenzaEvent::DayFailed);
+                    self.send(NexoraEvent::DayFailed);
                 }
             },
             // A server from before the Today page, or with it switched off: the page
             // stays as it was, and asks again later rather than every 5 minutes.
             Ok(r) if r.status == 404 || r.status == 503 => {
                 self.next_day = Instant::now() + Duration::from_secs(agenda::UNAVAILABLE_S);
-                self.send(OyenzaEvent::DayUnavailable);
+                self.send(NexoraEvent::DayUnavailable);
             }
             Ok(r) if r.status == 401 => self.signed_out_by_server(),
             Ok(r) => {
                 self.next_day = self.failed("day for Today", format!("HTTP {}", r.status), r.retry_after_s);
-                self.send(OyenzaEvent::DayFailed);
+                self.send(NexoraEvent::DayFailed);
             }
             Err(e) => {
                 self.next_day = self.failed("day for Today", e.to_string(), None);
-                self.send(OyenzaEvent::DayFailed);
+                self.send(NexoraEvent::DayFailed);
             }
         }
     }
@@ -716,53 +716,53 @@ impl Worker {
 
     fn note(&mut self, text: String) {
         let Some(key) = self.link.as_ref().map(|l| l.key.clone()) else {
-            self.send(OyenzaEvent::NoteFailed { text, code: "offline".into() });
+            self.send(NexoraEvent::NoteFailed { text, code: "offline".into() });
             return;
         };
-        let body = oyenza::note_body(&text, &tz_now());
-        match self.call(Method::Post, &oyenza::note_url(), Some(&key), Some(&body), NOTE_TIMEOUT) {
-            Ok(r) if r.status == 200 => match oyenza::parse_saved(&r.body) {
+        let body = nexora::note_body(&text, &tz_now());
+        match self.call(Method::Post, &nexora::note_url(), Some(&key), Some(&body), NOTE_TIMEOUT) {
+            Ok(r) if r.status == 200 => match nexora::parse_saved(&r.body) {
                 Some(saved) => {
-                    crate::pinfo!("oyenza: {} spend(s) saved", saved.len());
-                    self.send(OyenzaEvent::NoteSaved(saved));
+                    crate::pinfo!("nexora: {} spend(s) saved", saved.len());
+                    self.send(NexoraEvent::NoteSaved(saved));
                     // The page's list shows it at once.
                     self.next_activity = Instant::now();
                 }
-                None => self.send(OyenzaEvent::NoteFailed { text, code: "other".into() }),
+                None => self.send(NexoraEvent::NoteFailed { text, code: "other".into() }),
             },
             Ok(r) if r.status == 401 => {
-                self.send(OyenzaEvent::NoteFailed { text, code: "offline".into() });
+                self.send(NexoraEvent::NoteFailed { text, code: "offline".into() });
                 self.signed_out_by_server();
             }
             Ok(r) => {
-                let code = oyenza::error_code(&r.body).unwrap_or_else(|| "other".into());
-                crate::pwarn!("oyenza: note not saved ({code})");
-                self.send(OyenzaEvent::NoteFailed { text, code });
+                let code = nexora::error_code(&r.body).unwrap_or_else(|| "other".into());
+                crate::pwarn!("nexora: note not saved ({code})");
+                self.send(NexoraEvent::NoteFailed { text, code });
             }
             Err(e) => {
-                crate::pwarn!("oyenza: note not sent ({e})");
-                self.send(OyenzaEvent::NoteFailed { text, code: "offline".into() });
+                crate::pwarn!("nexora: note not sent ({e})");
+                self.send(NexoraEvent::NoteFailed { text, code: "offline".into() });
             }
         }
     }
 
     fn undo(&mut self, id: String) {
         let Some(key) = self.link.as_ref().map(|l| l.key.clone()) else { return };
-        match self.call(Method::Delete, &oyenza::undo_url(&id), Some(&key), None, TIMEOUT) {
+        match self.call(Method::Delete, &nexora::undo_url(&id), Some(&key), None, TIMEOUT) {
             Ok(r) if r.status == 200 => {
-                self.send(OyenzaEvent::Undone);
+                self.send(NexoraEvent::Undone);
                 self.next_activity = Instant::now();
             }
             Ok(r) if r.status == 401 => self.signed_out_by_server(),
-            Ok(r) => self.send(OyenzaEvent::UndoFailed(oyenza::error_code(&r.body).unwrap_or_else(|| "other".into()))),
-            Err(_) => self.send(OyenzaEvent::UndoFailed("offline".into())),
+            Ok(r) => self.send(NexoraEvent::UndoFailed(nexora::error_code(&r.body).unwrap_or_else(|| "other".into()))),
+            Err(_) => self.send(NexoraEvent::UndoFailed("offline".into())),
         }
     }
 }
 
 /// The local zone as the server reads days in it ("+07:00").
 fn tz_now() -> String {
-    oyenza::tz_param(oyenza::offset_minutes(&crate::clock::local_now(), crate::clock::unix_now()))
+    nexora::tz_param(nexora::offset_minutes(&crate::clock::local_now(), crate::clock::unix_now()))
 }
 
 /// The PC's date (YYYY-MM-DD), to notice midnight between two looks.

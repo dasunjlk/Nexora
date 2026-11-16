@@ -1,8 +1,8 @@
-//! The Oyenza mark's outlines, as SVG path data in the mark's own units.
+//! The Nexora mark's outlines, as SVG path data in the mark's own units.
 //!
 //! Copied verbatim from OyenKit's `OyenMarkData.swift`, which is generated from
-//! the Oyenza app's `src/components/oyenza-mark.tsx` (app commit 871d07c) by
-//! `Oyenza/tools/gen_mark_paths.py`. Never edit these by hand: when the mark
+//! the Nexora app's `src/components/nexora-mark.tsx` (app commit 871d07c) by
+//! `Nexora/tools/gen_mark_paths.py`. Never edit these by hand: when the mark
 //! changes, regenerate OyenKit's file and copy the strings again.
 
 /// The head's outline: the right ear upright, the left one cut off at its crease.

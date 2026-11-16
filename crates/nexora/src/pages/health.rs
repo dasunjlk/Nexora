@@ -1,19 +1,19 @@
 //! Health page, the Health add-on's (off until switched on): today's steps
 //! against the goal, the week as bars, and where the numbers came from.
 //!
-//! The numbers come from the person's phone: Oyenza reads daily totals from
-//! Apple Health or Health Connect and, with Show on Oyenza Studio turned on
-//! there, a signed-in Oyenza Studio receives them (`AppState::health`, in
+//! The numbers come from the person's phone: Nexora reads daily totals from
+//! Apple Health or Health Connect and, with Show on Nexora turned on
+//! there, a signed-in Nexora receives them (`AppState::health`, in
 //! memory only). Without numbers the page says how to get them; numbers more
-//! than two hours old stay, with a line asking to open Oyenza on the phone.
+//! than two hours old stay, with a line asking to open Nexora on the phone.
 //! Nothing here animates; the page only redraws when new numbers arrive (each
 //! check, every 15 minutes, brings them again, so that line comes on time).
 
-use crate::commands::{Command, OyenzaCmd};
+use crate::commands::{Command, NexoraCmd};
 use crate::gfx::{ts, TextStyle, Weight};
 use crate::icons::Icon;
 use crate::pages::PageKind;
-use crate::state::{AppState, Notice, NoticeAction, OyenzaLink};
+use crate::state::{AppState, Notice, NoticeAction, NexoraLink};
 use crate::ui::{wid, PillStyle, Ui, PILL_SMALL};
 use nexora_core::datetime::{fmt_clock, fmt_date_short, LocalDateTime};
 use nexora_core::geom::{palette, Color, Point, Rect};
@@ -126,12 +126,12 @@ fn draw_today(ui: &mut Ui, st: &AppState, h: &HealthSnapshot, steps: u32, goal: 
 
     let faint = TextStyle::caption().color(palette::TEXT_FAINT);
     if is_stale(h.updated_at, st.unix) {
-        // Not updated for two hours (`STALE_AFTER_S`): opening Oyenza on the phone sends the newest.
+        // Not updated for two hours (`STALE_AFTER_S`): opening Nexora on the phone sends the newest.
         ui.c.text(&updated_text(st, h.updated_at), Rect::new(r.x, y + 92.0, r.w, 15.0), &faint);
         let hint = TextStyle::caption().color(palette::TEXT_DIM);
-        ui.c.text("Open Oyenza on your phone to update", Rect::new(r.x, y + 107.0, (right - r.x).max(r.w), 15.0), &hint);
+        ui.c.text("Open Nexora on your phone to update", Rect::new(r.x, y + 107.0, (right - r.x).max(r.w), 15.0), &hint);
     } else {
-        ui.c.text(&format!("From {} via Oyenza", h.source.name()), Rect::new(r.x, y + 92.0, r.w, 15.0), &faint);
+        ui.c.text(&format!("From {} via Nexora", h.source.name()), Rect::new(r.x, y + 92.0, r.w, 15.0), &faint);
         ui.c.text(&updated_text(st, h.updated_at), Rect::new(r.x, y + 107.0, r.w, 15.0), &faint);
     }
 }
@@ -154,19 +154,19 @@ pub(crate) fn updated_text(st: &AppState, at: i64) -> String {
     }
 }
 
-/// Title, explanation and a button (or the "Off in Oyenza" tag), stacked and
+/// Title, explanation and a button (or the "Off in Nexora" tag), stacked and
 /// centred on `center_y` (the ring's centre). Heights are measured, so a wider
-/// font wraps instead of clipping. Signed out, the button signs in to Oyenza
+/// font wraps instead of clipping. Signed out, the button signs in to Nexora
 /// right here (while a code waits, it shows the code). Signed in already
-/// (`services::oyenza`) with no steps, the switch is off on the phone (or its
-/// Oyenza can't send them yet): the text says where to turn it on.
+/// (`services::nexora`) with no steps, the switch is off on the phone (or its
+/// Nexora can't send them yet): the text says where to turn it on.
 fn draw_not_connected(ui: &mut Ui, st: &mut AppState, r: Rect, center_y: f32) {
-    let signed_in = matches!(st.oyenza.link, OyenzaLink::Connected { .. });
+    let signed_in = matches!(st.nexora.link, NexoraLink::Connected { .. });
     let title = "Your steps, from your phone";
     let body = if signed_in {
-        "Open Oyenza on your iPhone or Android and, under your steps in Health (Sehat), turn on Show on Oyenza Studio. Your daily steps then show here."
+        "Open Nexora on your iPhone or Android and, under your steps in Health (Sehat), turn on Show on Nexora. Your daily steps then show here."
     } else {
-        "Oyenza on your iPhone or Android reads them from Apple Health or Health Connect. Sign in to Oyenza to see them here."
+        "Nexora on your iPhone or Android reads them from Apple Health or Health Connect. Sign in to Nexora to see them here."
     };
     let title_st = TextStyle::headline().wrap().top();
     let body_st = TextStyle::footnote().color(palette::TEXT_DIM).wrap().top();
@@ -180,24 +180,24 @@ fn draw_not_connected(ui: &mut Ui, st: &mut AppState, r: Rect, center_y: f32) {
     let body_y = y + title_h + gap;
     ui.c.text(body, Rect::new(r.x, body_y, r.w, body_h + 1.0), &body_st);
     let tag_y = body_y + body_h + tag_gap;
-    match st.oyenza.link {
-        OyenzaLink::Off => {
-            let label = "Sign in with Oyenza";
+    match st.nexora.link {
+        NexoraLink::Off => {
+            let label = "Sign in with Nexora";
             let w = ui.pill_width(label, false, true).min(r.w);
             if ui.pill(wid("health.sign-in"), Rect::new(r.x, tag_y, w, PILL_SMALL), label, None, PillStyle::Primary(palette::ORANGE)).clicked {
-                st.cmd(Command::Oyenza(OyenzaCmd::SignIn));
+                st.cmd(Command::Nexora(NexoraCmd::SignIn));
             }
         }
-        OyenzaLink::Connecting { .. } => {
+        NexoraLink::Connecting { .. } => {
             let label = "Show the sign-in code";
             let w = ui.pill_width(label, false, true).min(r.w);
             if ui.pill(wid("health.show-code"), Rect::new(r.x, tag_y, w, PILL_SMALL), label, None, PillStyle::Primary(palette::ORANGE)).clicked {
-                st.cmd(Command::SetPage(PageKind::Oyenza));
+                st.cmd(Command::SetPage(PageKind::Nexora));
             }
         }
         // Not a button: the switch is on the phone.
-        OyenzaLink::Connected { .. } => {
-            let label = "Off in Oyenza";
+        NexoraLink::Connected { .. } => {
+            let label = "Off in Nexora";
             let tag_st = TextStyle::caption().weight(Weight::Semibold).color(palette::TEXT_DIM);
             let (tw, _) = ui.c.measure(label, &tag_st, r.w);
             let tag = Rect::new(r.x, tag_y, (tw.ceil() + 20.0).min(r.w), tag_h);

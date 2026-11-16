@@ -1,6 +1,6 @@
 //! AI usage: how much of each AI coding plan a person has left (Codex,
 //! Claude Code, OpenCode Go and the rest), for the AI tab, plus their
-//! inference.oyenza.com balance once they connect it.
+//! inference.nexora.app balance once they connect it.
 //!
 //! Each service is one file here (`codex.rs`, `claude.rs`, ...) behind the
 //! same [`Provider`] contract, and all of it is pure, so every service is
@@ -8,7 +8,7 @@
 //!
 //! 1. [`Provider::wants`]: which files on this computer to read (the
 //!    service's own sign-in or logs), a Mac keychain item, or a key the
-//!    person typed into Oyenza Studio. The app reads them ([`Got`]).
+//!    person typed into Nexora. The app reads them ([`Got`]).
 //! 2. [`Provider::next`], called with what was read and the answers so far:
 //!    either a request to make ([`Step::Fetch`], at most [`MAX_FETCHES`] a
 //!    refresh), a program to run ([`Step::Run`], at most [`MAX_RUNS`], for a
@@ -28,7 +28,7 @@
 //! - A sign-in read here goes only to its own service's server (the token
 //!   from Codex's file goes to chatgpt.com, never anywhere else), and never
 //!   into the log, an error message or a snapshot.
-//! - Ask as Oyenza Studio: never set a `User-Agent` that pretends to be
+//! - Ask as Nexora: never set a `User-Agent` that pretends to be
 //!   another app.
 //! - Unknown is not zero: a number the answer doesn't carry stays `None`.
 
@@ -47,7 +47,7 @@ pub mod kimi;
 pub mod minimax;
 pub mod opencode;
 pub mod openrouter;
-pub mod oyenza;
+pub mod nexora;
 pub mod pace;
 pub mod safe_storage;
 pub mod zai;
@@ -80,8 +80,8 @@ pub enum ProviderId {
     Zai,
     MiniMax,
     OpenRouter,
-    /// inference.oyenza.com: the person's balance and spend, once connected.
-    Oyenza,
+    /// inference.nexora.app: the person's balance and spend, once connected.
+    Nexora,
 }
 
 impl ProviderId {
@@ -97,7 +97,7 @@ impl ProviderId {
         ProviderId::Zai,
         ProviderId::MiniMax,
         ProviderId::OpenRouter,
-        ProviderId::Oyenza,
+        ProviderId::Nexora,
     ];
 
     /// Stable key: settings, the log, fixture folders.
@@ -114,7 +114,7 @@ impl ProviderId {
             ProviderId::Zai => "zai",
             ProviderId::MiniMax => "minimax",
             ProviderId::OpenRouter => "openrouter",
-            ProviderId::Oyenza => "oyenza",
+            ProviderId::Nexora => "nexora",
         }
     }
 
@@ -132,7 +132,7 @@ impl ProviderId {
             ProviderId::Zai => "Z.ai GLM",
             ProviderId::MiniMax => "MiniMax",
             ProviderId::OpenRouter => "OpenRouter",
-            ProviderId::Oyenza => "Oyenza Inference",
+            ProviderId::Nexora => "Nexora Inference",
         }
     }
 
@@ -245,7 +245,7 @@ pub enum Want {
     /// A macOS keychain password (generic password, by service and account).
     /// Windows answers [`Got::Missing`].
     Keychain { service: String, account: Option<String> },
-    /// A key the person typed into Oyenza Studio for this service, kept
+    /// A key the person typed into Nexora for this service, kept
     /// sealed by the app (DPAPI / keychain), by name.
     Secret(&'static str),
     /// `len` bytes of a file from `offset` (fewer at its end), for files too
@@ -503,7 +503,7 @@ pub trait Provider: Sync {
         false
     }
 
-    /// The service needs a key typed into Oyenza Studio ([`Want::Secret`]);
+    /// The service needs a key typed into Nexora ([`Want::Secret`]);
     /// the tab then offers a field for it.
     fn takes_key(&self) -> Option<KeyAsk> {
         None
@@ -535,7 +535,7 @@ pub fn all() -> [&'static dyn Provider; 12] {
         &zai::Zai,
         &minimax::MiniMax,
         &openrouter::OpenRouter,
-        &oyenza::Oyenza,
+        &nexora::Nexora,
     ]
 }
 
@@ -730,7 +730,7 @@ pub enum Trouble {
     /// The sign-in here has expired; the service's own app renews it the
     /// next time it runs (we never do).
     Expired,
-    /// It needs a key typed into Oyenza Studio.
+    /// It needs a key typed into Nexora.
     NeedsKey,
     /// The service refused the sign-in or key (401/403).
     Refused,

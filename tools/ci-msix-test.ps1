@@ -110,7 +110,7 @@ if ($TestCopy) {
     New-Item -ItemType Directory -Force -Path $TestCopy | Out-Null
     $name = [IO.Path]::GetFileNameWithoutExtension($Msix)
     Copy-Item $signed (Join-Path $TestCopy "$name-test.msix") -Force
-    Copy-Item $cer (Join-Path $TestCopy "oyenza-studio-test.cer") -Force
+    Copy-Item $cer (Join-Path $TestCopy "nexora-test.cer") -Force
     Copy-Item (Join-Path $PSScriptRoot "store-test-copy\*") $TestCopy -Force
     "test copy: $((Get-ChildItem $TestCopy).Name -join ', ')"
 }

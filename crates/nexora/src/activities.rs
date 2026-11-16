@@ -30,7 +30,7 @@ pub enum Activity {
     Prayer,
     /// Show over games: frame rate, GPU and CPU while a full-screen app is in front.
     Game,
-    /// A screen recording with Oyenza Studio Recorder: its dot and time.
+    /// A screen recording with Nexora Recorder: its dot and time.
     Recording,
     /// The Downloader add-on: how far its downloads are.
     Download,
@@ -939,7 +939,7 @@ fn battery_badge(ui: &mut Ui, right: f32, cy: f32, percent: u8, color: Color) ->
 fn inline_done(st: &AppState, a: InlineAction) -> bool {
     match a {
         InlineAction::StartFocus => st.pomodoro.is_active(),
-        // Oyenza: the sum is in place once Show took it.
+        // Nexora: the sum is in place once Show took it.
         InlineAction::ShowAmount => st.notice.as_ref().is_some_and(|n| n.reveal.is_none()),
         InlineAction::StopAdzan => !st.prayer.adzan,
         // Done once clicked: the app puts the check in the notice's icon.
@@ -1235,8 +1235,8 @@ mod tests {
     /// starting (no size known yet).
     fn with_downloads(mut st: AppState, n: usize) -> AppState {
         st.downloader_offered = true;
-        st.oyenza.link = crate::state::OyenzaLink::Connected { account: "a•••@example.com".into() };
-        st.oyenza.pro = Some(true);
+        st.nexora.link = crate::state::NexoraLink::Connected { account: "a•••@example.com".into() };
+        st.nexora.pro = Some(true);
         st.addons.insert(nexora_core::addons::DOWNLOADER.id, nexora_core::addons::Status::Ready);
         for i in 0..n {
             let id = add(&mut st, &format!("https://video.blender.org/w/{i}"));
@@ -1268,7 +1268,7 @@ mod tests {
         assert_eq!(current_activity(&mac), None);
         // Nor for an account without Studio Pro.
         let mut free = with_downloads(AppState::new(Settings::default(), Store::default()), 1);
-        free.oyenza.pro = Some(false);
+        free.nexora.pro = Some(false);
         assert_eq!(current_activity(&free), None);
     }
 

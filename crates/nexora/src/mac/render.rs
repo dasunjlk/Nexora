@@ -33,7 +33,7 @@ use crate::notch::{self, Notch};
 use crate::pages::{self, PageKind};
 use crate::services::romanize::{self, Pronounced};
 use crate::state::{
-    AppState, CityFile, Hud, HudKind, InlineAction, Locate, LyricsState, LyricsStatus, MediaSession, NoticeAction, OyenzaLink, OyenzaState, PowerState, SysStats, VolumeState,
+    AppState, CityFile, Hud, HudKind, InlineAction, Locate, LyricsState, LyricsStatus, MediaSession, NoticeAction, NexoraLink, NexoraState, PowerState, SysStats, VolumeState,
 };
 use crate::ui::{Hit, Input};
 use nexora_core::addons::{Status as AddonStatus, JAPANESE_READINGS, PRAYER_TIMES};
@@ -41,7 +41,7 @@ use nexora_core::datetime::LocalDateTime;
 use nexora_core::geom::{palette, Color, Point, Rect};
 use nexora_core::health::{HealthDay, HealthSnapshot, HealthSource};
 use nexora_core::lrc::parse_lrc;
-use nexora_core::oyenza::{Activity, Bill, Day, Seen, Txn, WalletRef};
+use nexora_core::nexora::{Activity, Bill, Day, Seen, Txn, WalletRef};
 use nexora_core::pomodoro::{Phase, RunState};
 use nexora_core::power::PowerReading;
 use nexora_core::prayer::{PlaceList, Prayer, World};
@@ -138,16 +138,16 @@ enum Scene {
     PrayerWorld,
     /// Bluetooth headphones connected (the headphone pop-up).
     HeadphonesHud,
-    /// Oyenza, signed in as a made-up account: its page (today's and
+    /// Nexora, signed in as a made-up account: its page (today's and
     /// yesterday's transactions, bills due), the sign-in code, a money
     /// notice with the sum held back, and Settings signed in.
-    Oyenza,
-    OyenzaCode,
-    /// The Oyenza tab signed out: what signing in brings, and Sign in.
-    OyenzaSignedOut,
-    OyenzaNotice,
+    Nexora,
+    NexoraCode,
+    /// The Nexora tab signed out: what signing in brings, and Sign in.
+    NexoraSignedOut,
+    NexoraNotice,
     SettingsSignedIn,
-    /// The Today page signed in to Oyenza: the day from Google Calendar and
+    /// The Today page signed in to Nexora: the day from Google Calendar and
     /// Gmail (`agenda::sample`), no app switched on, and a server without the
     /// day (the stat tiles, as before). Signed out, `Page(Today)` above shows
     /// the sign-in card.
@@ -167,7 +167,7 @@ enum Scene {
     /// next start.
     UpdateSheet,
     UpdateReady,
-    /// Oyenza Studio Recorder installed and heard from: the Record page's
+    /// Nexora Recorder installed and heard from: the Record page's
     /// choices, the page while it records (0:42), the closed island's
     /// recording (12:34; around a notch its dot and time sit in the ears),
     /// paused, and the Add-ons tab with Screen recorder's row.
@@ -178,7 +178,7 @@ enum Scene {
     AddonsRecorder,
     /// The AI tab with made-up readings (`pages::usage::picture`): plans
     /// and limits, a trouble mix, nothing found, the first look, connecting
-    /// and connected Oyenza Inference, the Services list.
+    /// and connected Nexora Inference, the Services list.
     Ai(crate::pages::usage::Picture),
     /// The IELTS add-on signed in: on the Mac, for now, the coach is on its
     /// way (its microphone and voice come with branch ielts-coach-mac).
@@ -270,7 +270,7 @@ const SCENES: [Scene; 19] = [
     Scene::Page(PageKind::Media),
     Scene::Page(PageKind::Shelf),
     // In the Clipboard page's place (it left the app), so the numbers stay.
-    Scene::OyenzaSignedOut,
+    Scene::NexoraSignedOut,
     // Slice 3: the pop-ups and the Shelf with real files.
     Scene::ChargingHud,
     Scene::LowBatteryHud,
@@ -323,9 +323,9 @@ fn ai_scenes() -> impl Iterator<Item = Scene> {
 const SETTINGS_SCENES: [Scene; 1] = [Scene::Page(PageKind::Settings)];
 /// The headphone pop-up, after Settings.
 const HEADPHONE_SCENES: [Scene; 1] = [Scene::HeadphonesHud];
-/// Oyenza sign-in, after the headphone pop-up.
-const OYENZA_SCENES: [Scene; 4] = [Scene::Oyenza, Scene::OyenzaCode, Scene::OyenzaNotice, Scene::SettingsSignedIn];
-/// The System page's Power module on a Mac without a battery, after Oyenza.
+/// Nexora sign-in, after the headphone pop-up.
+const NEXORA_SCENES: [Scene; 4] = [Scene::Nexora, Scene::NexoraCode, Scene::NexoraNotice, Scene::SettingsSignedIn];
+/// The System page's Power module on a Mac without a battery, after Nexora.
 const POWER_SCENES: [Scene; 1] = [Scene::System(Module::Power)];
 /// The Today page signed in, after Power.
 const TODAY_SCENES: [Scene; 5] = [Scene::TodayDay, Scene::TodayNoApps, Scene::TodayTiles, Scene::TodayOff, Scene::TodayPicked];
@@ -374,10 +374,10 @@ const DIORAMA_SCENES: [Scene; 9] = [
 
 /// What every theme draws after Pill's pictures, in its order: the Japanese
 /// song, the Add-ons tab, Prayer times, Settings, the headphone pop-up,
-/// Oyenza, Power, Today signed in, Prayer times abroad, Stocks, the Update
+/// Nexora, Power, Today signed in, Prayer times abroad, Stocks, the Update
 /// sheet, Record, the AI tab, IELTS, the Downloader, Meeting notes and Caffeine.
 fn later_scenes() -> impl Iterator<Item = Scene> {
-    let later = SETTINGS_SCENES.into_iter().chain(HEADPHONE_SCENES).chain(OYENZA_SCENES).chain(POWER_SCENES).chain(TODAY_SCENES).chain(PRAYER_WORLD_SCENES).chain(STOCKS_SCENES).chain(UPDATE_SCENES).chain(RECORD_SCENES).chain(ai_scenes()).chain(IELTS_SCENES).chain(DOWNLOAD_SCENES).chain(NOTES_SCENES).chain(CAFFEINE_SCENES);
+    let later = SETTINGS_SCENES.into_iter().chain(HEADPHONE_SCENES).chain(NEXORA_SCENES).chain(POWER_SCENES).chain(TODAY_SCENES).chain(PRAYER_WORLD_SCENES).chain(STOCKS_SCENES).chain(UPDATE_SCENES).chain(RECORD_SCENES).chain(ai_scenes()).chain(IELTS_SCENES).chain(DOWNLOAD_SCENES).chain(NOTES_SCENES).chain(CAFFEINE_SCENES);
     JA_SCENES.into_iter().chain(ADDON_SCENES).chain(PRAYER_SCENES).chain(later)
 }
 
@@ -415,10 +415,10 @@ impl Scene {
             Scene::PrayerPickerWorld => "page-prayer-picker-world".into(),
             Scene::PrayerWorld => "page-prayer-world".into(),
             Scene::HeadphonesHud => "headphones-hud".into(),
-            Scene::Oyenza => "page-oyenza".into(),
-            Scene::OyenzaSignedOut => "page-oyenza-signed-out".into(),
-            Scene::OyenzaCode => "page-oyenza-code".into(),
-            Scene::OyenzaNotice => "oyenza-notice".into(),
+            Scene::Nexora => "page-nexora".into(),
+            Scene::NexoraSignedOut => "page-nexora-signed-out".into(),
+            Scene::NexoraCode => "page-nexora-code".into(),
+            Scene::NexoraNotice => "nexora-notice".into(),
             Scene::SettingsSignedIn => "page-settings-signed-in".into(),
             Scene::TodayDay => "page-today-day".into(),
             Scene::TodayNoApps => "page-today-no-apps".into(),
@@ -977,7 +977,7 @@ fn base_state(theme: Theme) -> AppState {
     st.volume = VolumeState { level: 0.64, muted: false, known: true };
     st.power = PowerState { has_battery: true, percent: 76, charging: false, on_ac: false, saver: false };
     st.stats = SysStats { valid: true, cpu: 0.23, mem_used: 9 << 30, mem_total: 16 << 30, disk_free: 212 << 30, disk_total: 476 << 30, uptime_s: 3 * 86_400 + 4 * 3600 };
-    // Oyen in the Oyenza tab long since arrived: at rest in every picture.
+    // Oyen in the Nexora tab long since arrived: at rest in every picture.
     st.ui.oyen_tab = Some((crate::oyen::TabMove::Arrive, f64::NEG_INFINITY));
     seed(&mut st);
     st
@@ -998,21 +998,21 @@ fn fake_release() -> nexora_core::update::Release {
         *last += 1;
     }
     let version = parts.iter().map(u64::to_string).collect::<Vec<_>>().join(".");
-    let repo = "https://github.com/lucacadalora/oyenza-studio/releases";
+    let repo = "https://github.com/dasunjlk/Nexora/releases";
     nexora_core::update::Release {
         date: "2026-10-27".into(),
         headline: "Updates install themselves on a Mac".into(),
         notes: format!("{repo}/tag/v{version}"),
         windows: None,
-        mac: Some(nexora_core::update::Download { url: format!("{repo}/download/v{version}/Oyenza-Studio-{version}-mac.dmg"), size: 4_300_000, sha256: "0".repeat(64) }),
+        mac: Some(nexora_core::update::Download { url: format!("{repo}/download/v{version}/Nexora-{version}-mac.dmg"), size: 4_300_000, sha256: "0".repeat(64) }),
         version,
     }
 }
 
-/// Oyenza for its scenes, all made up: today's and yesterday's
+/// Nexora for its scenes, all made up: today's and yesterday's
 /// transactions (today's newest just landed, so it glows), bills due
-/// tomorrow and later; or, signing in, the code to type in oyenza.app.
-pub(crate) fn fake_oyenza(st: &AppState, connecting: bool) -> OyenzaState {
+/// tomorrow and later; or, signing in, the code to type in nexora.app.
+pub(crate) fn fake_nexora(st: &AppState, connecting: bool) -> NexoraState {
     let iso = |t: i64| {
         let (y, m, d) = nexora_core::datetime::civil_from_days(t.div_euclid(86_400));
         let s = t.rem_euclid(86_400);
@@ -1065,12 +1065,12 @@ pub(crate) fn fake_oyenza(st: &AppState, connecting: bool) -> OyenzaState {
     seen.note(&before, st.now - 120.0);
     seen.note(&days, st.now - 12.0);
     let link = if connecting {
-        OyenzaLink::Connecting { code: "KPJX-TMNQ".into(), url: "https://oyenza.app/connect?code=KPJX-TMNQ".into(), until: st.now + 581.0 }
+        NexoraLink::Connecting { code: "KPJX-TMNQ".into(), url: "https://nexora.app/connect?code=KPJX-TMNQ".into(), until: st.now + 581.0 }
     } else {
-        OyenzaLink::Connected { account: "a\u{2022}\u{2022}\u{2022}@example.com".into() }
+        NexoraLink::Connected { account: "a\u{2022}\u{2022}\u{2022}@example.com".into() }
     };
     let bill = |kind: &str, name: &str, due: String, text: Option<&str>| Bill { kind: kind.into(), name: name.into(), due, amount: text.map(|_| 1.0), text: text.map(Into::into) };
-    OyenzaState {
+    NexoraState {
         link,
         activity: Some(Activity { cursor: "42".into(), today: day(0), days }),
         seen,
@@ -1081,7 +1081,7 @@ pub(crate) fn fake_oyenza(st: &AppState, connecting: bool) -> OyenzaState {
         ],
         bills_today: st.day_key(),
         updated_unix: Some(st.unix - 8),
-        ..OyenzaState::default()
+        ..NexoraState::default()
     }
 }
 
@@ -1272,14 +1272,14 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
         }
         Scene::TodayDay | Scene::TodayNoApps | Scene::TodayTiles | Scene::TodayOff | Scene::TodayPicked => {
             use nexora_core::agenda::{day_num, sample, Answer, Source};
-            st.oyenza = fake_oyenza(&st, false);
+            st.nexora = fake_nexora(&st, false);
             let today = st.day_key();
             let now_min = st.local.hour as i32 * 60 + st.local.minute as i32;
             // The list starts at today, or at the date clicked ten days on.
             st.ui.today_pick = (scene == Scene::TodayPicked).then(|| day_num(&today).unwrap_or(0) + 10);
             st.ui.today_jump = st.ui.today_pick.is_some();
             st.ui.today_drawn = st.now;
-            let o = &mut st.oyenza;
+            let o = &mut st.nexora;
             o.agenda_unix = Some(st.unix - 120);
             match scene {
                 Scene::TodayDay | Scene::TodayPicked => {
@@ -1306,7 +1306,7 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
             // IELTS is an add-on, off by default: on for its own scene, signed in.
             st.settings.set_addon(nexora_core::addons::IELTS.id, true);
             st.addons.insert(nexora_core::addons::IELTS.id, AddonStatus::Ready);
-            st.oyenza = fake_oyenza(&st, false);
+            st.nexora = fake_nexora(&st, false);
             st.ielts = nexora_core::ielts::Coach::sample(nexora_core::ielts::Sample::Home, st.now);
             st.page = PageKind::Ielts;
             Mode::Expanded(PageKind::Ielts)
@@ -1314,8 +1314,8 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
         Scene::Downloads | Scene::DownloadActivity | Scene::AddonsDownloader => {
             // The Downloader is an add-on, off by default, for Studio Pro: on
             // for its own scenes, signed in with Pro.
-            st.oyenza = fake_oyenza(&st, false);
-            st.oyenza.pro = Some(true);
+            st.nexora = fake_nexora(&st, false);
+            st.nexora.pro = Some(true);
             st.downloader_offered = true;
             st.settings.set_addon(nexora_core::addons::DOWNLOADER.id, true);
             st.addons.insert(nexora_core::addons::DOWNLOADER.id, AddonStatus::Ready);
@@ -1337,8 +1337,8 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
         }
         Scene::NotesListening | Scene::NotesActivity | Scene::AddonsPro => {
             // Signed in with Studio Pro, every Pro add-on switched on.
-            st.oyenza = fake_oyenza(&st, false);
-            st.oyenza.pro = Some(true);
+            st.nexora = fake_nexora(&st, false);
+            st.nexora.pro = Some(true);
             st.downloader_offered = true;
             for a in [nexora_core::addons::MEETING_NOTES, nexora_core::addons::IELTS, nexora_core::addons::DOWNLOADER] {
                 st.settings.set_addon(a.id, true);
@@ -1409,30 +1409,30 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
         }
         Scene::Ai(shows) => {
             // AI usage is part of Studio Pro: signed in with it.
-            st.oyenza = fake_oyenza(&st, false);
-            st.oyenza.pro = Some(true);
+            st.nexora = fake_nexora(&st, false);
+            st.nexora.pro = Some(true);
             let now = st.now;
             crate::pages::usage::picture(&mut st, shows, now);
             st.page = PageKind::Ai;
             Mode::Expanded(PageKind::Ai)
         }
-        Scene::Oyenza | Scene::OyenzaCode => {
-            st.oyenza = fake_oyenza(&st, scene == Scene::OyenzaCode);
-            st.page = PageKind::Oyenza;
-            Mode::Expanded(PageKind::Oyenza)
+        Scene::Nexora | Scene::NexoraCode => {
+            st.nexora = fake_nexora(&st, scene == Scene::NexoraCode);
+            st.page = PageKind::Nexora;
+            Mode::Expanded(PageKind::Nexora)
         }
-        Scene::OyenzaSignedOut => {
-            st.page = PageKind::Oyenza;
-            Mode::Expanded(PageKind::Oyenza)
+        Scene::NexoraSignedOut => {
+            st.page = PageKind::Nexora;
+            Mode::Expanded(PageKind::Nexora)
         }
-        Scene::OyenzaNotice => {
-            st.oyenza = fake_oyenza(&st, false);
-            st.notify(Icon::MoneyIn, palette::GREEN, "Money in \u{b7} BCA", "Amount and sender hidden", 30.0, Some(NoticeAction::OpenPage(PageKind::Oyenza)));
+        Scene::NexoraNotice => {
+            st.nexora = fake_nexora(&st, false);
+            st.notify(Icon::MoneyIn, palette::GREEN, "Money in \u{b7} BCA", "Amount and sender hidden", 30.0, Some(NoticeAction::OpenPage(PageKind::Nexora)));
             st.set_notice_inline(InlineAction::ShowAmount);
             Mode::Notice
         }
         Scene::SettingsSignedIn => {
-            st.oyenza = fake_oyenza(&st, false);
+            st.nexora = fake_nexora(&st, false);
             st.page = PageKind::Settings;
             Mode::Expanded(PageKind::Settings)
         }

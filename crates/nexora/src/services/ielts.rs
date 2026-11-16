@@ -12,8 +12,8 @@
 //! (the app closed mid-session) goes when the next session starts or the
 //! add-on is switched off.
 //!
-//! The calls carry the PC's Oyenza key, read from its sealed file when the
-//! worker starts (`services::secret`), like the Oyenza worker's: it never
+//! The calls carry the PC's Nexora key, read from its sealed file when the
+//! worker starts (`services::secret`), like the Nexora worker's: it never
 //! reaches the UI thread or the log. An answer, its upload and the server's
 //! thinking, may take a while: 60 s before it counts as no answer.
 //!
@@ -24,13 +24,13 @@ use crate::services::http::{Client, Method, MtaGuard};
 use crate::services::mic::{Mic, MicError};
 use crate::services::voice::VoicePlayer;
 use nexora_core::ielts::{self, Call, MicIssue, Problem, Reply};
-use nexora_core::oyenza;
+use nexora_core::nexora;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{mpsc, Arc};
 use std::time::{Duration, Instant};
 
-const USER_AGENT: &str = concat!("OyenzaStudio/", env!("CARGO_PKG_VERSION"), " (+https://github.com/lucacadalora/oyenza-studio)");
+const USER_AGENT: &str = concat!("NexoraStudio/", env!("CARGO_PKG_VERSION"), " (+https://github.com/dasunjlk/Nexora)");
 const ME_TIMEOUT: Duration = Duration::from_secs(10);
 /// A new session's first turn is voiced before it comes back.
 const START_TIMEOUT: Duration = Duration::from_secs(30);
@@ -45,7 +45,7 @@ pub struct Kit {
     worker: Option<Worker>,
     mic: Option<Mic>,
     pub voice: VoicePlayer,
-    /// The self-test's own server and key, in place of api.oyenza.app and
+    /// The self-test's own server and key, in place of api.nexora.app and
     /// this PC's sign-in.
     pub api: Option<(String, String)>,
     /// The self-test's answer: recording "records" this file instead of the
@@ -276,7 +276,7 @@ impl Calls {
 
     fn answer(&mut self, call: Call) -> Result<Reply, (Problem, Vec<ielts::Say>)> {
         let plain = |p: Problem| (p, Vec::new());
-        let tz = oyenza::tz_param(oyenza::offset_minutes(&crate::clock::local_now(), crate::clock::unix_now()));
+        let tz = nexora::tz_param(nexora::offset_minutes(&crate::clock::local_now(), crate::clock::unix_now()));
         match call {
             Call::Me => {
                 let body = self.send(Method::Get, &ielts::me_url(&self.base, &tz), None, ME_TIMEOUT)?;
@@ -354,7 +354,7 @@ impl Calls {
     /// The key: the self-test's, or this PC's sign-in (read when first needed).
     fn key(&mut self) -> Option<String> {
         if self.key.is_none() {
-            self.key = crate::services::secret::load(&crate::paths::oyenza_link_path()).and_then(|s| oyenza::parse_link(&s)).map(|l| l.key);
+            self.key = crate::services::secret::load(&crate::paths::nexora_link_path()).and_then(|s| nexora::parse_link(&s)).map(|l| l.key);
         }
         self.key.clone()
     }

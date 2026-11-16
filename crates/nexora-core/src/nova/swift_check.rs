@@ -6,7 +6,7 @@
 //! bit; another libm (Windows CI) may round a last digit differently.
 //!
 //! The fixture was written by a small Swift program built with OyenKit's own
-//! sources (oyenza-bar commit 213172663). The program is at the fixture's end,
+//! sources (nexora-bar commit 213172663). The program is at the fixture's end,
 //! with how to run it again when OyenKit changes; its header gives the records.
 
 use super::svg::{self, Canvas, Style};

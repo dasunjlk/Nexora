@@ -1,9 +1,9 @@
-; Oyenza Studio installer (Inno Setup 6.5.2+, for the PNG wizard images).
+; Nexora installer (Inno Setup 6.5.2+, for the PNG wizard images).
 ;
 ; Releases ship installer/nexora.nsi (NSIS), which 0.1.x installs came from; CI builds this one too as a check.
 ;
 ; Build after `cargo build -p nexora --release`:
-;   iscc installer\nexora.iss                      -> dist\Oyenza-Studio-Setup-0.2.30.exe
+;   iscc installer\nexora.iss                      -> dist\Nexora-Setup-0.2.30.exe
 ;   iscc /DAppVersion=0.2.0 installer\nexora.iss   (another version)
 ;
 ; Per-user install: no admin rights and no UAC prompt. The app goes to
@@ -16,7 +16,7 @@
 #ifndef ExeSource
   #define ExeSource "..\target\release\nexora.exe"
 #endif
-#define AppName "Oyenza Studio"
+#define AppName "Nexora"
 ; Folder, data and Run value names stay "Nexora" (the app and 0.1.x installs use them).
 #define AppDir "Nexora"
 #define AppPublisher "Jatevo Labs"
@@ -45,7 +45,7 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 OutputDir=..\dist
-OutputBaseFilename=Oyenza-Studio-Setup-{#AppVersion}
+OutputBaseFilename=Nexora-Setup-{#AppVersion}
 SetupIconFile=..\crates\nexora\res\nexora.ico
 UninstallDisplayIcon={app}\{#AppExe}
 UninstallDisplayName={#AppName}
@@ -71,7 +71,7 @@ Source: "{#ExeSource}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\THIRD-PARTY-NOTICES.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [InstallDelete]
-; The shortcut the 0.1.x versions from 0.1.2 on made, before the app was renamed Oyenza Studio.
+; The shortcut the 0.1.x versions from 0.1.2 on made, before the app was renamed Nexora.
 Type: files; Name: "{autoprograms}\Nexora.lnk"
 
 [Icons]

@@ -1,9 +1,9 @@
-//! The Oyen theme: Oyen, the Oyenza cat, living in the island.
+//! The Oyen theme: Oyen, the Nexora cat, living in the island.
 //!
-//! Oyen is drawn from the Oyenza app's own built face ([`nexora_core::oyen`]),
+//! Oyen is drawn from the Nexora app's own built face ([`nexora_core::oyen`]),
 //! never from a picture, so he is the same character, with the same moods, as
 //! in the app. He peeks over a line near the island's bottom edge the way the
-//! Oyenza Studio logo does, his chin hidden behind it. (The logo's cream paws are
+//! Nexora logo does, his chin hidden behind it. (The logo's cream paws are
 //! left out: at island size they read as teeth, and Oyen has no mouth.)
 //!
 //! Moods only ever follow what the island is doing (resting, music, the
@@ -24,7 +24,7 @@ const FOLD: Color = Color::hex(oyen::FOLD_ORANGE);
 const INK: Color = Color::hex(oyen::INK);
 const PINK: Color = Color::hex(oyen::PINK);
 const GREEN: Color = Color::hex(oyen::GREEN);
-/// The Oyenza app icon's ground.
+/// The Nexora app icon's ground.
 const ICON_TILE: Color = Color::hex(0x171717);
 /// Shapes that float around the head (thinking dots, z's) are ink on a light
 /// page; on the black island they need to be light.
@@ -297,15 +297,15 @@ pub fn peek(c: &mut Canvas, frame: &Frame, cx: f32, bar_y: f32, w: f32, top: f32
     c.unclip();
 }
 
-// ---------------------------------------------------------------- the Oyenza tab
+// ---------------------------------------------------------------- the Nexora tab
 
-/// How long Oyen takes to rise into the Oyenza tab as the island opens.
+/// How long Oyen takes to rise into the Nexora tab as the island opens.
 const TAB_RISE: f64 = 0.45;
 /// His arrival, rise and wave: the Hello mood's wave is over by 1.2 s (its
 /// last 0.4 s only hold still), so the frames stop there.
 const TAB_ARRIVE: f64 = 1.2;
 
-/// A move Oyen makes in the Oyenza tab, by himself, once.
+/// A move Oyen makes in the Nexora tab, by himself, once.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TabMove {
     /// The island opened: he rises into his tab, waving (the Hello mood).
@@ -314,7 +314,7 @@ pub enum TabMove {
     Picked,
 }
 
-/// Oyen as the Oyenza tab's icon: the Oyenza mark, his whole head `w` DIPs
+/// Oyen as the Nexora tab's icon: the Nexora mark, his whole head `w` DIPs
 /// wide, centred on `center` and kept inside `clip` (the tab). `moved`: his
 /// last move of his own and when it started; after it he rests (a blink, an
 /// ear flick now and then) and, with the pointer over the tab row, watches it
@@ -435,7 +435,7 @@ fn talk(t: f64, eyes: f64) -> Frame {
     f
 }
 
-/// Oyen whole and still, as on the Oyenza mark: his head `w` DIPs wide, head
+/// Oyen whole and still, as on the Nexora mark: his head `w` DIPs wide, head
 /// and ears centred on `center`. The mark fits a 108-unit square whose
 /// middle is 12 units above its origin.
 fn badge(c: &mut Canvas, center: Point, w: f32) {
@@ -445,7 +445,7 @@ fn badge(c: &mut Canvas, center: Point, w: f32) {
     draw(c, &frame, Point::new(center.x, center.y + 12.0 * k), k);
 }
 
-/// The Oyenza app's icon, `size` DIPs square and centred on `center`: Oyen on
+/// The Nexora app's icon, `size` DIPs square and centred on `center`: Oyen on
 /// the icon's near-black tile (catat assets/images/icon.png: his head is
 /// 61.7 % of the tile, his middle 1.3 % below its centre), with the rounded
 /// corners phones give it. Its own colours in every theme.

@@ -1,4 +1,4 @@
-# Oyen's face from the Swift port (OyenKit at oyenza-bar commit 213172663), for nexora-core's cross-check
+# Oyen's face from the Swift port (OyenKit at nexora-bar commit 213172663), for nexora-core's cross-check
 # (crates/nexora-core/src/oyen/swift_check.rs). Do not edit by hand: the Swift program at the end of this
 # file wrote it. To write it again, save that program as main.swift (without the leading "# "), then
 #   swiftc -O -module-name OyenKit <OyenKit's four .swift files> main.swift -o oyen-dump
@@ -1552,7 +1552,7 @@ defs	oyen	<path id="oyen-head" d="M25.65 -58.33L25.65 -58.33Q28.39 -61.57 32.53 
 #
 # if mode == "fixture" {
 #     lines += [
-#         "# Oyen's face from the Swift port (OyenKit at oyenza-bar commit 213172663), for nexora-core's cross-check",
+#         "# Oyen's face from the Swift port (OyenKit at nexora-bar commit 213172663), for nexora-core's cross-check",
 #         "# (crates/nexora-core/src/oyen/swift_check.rs). Do not edit by hand: the Swift program at the end of this",
 #         "# file wrote it. To write it again, save that program as main.swift (without the leading \"# \"), then",
 #         "#   swiftc -O -module-name OyenKit <OyenKit's four .swift files> main.swift -o oyen-dump",

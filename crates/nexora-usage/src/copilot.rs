@@ -54,7 +54,7 @@ impl Provider for Copilot {
         }
         match replies.last() {
             // The token and nothing else: VS Code asks the same way, so no
-            // editor's name is needed (the app adds Oyenza Studio's own
+            // editor's name is needed (the app adds Nexora's own
             // User-Agent, which GitHub requires).
             None => Step::Fetch(Request::get(format!("https://{}/copilot_internal/user", s.api)).header("Authorization", format!("token {}", s.token)).header("Accept", "application/json")),
             Some(r) => Step::Done(answer(r, cx, s.user.as_deref())),

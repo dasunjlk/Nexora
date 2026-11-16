@@ -1,6 +1,6 @@
-; Oyenza Studio installer (NSIS 3). Per-user install, no admin rights needed.
+; Nexora installer (NSIS 3). Per-user install, no admin rights needed.
 ;
-; The name shown to people is "Oyenza Studio" (the 0.1.x versions from 0.1.2 on said "Nexora"); the install folder,
+; The name shown to people is "Nexora" (the 0.1.x versions from 0.1.2 on said "Nexora"); the install folder,
 ; the uninstall key, the Run value and nexora.exe keep the name "Nexora", so older installs upgrade in place.
 ;
 ; Build (Linux/macOS/Windows with makensis):
@@ -11,7 +11,7 @@
 Target amd64-unicode
 SetCompressor /SOLID lzma
 
-!define APPNAME "Oyenza Studio"
+!define APPNAME "Nexora"
 !define VERSION "0.2.30"
 !define PUBLISHER "Jatevo Labs"
 !define UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Nexora"
@@ -25,7 +25,7 @@ SetCompressor /SOLID lzma
 !endif
 
 Name "${APPNAME}"
-OutFile "${OUTDIR}/Oyenza-Studio-Setup-${VERSION}.exe"
+OutFile "${OUTDIR}/Nexora-Setup-${VERSION}.exe"
 RequestExecutionLevel user
 InstallDir "$LOCALAPPDATA\Programs\Nexora"
 InstallDirRegKey HKCU "Software\Nexora" "InstallDir"
@@ -34,7 +34,7 @@ BrandingText "${APPNAME} ${VERSION}"
 VIProductVersion "0.2.30.0"
 VIAddVersionKey "ProductName" "${APPNAME}"
 VIAddVersionKey "CompanyName" "${PUBLISHER}"
-VIAddVersionKey "FileDescription" "Oyenza Studio installer"
+VIAddVersionKey "FileDescription" "Nexora installer"
 VIAddVersionKey "FileVersion" "${VERSION}"
 VIAddVersionKey "ProductVersion" "${VERSION}"
 VIAddVersionKey "LegalCopyright" "Copyright (C) 2026 ${PUBLISHER}"
@@ -74,9 +74,9 @@ VIAddVersionKey "LegalCopyright" "Copyright (C) 2026 ${PUBLISHER}"
 !define MUI_ABORTWARNING
 !define MUI_COMPONENTSPAGE_SMALLDESC
 !define MUI_FINISHPAGE_RUN "$INSTDIR\nexora.exe"
-!define MUI_FINISHPAGE_RUN_TEXT "Launch Oyenza Studio now"
-!define MUI_WELCOMEPAGE_TITLE "Welcome to Oyenza Studio"
-!define MUI_WELCOMEPAGE_TEXT "Oyenza Studio puts a living notch at the top of your screen: music with synced lyrics, your day, a focus timer, your steps, a file shelf, tasks and more.$\r$\n$\r$\nIt installs just for you and doesn't need administrator rights."
+!define MUI_FINISHPAGE_RUN_TEXT "Launch Nexora now"
+!define MUI_WELCOMEPAGE_TITLE "Welcome to Nexora"
+!define MUI_WELCOMEPAGE_TEXT "Nexora puts a living notch at the top of your screen: music with synced lyrics, your day, a focus timer, your steps, a file shelf, tasks and more.$\r$\n$\r$\nIt installs just for you and doesn't need administrator rights."
 
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_COMPONENTS
@@ -86,7 +86,7 @@ VIAddVersionKey "LegalCopyright" "Copyright (C) 2026 ${PUBLISHER}"
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_LANGUAGE "English"
 
-Section "Oyenza Studio" SecMain
+Section "Nexora" SecMain
   SectionIn RO
   ; Close a running copy so the exe can be replaced.
   !insertmacro StopNexora
@@ -112,7 +112,7 @@ Section "Oyenza Studio" SecMain
   WriteRegDWORD HKCU "${UNINST_KEY}" "EstimatedSize" 7680
 SectionEnd
 
-Section "Start Oyenza Studio with Windows" SecAutostart
+Section "Start Nexora with Windows" SecAutostart
   ; Same value the app's own "Start with Windows" toggle writes.
   WriteRegStr HKCU "${RUN_KEY}" "Nexora" '"$INSTDIR\nexora.exe"'
 SectionEnd
@@ -126,7 +126,7 @@ Function .onInit
 FunctionEnd
 
 Function .onInstSuccess
-  ; The finish page's "Launch Oyenza Studio now" never shows in silent mode: /reopen starts it.
+  ; The finish page's "Launch Nexora now" never shows in silent mode: /reopen starts it.
   ${If} ${Silent}
     ${GetParameters} $R0
     ClearErrors
@@ -138,8 +138,8 @@ Function .onInstSuccess
 FunctionEnd
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-  !insertmacro MUI_DESCRIPTION_TEXT ${SecMain} "The Oyenza Studio app and a Start Menu shortcut."
-  !insertmacro MUI_DESCRIPTION_TEXT ${SecAutostart} "Open Oyenza Studio automatically when you sign in. You can change this later from its menu."
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecMain} "The Nexora app and a Start Menu shortcut."
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecAutostart} "Open Nexora automatically when you sign in. You can change this later from its menu."
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 Section "Uninstall"

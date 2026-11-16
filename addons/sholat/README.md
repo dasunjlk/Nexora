@@ -6,7 +6,7 @@ them. The code that works out the times (`crates/nexora-core/src/prayer/`) is
 part of nexora.exe and stays asleep until the add-on is on.
 
 The files are published, byte for byte, on the pre-release
-[`addon-sholat-3`](https://github.com/lucacadalora/oyenza-studio/releases/tag/addon-sholat-3).
+[`addon-sholat-3`](https://github.com/dasunjlk/Nexora/releases/tag/addon-sholat-3).
 Each one's size and SHA-256 are built into the app (`nexora_core::addons`),
 and `cargo test -p nexora-core addons` checks that they match the files here.
 Changing a file means a new tag (`addon-sholat-4`), new numbers in

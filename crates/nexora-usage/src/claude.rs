@@ -10,7 +10,7 @@
 //!   never refresh it: once it expires, Claude Code renews it when it next runs.
 //! - Online: `GET api.anthropic.com/api/oauth/usage` with the token and the
 //!   beta flag the endpoint asks for. CodexBar sends a `claude-cli/<version>`
-//!   User-Agent there; we ask as Oyenza Studio.
+//!   User-Agent there; we ask as Nexora.
 //! - The account, masked, comes from Claude Code's settings (`~/.claude.json`,
 //!   `oauthAccount.emailAddress`), which also tell "signed out" from "not on
 //!   this computer".

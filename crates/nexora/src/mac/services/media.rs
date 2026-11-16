@@ -18,7 +18,7 @@
 //!   for immediate delivery. The exact position, the album art and the
 //!   buttons go through each app's own AppleScript, only while that app runs
 //!   (a script never starts it); while the service may still answer, the
-//!   scripts wait [`FIRST_WORD`] for it. The first time, macOS asks "Oyenza
+//!   scripts wait [`FIRST_WORD`] for it. The first time, macOS asks "Nexora
 //!   Studio wants to control Music".
 //!
 //! A worker thread owns the state, runs the scripts and the adapter's
@@ -66,7 +66,7 @@ const FIRST_WORD: Duration = Duration::from_secs(2);
 /// of those the app stops asking for the run.
 const FAILED_START: Duration = Duration::from_secs(5);
 const MAX_FAILS: u32 = 3;
-const USER_AGENT: &str = "Nexora/0.1 (+https://github.com/lucacadalora/oyenza-studio)";
+const USER_AGENT: &str = "Nexora/0.1 (+https://github.com/dasunjlk/Nexora)";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Player {
@@ -656,7 +656,7 @@ impl Worker {
         match osascript(script) {
             Err(e) if e.contains("-1743") => {
                 if self.denied_at[p.index()].replace(Instant::now()).is_none() {
-                    pinfo!("media: macOS doesn't let Oyenza Studio control {} (System Settings > Privacy & Security > Automation)", p.name());
+                    pinfo!("media: macOS doesn't let Nexora control {} (System Settings > Privacy & Security > Automation)", p.name());
                 }
                 Err(e)
             }

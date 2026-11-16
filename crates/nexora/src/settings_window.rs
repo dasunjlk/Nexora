@@ -1,6 +1,6 @@
-//! The Settings window's content: every setting Oyenza Studio has, in a
+//! The Settings window's content: every setting Nexora has, in a
 //! sidebar of sections (General, Appearance, Island, Music and lyrics,
-//! Pop-ups, Tabs, Add-ons, Focus, Prayer, Caffeine, AI, Oyenza, About), called
+//! Pop-ups, Tabs, Add-ons, Focus, Prayer, Caffeine, AI, Nexora, About), called
 //! Advanced settings. The last row of the island's Settings page (behind
 //! the gear) and the menu's Advanced settings… open it, in a window of its
 //! own: on Windows a borderless one (`settings_host.rs`), on the Mac a real
@@ -157,7 +157,7 @@ pub enum Section {
     Prayer,
     Caffeine,
     Ai,
-    Oyenza,
+    Nexora,
     About,
 }
 
@@ -174,7 +174,7 @@ impl Section {
         Section::Prayer,
         Section::Caffeine,
         Section::Ai,
-        Section::Oyenza,
+        Section::Nexora,
         Section::About,
     ];
 
@@ -191,7 +191,7 @@ impl Section {
             Section::Prayer => "Prayer times",
             Section::Caffeine => "Caffeine",
             Section::Ai => "AI usage",
-            Section::Oyenza => "Oyenza account",
+            Section::Nexora => "Nexora account",
             Section::About => "About",
         }
     }
@@ -210,7 +210,7 @@ impl Section {
             Section::Prayer => "prayer",
             Section::Caffeine => "caffeine",
             Section::Ai => "ai",
-            Section::Oyenza => "oyenza",
+            Section::Nexora => "nexora",
             Section::About => "about",
         }
     }
@@ -228,7 +228,7 @@ impl Section {
             Section::Prayer => Icon::Moon,
             Section::Caffeine => Icon::Coffee,
             Section::Ai => Icon::Ai,
-            Section::Oyenza => Icon::Oyenza,
+            Section::Nexora => Icon::Nexora,
             Section::About => Icon::Gear,
         }
     }
@@ -247,7 +247,7 @@ impl Section {
             Section::Prayer => Color::hex(0x30B0A0),
             Section::Caffeine => Color::hex(0xA2845E),
             Section::Ai => palette::PURPLE,
-            Section::Oyenza => palette::ORANGE,
+            Section::Nexora => palette::ORANGE,
             Section::About => Color::hex(0x8E8E93),
         }
     }
@@ -358,7 +358,7 @@ pub enum Block {
     Version,
     /// The themes as cards with a small picture of each.
     Themes,
-    /// The Oyenza account row (the island's Settings page has the same).
+    /// The Nexora account row (the island's Settings page has the same).
     Account,
     /// The Add-ons page itself.
     Addons,
@@ -393,9 +393,9 @@ const THEMES: [(Theme, &str, &str); 5] = [
 ];
 /// Start with Windows, or at login on a Mac (its menu bar says so).
 const AUTOSTART: (&str, &str) = if cfg!(target_os = "macos") {
-    ("Start at login", "Opens Oyenza Studio when you log in")
+    ("Start at login", "Opens Nexora when you log in")
 } else {
-    ("Start with Windows", "Opens Oyenza Studio when you sign in")
+    ("Start with Windows", "Opens Nexora when you sign in")
 };
 const WIDTH_STEP: f32 = 20.0;
 const OFFSET_STEP: i32 = 100;
@@ -541,7 +541,7 @@ pub fn blocks(section: Section, st: &AppState) -> Vec<Block> {
                     item(Key::Tab(p), p.title(), sub, Ctl::Switch(Some(!st.tab_hidden(p))))
                 })
                 .collect();
-            vec![Block::Group(Some("When the island opens"), open), Block::Group(Some("Tabs in the island"), tabs), Block::Note("Oyenza and the add-ons' pages always have a tab.")]
+            vec![Block::Group(Some("When the island opens"), open), Block::Group(Some("Tabs in the island"), tabs), Block::Note("Nexora and the add-ons' pages always have a tab.")]
         }
         Section::Addons => vec![Block::Addons],
         Section::Focus => {
@@ -600,7 +600,7 @@ pub fn blocks(section: Section, st: &AppState) -> Vec<Block> {
             if u.notices {
                 rows.push(item(Key::AiNear, "Close to the limit at", None, Ctl::Stepper(format!("{} %", st.usage_near_pct()))));
             }
-            vec![Block::Group(None, rows), Block::Note("Services, keys and the Oyenza Inference connect are on the AI tab.")]
+            vec![Block::Group(None, rows), Block::Note("Services, keys and the Nexora Inference connect are on the AI tab.")]
         }
         Section::Caffeine => {
             let c = s.caffeine.sane();
@@ -619,7 +619,7 @@ pub fn blocks(section: Section, st: &AppState) -> Vec<Block> {
                 Block::Note("Add what you drink on the island's Caffeine page."),
             ]
         }
-        Section::Oyenza => vec![Block::Account],
+        Section::Nexora => vec![Block::Account],
         Section::About => vec![
             Block::Version,
             Block::Group(
@@ -1570,7 +1570,7 @@ fn fill_row(ui: &mut Ui, row: Rect, c: Color, (first, last): (bool, bool)) {
     ui.c.unclip();
 }
 
-/// The version card: Oyen's tile, "Oyenza Studio" and this version, and
+/// The version card: Oyen's tile, "Nexora" and this version, and
 /// Check now; with a later version out, what it brings and how to get it
 /// (the island's Update sheet does the same).
 fn draw_version(ui: &mut Ui, st: &mut AppState, r: Rect, view: Rect, sf: &Surfaces) {
@@ -1582,7 +1582,7 @@ fn draw_version(ui: &mut Ui, st: &mut AppState, r: Rect, view: Rect, sf: &Surfac
     let clickable = visible(r, view).is_some_and(|v| v.h >= r.h - 0.5);
     let check = clickable.then(|| crate::pages::settings::check_slot(ui, st, head)).flatten();
     let right = check.map_or(head.right(), |b| b.x - 12.0);
-    ui.c.text("Oyenza Studio", Rect::new(tx, cy - 20.0, (right - tx).max(0.0), 22.0), &TextStyle::headline());
+    ui.c.text("Nexora", Rect::new(tx, cy - 20.0, (right - tx).max(0.0), 22.0), &TextStyle::headline());
     ui.c.text(&format!("Version {VERSION}"), Rect::new(tx, cy + 2.0, (right - tx).max(0.0), 17.0), &TextStyle::footnote().color(palette::TEXT_DIM));
     if let Some(b) = check {
         crate::pages::settings::draw_check(ui, st, b);

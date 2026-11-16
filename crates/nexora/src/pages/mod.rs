@@ -20,7 +20,7 @@ pub mod ielts;
 pub mod media;
 pub mod notes;
 pub mod notifications;
-pub mod oyenza;
+pub mod nexora;
 pub mod prayer;
 pub mod record;
 pub mod script;
@@ -65,25 +65,25 @@ pub enum PageKind {
     /// AI usage: how much of each AI coding plan is left (`pages::usage`).
     /// Part of Studio Pro: in the row with it, until switched off.
     Ai,
-    /// Oyenza, with Oyen himself as its tab (`oyen::tab`): signed out, the
+    /// Nexora, with Oyen himself as its tab (`oyen::tab`): signed out, the
     /// way to sign in; signed in, the money by day.
-    Oyenza,
+    Nexora,
     /// The Health add-on's page, while it is on ([`tabs`]): the steps
-    /// Oyenza sends, so its tab sits beside Oyenza's.
+    /// Nexora sends, so its tab sits beside Nexora's.
     Health,
     /// The IELTS add-on's page, while it is on ([`tabs`]): Oyen as an IELTS
-    /// Speaking examiner, through the Oyenza account, so its tab follows
-    /// Oyenza's and Health's.
+    /// Speaking examiner, through the Nexora account, so its tab follows
+    /// Nexora's and Health's.
     Ielts,
     /// The Meeting notes add-on's page, while it is on ([`tabs`]; Windows):
-    /// Oyen listens to a meeting and the Oyenza account writes its notes, so
+    /// Oyen listens to a meeting and the Nexora account writes its notes, so
     /// its tab follows IELTS'.
     Notes,
     /// The System add-on's page, while it is on ([`tabs`]).
     System,
     /// The teleprompter: a script read under the webcam.
     Script,
-    /// Screen recording with Oyenza Studio Recorder, while its add-on is on
+    /// Screen recording with Nexora Recorder, while its add-on is on
     /// ([`tabs`]): what to record, then the recording under way.
     Record,
     /// Prayer times, while that add-on is on ([`tabs`]).
@@ -105,7 +105,7 @@ pub enum PageKind {
 }
 
 impl PageKind {
-    /// The tab row's order: the island's own pages, Oyenza, then the
+    /// The tab row's order: the island's own pages, Nexora, then the
     /// add-ons' pages and the "+".
     pub const ALL: [PageKind; 20] = [
         PageKind::Media,
@@ -114,7 +114,7 @@ impl PageKind {
         PageKind::Tasks,
         PageKind::Focus,
         PageKind::Ai,
-        PageKind::Oyenza,
+        PageKind::Nexora,
         PageKind::Health,
         PageKind::Ielts,
         PageKind::Notes,
@@ -144,7 +144,7 @@ impl PageKind {
             PageKind::System => "system",
             PageKind::Script => "script",
             PageKind::Record => "record",
-            PageKind::Oyenza => "oyenza",
+            PageKind::Nexora => "nexora",
             PageKind::Prayer => "prayer",
             PageKind::Stocks => "stocks",
             PageKind::Caffeine => "caffeine",
@@ -175,7 +175,7 @@ impl PageKind {
             PageKind::System => "System",
             PageKind::Script => "Script",
             PageKind::Record => "Record",
-            PageKind::Oyenza => "Oyenza",
+            PageKind::Nexora => "Nexora",
             PageKind::Prayer => "Prayer",
             PageKind::Stocks => "Stocks",
             PageKind::Caffeine => "Caffeine",
@@ -200,7 +200,7 @@ impl PageKind {
             PageKind::System => Icon::Gauge,
             PageKind::Script => Icon::Script,
             PageKind::Record => Icon::Recorder,
-            PageKind::Oyenza => Icon::Wallet,
+            PageKind::Nexora => Icon::Wallet,
             PageKind::Prayer => Icon::Moon,
             PageKind::Stocks => Icon::Stocks,
             PageKind::Caffeine => Icon::Coffee,
@@ -228,7 +228,7 @@ impl PageKind {
 
     /// The island's own pages, which Settings can take off the row, and
     /// Notifications, which goes off with its tab (it's offered only where
-    /// the copy can read notifications). Oyenza stays; the add-ons' pages come
+    /// the copy can read notifications). Nexora stays; the add-ons' pages come
     /// and go with their switches, AI's with Studio Pro.
     pub const HIDEABLE: [PageKind; 6] = [PageKind::Media, PageKind::Today, PageKind::Shelf, PageKind::Tasks, PageKind::Focus, PageKind::Notifications];
 
@@ -243,8 +243,8 @@ impl PageKind {
 /// Music, Today, Shelf, Tasks and Focus unless Settings took them off the
 /// row; one of those still shows while its page is open (a file dropped on
 /// the island opens the Shelf). Notifications wherever the copy can read
-/// them, unless Settings switched it off. AI and Oyenza are always there
-/// (signed out, Oyenza is where to sign in). Add-ons is last, in both apps.
+/// them, unless Settings switched it off. AI and Nexora are always there
+/// (signed out, Nexora is where to sign in). Add-ons is last, in both apps.
 pub fn tabs(st: &AppState) -> Vec<PageKind> {
     row(st, Some(st.page))
 }
@@ -265,7 +265,7 @@ pub fn hideable_tabs(st: &AppState) -> &'static [PageKind] {
 /// Where the island goes when its page leaves the row (an add-on switched
 /// off, a tab hidden): the first tab, Music unless it's hidden.
 pub fn first_tab(st: &AppState) -> PageKind {
-    // Never empty: Oyenza and Add-ons always have tabs.
+    // Never empty: Nexora and Add-ons always have tabs.
     row(st, None)[0]
 }
 
@@ -313,7 +313,7 @@ pub fn content_height(p: PageKind, st: &AppState) -> f32 {
         PageKind::System => system::height(st),
         PageKind::Script => script::height(st),
         PageKind::Record => record::height(st),
-        PageKind::Oyenza => oyenza::height(st),
+        PageKind::Nexora => nexora::height(st),
         PageKind::Prayer => prayer::height(st),
         PageKind::Stocks => stocks::height(st),
         PageKind::Caffeine => caffeine::height(st),
@@ -332,7 +332,7 @@ pub fn next_wake(page: PageKind, st: &AppState) -> Option<f64> {
     let wake = match page {
         PageKind::Tasks => tasks::next_wake(st),
         PageKind::Shelf => shelf::next_wake(st),
-        PageKind::Oyenza => oyenza::next_wake(st),
+        PageKind::Nexora => nexora::next_wake(st),
         PageKind::Settings => settings::next_wake(st),
         PageKind::Script => script::next_wake(st),
         PageKind::Record => record::next_wake(st),
@@ -343,7 +343,7 @@ pub fn next_wake(page: PageKind, st: &AppState) -> Option<f64> {
         PageKind::Notes => notes::next_wake(st),
         _ => None,
     };
-    // Oyen in the Oyenza tab (and beside the pin in his theme) blinks and
+    // Oyen in the Nexora tab (and beside the pin in his theme) blinks and
     // flicks an ear now and then; asleep at night, he stays still.
     let oyen = (!crate::activities::night(st)).then(|| crate::oyen::next_rest_move(st.now));
     match (wake, oyen) {
@@ -456,7 +456,7 @@ pub(crate) fn draw_page(ui: &mut Ui, st: &mut AppState, area: Rect, page: PageKi
         PageKind::System => system::draw(ui, st, area),
         PageKind::Script => script::draw(ui, st, area),
         PageKind::Record => record::draw(ui, st, area),
-        PageKind::Oyenza => oyenza::draw(ui, st, area),
+        PageKind::Nexora => nexora::draw(ui, st, area),
         PageKind::Prayer => prayer::draw(ui, st, area),
         PageKind::Stocks => stocks::draw(ui, st, area),
         PageKind::Caffeine => caffeine::draw(ui, st, area),
@@ -489,7 +489,7 @@ const TAB_H: f32 = 28.0;
 const TAB_W: f32 = 30.0;
 const TAB_GAP: f32 = 2.0;
 const TAB_ICON: f32 = 16.0;
-/// Oyen's head in the Oyenza tab (a little wider than the icons: his ears
+/// Oyen's head in the Nexora tab (a little wider than the icons: his ears
 /// take the top of it).
 const OYEN_TAB_W: f32 = 18.0;
 /// The active tab's label starts this far in and ends `TAB_LABEL_END` before its edge.
@@ -554,7 +554,7 @@ pub(crate) fn draw_header(ui: &mut Ui, st: &mut AppState, r: Rect, page: PageKin
     let lay_to = if from == page { lay_from.clone() } else { tab_layout(ui, r.x, &row, page, &label_st, scale) };
     let tabs: Vec<Rect> =
         (0..row.len()).map(|i| Rect::new(lerp(lay_from[i].0, lay_to[i].0, e), cy - TAB_H / 2.0, lerp(lay_from[i].1, lay_to[i].1, e), TAB_H)).collect();
-    // A page that isn't in the row (Oyenza right after signing out) counts as the first tab.
+    // A page that isn't in the row (Nexora right after signing out) counts as the first tab.
     let place = |p: PageKind| row.iter().position(|t| *t == p).unwrap_or(0);
     let (fi, pi) = (place(from), place(page));
     let tabs_end = tabs[tabs.len() - 1].right();
@@ -583,7 +583,7 @@ pub(crate) fn draw_header(ui: &mut Ui, st: &mut AppState, r: Rect, page: PageKin
             ui.c.fill_rrect(tr, TAB_H / 2.0, palette::SURFACE);
             hover = Some((i, tr));
         }
-        if p == PageKind::Oyenza {
+        if p == PageKind::Nexora {
             draw_oyen_tab(ui, st, r, tr);
         } else {
             let k = if active { e } else if from.tabbed() && i == fi { 1.0 - e } else { 0.0 };
@@ -593,7 +593,7 @@ pub(crate) fn draw_header(ui: &mut Ui, st: &mut AppState, r: Rect, page: PageKin
         }
         if resp.clicked && !active {
             st.cmd(Command::SetPage(p));
-            if p == PageKind::Oyenza {
+            if p == PageKind::Nexora {
                 st.ui.oyen_tab = Some((crate::oyen::TabMove::Picked, ui.now));
             }
         }
@@ -700,7 +700,7 @@ pub(crate) fn draw_header(ui: &mut Ui, st: &mut AppState, r: Rect, page: PageKin
     Some(Tip { anchor, text, alpha })
 }
 
-/// The Oyenza tab's icon: Oyen himself, the Oyenza mark, in his own colours
+/// The Nexora tab's icon: Oyen himself, the Nexora mark, in his own colours
 /// whether the tab is picked or not (`oyen::tab`). His eyes follow the pointer
 /// while it is over the tab `row`.
 fn draw_oyen_tab(ui: &mut Ui, st: &AppState, row: Rect, tab: Rect) {
@@ -759,7 +759,7 @@ pub fn empty_state(ui: &mut Ui, area: Rect, icon: Icon, title: &str, hint: &str)
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::state::OyenzaLink;
+    use crate::state::NexoraLink;
     use nexora_core::settings::Settings;
     use nexora_core::store::Store;
 
@@ -768,21 +768,21 @@ mod tests {
     }
 
     #[test]
-    fn the_row_is_the_island_s_own_pages_then_oyenza_then_the_plus() {
+    fn the_row_is_the_island_s_own_pages_then_nexora_then_the_plus() {
         // Music, then Today beside it; Focus where Today was; AI after it,
-        // with Studio Pro; Oyenza last, signed in or not.
+        // with Studio Pro; Nexora last, signed in or not.
         use PageKind::*;
         let mut st = state();
-        assert_eq!(tabs(&st), [Media, Today, Shelf, Tasks, Focus, Oyenza, Addons]);
-        st.oyenza.link = OyenzaLink::Connected { account: "a•••@example.com".into() };
-        assert_eq!(tabs(&st), [Media, Today, Shelf, Tasks, Focus, Oyenza, Addons]);
-        st.oyenza.pro = Some(true);
-        assert_eq!(tabs(&st), [Media, Today, Shelf, Tasks, Focus, Ai, Oyenza, Addons]);
-        // The add-ons' pages come after Oyenza (Health, Oyenza's steps, first), before the "+".
+        assert_eq!(tabs(&st), [Media, Today, Shelf, Tasks, Focus, Nexora, Addons]);
+        st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
+        assert_eq!(tabs(&st), [Media, Today, Shelf, Tasks, Focus, Nexora, Addons]);
+        st.nexora.pro = Some(true);
+        assert_eq!(tabs(&st), [Media, Today, Shelf, Tasks, Focus, Ai, Nexora, Addons]);
+        // The add-ons' pages come after Nexora (Health, Nexora's steps, first), before the "+".
         for id in ["system", "script", "health"] {
             st.addons.insert(id, nexora_core::addons::Status::Ready);
         }
-        assert_eq!(&tabs(&st)[6..], [Oyenza, Health, System, Script, Addons]);
+        assert_eq!(&tabs(&st)[6..], [Nexora, Health, System, Script, Addons]);
         // Clipboard left the app: an island last open there opens on Music.
         assert_eq!(PageKind::from_key("clipboard"), Media);
     }
@@ -791,23 +791,23 @@ mod tests {
     fn hidden_tabs_leave_the_row_but_not_while_their_page_is_open() {
         use PageKind::*;
         let mut st = state();
-        st.settings.hidden_tabs = vec!["today".into(), "tasks".into(), "oyenza".into(), "addons".into()];
+        st.settings.hidden_tabs = vec!["today".into(), "tasks".into(), "nexora".into(), "addons".into()];
         st.page = Focus;
-        // Oyenza and the "+" can't be hidden.
-        assert_eq!(tabs(&st), [Media, Shelf, Focus, Oyenza, Addons]);
+        // Nexora and the "+" can't be hidden.
+        assert_eq!(tabs(&st), [Media, Shelf, Focus, Nexora, Addons]);
         assert_eq!(first_tab(&st), Media);
         // Opened from elsewhere (a meeting's notice opens Today): its tab
         // shows while it's open, and stepping on leaves it behind.
         st.page = Today;
-        assert_eq!(tabs(&st), [Media, Today, Shelf, Focus, Oyenza, Addons]);
+        assert_eq!(tabs(&st), [Media, Today, Shelf, Focus, Nexora, Addons]);
         st.page = step_tab(Today, &st, true);
         assert_eq!(st.page, Shelf);
         assert!(!tabs(&st).contains(&Today));
-        // Every one of them hidden: the island opens on Oyenza.
+        // Every one of them hidden: the island opens on Nexora.
         st.settings.hidden_tabs = PageKind::HIDEABLE.iter().map(|p| p.key().to_string()).collect();
-        st.page = Oyenza;
-        assert_eq!(tabs(&st), [Oyenza, Addons]);
-        assert_eq!(first_tab(&st), Oyenza);
+        st.page = Nexora;
+        assert_eq!(tabs(&st), [Nexora, Addons]);
+        assert_eq!(first_tab(&st), Nexora);
         // A start on a hidden page opens on the first tab instead.
         let mut settings = nexora_core::settings::Settings::default();
         settings.start_page = "today".into();
@@ -820,10 +820,10 @@ mod tests {
     fn settings_has_the_gear_not_a_tab() {
         let mut st = state();
         assert!(!tabs(&st).contains(&PageKind::Settings));
-        assert!(tabs(&st).contains(&PageKind::Oyenza), "signed out it's where to sign in");
-        st.oyenza.link = OyenzaLink::Connected { account: "a•••@example.com".into() };
+        assert!(tabs(&st).contains(&PageKind::Nexora), "signed out it's where to sign in");
+        st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
         let row = tabs(&st);
-        assert!(row.contains(&PageKind::Oyenza) && !row.contains(&PageKind::Settings));
+        assert!(row.contains(&PageKind::Nexora) && !row.contains(&PageKind::Settings));
         // Stepping through the tabs never lands on Settings.
         let mut p = PageKind::Media;
         for _ in 0..2 * PageKind::ALL.len() {
@@ -842,7 +842,7 @@ mod tests {
     fn addons_is_the_last_tab_and_never_makes_the_window_taller() {
         let mut st = state();
         assert_eq!(tabs(&st).last(), Some(&PageKind::Addons));
-        st.oyenza.link = OyenzaLink::Connected { account: "a•••@example.com".into() };
+        st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
         assert_eq!(tabs(&st).last(), Some(&PageKind::Addons));
         assert_eq!(PageKind::from_key("addons"), PageKind::Addons);
         // The window is as tall as the tallest page (System, laid out for
@@ -855,23 +855,23 @@ mod tests {
             st.settings.notifications.remember(&format!("App.{i}"), &format!("App {i}"));
         }
         assert!(content_height(PageKind::Notifications, &st) <= content_height(PageKind::System, &st));
-        // Signed out, Oyenza's sign-in is as tall as its code, so starting to
+        // Signed out, Nexora's sign-in is as tall as its code, so starting to
         // sign in doesn't move the island.
-        st.oyenza.link = OyenzaLink::Off;
-        let signed_out = content_height(PageKind::Oyenza, &st);
-        st.oyenza.link = OyenzaLink::Connecting { code: "ABCD-EFGH".into(), url: String::new(), until: 600.0 };
-        assert_eq!(signed_out, content_height(PageKind::Oyenza, &st));
+        st.nexora.link = NexoraLink::Off;
+        let signed_out = content_height(PageKind::Nexora, &st);
+        st.nexora.link = NexoraLink::Connecting { code: "ABCD-EFGH".into(), url: String::new(), until: 600.0 };
+        assert_eq!(signed_out, content_height(PageKind::Nexora, &st));
     }
 
     #[test]
     fn ai_has_a_tab_only_with_studio_pro_and_never_makes_the_window_taller() {
         let mut st = state();
         assert!(!tabs(&st).contains(&PageKind::Ai), "signed out");
-        st.oyenza.link = OyenzaLink::Connected { account: "a\u{2022}\u{2022}\u{2022}@example.com".into() };
+        st.nexora.link = NexoraLink::Connected { account: "a\u{2022}\u{2022}\u{2022}@example.com".into() };
         assert!(!tabs(&st).contains(&PageKind::Ai), "before the server's answer");
-        st.oyenza.pro = Some(false);
+        st.nexora.pro = Some(false);
         assert!(!tabs(&st).contains(&PageKind::Ai), "an account without Pro");
-        st.oyenza.pro = Some(true);
+        st.nexora.pro = Some(true);
         assert!(tabs(&st).contains(&PageKind::Ai), "on with Pro, nothing to switch on");
         st.settings.set_addon(nexora_core::addons::AI_USAGE.id, false);
         assert!(!tabs(&st).contains(&PageKind::Ai), "switched off under Add-ons");
@@ -930,14 +930,14 @@ mod tests {
             st.settings.set_addon(addon.id, true);
             st.addons.insert(addon.id, nexora_core::addons::Status::Ready);
             assert!(!tabs(&st).contains(&page), "{}: signed out", addon.id);
-            st.oyenza.link = OyenzaLink::Connected { account: "a•••@example.com".into() };
+            st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
             assert!(!tabs(&st).contains(&page), "{}: before the server's answer", addon.id);
-            st.oyenza.pro = Some(false);
+            st.nexora.pro = Some(false);
             assert!(!tabs(&st).contains(&page), "{}: an account without Pro", addon.id);
-            st.oyenza.pro = Some(true);
+            st.nexora.pro = Some(true);
             assert!(tabs(&st).contains(&page), "{}", addon.id);
             // Signed out again: gone, whatever the server said before.
-            st.oyenza.link = OyenzaLink::Off;
+            st.nexora.link = NexoraLink::Off;
             assert!(!tabs(&st).contains(&page), "{}", addon.id);
             // Pro isn't known yet at start: an island last open on its page opens on the first tab.
             let store = Store { last_page: page.key().into(), ..Store::default() };
@@ -953,14 +953,14 @@ mod tests {
         let mut st = state();
         // Signed out: the sign-in card, so no stats are read for tiles.
         assert!(!today::shows_tiles(&st));
-        st.oyenza.link = OyenzaLink::Connected { account: "a•••@example.com".into() };
+        st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
         assert!(!today::shows_tiles(&st), "getting the day");
-        st.oyenza.agenda_state = AgendaState::Unavailable;
+        st.nexora.agenda_state = AgendaState::Unavailable;
         assert!(today::shows_tiles(&st));
         // The day for today, Calendar switched on: the day, and a look at the next minute.
         let today = st.day_key();
-        st.oyenza.agenda = Some(nexora_core::agenda::sample(&today, 600));
-        st.oyenza.agenda_state = AgendaState::Ready;
+        st.nexora.agenda = Some(nexora_core::agenda::sample(&today, 600));
+        st.nexora.agenda_state = AgendaState::Ready;
         assert!(!today::shows_tiles(&st));
         assert!(today::next_wake(&st).is_some_and(|t| t > st.now && t <= st.now + 60.0));
     }
@@ -982,16 +982,16 @@ mod tests {
 
     #[test]
     fn ielts_has_a_tab_only_while_its_add_on_is_on_after_health() {
-        use PageKind::{Addons, Health, Ielts, Oyenza};
+        use PageKind::{Addons, Health, Ielts, Nexora};
         let mut st = state();
         assert!(!tabs(&st).contains(&Ielts), "off for everyone until switched on");
         st.addons.insert("ielts", nexora_core::addons::Status::Ready);
         st.addons.insert("health", nexora_core::addons::Status::Ready);
-        assert_eq!(&tabs(&st)[5..], [Oyenza, Health, Ielts, Addons]);
+        assert_eq!(&tabs(&st)[5..], [Nexora, Health, Ielts, Addons]);
         // Signed out it shows the sign-in card; signed in, every state is as
         // tall, and never taller than System: the window keeps its size.
         let signed_out = content_height(Ielts, &st);
-        st.oyenza.link = OyenzaLink::Connected { account: "a•••@example.com".into() };
+        st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
         let h = content_height(Ielts, &st);
         assert!(signed_out < h && h <= content_height(PageKind::System, &st), "{signed_out} {h}");
         for s in [nexora_core::ielts::Sample::Talking, nexora_core::ielts::Sample::Result, nexora_core::ielts::Sample::MicDenied] {

@@ -1,6 +1,6 @@
 //! Z.ai's GLM Coding Plan: how much of each limit is used and when it
 //! resets (the 5-hour token window, the week, the month's tool calls), read
-//! with the API key the person typed into Oyenza Studio, or `Z_AI_API_KEY`.
+//! with the API key the person typed into Nexora, or `Z_AI_API_KEY`.
 //!
 //! One GET to `/api/monitor/usage/quota/limit` on api.z.ai, the endpoint
 //! z.ai's own usage page reads, with the key as a bearer token. A key made

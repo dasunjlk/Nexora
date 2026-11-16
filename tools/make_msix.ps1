@@ -2,15 +2,15 @@
 #
 #   ./tools/make_msix.ps1 -Exe target\release\nexora.exe -Version 0.1.2
 #
-# Writes dist\Oyenza-Studio-<version>.msix, unsigned: the Store signs what it ships.
+# Writes dist\Nexora-<version>.msix, unsigned: the Store signs what it ships.
 # Needs the Windows SDK (makepri.exe, makeappx.exe) and Python with Pillow.
 param(
     [Parameter(Mandatory = $true)][string]$Exe,
     [Parameter(Mandatory = $true)][string]$Version,
     [string]$OutDir = "dist",
-    # Partner Center > Oyenza Studio > Product identity. These are stand-ins until
+    # Partner Center > Nexora > Product identity. These are stand-ins until
     # the name is reserved; the Store refuses a package whose identity differs.
-    [string]$IdentityName = "JatevoLabs.OyenzaStudio",
+    [string]$IdentityName = "JatevoLabs.NexoraStudio",
     [string]$Publisher = "CN=Jatevo Labs",
     [string]$PublisherDisplayName = "Jatevo Labs"
 )
@@ -72,7 +72,7 @@ foreach ($node in @($cfg.SelectNodes("/resources/packaging"))) { $null = $node.P
 $cfg.Save($priConfig)
 Invoke-Tool $makepri @("new", "/pr", $layout, "/cf", $priConfig, "/mn", $manifestPath, "/of", (Join-Path $layout "resources.pri"), "/o")
 
-$msix = Join-Path $OutDir "Oyenza-Studio-$Version.msix"
+$msix = Join-Path $OutDir "Nexora-$Version.msix"
 $makeappx = Find-SdkTool "makeappx.exe"
 Invoke-Tool $makeappx @("pack", "/d", $layout, "/p", $msix, "/o")
 Get-Item $msix | Format-List Name, Length

@@ -5,8 +5,8 @@ Usage:
     python3 tools/tokens.py            # rewrite the token block in site/index.html
     python3 tools/tokens.py --check    # fail when the file is invalid or the block is out of date
 
-design/tokens.json holds Oyenza Studio's design tokens: the website's colours,
-fonts, radius and motion curves under "site", and Oyenza Studio Recorder's
+design/tokens.json holds Nexora's design tokens: the website's colours,
+fonts, radius and motion curves under "site", and Nexora Recorder's
 theme under "recorder": every entry has a light and a dark value, except under
 "fixed", which holds colours that are the same in both; a role can name a
 palette or editor entry ("palette.blue-9") instead of a colour, and a colour

@@ -1,4 +1,4 @@
-//! Record page: the island as the face of Oyenza Studio Recorder, the
+//! Record page: the island as the face of Nexora Recorder, the
 //! separate app (built from Cap) that makes the video (`nexora_core::recorder`).
 //!
 //! Before a recording: what to record (this screen at once, or a window or
@@ -87,7 +87,7 @@ fn draw_choices(ui: &mut Ui, st: &mut AppState, area: Rect) {
     };
     let sx = r.right() + 14.0;
     ui.c.text(&status, Rect::new(sx, ay, (area.right() - sx).max(0.0), PILL_REGULAR), &TextStyle::body().color(color));
-    foot(ui, area, "Oyenza Studio Recorder makes the video. The island stays out of it.");
+    foot(ui, area, "Nexora Recorder makes the video. The island stays out of it.");
 }
 
 fn target_hint(t: Target) -> &'static str {
