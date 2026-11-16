@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Creator links: studio.oyenza.com/<code> for each code in site/creators.json (docs/creators.md).
+"""Creator links: dasunjlk.github.io/Nexora/<code> for each code in site/creators.json (docs/creators.md).
 
 Each link is a tiny page that forwards to the landing page with the creator's tags (utm_source=<code>,
 utm_medium=creator, utm_campaign=<campaign>), so the visit counter (site/track.js) counts that creator's
@@ -30,12 +30,12 @@ PAGE = """<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
 <meta name="robots" content="noindex">
-<link rel="canonical" href="https://studio.oyenza.com/">
+<link rel="canonical" href="https://dasunjlk.github.io/Nexora/">
 {preview}
 <meta http-equiv="refresh" content="0; url={href}">
 <script>location.replace({target} + location.hash)</script>
 </head>
-<body><a href="{href}">Oyenza Studio</a></body>
+<body><a href="{href}">Nexora</a></body>
 </html>
 """
 
@@ -77,7 +77,7 @@ def main(src, out):
         if not CAMPAIGN.fullmatch(camp):
             die(f'campaign "{camp}" for "{code}": a-z, 0-9 and "-", up to 40 characters')
         target = f"/?utm_source={code}&utm_medium=creator&utm_campaign={camp}"
-        page = PAGE.format(title=title.group(1) if title else "Oyenza Studio", preview=preview,
+        page = PAGE.format(title=title.group(1) if title else "Nexora", preview=preview,
                            href=html.escape(target), target=json.dumps(target))
         (out / code).mkdir()
         (out / code / "index.html").write_text(page)

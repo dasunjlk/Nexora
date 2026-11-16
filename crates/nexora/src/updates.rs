@@ -175,7 +175,7 @@ impl Updater {
             if in_settings {
                 st.update.said = Some(Said::UpToDate);
             } else {
-                st.notify(Icon::CheckCircle, palette::GREEN, "Oyenza Studio is up to date", format!("{VERSION} is the latest version."), ANSWER_S, None);
+                st.notify(Icon::CheckCircle, palette::GREEN, "Nexora is up to date", format!("{VERSION} is the latest version."), ANSWER_S, None);
             }
             return false;
         };
@@ -384,7 +384,7 @@ pub enum UpdateLine {
     None,
     /// "Check for updates…", under About.
     Check,
-    /// "Update to Oyenza Studio x…", first, until it is installed.
+    /// "Update to Nexora x…", first, until it is installed.
     Offer(String),
 }
 
@@ -499,9 +499,9 @@ mod tests {
     /// A later release than this build, remembered from an earlier look.
     fn remembered(dir: &std::path::Path, setup: &[u8]) -> PathBuf {
         let next = format!("{}.99", VERSION);
-        let repo = "https://github.com/lucacadalora/oyenza-studio/releases";
+        let repo = "https://github.com/dasunjlk/Nexora/releases";
         let d = Download {
-            url: format!("{repo}/download/v{next}/Oyenza-Studio-Setup-{next}.exe"),
+            url: format!("{repo}/download/v{next}/Nexora-Setup-{next}.exe"),
             size: setup.len() as u64,
             sha256: nexora_core::sha256::hex(&nexora_core::sha256::sha256(setup)),
         };
@@ -558,10 +558,10 @@ mod tests {
         assert!(u.ask(now), "a read starts at once");
         u.begin();
         assert!(!u.ask(now), "not a second one while it runs");
-        let repo = "https://github.com/lucacadalora/oyenza-studio/releases";
+        let repo = "https://github.com/dasunjlk/Nexora/releases";
         let this = Release { version: VERSION.into(), date: String::new(), headline: "This".into(), notes: format!("{repo}/tag/v{VERSION}"), windows: None, mac: None };
         assert!(!u.checked(&mut st, Ok(this), now));
-        assert_eq!(st.notice.as_ref().map(|n| n.title.as_str()), Some("Oyenza Studio is up to date"));
+        assert_eq!(st.notice.as_ref().map(|n| n.title.as_str()), Some("Nexora is up to date"));
         assert!(st.notice.as_ref().is_some_and(|n| n.subtitle.contains(VERSION)));
         st.notice = None;
         assert!(u.ask(now));
@@ -657,7 +657,7 @@ mod tests {
         let mut st = AppState::new(Settings::default(), Store::default());
         let mut u = Updater::open(dir.join("update.json"), dir.join("setups"), &mut st, 10);
         let now = unix_now();
-        let repo = "https://github.com/lucacadalora/oyenza-studio/releases";
+        let repo = "https://github.com/dasunjlk/Nexora/releases";
         let this = Release { version: VERSION.into(), date: String::new(), headline: "This".into(), notes: format!("{repo}/tag/v{VERSION}"), windows: None, mac: None };
         st.update.said = Some(Said::Checking);
         assert!(u.ask(now));
@@ -695,10 +695,10 @@ mod tests {
     fn install_on_next_start_is_remembered_and_old_setups_go() {
         let dir = folder("next");
         let path = remembered(&dir, b"setup bytes");
-        std::fs::write(dir.join("setups/Oyenza-Studio-Setup-0.0.1.exe"), b"old").unwrap();
+        std::fs::write(dir.join("setups/Nexora-Setup-0.0.1.exe"), b"old").unwrap();
         let mut st = AppState::new(Settings::default(), Store::default());
         let mut u = Updater::open(path.clone(), dir.join("setups"), &mut st, 10);
-        assert!(!dir.join("setups/Oyenza-Studio-Setup-0.0.1.exe").exists(), "an older version's Setup goes at start");
+        assert!(!dir.join("setups/Nexora-Setup-0.0.1.exe").exists(), "an older version's Setup goes at start");
         u.install_on_next_start(&mut st);
         assert!(st.update.next_start);
         let (memory, _) = load_json::<Memory>(&path);

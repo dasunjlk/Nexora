@@ -1,8 +1,8 @@
 //! Notes page, the Meeting notes add-on's (off until switched on; Windows):
-//! one click and Oyen listens to a meeting, then the Oyenza account writes
+//! one click and Oyen listens to a meeting, then the Nexora account writes
 //! its notes (`nexora_core::notes`).
 //!
-//! - Signed out: the Oyenza sign-in card, saying what the notes do.
+//! - Signed out: the Nexora sign-in card, saying what the notes do.
 //! - Signed in without Studio Pro (the server's word, `GET /island/pro`):
 //!   what the notes do and that they're part of Pro; nothing records.
 //! - Before a meeting: Oyen beside the record button, what he hears (the
@@ -24,14 +24,14 @@ use crate::commands::{Command, NotesCmd};
 use crate::gfx::{TextStyle, Weight};
 use crate::icons::Icon;
 use crate::oyen::{self, Coach as Oyen};
-use crate::state::{AppState, OyenzaLink};
+use crate::state::{AppState, NexoraLink};
 use crate::ui::{wid, PillStyle, Ui, PILL_GAP, PILL_SMALL};
 use nexora_core::geom::{palette, Color, Point, Rect};
 use nexora_core::notes::{fmt_length, CaptureIssue, Phase, Problem};
 
 /// Every state is this tall, so the island never jumps between them.
 const HEIGHT: f32 = 180.0;
-/// Signed out: the Oyenza sign-in card's height.
+/// Signed out: the Nexora sign-in card's height.
 const SIGNED_OUT_H: f32 = 156.0;
 /// Oyen's column, and the gap to the right one.
 const LEFT_W: f32 = 150.0;
@@ -51,7 +51,7 @@ const MIC_SETTINGS: &str =
 /// What the computer's own sound is called on this one.
 const OWN_SOUND: &str = if cfg!(target_os = "macos") { "the Mac's sound" } else { "the PC's sound" };
 const SIGN_IN_TITLE: &str = "Meeting notes by Oyen";
-const SIGN_IN_BODY: &str = "One click and Oyen listens to your meeting, Meet, Zoom, Teams or in the room, then writes the notes and the transcript. Sign in to Oyenza to start.";
+const SIGN_IN_BODY: &str = "One click and Oyen listens to your meeting, Meet, Zoom, Teams or in the room, then writes the notes and the transcript. Sign in to Nexora to start.";
 
 pub fn height(st: &AppState) -> f32 {
     if signed_in(st) || st.notes.live() {
@@ -67,13 +67,13 @@ pub fn next_wake(st: &AppState) -> Option<f64> {
 }
 
 fn signed_in(st: &AppState) -> bool {
-    matches!(st.oyenza.link, OyenzaLink::Connected { .. })
+    matches!(st.nexora.link, NexoraLink::Connected { .. })
 }
 
 pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect) {
     if !signed_in(st) && !st.notes.live() {
         let card = Rect::new(area.x, area.y, area.w, SIGNED_OUT_H);
-        super::oyenza::sign_in_card(ui, st, card, SIGN_IN_TITLE, SIGN_IN_BODY, "notes.sign-in");
+        super::nexora::sign_in_card(ui, st, card, SIGN_IN_TITLE, SIGN_IN_BODY, "notes.sign-in");
         return;
     }
     // Without Pro nothing records (a meeting under way, or kept, still finishes:
@@ -124,7 +124,7 @@ fn draw_pro(ui: &mut Ui, st: &AppState, area: Rect) {
     let y = headline(ui, r, "Meeting notes are part of Studio Pro");
     let body = "One click and Oyen listens to your meeting, Meet, Zoom, Teams or in the room, then writes the notes and the whole transcript. Studio Pro is in early access, so it isn't on this account yet.";
     let y = para(ui, Rect::new(r.x, y + 6.0, r.w, 80.0), body, palette::TEXT_DIM);
-    if let OyenzaLink::Connected { account } = &st.oyenza.link {
+    if let NexoraLink::Connected { account } = &st.nexora.link {
         para(ui, Rect::new(r.x, y + 10.0, r.w, 20.0), &format!("Signed in as {account}"), palette::TEXT_FAINT);
     }
 }
@@ -201,9 +201,9 @@ fn draw_idle(ui: &mut Ui, st: &mut AppState, r: Rect) {
     let r = Rect::new(r.x, r.y + 4.0, r.w.min(420.0), r.h);
     let y = headline(ui, r, "Oyen takes your meeting notes");
     let body = if cfg!(target_os = "macos") {
-        "He listens to your microphone and your Mac's sound, so a call in Meet, Zoom or Teams is heard with no bot joining. Stop when it's over: the notes and the transcript are saved to Documents \u{203a} Oyenza Studio \u{203a} Notes."
+        "He listens to your microphone and your Mac's sound, so a call in Meet, Zoom or Teams is heard with no bot joining. Stop when it's over: the notes and the transcript are saved to Documents \u{203a} Nexora \u{203a} Notes."
     } else {
-        "He listens to your microphone and your PC's sound, so a call in Meet, Zoom or Teams is heard with no bot joining. Stop when it's over: the notes and the transcript are saved to Documents \u{203a} Oyenza Studio \u{203a} Notes."
+        "He listens to your microphone and your PC's sound, so a call in Meet, Zoom or Teams is heard with no bot joining. Stop when it's over: the notes and the transcript are saved to Documents \u{203a} Nexora \u{203a} Notes."
     };
     let y = para(ui, Rect::new(r.x, y + 6.0, r.w, 80.0), body, palette::TEXT_DIM);
     let foot = Rect::new(r.x, r.bottom() - PILL_SMALL - 6.0, r.w, PILL_SMALL);

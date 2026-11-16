@@ -14,7 +14,7 @@
 //! A tool this build doesn't pin yet is left out: FFmpeg's absence (yt-dlp
 //! is pointed at an ffmpeg that isn't there, so a copy on the runner is never
 //! used either) skips a run that needs it with a warning. The film's site
-//! having trouble only warns, like oyenza.trade in the Stocks test; anything
+//! having trouble only warns, like nexora.trade in the Stocks test; anything
 //! else that goes wrong fails.
 
 use crate::services::http::{Client, MtaGuard};
@@ -32,7 +32,7 @@ use std::time::{Duration, Instant};
 /// own PeerTube: no sign-in, and not YouTube, which turns CI's runners away.
 const LINK: &str = "https://video.blender.org/w/b29290cc-dc51-4a12-bcb2-2aa5fece7605";
 /// The add-on's own (`services::addons`).
-const USER_AGENT: &str = concat!("OyenzaStudio/", env!("CARGO_PKG_VERSION"), " (+https://github.com/lucacadalora/oyenza-studio)");
+const USER_AGENT: &str = concat!("NexoraStudio/", env!("CARGO_PKG_VERSION"), " (+https://github.com/dasunjlk/Nexora)");
 /// Budget for one tool, as the add-on gives one file.
 const FETCH_TIMEOUT: Duration = Duration::from_secs(180);
 /// Budget for one download; the film takes seconds.

@@ -1,4 +1,4 @@
-//! Oyenza Studio Recorder: the separate recorder app built from Cap. The
+//! Nexora Recorder: the separate recorder app built from Cap. The
 //! island starts, pauses and stops its recordings through the recorder's own
 //! links (`nexora_core::recorder`), and the recorder tells the island how they
 //! go with `WM_COPYDATA` (read in `app.rs`). Nothing here runs at rest:
@@ -11,7 +11,7 @@ use windows::Win32::Graphics::Gdi::{EnumDisplayDevicesW, GetMonitorInfoW, Monito
 use windows::Win32::System::Registry::{RegCloseKey, RegOpenKeyExW, HKEY, HKEY_CLASSES_ROOT, KEY_READ};
 
 /// Whether the recorder is installed: its installer registers the
-/// `oyenza-recorder:` link scheme (per user or for the machine; HKCR shows both).
+/// `nexora-recorder:` link scheme (per user or for the machine; HKCR shows both).
 pub fn installed() -> bool {
     let scheme = HSTRING::from(recorder::SCHEME);
     let mut key = HKEY::default();

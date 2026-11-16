@@ -1,4 +1,4 @@
-# Installs the Oyenza Studio test copy from this folder: the Microsoft Store
+# Installs the Nexora test copy from this folder: the Microsoft Store
 # package, signed with the throwaway certificate of the CI run that built it,
 # to try on a PC what only the Store copy can do (Notifications).
 # README.txt says how to run it and how to go back.
@@ -11,7 +11,7 @@ param([switch]$TrustOnly)
 
 $ErrorActionPreference = "Stop"
 $here = $PSScriptRoot
-$cer = Join-Path $here "oyenza-studio-test.cer"
+$cer = Join-Path $here "nexora-test.cer"
 
 if ($TrustOnly) {
     # The elevated half: trust the certificate, nothing else.
@@ -19,9 +19,9 @@ if ($TrustOnly) {
     exit 0
 }
 
-$msix = Get-ChildItem -Path $here -Filter "Oyenza-Studio-*-test.msix" | Select-Object -First 1
+$msix = Get-ChildItem -Path $here -Filter "Nexora-*-test.msix" | Select-Object -First 1
 if (-not $msix -or -not (Test-Path $cer)) {
-    throw "Run this from the unzipped oyenza-studio-test-copy folder: it needs the .msix and oyenza-studio-test.cer next to it."
+    throw "Run this from the unzipped nexora-test-copy folder: it needs the .msix and nexora-test.cer next to it."
 }
 $thumb = (New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $cer).Thumbprint
 if (-not (Test-Path "Cert:\LocalMachine\TrustedPeople\$thumb")) {
@@ -35,7 +35,7 @@ if (-not (Test-Path "Cert:\LocalMachine\TrustedPeople\$thumb")) {
 # One island at a time: the test copy can't start while the usual one runs.
 $running = Get-Process -Name nexora -ErrorAction SilentlyContinue
 if ($running) {
-    "Quitting the Oyenza Studio that's running (its settings stay)."
+    "Quitting the Nexora that's running (its settings stay)."
     $running | Stop-Process -Force
 }
 
@@ -49,7 +49,7 @@ try {
     Invoke-WebRequest -Uri "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx" -OutFile $vclibs -UseBasicParsing
     Add-AppxPackage -Path $msix.FullName -DependencyPath $vclibs -ForceApplicationShutdown
 }
-$pkg = Get-AppxPackage -Name "JatevoLabs.OyenzaStudio"
+$pkg = Get-AppxPackage -Name "JatevoLabs.NexoraStudio"
 if (-not $pkg) { throw "The test copy didn't install." }
 "Installed $($pkg.Version). Starting it."
 Start-Process "shell:AppsFolder\$($pkg.PackageFamilyName)!Nexora"

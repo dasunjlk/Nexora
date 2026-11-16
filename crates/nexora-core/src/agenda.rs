@@ -1,20 +1,20 @@
-//! The days on the Today page, once signed in to Oyenza: what `GET
-//! /island/day` answers (catat-server `island/day.ts`), from the apps the
-//! person switched on for it in oyenza.app (Google Calendar's events, and the
-//! flights Oyenza's Gmail reader kept), with the bills due that the island
-//! already has from Oyenza (`oyenza::Bill`). Studio asks for today and the
+//! The days on the Today page, once signed in to Nexora: what `GET
+//! /island/day` answers (nexora-notes-server `island/day.ts`), from the apps the
+//! person switched on for it in nexora.app (Google Calendar's events, and the
+//! flights Nexora's Gmail reader kept), with the bills due that the island
+//! already has from Nexora (`nexora::Bill`). Studio asks for today and the
 //! next five weeks ([`ASK_DAYS`]); a server from before the weeks, or a person
-//! who hasn't agreed to them in oyenza.app yet, answers the day alone.
+//! who hasn't agreed to them in nexora.app yet, answers the day alone.
 //!
 //! Pure: the address, reading the answer, and what the page draws (the
 //! meeting on now, the days that hold something, and what each date holds
-//! for the five-week grid). The HTTP is the Oyenza worker's
-//! (`services/oyenza.rs`), which asks only while the Today page is on screen:
+//! for the five-week grid). The HTTP is the Nexora worker's
+//! (`services/nexora.rs`), which asks only while the Today page is on screen:
 //! when it opens (at most every [`OPEN_GAP_S`]) and every [`EVERY_S`] while it
 //! stays.
 
 use crate::datetime::{civil_from_days, days_from_civil, weekday_from_days, MONTH_SHORT, WEEKDAY_SHORT};
-use crate::oyenza::{self, Bill, API};
+use crate::nexora::{self, Bill, API};
 use crate::urlenc::with_query;
 use serde::Deserialize;
 use std::collections::BTreeMap;
@@ -33,14 +33,14 @@ pub const ASK_DAYS: u32 = 35;
 /// The grid: five weeks from this week's Monday.
 pub const GRID_DAYS: i64 = 35;
 
-/// `day`: the PC's own date (YYYY-MM-DD); `tz` as `oyenza::tz_param`.
+/// `day`: the PC's own date (YYYY-MM-DD); `tz` as `nexora::tz_param`.
 pub fn url(tz: &str, day: &str) -> String {
     with_query(&format!("{API}/island/day"), &[("tz", tz), ("day", day), ("days", &ASK_DAYS.to_string())])
 }
 
 // ---------------------------------------------------------------- answer
 
-/// How one app went: switched off in oyenza.app, not connected to the
+/// How one app went: switched off in nexora.app, not connected to the
 /// account there, read, or not readable just now.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -123,7 +123,7 @@ pub struct Answer {
     /// The day it starts on (YYYY-MM-DD).
     pub day: String,
     /// Days from `day` it covers: 1 from a server before the weeks, or until
-    /// the person agrees to them in oyenza.app.
+    /// the person agrees to them in nexora.app.
     #[serde(default = "one_day")]
     pub days: u32,
     /// The last day the events are complete through: earlier than the end of
@@ -157,7 +157,7 @@ impl Answer {
     }
 
     /// The server answered the day alone because the person hasn't agreed to
-    /// the weeks in oyenza.app yet.
+    /// the weeks in nexora.app yet.
     pub fn weeks_to_allow(&self) -> bool {
         self.weeks == Some(false) && self.days <= 1
     }
@@ -169,7 +169,7 @@ pub fn parse(body: &str) -> Option<Answer> {
 
 /// A meeting link Join may open: https, on Google Meet, Zoom, Microsoft Teams
 /// or Webex, with no name, password or port. The server keeps only such links
-/// (catat-server `joinLink`); this checks again, so no other link can ever get
+/// (nexora-notes-server `joinLink`); this checks again, so no other link can ever get
 /// behind the button.
 pub fn join_ok(url: &str) -> bool {
     let Some((host, _)) = https_parts(url) else { return false };
@@ -179,7 +179,7 @@ pub fn join_ok(url: &str) -> bool {
 
 /// An event's page a click may open: https on Google Calendar's own pages
 /// (`www.google.com/calendar/…` or `calendar.google.com`), with no name,
-/// password or port. The server keeps only such links (catat-server
+/// password or port. The server keeps only such links (nexora-notes-server
 /// `calendarLink`); this checks again.
 pub fn open_ok(url: &str) -> bool {
     let Some((host, path)) = https_parts(url) else { return false };
@@ -220,7 +220,7 @@ pub fn meeting_service(url: &str) -> &'static str {
 pub enum Mark {
     Calendar,
     Gmail,
-    /// Oyenza's own: a bill due.
+    /// Nexora's own: a bill due.
     Bill,
 }
 
@@ -478,7 +478,7 @@ pub fn weeks(answer: &Answer, bills: &[Bill], bills_today: &str, today: &str, no
             let detail = match (&b.text, b.is_card()) {
                 (_, true) => "Card bill".to_string(),
                 (Some(t), false) if show_amounts => t.clone(),
-                (Some(t), false) => oyenza::masked(t),
+                (Some(t), false) => nexora::masked(t),
                 (None, false) => "Renews".to_string(),
             };
             by_day.entry(d).or_default().push((2000, Row { when: "Due".into(), mark: Mark::Bill, title: one_line(&b.name), detail, join: None, link: None }));
@@ -665,7 +665,7 @@ mod tests {
         // The person hasn't agreed to the weeks yet: the day alone, and the page offers the agreement.
         let one = parse(r#"{"day":"2026-10-26","days":1,"through":"2026-10-26","weeks":false}"#).expect("reads");
         assert!(one.weeks_to_allow());
-        assert_eq!(url("+07:00", "2026-10-26"), "https://api.oyenza.app/island/day?tz=%2B07%3A00&day=2026-10-26&days=35");
+        assert_eq!(url("+07:00", "2026-10-26"), "https://api.nexora.app/island/day?tz=%2B07%3A00&day=2026-10-26&days=35");
     }
 
     #[test]

@@ -1,7 +1,7 @@
-Oyenza Studio test copy
+Nexora test copy
 =======================
 
-This folder is the Microsoft Store package of Oyenza Studio, signed with a
+This folder is the Microsoft Store package of Nexora, signed with a
 throwaway certificate by the CI run that built it. Install it to try what
 only the Store copy can do, such as Notifications: Windows lets only an
 app installed as a package read other apps' notifications.
@@ -17,7 +17,7 @@ Install
 3. Windows asks for administrator rights once: that trusts this one
    certificate for installing apps. Its private key was thrown away with the
    CI run, so nothing else can be signed with it.
-4. The script quits the Oyenza Studio that's running (its settings stay),
+4. The script quits the Nexora that's running (its settings stay),
    installs the test copy and starts it. The test copy keeps its own
    settings, so it starts like a new install.
 
@@ -25,7 +25,7 @@ Try Notifications
 -----------------
 1. Open the island and the bell tab (Notifications): it's on from the
    start. Press Allow.
-2. Windows asks whether Oyenza Studio may read your notifications: Allow.
+2. Windows asks whether Nexora may read your notifications: Allow.
    (No question? The bell tab's page has Ask again and Windows settings.
    To switch Notifications off, tap it under Tabs in Settings.)
 3. WhatsApp, Telegram and Phone Link start on. In Telegram Desktop, turn on
@@ -38,7 +38,7 @@ Go back
 -------
 Run Remove-Test-Copy.ps1 the same way. It removes the test copy and its
 settings, stops trusting the certificate (administrator rights again) and
-starts your usual Oyenza Studio.
+starts your usual Nexora.
 
 While the test copy is installed it also starts with Windows. Only one
 island runs at a time: whichever starts first.

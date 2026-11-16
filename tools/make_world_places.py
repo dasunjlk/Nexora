@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Build site/places/1/: the Prayer times picker's cities outside Indonesia,
-looked up online at https://studio.oyenza.com/places/1/ (Kemenag's
+looked up online at https://dasunjlk.github.io/Nexora/places/1/ (Kemenag's
 places.json, in the add-on, covers Indonesia, Makkah, Madinah and Jeddah).
 
 Cities: GeoNames' cities of 15,000 people or more (cities15000), as packed in
@@ -171,7 +171,7 @@ def tile(lat: float, lng: float) -> str:
 
 
 HEADER = (
-    "# Oyenza Studio, Prayer times. Cities: GeoNames (https://www.geonames.org), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). "
+    "# Nexora, Prayer times. Cities: GeoNames (https://www.geonames.org), CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). "
     f"Clocks: the IANA time zone database, {FIRST_YEAR} to {END_YEAR - 1}. Built by tools/make_world_places.py."
 )
 

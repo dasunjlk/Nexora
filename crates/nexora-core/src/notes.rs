@@ -1,6 +1,6 @@
 //! Meeting notes, the Meeting notes add-on: one click and Oyen listens to the
 //! microphone and to the PC's own sound together, so a call in Meet, Zoom,
-//! Teams or WhatsApp is heard with nobody joining it; after Stop the Oyenza
+//! Teams or WhatsApp is heard with nobody joining it; after Stop the Nexora
 //! server hears the meeting and writes the notes, which are saved as a
 //! Markdown file on this PC.
 //!
@@ -16,7 +16,7 @@ use std::collections::VecDeque;
 
 pub use crate::ielts::RATE;
 
-pub const BASE: &str = crate::oyenza::API;
+pub const BASE: &str = crate::nexora::API;
 pub const PATH: &str = "/island/notes";
 /// Each part of the audio: five minutes (9.6 MB), written and sent in turn.
 pub const PART_SECS: u32 = 300;
@@ -262,14 +262,14 @@ pub enum Problem {
     Gone,
     /// No answer: no internet, or the server didn't answer in time.
     Offline,
-    /// 401, or no Oyenza key on this PC.
+    /// 401, or no Nexora key on this PC.
     SignedOut,
     /// The server took too long to write.
     TooSlow,
     /// The app closed on a meeting (a crash, a restart, the PC turned off)
     /// before its notes were written: its recording was kept.
     Unfinished,
-    /// 403 `pro_required`: this Oyenza account doesn't have Studio Pro.
+    /// 403 `pro_required`: this Nexora account doesn't have Studio Pro.
     ProRequired,
     /// Any other status, or an answer that couldn't be read.
     Server,
@@ -306,8 +306,8 @@ impl Problem {
             Problem::NothingHeard => "Oyen didn't hear anyone",
             Problem::Unfinished => "Your last meeting isn't written up",
             Problem::ProRequired => "Meeting notes are part of Studio Pro",
-            Problem::Offline => "Can't reach Oyenza",
-            Problem::SignedOut => "You're signed out of Oyenza",
+            Problem::Offline => "Can't reach Nexora",
+            Problem::SignedOut => "You're signed out of Nexora",
             Problem::Capture(CaptureIssue::MicDenied) => "The microphone is blocked",
             Problem::Capture(CaptureIssue::NoSound) => "No sound to record",
             Problem::Capture(CaptureIssue::Failed) => "Recording stopped",
@@ -325,11 +325,11 @@ impl Problem {
             Problem::Busy(_) => "Your recording is kept. Try again in a minute.".into(),
             Problem::AiFailed | Problem::Server | Problem::Gone | Problem::TooSlow => "Your recording is kept. Try again.".into(),
             Problem::NothingHeard => "Was the call muted? Check that the bars move next time.".into(),
-            Problem::Unfinished => "Its recording was kept when Oyenza Studio closed. Write it up now, or throw it away.".into(),
-            Problem::ProRequired => "This Oyenza account doesn't have Pro. Your recording is kept.".into(),
+            Problem::Unfinished => "Its recording was kept when Nexora closed. Write it up now, or throw it away.".into(),
+            Problem::ProRequired => "This Nexora account doesn't have Pro. Your recording is kept.".into(),
             Problem::Offline => "Your recording is kept. Check the internet, then try again.".into(),
-            Problem::SignedOut => "Sign in to Oyenza again: your recording is kept.".into(),
-            Problem::Capture(CaptureIssue::MicDenied) if cfg!(target_os = "macos") => "Turn on Oyenza Studio in System Settings \u{203a} Privacy & Security \u{203a} Microphone.".into(),
+            Problem::SignedOut => "Sign in to Nexora again: your recording is kept.".into(),
+            Problem::Capture(CaptureIssue::MicDenied) if cfg!(target_os = "macos") => "Turn on Nexora in System Settings \u{203a} Privacy & Security \u{203a} Microphone.".into(),
             Problem::Capture(CaptureIssue::MicDenied) => "Turn on microphone access for desktop apps in Windows Settings.".into(),
             Problem::Capture(CaptureIssue::NoSound) => "Plug in a microphone or speakers, then try again.".into(),
             Problem::Capture(CaptureIssue::Failed) => "A sound device went away. What was heard is kept.".into(),
@@ -527,7 +527,7 @@ pub fn markdown(n: &Notes, started: &LocalDateTime, with_transcript: bool) -> St
             md += &format!("**[{}] {}:** {}\n\n", fmt_length(l.t), l.who, l.text);
         }
     }
-    md += "\n---\nNotes by Oyen, in Oyenza Studio\n";
+    md += "\n---\nNotes by Oyen, in Nexora\n";
     md
 }
 
@@ -586,7 +586,7 @@ mod tests {
 
     #[test]
     fn addresses_and_answers() {
-        assert_eq!(start_url(BASE), "https://api.oyenza.app/island/notes");
+        assert_eq!(start_url(BASE), "https://api.nexora.app/island/notes");
         assert_eq!(part_url("http://127.0.0.1:9", "a b", 3), "http://127.0.0.1:9/island/notes/a%20b/part/3");
         assert_eq!(finish_url("x", "id1"), "x/island/notes/id1/finish");
         assert_eq!(view_url("x", "id1"), "x/island/notes/id1");

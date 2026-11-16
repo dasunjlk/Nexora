@@ -28,7 +28,7 @@ pub enum Theme {
     /// The plain black island.
     #[default]
     Classic,
-    /// Oyen, the Oyenza cat, lives in the island: he peeks over its edge
+    /// Oyen, the Nexora cat, lives in the island: he peeks over its edge
     /// while it rests, bobs to the music and takes Oyen's orange as accent.
     Oyen,
     /// Liquid glass: the island bends, frosts and tints what's under it.
@@ -99,7 +99,7 @@ pub struct Settings {
     pub hud_power: bool,
     pub hud_bluetooth: bool,
     pub sounds: bool,
-    /// Page shown first when expanding ("media", "today", "health", "shelf", "tasks", "focus", "ai", "oyenza").
+    /// Page shown first when expanding ("media", "today", "health", "shelf", "tasks", "focus", "ai", "nexora").
     pub start_page: String,
     /// Remember the last page instead of `start_page`.
     pub remember_page: bool,
@@ -109,9 +109,9 @@ pub struct Settings {
     /// newer Studio's choices survive a save.
     pub hidden_tabs: Vec<String>,
     pub pomodoro: PomodoroConfig,
-    /// Oyenza (once signed in): show sums and senders on the island straight
+    /// Nexora (once signed in): show sums and senders on the island straight
     /// away. Off: they wait for a click on Show, so a shared screen shows none.
-    pub oyenza_show_amounts: bool,
+    pub nexora_show_amounts: bool,
     /// Keep the System page's charts going while it's closed (a light reading
     /// of the kernel counters once a second), so they're full when it opens.
     /// Only while the System add-on is on ([`Settings::system_history_on`]).
@@ -136,7 +136,7 @@ pub struct Settings {
     pub game_peek: bool,
     /// The AI tab's choices (its readers are the `nexora-usage` crate).
     pub usage: UsageSettings,
-    /// The Record page's choices (Oyenza Studio Recorder).
+    /// The Record page's choices (Nexora Recorder).
     pub record: RecordSettings,
     /// Notifications' choices: which apps the island shows, and
     /// whether who it's from and the message show at once.
@@ -284,7 +284,7 @@ impl Default for Settings {
             remember_page: true,
             hidden_tabs: Vec::new(),
             pomodoro: PomodoroConfig::default(),
-            oyenza_show_amounts: false,
+            nexora_show_amounts: false,
             system_history: true,
             addons: BTreeMap::new(),
             prayer: PrayerSettings::default(),
@@ -342,7 +342,7 @@ impl Settings {
         !self.addons.contains_key(id)
     }
 
-    /// Screen recorder: on once Oyenza Studio Recorder is `installed`, unless
+    /// Screen recorder: on once Nexora Recorder is `installed`, unless
     /// the person switched it off (installing the recorder is the switch).
     pub fn recorder_on(&self, installed: bool) -> bool {
         installed && self.addons.get(crate::addons::SCREEN_RECORDER.id).copied().unwrap_or(true)

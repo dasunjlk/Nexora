@@ -1,16 +1,16 @@
-# Oyenza Studio architecture
+# Nexora architecture
 
-Oyenza Studio is a "living notch" for Windows 10/11: a black island that hangs from the
+Nexora is a "living notch" for Windows 10/11: a black island that hangs from the
 top-centre of the screen, shows live activities (media, timers, pop-ups) while
 collapsed, and expands on hover into pages (Music + synced lyrics, Today,
-Shelf, Tasks, Focus, AI and Oyenza, plus the add-ons' Health, IELTS, Notes,
+Shelf, Tasks, Focus, AI and Nexora, plus the add-ons' Health, IELTS, Notes,
 System, Script, Prayer, Stocks, Caffeine and Downloads pages once they are switched on). The Shelf's Phone drop serves a
 small web page on the local network so a phone can send files to it.
 
 It was called Nexora until 0.2.0, and plain Nexora before that. The code keeps the
 old short name where people don't see it: the crates (`nexora`, `nexora-core`), `nexora.exe`,
 its folders (`%LOCALAPPDATA%\Programs\Nexora`, `%APPDATA%\Nexora`), the uninstall key and
-Run value, `Local\Nexora.Island`, the Mac bundle id `com.oyenza.nexora` and the `NEXORA_*`
+Run value, `Local\Nexora.Island`, the Mac bundle id `app.nexora.nexora` and the `NEXORA_*`
 variables. Changing those would break upgrades and settings, so they stay. New
 crates take the new name (`nexora-usage`, `nexora-diorama`).
 
@@ -18,8 +18,8 @@ crates take the new name (`nexora-usage`, `nexora-diorama`).
 
 | Crate | What | Builds on |
 |---|---|---|
-| `crates/nexora-core` | Pure logic + models: geometry/colour, springs, LRC parsing, LRCLIB URL/JSON, Apple Music lyrics (web-player token, API replies, TTML), romaji under Japanese, Korean and Chinese lyrics (`romanize/`; Japanese kanji come from Windows' reading analyzer, or from Oyenza Studio's own dictionary, `romanize/ja_dict.rs` with `data/ja-readings.dic.zst`, built by `tools/make_ja_dict.py`, which both apps download as the Japanese readings add-on), player metadata fix-ups, Pomodoro, the steps snapshot Oyenza sends (`health.rs`), tasks, shelf, settings, JSON store, SVG path parser, Oyen's face (`oyen/`, a port of the Oyenza app's built face, checked against its Swift port by `oyen/swift_check.rs`), Phone drop (`phonedrop/`: the LAN web server, the phone page, safe file names, QR codes), add-ons (`addons.rs`: each add-on's files with their size and SHA-256, and what the Add-ons page says; `sha256.rs` checks them), prayer times (`prayer/`: Adhan's sun math ported from adhan-js, with Kemenag RI's rules for Indonesia, Umm al-Qura for Saudi Arabia and each country's method elsewhere, checked against Kemenag's published 2026 schedule, Oyen Umroh's engine and adhan-js itself; Kemenag's places are `addons/sholat/places.json`; the world's cities are small files on the website, `site/places/1/`, built by `tools/make_world_places.py` and read by `prayer/world.rs`), the Caffeine add-on's numbers (`caffeine.rs`: the drinks by shots and beans or by serving, the curve of the caffeine still in the body, last call and the reminder's time, every number's source in docs/caffeine.md), the System page's arithmetic (`sysmon.rs`: CPU load, per-app usage from two process lists, the process list's binary layout, a minute of history, number formats), the whole PC's power (`power.rs`: the Corsair HXi/RMi and MSI Ai power supplies' USB protocols, decoded from their replies, and the estimate when a PSU doesn't report). **No OS calls** beyond `std` file and socket I/O (`store`, `phonedrop`), so the server's tests run over real sockets anywhere. | any OS (`cargo test -p nexora-core`) |
-| `crates/nexora-usage` | The AI tab's readers: one per AI coding service behind one contract, heads-up notices from their readings, and inference.oyenza.com's device connect; see [AI usage](#ai-usage). Pure, like nexora-core, and built for size. | any OS (`cargo test -p nexora-usage`) |
+| `crates/nexora-core` | Pure logic + models: geometry/colour, springs, LRC parsing, LRCLIB URL/JSON, Apple Music lyrics (web-player token, API replies, TTML), romaji under Japanese, Korean and Chinese lyrics (`romanize/`; Japanese kanji come from Windows' reading analyzer, or from Nexora's own dictionary, `romanize/ja_dict.rs` with `data/ja-readings.dic.zst`, built by `tools/make_ja_dict.py`, which both apps download as the Japanese readings add-on), player metadata fix-ups, Pomodoro, the steps snapshot Nexora sends (`health.rs`), tasks, shelf, settings, JSON store, SVG path parser, Oyen's face (`oyen/`, a port of the Nexora app's built face, checked against its Swift port by `oyen/swift_check.rs`), Phone drop (`phonedrop/`: the LAN web server, the phone page, safe file names, QR codes), add-ons (`addons.rs`: each add-on's files with their size and SHA-256, and what the Add-ons page says; `sha256.rs` checks them), prayer times (`prayer/`: Adhan's sun math ported from adhan-js, with Kemenag RI's rules for Indonesia, Umm al-Qura for Saudi Arabia and each country's method elsewhere, checked against Kemenag's published 2026 schedule, Oyen Umroh's engine and adhan-js itself; Kemenag's places are `addons/sholat/places.json`; the world's cities are small files on the website, `site/places/1/`, built by `tools/make_world_places.py` and read by `prayer/world.rs`), the Caffeine add-on's numbers (`caffeine.rs`: the drinks by shots and beans or by serving, the curve of the caffeine still in the body, last call and the reminder's time, every number's source in docs/caffeine.md), the System page's arithmetic (`sysmon.rs`: CPU load, per-app usage from two process lists, the process list's binary layout, a minute of history, number formats), the whole PC's power (`power.rs`: the Corsair HXi/RMi and MSI Ai power supplies' USB protocols, decoded from their replies, and the estimate when a PSU doesn't report). **No OS calls** beyond `std` file and socket I/O (`store`, `phonedrop`), so the server's tests run over real sockets anywhere. | any OS (`cargo test -p nexora-core`) |
+| `crates/nexora-usage` | The AI tab's readers: one per AI coding service behind one contract, heads-up notices from their readings, and inference.nexora.app's device connect; see [AI usage](#ai-usage). Pure, like nexora-core, and built for size. | any OS (`cargo test -p nexora-usage`) |
 | `crates/nexora-diorama` | The Diorama theme's picture: the resting pill as a small window onto a pixel-art place that keeps the day's hours (a house, a tree, a sky that follows the clock, and a glass ball that rolls from the house to the tree as night falls). `render` turns a `Moment` (the minute, when the sun rises and sets, where the ball is, what the clock says) into the pill's pixels for a `View` (its size and the display's scale); `width` and `H` are the pill's size (`LONG` by 38, about a notch). `Moment::slid` is the place with the ball slid by hand: the time runs on with the ball through the next sunset or sunrise. No clock, no state and no OS calls: the app says what time it is and draws the result as an image (`pill/diorama.rs`), so Windows and the Mac show the same pixels. Pure, with no dependencies, and built for size: it paints once a minute while the pill rests and for the frames of the ball's roll, never in a frame of anything else. | any OS (`cargo test -p nexora-diorama`) |
 | `crates/nexora` | The Windows app (Win32 + Direct2D + WinRT via `windows` 0.58) | Windows only (`cargo wcheck` / `cargo wbuild` cross from macOS/Linux) |
 | `crates/nexora/src/mac/` | The Mac app (AppKit + Core Graphics + Core Text via `objc2`): its own window, renderer, main loop, notch layouts and menu bar item around the same state, pages, activities and Oyen. See [The Mac app](#the-mac-app). | macOS 14+ (`cargo mcheck` type-checks it from Linux) |
@@ -137,11 +137,11 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect);  // draw + handle input
 * AI (`pages/usage.rs`) is a core tab right after Focus (`PageKind::Ai`): a card
   per AI service on the computer and the Services list; the readings come
   from `services::usage` through `AppEvent::Usage` into `st.usage`, and the
-  page asks for refreshes, keys and inference.oyenza.com's connect through
+  page asks for refreshes, keys and inference.nexora.app's connect through
   `Command::Usage`. See [AI usage](#ai-usage).
 * The Settings window, called Advanced settings: every setting in a window of its
   own, a sidebar of sections (General, Appearance, Island, Music and lyrics, Pop-ups,
-  Tabs, Add-ons, Focus, Prayer times and Caffeine while their add-ons are on, AI usage, Oyenza
+  Tabs, Add-ons, Focus, Prayer times and Caffeine while their add-ons are on, AI usage, Nexora
   account, About). The Settings page's last row and the menu's Advanced settings…
   open it (`Command::OpenSettings`, `MenuCmd::ShowSettings`), and the island closes
   as it opens (`App::show_settings`), so the open island never sits over it. Its
@@ -149,7 +149,7 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect);  // draw + handle input
   list of `Block`s (rows of `Item`s: a switch, a picker, a stepper or a button), and
   a click comes back as an `Act` that `settings_window::apply` turns into the setting
   and `Command::SaveSettings`. It draws with the pages' widgets on the same `AppState`
-  (Add-ons draws the Add-ons page itself, Oyenza account the Settings page's
+  (Add-ons draws the Add-ons page itself, Nexora account the Settings page's
   account row), light or dark as the system is: its own surfaces from `Surfaces`,
   everything on them through `look::glass(light)`, which turns the island's white
   ink dark on the light window. It draws only when its input or what it shows
@@ -202,7 +202,7 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect);  // draw + handle input
   the next, a scrub under the pointer, the day's numbers), with a search to
   add a stock and an edit mode to remove and reorder them. The list is
   `store.stocks` (`nexora_core::stocks::Watchlist`); the prices come from
-  oyenza.trade's `/dashboard/api/live/` (`watch`, `names`, `chart`) through
+  nexora.trade's `/dashboard/api/live/` (`watch`, `names`, `chart`) through
   `services::stocks`, one thread started the first time the page opens,
   which asks only while the page is on screen and someone is at the computer
   (`pages::stocks::watch`, `App::set_stocks_watch`), as often as the answer
@@ -258,13 +258,13 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect);  // draw + handle input
   or a click on it, opens the app (`shell::open_app`, the Apps folder).
 * IELTS (`pages/ielts.rs`) is a tab only while the IELTS add-on is on
   (`AppState::ielts_on`; built in, nothing to download): Oyen as an IELTS
-  Speaking examiner through the Oyenza account (catat-server's
+  Speaking examiner through the Nexora account (nexora-notes-server's
   `/island/ielts/*`). The session is `nexora_core::ielts::Coach` in
   `AppState::ielts`, a state machine the app drives with what happened (a
   reply, a clip that ended, a tap, the clock, the page coming and going) and
   that answers with `Effect`s the app carries out (`App::ielts_do`): calls
   on `services::ielts`'s worker thread (`nexora-ielts`, started by the first
-  call, gone once the page is closed with nothing in flight; the PC's Oyenza
+  call, gone once the page is closed with nothing in flight; the PC's Nexora
   key read there), Oyen's clips on `services::voice` (WinRT MediaPlayer
   without media controls, like the adzan), the answer on `services::mic`
   (WASAPI shared-mode capture on a `nexora-mic` thread that exists only while
@@ -276,8 +276,8 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect);  // draw + handle input
   `mac/services/{mic,voice}.rs`, wired in next).
 * Notes (`pages/notes.rs`) is a tab only while the Meeting notes add-on is
   on (`AppState::notes_on`; Windows and the Mac; built in, nothing to download): one
-  click and Oyen listens to a meeting, then the Oyenza account writes its
-  notes (catat-server's `/island/notes/*`). `nexora_core::notes` holds the
+  click and Oyen listens to a meeting, then the Nexora account writes its
+  notes (nexora-notes-server's `/island/notes/*`). `nexora_core::notes` holds the
   page's moments (`Taker` in `AppState::notes`), the mix, the calls'
   answers and the Markdown. `services::notes` records on a `nexora-notes`
   thread that exists only while recording: the default microphone and the
@@ -288,7 +288,7 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect);  // draw + handle input
   default device (a headset plugged in) is followed. After Stop, a
   `nexora-notes-send` thread, only while a meeting is handed over, sends the
   parts (`Client::post_bytes`), asks every 4 s until the notes are
-  written, saves them as Markdown in `Documents\Oyenza Studio\Notes` and
+  written, saves them as Markdown in `Documents\Nexora\Notes` and
   deletes the audio, which is kept for Try again until then. The closed
   island shows Oyen listening (`Activity::Notes`, ambient frames while it
   shows). The Mac runs the same `services::notes` with its own two sources
@@ -328,13 +328,13 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect);  // draw + handle input
 |---|---|
 | `app.rs` | message loop, island state machine, input, timers, commands |
 | `activities.rs` | collapsed modes + their geometry and drawing |
-| `oyen.rs` | Oyen: draws `nexora_core::oyen` frames peeking over the island's edge in his theme (idle, beside the clock, in the media pill), and in every theme as the Oyenza tab's icon (`oyen::tab`: he rises into the tab and waves as the island opens, blinks and flicks an ear now and then, watches the pointer over the tab row, hops when his tab is picked) |
+| `oyen.rs` | Oyen: draws `nexora_core::oyen` frames peeking over the island's edge in his theme (idle, beside the clock, in the media pill), and in every theme as the Nexora tab's icon (`oyen::tab`: he rises into the tab and waves as the island opens, blinks and flicks an ear now and then, watches the pointer over the tab row, hops when his tab is picked) |
 | `pill/*.rs` | the Pill theme (`Theme::Pill`, `look::PILL` with `Shape::Pill`): the island floats `pill::TOP_GAP` below the top edge (`Island::set_floating`); `shape` draws the floating outline, shadow and hit area, `motion` its springs, and one module per surface (`idle`, `status`, `media`, `lyric`, `live`, `hud`, `notice`, `expanded`, `music`) behind hooks in `activities.rs` and `pages` that fall back to Classic's drawing. The Diorama theme (`Theme::Diorama`) is this island too, so `pill::on` is true for both; `diorama` is its resting pill, the app's side of `nexora_diorama`'s picture: the moment (the clock, the sun's times, the battery), the glass ball's roll, its slide by hand (`grab`, `slide`, `let_go`; the ball is a widget, `BALL_ID`, that the press handlers on both platforms ask first), the side of the day a hand left it on (`night`, which the whole theme's look follows), and the painting kept between frames |
 | `gfx.rs`, `icons.rs`, `ui.rs`, `island.rs`, `window.rs` | rendering/UI foundation |
 | `state.rs`, `events.rs`, `commands.rs` | shared contracts |
 | `pages/*.rs` | expanded pages |
 | `last_call.rs` | the Caffeine add-on's reminder: the minute it shows (`nexora_core::caffeine::reminder_at`, worked out again only when the drinks, the settings or the day change), once a day, as a notice from `tick`; the app's wake time includes it; nothing runs in between |
-| `services/*.rs` | media (Apple Music's own progress slider and back button through UI Automation in `applemusic_ui`: it declines both from Windows' media controls), lyrics/http, audio, bluetooth, fullscreen, clipboard (plain-text read and write for paste and the Apple Music token; nothing watches it), imaging, ielts (the IELTS page's calls, microphone and voice, only while that page is open or a session runs), mic (WASAPI capture, only while recording), notes (Meeting notes: the microphone and the PC's own sound, only while recording; the hand-over to the server, only after Stop until the notes are saved), voice (Oyen's clips, only while one plays), oyenza, power, sound, stocks (the Stocks page's prices from oyenza.trade, only while the page is open), notifications (Notifications: Windows' notification listener, in the Store copy only, event-driven while it is on and Windows allows it), sysstats, usage (the AI tab's readings: each service's own sign-in files and server, only while the tab is open or the heads-up notices are on; see [AI usage](#ai-usage)), phonedrop (started and stopped by the Shelf's phone panel), sysmon (the System page's readings: each second while the page is open or a game's readout shows, a light reading a second for the kept minute while it's closed; all of it rests while nobody is at the PC, the kept minute also on battery saver; while the page is open on a desktop it also loads NVML for an NVIDIA card's watts and reads a power supply that reports over USB, both closed with the page), psu (that power supply: found among the HID devices by its USB ids, read with requests only, replies matched to them), addons (add-on files: downloaded from their GitHub pre-release, or a tool's own release for the Downloader's yt-dlp and QuickJS-ng, when an add-on is switched on, checked against the size and SHA-256 in `nexora_core::addons`, deleted when it is switched off; asleep otherwise), downloader (the Downloader's yt-dlp: one per download, without a window, in a job object that ends it and what it started; nothing between downloads), frames (Show over games' frame count: a real-time event tracing session of the game's Present calls, only while the readout shows; the one-time OK that lets the app read it is `nexora.exe --allow-fps <SID>`, run elevated) |
+| `services/*.rs` | media (Apple Music's own progress slider and back button through UI Automation in `applemusic_ui`: it declines both from Windows' media controls), lyrics/http, audio, bluetooth, fullscreen, clipboard (plain-text read and write for paste and the Apple Music token; nothing watches it), imaging, ielts (the IELTS page's calls, microphone and voice, only while that page is open or a session runs), mic (WASAPI capture, only while recording), notes (Meeting notes: the microphone and the PC's own sound, only while recording; the hand-over to the server, only after Stop until the notes are saved), voice (Oyen's clips, only while one plays), nexora, power, sound, stocks (the Stocks page's prices from nexora.trade, only while the page is open), notifications (Notifications: Windows' notification listener, in the Store copy only, event-driven while it is on and Windows allows it), sysstats, usage (the AI tab's readings: each service's own sign-in files and server, only while the tab is open or the heads-up notices are on; see [AI usage](#ai-usage)), phonedrop (started and stopped by the Shelf's phone panel), sysmon (the System page's readings: each second while the page is open or a game's readout shows, a light reading a second for the kept minute while it's closed; all of it rests while nobody is at the PC, the kept minute also on battery saver; while the page is open on a desktop it also loads NVML for an NVIDIA card's watts and reads a power supply that reports over USB, both closed with the page), psu (that power supply: found among the HID devices by its USB ids, read with requests only, replies matched to them), addons (add-on files: downloaded from their GitHub pre-release, or a tool's own release for the Downloader's yt-dlp and QuickJS-ng, when an add-on is switched on, checked against the size and SHA-256 in `nexora_core::addons`, deleted when it is switched off; asleep otherwise), downloader (the Downloader's yt-dlp: one per download, without a window, in a job object that ends it and what it started; nothing between downloads), frames (Show over games' frame count: a real-time event tracing session of the game's Present calls, only while the readout shows; the one-time OK that lets the app read it is `nexora.exe --allow-fps <SID>`, run elevated) |
 | `settings_window.rs`, `settings_host.rs` | the Settings window: its sections, rows and drawing (shared with the Mac), and the Windows window that shows them |
 | `dragdrop.rs`, `shell.rs`, `tray.rs`, `autostart.rs` | OS integration |
 | `version.rs` | which build this is for the menu's About line: the version, and from `build.rs` release, test build (commit) or local build, and the day CI built it |
@@ -348,22 +348,22 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect);  // draw + handle input
 * Cache + log: `%LOCALAPPDATA%\Nexora\` (`lyrics\*.json`, `nexora.log`), plus the Apple Music
   token sealed with DPAPI (`apple-music-token.bin`) and the web player's public
   developer token (`apple-music-web.json`).
-* Phone drop: received files go to `Downloads\Oyenza Studio` (`paths::phone_inbox_dir`),
+* Phone drop: received files go to `Downloads\Nexora` (`paths::phone_inbox_dir`),
   staged in a `.nexora-incoming-<n>` folder there until every file of a send has arrived.
-* Oyenza (optional): the sign-in, this PC's own key, sealed with DPAPI
-  (`%LOCALAPPDATA%\Nexora\oyenza-link.bin`; `oyenza-revoke.bin` while a sign-out
-  still has to reach the server). The worker (`services/oyenza.rs`) asks
-  api.oyenza.app on its own thread, paced by the PC's use and power, and
+* Nexora (optional): the sign-in, this PC's own key, sealed with DPAPI
+  (`%LOCALAPPDATA%\Nexora\nexora-link.bin`; `nexora-revoke.bin` while a sign-out
+  still has to reach the server). The worker (`services/nexora.rs`) asks
+  api.nexora.app on its own thread, paced by the PC's use and power, and
   checks the tab's day list every 15 s only while the tab is on screen
-  (`App::set_oyenza_watch`, beside the System page's sampler); words,
-  parsing and cadence are in `nexora_core::oyenza`, the tab in `pages/oyenza.rs`.
+  (`App::set_nexora_watch`, beside the System page's sampler); words,
+  parsing and cadence are in `nexora_core::nexora`, the tab in `pages/nexora.rs`.
   The Today page's days (`GET /island/day?days=35`: today and the next five
   weeks of Google Calendar's events and the flights from Gmail that the person
-  switched on in oyenza.app) are asked for when Today opens and every 5
+  switched on in nexora.app) are asked for when Today opens and every 5
   minutes while it stays (`App::set_today_watch`); reading them, the list's
   days and rows and each date's dots are in `nexora_core::agenda`, the page in
   `pages/today.rs`, which keeps the stat tiles for a server without the day.
-* AI usage (optional): keys typed into the AI tab and inference.oyenza.com's
+* AI usage (optional): keys typed into the AI tab and inference.nexora.app's
   key, each sealed with DPAPI in its own file
   (`%LOCALAPPDATA%\Nexora\usage-<name>.bin`; on a Mac an owner-only file in
   `~/Library/Application Support/Nexora/`); which services are hidden or added
@@ -382,7 +382,7 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect);  // draw + handle input
 The AI tab (`PageKind::Ai`, a core tab right after Focus) shows how much of
 each AI coding plan on this computer is left (Codex, Claude Code, OpenCode Go,
 Gemini CLI, Antigravity, Cursor, GitHub Copilot, Kimi Code, Z.ai, MiniMax, OpenRouter) and
-the person's inference.oyenza.com balance once they connect it. What it reads,
+the person's inference.nexora.app balance once they connect it. What it reads,
 service by service, in people's words: [docs/ai-usage.md](docs/ai-usage.md).
 
 * **Readers** (`crates/nexora-usage`): one file per service behind the
@@ -405,17 +405,17 @@ service by service, in people's words: [docs/ai-usage.md](docs/ai-usage.md).
   `Trouble` the tab says in plain words. The rules at the top of `lib.rs` bind
   every reader: read only, never refresh another app's sign-in, a sign-in
   goes only to its own service's server and never into the log, an error or
-  a snapshot, ask as Oyenza Studio (never another app's `User-Agent`), and
+  a snapshot, ask as Nexora (never another app's `User-Agent`), and
   unknown is not zero. `alerts.rs` turns a service's readings into heads-up
-  notices (near, out, back after a reset); `oyenza.rs` also holds
-  inference.oyenza.com's device connect (start, poll, the read-only `oyis_`
+  notices (near, out, back after a reset); `nexora.rs` also holds
+  inference.nexora.app's device connect (start, poll, the read-only `nxis_`
   key, disconnect). Its test-server variable, `NEXORA_INFERENCE_URL`, takes
   `https://` anywhere but plain `http://` only for this computer (`localhost`,
   `127.0.0.1`, `[::1]`), since the key goes wherever it points.
 * **Built for size**: the readers are their own crate so the release profile
   can build them at opt-level "s": they parse for moments every few minutes,
   never in a frame. They use nexora-core's dates and SHA-256, and the device
-  code helpers the oyenza.app sign-in uses (`nexora_core::oyenza`).
+  code helpers the nexora.app sign-in uses (`nexora_core::nexora`).
 * **Worker** (`services/usage.rs`, which the Mac app runs too through
   `#[path]`): one thread, started the first time the tab opens or the notices
   are switched on (`Services::usage_watch`), that sleeps on a condvar at zero
@@ -440,7 +440,7 @@ service by service, in people's words: [docs/ai-usage.md](docs/ai-usage.md).
 * **Cadence**: the tab opening refreshes at once (at most once per 15 s of
   reopening), then every 60 s while it stays. A service is asked online only
   once its `min_gap_s` has passed since its last online ask (the reader's
-  own, from 60 s for inference.oyenza.com to 300 s; docs/ai-usage.md lists
+  own, from 60 s for inference.nexora.app to 300 s; docs/ai-usage.md lists
   them); otherwise the refresh is `Reach::Local`, which services with only
   online numbers skip. With the
   notices on and the tab closed: files every 5 minutes, online at most every
@@ -482,7 +482,7 @@ cargo build -p nexora --release    # on a Mac: the Mac app (tools/make_mac_app.s
 ## The Mac app
 
 Built in slices (slice 1: the island, drawing, clock, timer and the menu bar
-item; music, the Shelf, pop-ups and Oyenza sign-in came later). `main.rs` builds the shared modules (`activities`, `commands`,
+item; music, the Shelf, pop-ups and Nexora sign-in came later). `main.rs` builds the shared modules (`activities`, `commands`,
 `icons`, `island`, `oyen`, `pages`, `plog`, `png`, `state`, `ui`) for both
 systems and takes the platform ones from `src/mac/` by `#[path]` on macOS, so
 the Windows files are untouched.
@@ -503,7 +503,7 @@ the Windows files are untouched.
 CI (`.github/workflows/mac.yml`, on `main` and `mac-*` branches) builds for
 Apple Silicon and Intel, renders every state, runs the real window through a
 few states with screenshots (`nexora --smoke <dir>` writes where its window is
-and waits for each screenshot), and packages `Oyenza-Studio-<version>-mac-unsigned.dmg` with the MediaRemote
+and waits for each screenshot), and packages `Nexora-<version>-mac-unsigned.dmg` with the MediaRemote
 adapter's framework built by CMake (ad-hoc signed; Developer ID signing and
 notarization need the Apple secrets).
 

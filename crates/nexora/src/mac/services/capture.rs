@@ -6,7 +6,7 @@
 //! every 40 ms, as it empties WASAPI's buffers on Windows.
 //!
 //! The Mac's own sound comes through a process tap (macOS 14.2 and later): a
-//! stereo tap of every app but Oyenza Studio, in a private aggregate device
+//! stereo tap of every app but Nexora, in a private aggregate device
 //! of our own clocked by the output device. macOS asks the person once
 //! (NSAudioCaptureUsageDescription); until they allow it the tap hears
 //! silence. The tap's functions are looked up when first needed, so the app
@@ -490,7 +490,7 @@ fn open_pc() -> Result<(u32, Running), MicError> {
             let _: () = msg_send![&*d, setPrivateTap: true];
         }
         if answers(sel!(setName:)) {
-            let _: () = msg_send![&*d, setName: &*NSString::from_str("Oyenza Studio meeting notes")];
+            let _: () = msg_send![&*d, setName: &*NSString::from_str("Nexora meeting notes")];
         }
         d
     };
@@ -556,9 +556,9 @@ fn aggregate(output_uid: &str, tap_uid: &str) -> Result<u32, MicError> {
     };
     let sub = dict(vec![("uid", any(s(output_uid)))]);
     let tap = dict(vec![("uid", any(s(tap_uid))), ("drift", any(NSNumber::new_bool(true)))]);
-    let unique = format!("com.oyenza.studio.notes.{}", std::process::id());
+    let unique = format!("com.nexora.studio.notes.{}", std::process::id());
     let desc = dict(vec![
-        ("name", any(s("Oyenza Studio meeting notes"))),
+        ("name", any(s("Nexora meeting notes"))),
         ("uid", any(s(&unique))),
         ("master", any(s(output_uid))),
         ("private", any(NSNumber::new_bool(true))),

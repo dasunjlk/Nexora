@@ -95,11 +95,11 @@ jobs:
             Get-Content $env:NEXORA_FAKE_AM_LOG -ErrorAction SilentlyContinue
           }
 
-      # The Stocks thread against the live oyenza.trade, from the build above.
+      # The Stocks thread against the live nexora.trade, from the build above.
       # The self-test shows a made-up market and asks for nothing, which is
       # how 0.2.11 shipped a thread that never asked. Silence fails the step;
-      # oyenza.trade answering badly only warns.
-      - name: Stocks from the live oyenza.trade
+      # nexora.trade answering badly only warns.
+      - name: Stocks from the live nexora.trade
         run: cargo test -p nexora --release the_live_market_comes_in -- --ignored --nocapture
 
       # Windows reads the Bluetooth watchers' filters only when they start,
@@ -262,10 +262,10 @@ jobs:
           }
 
       # The same song the way a PC without Windows' Japanese reading data
-      # reads it (most Windows 11 PCs outside Japan): with Oyenza Studio's own
+      # reads it (most Windows 11 PCs outside Japan): with Nexora's own
       # dictionary from the Japanese readings add-on (the repo's copy, put
       # where the add-on keeps it). Every line must read here too.
-      - name: Self-test, Japanese lyrics with Oyenza Studio's own dictionary
+      - name: Self-test, Japanese lyrics with Nexora's own dictionary
         if: matrix.group == 'classic'
         shell: pwsh
         env:
@@ -553,7 +553,7 @@ jobs:
           if (-not $iscc) { Write-Error "ISCC.exe not found after installing Inno Setup"; exit 1 }
           & $iscc "/DAppVersion=$env:NEXORA_VERSION" installer\nexora.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          Get-Item "dist\Oyenza-Studio-Setup-$env:NEXORA_VERSION.exe" | Format-List Name, Length
+          Get-Item "dist\Nexora-Setup-$env:NEXORA_VERSION.exe" | Format-List Name, Length
 
       - name: Upload screenshots and logs
         if: always()
@@ -588,7 +588,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nexora-setup-inno
-          path: dist/Oyenza-Studio-Setup-${{ env.NEXORA_VERSION }}.exe
+          path: dist/Nexora-Setup-${{ env.NEXORA_VERSION }}.exe
           if-no-files-found: error
 
   # The three machines' screenshots and logs as one nexora-screens download,
@@ -622,18 +622,18 @@ jobs:
           sudo apt-get install -y -qq nsis zip > /dev/null
           makensis -V2 -DEXE="$PWD/dist/nexora.exe" -DOUTDIR="$PWD/dist" installer/nexora.nsi
           # Portable build inside its own folder, as tools/package.sh makes it.
-          ( cd dist && mkdir Nexora && cp nexora.exe ../THIRD-PARTY-NOTICES.txt Nexora/ && zip -qr "Oyenza-Studio-$NEXORA_VERSION-portable.zip" Nexora && rm -rf Nexora )
+          ( cd dist && mkdir Nexora && cp nexora.exe ../THIRD-PARTY-NOTICES.txt Nexora/ && zip -qr "Nexora-$NEXORA_VERSION-portable.zip" Nexora && rm -rf Nexora )
           ls -la dist
       # The download against tools/weight-budget.json (the Windows job's smoke
       # run weighs memory, CPU and wake-ups).
       - name: Weight check, download size
-        run: tools/ci-weight-download.sh "dist/Oyenza-Studio-Setup-$NEXORA_VERSION.exe"
+        run: tools/ci-weight-download.sh "dist/Nexora-Setup-$NEXORA_VERSION.exe"
       - uses: actions/upload-artifact@v4
         with:
-          name: oyenza-studio-setup
+          name: nexora-setup
           path: |
-            dist/Oyenza-Studio-Setup-${{ env.NEXORA_VERSION }}.exe
-            dist/Oyenza-Studio-${{ env.NEXORA_VERSION }}-portable.zip
+            dist/Nexora-Setup-${{ env.NEXORA_VERSION }}.exe
+            dist/Nexora-${{ env.NEXORA_VERSION }}-portable.zip
           if-no-files-found: error
 
   install-test:
@@ -644,15 +644,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: oyenza-studio-setup
+          name: nexora-setup
           path: dist
       - name: Fetch the release to upgrade from
         shell: pwsh
         # 0.1.1 is the installer people have today; the check upgrades from it.
-        run: Invoke-WebRequest -Uri "https://github.com/lucacadalora/oyenza-studio/releases/download/v0.1.1/Nexora-Setup-0.1.1.exe" -OutFile previous-setup.exe
+        run: Invoke-WebRequest -Uri "https://github.com/dasunjlk/Nexora/releases/download/v0.1.1/Nexora-Setup-0.1.1.exe" -OutFile previous-setup.exe
       - name: Install, check, uninstall
         shell: pwsh
-        run: ./tools/ci-installer.ps1 -Setup "dist\Oyenza-Studio-Setup-$env:NEXORA_VERSION.exe" -Version $env:NEXORA_VERSION -Previous previous-setup.exe -Out installer-out
+        run: ./tools/ci-installer.ps1 -Setup "dist\Nexora-Setup-$env:NEXORA_VERSION.exe" -Version $env:NEXORA_VERSION -Previous previous-setup.exe -Out installer-out
       - name: Upload screenshots and results
         if: always()
         uses: actions/upload-artifact@v4
@@ -720,27 +720,27 @@ jobs:
         run: test "$GITHUB_REF_NAME" = "v$NEXORA_VERSION"
       - uses: actions/download-artifact@v4
         with:
-          name: oyenza-studio-setup
+          name: nexora-setup
           path: dist
       # Oyen-Nexora-Setup.exe is the fixed name before the rename (0.1.2 to the last 0.1.x). Links to it are
-      # out there (oyenza.com, shared links, old README copies), so every release keeps carrying it.
+      # out there (nexora.com, shared links, old README copies), so every release keeps carrying it.
       - name: Copy the installer to the fixed names the download links use
         run: |
-          cp "dist/Oyenza-Studio-Setup-$NEXORA_VERSION.exe" dist/Oyenza-Studio-Setup.exe
-          cp "dist/Oyenza-Studio-Setup-$NEXORA_VERSION.exe" dist/Oyen-Nexora-Setup.exe
+          cp "dist/Nexora-Setup-$NEXORA_VERSION.exe" dist/Nexora-Setup.exe
+          cp "dist/Nexora-Setup-$NEXORA_VERSION.exe" dist/Oyen-Nexora-Setup.exe
       - name: Publish as the latest release
         if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
-          name: Oyenza Studio ${{ env.NEXORA_VERSION }}
+          name: Nexora ${{ env.NEXORA_VERSION }}
           body_path: docs/release-notes/${{ github.ref_name }}.md
           prerelease: false
           make_latest: "true"
           files: |
-            dist/Oyenza-Studio-Setup-${{ env.NEXORA_VERSION }}.exe
-            dist/Oyenza-Studio-Setup.exe
+            dist/Nexora-Setup-${{ env.NEXORA_VERSION }}.exe
+            dist/Nexora-Setup.exe
             dist/Oyen-Nexora-Setup.exe
-            dist/Oyenza-Studio-${{ env.NEXORA_VERSION }}-portable.zip
+            dist/Nexora-${{ env.NEXORA_VERSION }}-portable.zip
           fail_on_unmatched_files: true
       - name: What a tag would publish (dry run, nothing is published)
         if: github.event_name != 'push'
@@ -753,10 +753,10 @@ jobs:
           {
             echo "### Release dry run: nothing was published"
             echo
-            echo "A \`v$NEXORA_VERSION\` tag would publish **Oyenza Studio $NEXORA_VERSION** as the latest release, with \`$notes\` as its text and these files:"
+            echo "A \`v$NEXORA_VERSION\` tag would publish **Nexora $NEXORA_VERSION** as the latest release, with \`$notes\` as its text and these files:"
             echo
             echo '```'
-            (cd dist && sha256sum "Oyenza-Studio-Setup-$NEXORA_VERSION.exe" Oyenza-Studio-Setup.exe Oyen-Nexora-Setup.exe "Oyenza-Studio-$NEXORA_VERSION-portable.zip" && ls -l "Oyenza-Studio-Setup-$NEXORA_VERSION.exe" Oyenza-Studio-Setup.exe Oyen-Nexora-Setup.exe "Oyenza-Studio-$NEXORA_VERSION-portable.zip")
+            (cd dist && sha256sum "Nexora-Setup-$NEXORA_VERSION.exe" Nexora-Setup.exe Oyen-Nexora-Setup.exe "Nexora-$NEXORA_VERSION-portable.zip" && ls -l "Nexora-Setup-$NEXORA_VERSION.exe" Nexora-Setup.exe Oyen-Nexora-Setup.exe "Nexora-$NEXORA_VERSION-portable.zip")
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
 

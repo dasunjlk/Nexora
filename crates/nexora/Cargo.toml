@@ -13,7 +13,7 @@ name = "nexora"
 path = "src/main.rs"
 
 [dependencies]
-# Oyenza Studio's own Japanese reading dictionary (3.8 MB) is not built into
+# Nexora's own Japanese reading dictionary (3.8 MB) is not built into
 # nexora.exe: Windows downloads it as the Japanese readings add-on
 # (nexora_core::addons::JAPANESE_READINGS) for the people who want it.
 nexora-core = { path = "../nexora-core" }

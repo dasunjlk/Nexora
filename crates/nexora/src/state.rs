@@ -12,7 +12,7 @@ use nexora_core::datetime::LocalDateTime;
 use nexora_core::geom::{palette, Color};
 use nexora_core::health::HealthSnapshot;
 use nexora_core::lrc::Lyrics;
-use nexora_core::oyenza::{Activity, Bill, DayPick, Saved, Seen};
+use nexora_core::nexora::{Activity, Bill, DayPick, Saved, Seen};
 use nexora_core::phonedrop::QrMatrix;
 use nexora_core::pomodoro::Pomodoro;
 use nexora_core::recorder::Phase as RecPhase;
@@ -148,7 +148,7 @@ pub enum NoticeAction {
 pub enum InlineAction {
     /// Start the idle Pomodoro phase.
     StartFocus,
-    /// Put the notice's hidden words in place: an Oyenza sum (and sender),
+    /// Put the notice's hidden words in place: an Nexora sum (and sender),
     /// or a message and who it's from (Notifications).
     ShowAmount,
     /// Stop the adzan (Prayer times).
@@ -179,7 +179,7 @@ pub enum NotifyAccess {
     /// Asked, and Windows came back without an answer (the question was
     /// closed, or never showed): ask again, or turn it on in Windows' settings.
     Unanswered,
-    /// Turned off for Oyenza Studio in Windows' settings.
+    /// Turned off for Nexora in Windows' settings.
     Denied,
     /// Windows lets it read them: new ones show on the island.
     Allowed,
@@ -341,7 +341,7 @@ pub struct PageUiState {
     pub peek_until: f64,
     /// Header tab under the pointer and since when (for hover labels).
     pub tab_hover: Option<(usize, f64)>,
-    /// Oyen in the Oyenza tab: his last move of his own and when it started
+    /// Oyen in the Nexora tab: his last move of his own and when it started
     /// (`oyen::tab`). None while the island is closed: the next opening is
     /// his arrival.
     pub oyen_tab: Option<(crate::oyen::TabMove, f64)>,
@@ -381,7 +381,7 @@ pub struct PageUiState {
     pub addon_about: Option<&'static str>,
 }
 
-/// Whether Windows lets Oyenza Studio read a game's frames. Its event tracing
+/// Whether Windows lets Nexora read a game's frames. Its event tracing
 /// is open to admins and to the Performance Log Users group; the one-time
 /// OK adds the account to that group, which counts from the next sign-in.
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -419,17 +419,17 @@ pub struct GameState {
     pub access: FpsAccess,
 }
 
-/// Oyenza sign-in, as the island sees it.
+/// Nexora sign-in, as the island sees it.
 #[derive(Clone, Debug, Default, PartialEq)]
-pub enum OyenzaLink {
+pub enum NexoraLink {
     #[default]
     Off,
-    /// A code on screen, waiting for approval in oyenza.app, until mono time `until`.
+    /// A code on screen, waiting for approval in nexora.app, until mono time `until`.
     Connecting { code: String, url: String, until: f64 },
     Connected { account: String },
 }
 
-/// Where the Today page's day stands (`OyenzaState::agenda`).
+/// Where the Today page's day stands (`NexoraState::agenda`).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum AgendaState {
     /// Not asked yet since signing in or opening.
@@ -443,12 +443,12 @@ pub enum AgendaState {
     Unavailable,
 }
 
-/// What the Oyenza tab and its notices show (`pages::oyenza`), and the Today
+/// What the Nexora tab and its notices show (`pages::nexora`), and the Today
 /// page's day (`pages::today`). Oyen's moods never read any of it: money
 /// never makes him happier or a bill sadder.
 #[derive(Clone, Debug, Default)]
-pub struct OyenzaState {
-    pub link: OyenzaLink,
+pub struct NexoraState {
+    pub link: NexoraLink,
     /// The last 7 days of transactions (asked while the page is open).
     pub activity: Option<Activity>,
     /// When each row was first seen, so what lands while you look glows.
@@ -460,7 +460,7 @@ pub struct OyenzaState {
     pub bills: Vec<Bill>,
     /// The server's today for `bills` (YYYY-MM-DD).
     pub bills_today: String,
-    /// Unix time of Oyenza's last answer ("Updated 13:49").
+    /// Unix time of Nexora's last answer ("Updated 13:49").
     pub updated_unix: Option<i64>,
     /// The spend being typed.
     pub input: String,
@@ -476,7 +476,7 @@ pub struct OyenzaState {
     pub reveal: bool,
     /// A notice that came while a full-screen app hid the island, and when.
     pub held: Option<(Notice, f64)>,
-    /// Arrivals already shown as a notice (`oyenza::unseen`), so none repeats.
+    /// Arrivals already shown as a notice (`nexora::unseen`), so none repeats.
     pub shown: Vec<String>,
     /// Pinned before a sign-in code pinned the island open.
     pub pinned_before: Option<bool>,
@@ -507,7 +507,7 @@ pub enum Locate {
     /// Away from Kemenag's places, and the cities around couldn't be looked
     /// up (offline): the place stays as it was.
     Offline,
-    /// Windows' location is off, or not allowed for Oyenza Studio.
+    /// Windows' location is off, or not allowed for Nexora.
     Denied,
     /// Windows couldn't tell where the PC is.
     Unknown,
@@ -613,7 +613,7 @@ pub struct PrayerState {
 }
 
 
-/// What Oyenza Studio Recorder last said about its recording
+/// What Nexora Recorder last said about its recording
 /// (`nexora_core::recorder::Message::State`).
 #[derive(Clone, Debug, Default)]
 pub struct RecView {
@@ -639,7 +639,7 @@ pub struct RecView {
 pub struct UsageState {
     /// Each service's last reading.
     pub readings: BTreeMap<ProviderId, Reading>,
-    /// inference.oyenza.com's balance and spend, once connected.
+    /// inference.nexora.app's balance and spend, once connected.
     pub inference: InferenceLink,
     /// The secret names (`usage::KeyAsk::secret`) that hold a typed key.
     pub keys: BTreeSet<&'static str>,
@@ -662,7 +662,7 @@ pub struct Reading {
     pub checked_at: i64,
 }
 
-/// inference.oyenza.com on the AI tab: connected by a code the person
+/// inference.nexora.app on the AI tab: connected by a code the person
 /// approves in its dashboard, after which Studio holds a read-only key.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub enum InferenceLink {
@@ -739,9 +739,9 @@ pub fn usage_notice(a: &Alert, accent: Color, until: f64) -> Notice {
 /// little for system fonts wider than the guess.
 const NOTICE_LINE_W: f32 = 280.0;
 
-/// A notice has two lines, so a plan that ran out while Oyenza Inference is
+/// A notice has two lines, so a plan that ran out while Nexora Inference is
 /// connected puts the nudge after the reset time ("Resets 14:20 · Keep going
-/// on Oyenza Inference") while both fit, else the nudge alone: the AI tab,
+/// on Nexora Inference") while both fit, else the nudge alone: the AI tab,
 /// a click away, has the reset time.
 fn usage_line(subtitle: &str, nudge: Option<&str>) -> String {
     match nudge.map(str::trim).filter(|n| !n.is_empty()) {
@@ -783,7 +783,7 @@ pub struct AppState {
     pub ui: PageUiState,
     /// System accent colour (falls back to blue).
     pub accent: Color,
-    /// Steps from the person's phone, sent by Oyenza (None until connected).
+    /// Steps from the person's phone, sent by Nexora (None until connected).
     pub health: Option<HealthSnapshot>,
     /// The page currently shown when expanded.
     pub page: PageKind,
@@ -803,7 +803,7 @@ pub struct AppState {
     pub paired: Vec<PairedPhone>,
     /// Whether the meeting server answers (None = not asked yet: no pairs).
     pub pair_server: Option<bool>,
-    pub oyenza: OyenzaState,
+    pub nexora: NexoraState,
     /// Where each add-on stands, by id (every one in `nexora_core::addons::ALL`).
     pub addons: BTreeMap<&'static str, AddonStatus>,
     /// New versions (`crate::updates`): what Settings, the menu and the
@@ -818,7 +818,7 @@ pub struct AppState {
     /// Whether Windows leaves the island out of screen capture while the
     /// Script page shows (None = not asked yet, or not on Windows).
     pub script_hidden: Option<bool>,
-    /// Oyenza Studio Recorder is installed: the Script page shows Record, and
+    /// Nexora Recorder is installed: the Script page shows Record, and
     /// the Record tab can show (`record_on`). Asked at start, as the island
     /// opens and when the recorder writes, never at rest.
     pub recorder: bool,
@@ -909,7 +909,7 @@ impl AppState {
             phone: None,
             paired: Vec::new(),
             pair_server: None,
-            oyenza: OyenzaState::default(),
+            nexora: NexoraState::default(),
             addons: BTreeMap::new(),
             update: UpdateView::default(),
             prayer: PrayerState::default(),
@@ -1050,7 +1050,7 @@ impl AppState {
     /// The IELTS add-on is on, and the server hasn't said the account is
     /// without Studio Pro: the IELTS tab shows (signed out, its sign-in card).
     pub fn ielts_on(&self) -> bool {
-        self.addon(nexora_core::addons::IELTS.id) == AddonStatus::Ready && self.oyenza.pro != Some(false)
+        self.addon(nexora_core::addons::IELTS.id) == AddonStatus::Ready && self.nexora.pro != Some(false)
     }
 
     /// AI usage is on: the AI tab shows and its readers may run. It takes an
@@ -1061,8 +1061,8 @@ impl AppState {
 
     /// The signed-in account has Studio Pro, as the server last said.
     pub fn studio_pro(&self) -> Option<bool> {
-        match self.oyenza.link {
-            OyenzaLink::Connected { .. } => self.oyenza.pro,
+        match self.nexora.link {
+            NexoraLink::Connected { .. } => self.nexora.pro,
             _ => Some(false),
         }
     }
@@ -1112,13 +1112,13 @@ impl AppState {
 
     /// Show `n` now or, while a full-screen app hides the island (`hidden`), keep
     /// it for when the island is back, the way money notices wait
-    /// (`OyenzaState::held`, shown then if no older than `HELD_MAX_S`). One
+    /// (`NexoraState::held`, shown then if no older than `HELD_MAX_S`). One
     /// notice waits at a time, and a money or bill notice already waiting stays.
     pub fn show_or_hold(&mut self, n: Notice, hidden: bool) {
         if !hidden {
             self.notice = Some(n);
-        } else if self.oyenza.held.as_ref().is_none_or(|(_, at)| self.now - at > nexora_core::oyenza::HELD_MAX_S) {
-            self.oyenza.held = Some((n, self.now));
+        } else if self.nexora.held.as_ref().is_none_or(|(_, at)| self.now - at > nexora_core::nexora::HELD_MAX_S) {
+            self.nexora.held = Some((n, self.now));
         }
     }
 
@@ -1155,12 +1155,12 @@ impl AppState {
             self.usage.waiting.clear();
             return false;
         }
-        self.usage.waiting.retain(|(a, at)| now - at <= nexora_core::oyenza::HELD_MAX_S && !u.hidden.iter().any(|k| k == a.provider.key()));
+        self.usage.waiting.retain(|(a, at)| now - at <= nexora_core::nexora::HELD_MAX_S && !u.hidden.iter().any(|k| k == a.provider.key()));
         if !free || self.notice.is_some() || self.usage.waiting.is_empty() {
             return false;
         }
         let (a, _) = self.usage.waiting.remove(0);
-        self.notice = Some(usage_notice(&a, self.accent, now + nexora_core::oyenza::NOTICE_S));
+        self.notice = Some(usage_notice(&a, self.accent, now + nexora_core::nexora::NOTICE_S));
         true
     }
 
@@ -1173,13 +1173,13 @@ impl AppState {
 
     /// What the AI tab's notices go by, for its worker (`alerts::changes`):
     /// that line, and the app's clock for the reset times ("Resets 14:20" or
-    /// "2:20 PM", local). A plan that runs out mentions Oyenza Inference only
+    /// "2:20 PM", local). A plan that runs out mentions Nexora Inference only
     /// while it is connected and its key works.
     pub fn usage_alert_cfg(&self) -> AlertCfg {
-        let refused = self.usage.readings.get(&ProviderId::Oyenza).is_some_and(|r| matches!(r.trouble, Some(Trouble::Refused | Trouble::Disabled)));
+        let refused = self.usage.readings.get(&ProviderId::Nexora).is_some_and(|r| matches!(r.trouble, Some(Trouble::Refused | Trouble::Disabled)));
         AlertCfg {
             near: f32::from(self.usage_near_pct()) / 100.0,
-            offset_min: nexora_core::oyenza::offset_minutes(&self.local, self.unix),
+            offset_min: nexora_core::nexora::offset_minutes(&self.local, self.unix),
             use_24h: self.settings.use_24h,
             inference: matches!(self.usage.inference, InferenceLink::On { .. }) && !refused,
             ..AlertCfg::default()
@@ -1292,7 +1292,7 @@ mod tests {
         // Over the goal in the first numbers after start: a baseline, no notice (a restart never repeats it).
         assert_eq!(st.take_health(Some(snap(9000))), None);
         assert_eq!(st.health.as_ref().map(|h| h.steps_on("2026-10-24")), Some(9000));
-        // Off in Oyenza: nothing kept; the numbers after it are a baseline again.
+        // Off in Nexora: nothing kept; the numbers after it are a baseline again.
         assert_eq!(st.take_health(None), None);
         assert!(st.health.is_none());
         assert_eq!(st.take_health(Some(snap(7900))), None);
@@ -1315,17 +1315,17 @@ mod tests {
             inline: None,
             reveal: None,
         };
-        let held = |st: &AppState| st.oyenza.held.as_ref().map(|(n, at)| (n.title.clone(), *at));
+        let held = |st: &AppState| st.nexora.held.as_ref().map(|(n, at)| (n.title.clone(), *at));
         // Hidden: it waits for the island instead of expiring unseen.
         st.show_or_hold(notice("goal"), true);
         assert!(st.notice.is_none());
         assert_eq!(held(&st), Some(("goal".into(), 100.0)));
         // A money notice already waiting stays...
-        st.oyenza.held = Some((notice("money"), 100.0));
+        st.nexora.held = Some((notice("money"), 100.0));
         st.show_or_hold(notice("goal"), true);
         assert_eq!(held(&st), Some(("money".into(), 100.0)));
         // ...unless it's too old to show any more.
-        st.now = 100.0 + nexora_core::oyenza::HELD_MAX_S + 1.0;
+        st.now = 100.0 + nexora_core::nexora::HELD_MAX_S + 1.0;
         st.show_or_hold(notice("goal"), true);
         assert_eq!(held(&st).map(|h| h.0), Some("goal".into()));
         // The island on screen: it shows at once.
@@ -1414,18 +1414,18 @@ mod tests {
         assert!(!st.show_usage_notice(false, false));
         assert!(st.notice.is_none());
         // ...and for another notice to leave.
-        st.notify(Icon::Check, palette::GREEN, "Connected to Oyenza", "as a•••@example.com", 6.0, None);
+        st.notify(Icon::Check, palette::GREEN, "Connected to Nexora", "as a•••@example.com", 6.0, None);
         assert!(!st.show_usage_notice(true, false));
-        assert_eq!(st.notice.as_ref().map(|n| n.title.as_str()), Some("Connected to Oyenza"));
+        assert_eq!(st.notice.as_ref().map(|n| n.title.as_str()), Some("Connected to Nexora"));
         st.notice = None;
         st.now = 130.0;
         assert!(st.show_usage_notice(true, false));
         let n = st.notice.take().unwrap();
-        assert_eq!((n.title.as_str(), n.subtitle.as_str(), n.until), ("Codex: 80% of 5-hour", "Resets 14:20", 130.0 + nexora_core::oyenza::NOTICE_S));
+        assert_eq!((n.title.as_str(), n.subtitle.as_str(), n.until), ("Codex: 80% of 5-hour", "Resets 14:20", 130.0 + nexora_core::nexora::NOTICE_S));
         assert_eq!((n.action, n.inline), (Some(NoticeAction::OpenPage(PageKind::Ai)), None));
         // Too old once the island is free: dropped.
         st.hold_usage_alerts(vec![codex()]);
-        st.now += nexora_core::oyenza::HELD_MAX_S + 1.0;
+        st.now += nexora_core::nexora::HELD_MAX_S + 1.0;
         assert!(shown(&mut st).is_empty());
         assert!(st.usage.waiting.is_empty());
         // A service hidden since: dropped.
@@ -1453,16 +1453,16 @@ mod tests {
             [color(AlertKind::Near(90)), color(AlertKind::Out), color(AlertKind::Low), color(AlertKind::Back)],
             [accent, palette::ORANGE, palette::ORANGE, palette::GREEN]
         );
-        // Out with Oyenza Inference connected: the nudge follows the reset time while both fit...
+        // Out with Nexora Inference connected: the nudge follows the reset time while both fit...
         let mut a = alert(ProviderId::Claude, AlertKind::Out, "Claude Code: 5-hour used up");
-        a.nudge = Some("Keep going on Oyenza Inference".into());
-        assert_eq!(usage_notice(&a, accent, 0.0).subtitle, "Resets 14:20 \u{b7} Keep going on Oyenza Inference");
+        a.nudge = Some("Keep going on Nexora Inference".into());
+        assert_eq!(usage_notice(&a, accent, 0.0).subtitle, "Resets 14:20 \u{b7} Keep going on Nexora Inference");
         a.subtitle = "Resets 2:20 PM".into();
-        assert_eq!(usage_notice(&a, accent, 0.0).subtitle, "Resets 2:20 PM \u{b7} Keep going on Oyenza Inference");
+        assert_eq!(usage_notice(&a, accent, 0.0).subtitle, "Resets 2:20 PM \u{b7} Keep going on Nexora Inference");
         // ...else it stands alone (the AI tab has the reset time).
         for long in ["Resets 10:20 AM", "Resets Thu 09:00", "Resets Tue 3 Nov", "None left for now", "Premium requests \u{b7} resets Tue 1 Dec"] {
             a.subtitle = long.into();
-            assert_eq!(usage_notice(&a, accent, 0.0).subtitle, "Keep going on Oyenza Inference", "{long}");
+            assert_eq!(usage_notice(&a, accent, 0.0).subtitle, "Keep going on Nexora Inference", "{long}");
         }
         // Without a nudge the alert's own line stays as it is.
         a.nudge = None;
@@ -1499,7 +1499,7 @@ mod tests {
         assert_eq!((n.title.as_str(), n.subtitle.as_str(), n.color), ("Claude Code: 90% of 5-hour", "Resets 2:20 PM", st.accent));
         // A refused or switched-off inference key: no nudge to a dead end.
         for t in [Trouble::Refused, Trouble::Disabled] {
-            st.usage.readings.insert(ProviderId::Oyenza, Reading { snapshot: None, trouble: Some(t), checked_at: st.unix });
+            st.usage.readings.insert(ProviderId::Nexora, Reading { snapshot: None, trouble: Some(t), checked_at: st.unix });
             assert!(!st.usage_alert_cfg().inference);
         }
     }

@@ -1,10 +1,10 @@
-//! Oyen, the Oyenza mascot: the Oyenza mark with eyes that change with the
+//! Oyen, the Nexora mascot: the Nexora mark with eyes that change with the
 //! moment, drawn flat like the logo (no fur, no mouth, no whiskers). A mood
 //! moves only the eyes, the folded ear and a little bounce, as a pure function
 //! of time, so every frame is exact and nothing animates on its own.
 //!
-//! There is one Oyen. This is a port of OyenKit (the Oyenza Mac bar's Swift
-//! port of the Oyenza app's `src/components/oyen-face.tsx`) that gives the same
+//! There is one Oyen. This is a port of OyenKit (the Nexora Mac bar's Swift
+//! port of the Nexora app's `src/components/oyen-face.tsx`) that gives the same
 //! numbers, checked against frames OyenKit wrote (see `swift_check`). Change
 //! the app first, then OyenKit, then this, never this alone.
 //!

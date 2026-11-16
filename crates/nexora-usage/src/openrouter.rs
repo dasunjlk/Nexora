@@ -2,7 +2,7 @@
 //! month (against the key's limit when it has one) and the credits left on
 //! the account, from OpenRouter's own API.
 //!
-//! The key is the one typed into Oyenza Studio, else `OPENROUTER_API_KEY`
+//! The key is the one typed into Nexora, else `OPENROUTER_API_KEY`
 //! (the variable tools that use OpenRouter read). A refresh asks
 //! openrouter.ai twice with it, and it goes nowhere else:
 //! - `GET /api/v1/key`: the key's spend, its limit, and whether the account

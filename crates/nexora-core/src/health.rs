@@ -1,9 +1,9 @@
-//! Steps from the person's phone, as Oyenza sends them.
+//! Steps from the person's phone, as Nexora sends them.
 //!
-//! Nexora has no health data of its own: Oyenza on the person's iPhone or
+//! Nexora has no health data of its own: Nexora on the person's iPhone or
 //! Android phone reads daily totals from Apple Health or Health Connect and,
-//! once the person turns on Show on Oyenza Studio there, sends the last 7
-//! days to their account, where a signed-in Oyenza Studio reads them
+//! once the person turns on Show on Nexora there, sends the last 7
+//! days to their account, where a signed-in Nexora reads them
 //! (`/island/health`). Only daily totals travel, never samples, places,
 //! sleep, heart rate or weight, and the PC keeps them in memory only.
 
@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 pub enum HealthSource {
     AppleHealth,
     HealthConnect,
-    /// A health app this version doesn't know (a newer Oyenza): the numbers still show.
+    /// A health app this version doesn't know (a newer Nexora): the numbers still show.
     #[serde(other)]
     Other,
 }
@@ -32,10 +32,10 @@ impl HealthSource {
 }
 
 /// Numbers the phone read longer ago than this are old, and the page asks the
-/// person to open Oyenza on the phone. Oyenza also sends with the app closed
+/// person to open Nexora on the phone. Nexora also sends with the app closed
 /// (on an iPhone when Apple Health wakes it for new steps, about once an hour
 /// at most; on Android every 15 minutes or so), but not always: an iPhone that
-/// was locked, an Oyenza that iOS closed, an older Oyenza. Two hours is past
+/// was locked, an Nexora that iOS closed, an older Nexora. Two hours is past
 /// a missed wake or two, so a reading that has fallen behind says so while
 /// the day is still going, not only the next day.
 pub const STALE_AFTER_S: i64 = 2 * 3600;
@@ -57,10 +57,10 @@ pub struct HealthDay {
     pub active_kcal: Option<u32>,
 }
 
-/// What Oyenza last sent: the step goal and up to the last week of days.
+/// What Nexora last sent: the step goal and up to the last week of days.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct HealthSnapshot {
-    /// Daily step goal, as set in Oyenza.
+    /// Daily step goal, as set in Nexora.
     pub goal: u32,
     pub source: HealthSource,
     /// When the phone last read the numbers (unix seconds).

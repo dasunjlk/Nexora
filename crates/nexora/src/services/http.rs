@@ -115,8 +115,8 @@ impl Drop for MtaGuard {
 /// Windows keeps an HTTP cache under it: a repeated GET whose answer had no
 /// `Cache-Control` comes back from that cache and never reaches the server
 /// (`cache_tests` below). A server whose answers change sends
-/// `Cache-Control: no-store`, as api.oyenza.app does on every `/island` route
-/// and oyenza.trade on the Stocks routes.
+/// `Cache-Control: no-store`, as api.nexora.app does on every `/island` route
+/// and nexora.trade on the Stocks routes.
 pub struct Client {
     http: HttpClient,
 }
@@ -574,7 +574,7 @@ mod pure {
 }
 
 /// Windows' HTTP cache, against a server of the test's own on 127.0.0.1 (CI's
-/// Windows unit tests): the same client and call as the Oyenza worker's.
+/// Windows unit tests): the same client and call as the Nexora worker's.
 #[cfg(test)]
 mod cache_tests {
     use super::*;
@@ -601,7 +601,7 @@ mod cache_tests {
         let run = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.as_nanos());
         let url = format!("http://127.0.0.1:{port}/island/bills?tz=%2B07%3A00&days=35&run={run}");
         let _com = MtaGuard::new();
-        let client = Client::new("OyenzaStudio/test").expect("a client");
+        let client = Client::new("NexoraStudio/test").expect("a client");
         let bodies = (0..2)
             .map(|_| client.send(Method::Get, &url, &[("Authorization", "Bearer oyzd_test")], None, DEFAULT_TIMEOUT).expect("an answer").body)
             .collect();
@@ -631,7 +631,7 @@ mod cache_tests {
 
     #[test]
     fn a_repeated_get_without_cache_headers_comes_from_windows_cache() {
-        // oyenza-studio#137's IELTS self-test found this. If it ever stops
+        // nexora#137's IELTS self-test found this. If it ever stops
         // happening, the test below proves nothing: look at both again.
         let (bodies, hits) = ask_twice("");
         assert_eq!((hits, bodies[1].as_str()), (1, r#"{"hit":1}"#), "answers {bodies:?}");
@@ -639,8 +639,8 @@ mod cache_tests {
 
     #[test]
     fn a_repeated_get_answered_with_no_store_reaches_the_server() {
-        // The headers api.oyenza.app sends on every /island route
-        // (catat-server's requirePc), so Today's bills, Health steps and
+        // The headers api.nexora.app sends on every /island route
+        // (nexora-notes-server's requirePc), so Today's bills, Health steps and
         // money are asked for every time.
         let (bodies, hits) = ask_twice("Cache-Control: no-store\r\nVary: Origin\r\n");
         assert_eq!((hits, bodies[1].as_str()), (2, r#"{"hit":2}"#), "answers {bodies:?}");

@@ -8,7 +8,7 @@ use crate::state::{MediaSession, PowerState, SysStats};
 use nexora_core::health::HealthSnapshot;
 use nexora_core::lrc::Lyrics;
 use nexora_core::agenda;
-use nexora_core::oyenza::{Activity, Arrival, Bill, Saved};
+use nexora_core::nexora::{Activity, Arrival, Bill, Saved};
 use nexora_core::romanize::Ruby;
 use nexora_core::timeline::Timeline;
 use std::sync::mpsc::Sender;
@@ -84,12 +84,12 @@ pub enum LyricsResult {
     Error(String),
 }
 
-/// What the Oyenza worker reports (`services::oyenza`).
+/// What the Nexora worker reports (`services::nexora`).
 #[derive(Clone, Debug)]
-pub enum OyenzaEvent {
+pub enum NexoraEvent {
     /// The sign-in saved on this PC was found at start (no notice).
     Restored { account: String },
-    /// A sign-in code to show, the oyenza.app address that takes it, and how long it lasts.
+    /// A sign-in code to show, the nexora.app address that takes it, and how long it lasts.
     Connecting { code: String, url: String, expires_in_s: u64 },
     Connected { account: String },
     /// Signing in stopped without a key: `expired`, `denied`, `offline` or `other`.
@@ -97,16 +97,16 @@ pub enum OyenzaEvent {
     ConnectCancelled,
     /// Money that just arrived or went out by itself (oldest first).
     Money { arrived: Vec<Arrival> },
-    /// The last 7 days of transactions, for the Oyenza page (while it's open).
+    /// The last 7 days of transactions, for the Nexora page (while it's open).
     Activity(Activity),
     /// Asked again while the page is open: nothing changed.
     ActivityChecked,
     /// Bills due in the next 30 days, and the server's today (YYYY-MM-DD).
     Bills { today: String, bills: Vec<Bill> },
     /// The steps the phone sent, for the Health page; None: none to show (off in
-    /// Oyenza on the phone, or a server from before steps).
+    /// Nexora on the phone, or a server from before steps).
     Health(Option<HealthSnapshot>),
-    /// The day for the Today page, from the apps switched on in oyenza.app (asked
+    /// The day for the Today page, from the apps switched on in nexora.app (asked
     /// while the page is on screen).
     Day(agenda::Answer),
     /// The server has no day for the Today page (a server from before it, or
@@ -121,7 +121,7 @@ pub enum OyenzaEvent {
     NoteFailed { text: String, code: String },
     Undone,
     UndoFailed(String),
-    /// Signed out: from the tray, or by the server (disconnected in oyenza.app).
+    /// Signed out: from the tray, or by the server (disconnected in nexora.app).
     Disconnected { by_server: bool },
 }
 
@@ -167,7 +167,7 @@ pub enum AppEvent {
     Phone(nexora_core::phonedrop::Event),
     /// Paired phones: pairing done, the list changed, files from a phone.
     Paired(nexora_core::pairdrop::MeetEvent),
-    Oyenza(OyenzaEvent),
+    Nexora(NexoraEvent),
     /// Where an add-on's files stand (`services::addons`).
     Addon { id: &'static str, status: nexora_core::addons::Status },
     /// What the update file said (`services::update`).
@@ -185,7 +185,7 @@ pub enum AppEvent {
     /// Notifications: what Windows allows, and new notifications
     /// (`services::notifications`).
     Notify(crate::services::notifications::NotifyEvent),
-    /// The AI tab's readings, typed keys, inference.oyenza.com's link and
+    /// The AI tab's readings, typed keys, inference.nexora.app's link and
     /// heads-up notices (`services::usage`).
     Usage(crate::services::usage::UsageEvent),
     /// The adzan finished playing, or couldn't play on.

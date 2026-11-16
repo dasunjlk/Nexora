@@ -76,7 +76,7 @@ notch around it, so they are kept as screen pictures, as
 mac/<theme>/<state>.webp; the resting states are cut to the middle of the
 menu bar:
 
-    gh run download <mac run> -R lucacadalora/oyenza-studio -n mac-renders -D mac-renders
+    gh run download <mac run> -R dasunjlk/Nexora -n mac-renders -D mac-renders
     python3 tools/site_shots.py mac-renders mac
 
 Pill's Mac pictures (mac/pill/, MAC_PILL_KEEP) are cut taller: what hangs
@@ -123,7 +123,7 @@ ROOT = Path(__file__).resolve().parent.parent
 KEEP = {
     "idle-clock", "idle-eyes", "media-activity", "timer-activity", "volume-hud", "bluetooth-hud",
     "page-media", "page-focus", "page-health", "page-shelf", "page-tasks", "page-today-day",
-    "page-shelf-phone-ask", "oyenza-money", "page-oyenza", "page-oyenza-signin", "page-settings", "page-system",
+    "page-shelf-phone-ask", "nexora-money", "page-nexora", "page-nexora-signin", "page-settings", "page-system",
     "page-shelf-pairing", "page-addons", "page-prayer", "page-prayer-muhammadiyah", "prayer-countdown",
     "game-stats", "page-system-games", "page-system-power-estimate", "page-script", "page-script-reading", "media-lyric",
     "message-notice", "notes-activity",
@@ -152,7 +152,7 @@ MAC_STRIP = (840, 136)
 MAC_PILL_KEEP = {"idle-clock", "media-activity", "volume-hud", "page-media", "page-today-day"}
 MAC_PILL_STRIP = (840, 216)
 # Resting states the page shows at twice their size, cut from a 400 % run.
-ZOOM_KEEP = {"idle-clock", "media-activity", "media-lyric", "timer-activity", "volume-hud", "bluetooth-hud", "prayer-countdown", "oyenza-money", "game-stats"}
+ZOOM_KEEP = {"idle-clock", "media-activity", "media-lyric", "timer-activity", "volume-hud", "bluetooth-hud", "prayer-countdown", "nexora-money", "game-stats"}
 # Diorama: its resting pill at dawn, by day, at the golden hour and at night, from the pictures a
 # Diorama run takes at set times (diorama-dawn.png is 06:10, diorama-morning.png 10:08,
 # diorama-golden-hour.png 17:40, diorama-night.png 21:30), and at 10:08 with the glass ball held

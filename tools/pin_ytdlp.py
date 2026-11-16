@@ -80,7 +80,7 @@ def die(msg):
 def fetch(url, accept="application/vnd.github+json"):
     """GET with a few tries: GitHub's API hiccups now and then. The token goes
     to the API only, not on to the host a download is sent to."""
-    req = urllib.request.Request(url, headers={"Accept": accept, "User-Agent": "oyenza-studio-downloader-pins"})
+    req = urllib.request.Request(url, headers={"Accept": accept, "User-Agent": "nexora-downloader-pins"})
     token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
     if token and url.startswith("https://api.github.com/"):
         req.add_unredirected_header("Authorization", "Bearer " + token)

@@ -17,12 +17,12 @@ The code that reads with it (`crates/nexora-core/src/romanize/ja_dict.rs`,
 dictionary only for a Japanese song, about 30 MB for that song.
 
 The files are published, byte for byte, on the pre-release
-[`addon-ja-1`](https://github.com/lucacadalora/oyenza-studio/releases/tag/addon-ja-1).
+[`addon-ja-1`](https://github.com/dasunjlk/Nexora/releases/tag/addon-ja-1).
 Each one's size and SHA-256 are built into the app (`nexora_core::addons::JAPANESE_READINGS`),
 and `cargo test -p nexora-core addons` checks that they match the files here.
 
 - `ja-readings.dic.zst` is `crates/nexora-core/data/ja-readings.dic.zst`:
-  mecab-ipadic trimmed for lyrics, with Oyenza Studio's fixes
+  mecab-ipadic trimmed for lyrics, with Nexora's fixes
   (`tools/ja_dict_fixes.csv`), compiled for vibrato and packed with zstd by
   `tools/make_ja_dict.py`. The `ja-dict` workflow checks that the file is
   exactly what the script builds.

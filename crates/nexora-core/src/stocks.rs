@@ -1,7 +1,7 @@
 //! Stocks: the IHSG and up to ten stocks on the Indonesia Stock Exchange, for
-//! the Stocks add-on's page, from oyenza.trade (Stockmap by Oyenza).
+//! the Stocks add-on's page, from nexora.trade (Stockmap by Nexora).
 //!
-//! oyenza.trade reads the whole exchange every 15 seconds while IDX trades,
+//! nexora.trade reads the whole exchange every 15 seconds while IDX trades,
 //! 10 minutes behind it, as every free IDX feed is (real time needs IDX's data
 //! licence through a vendor). The apps ask it three things, and only while
 //! the Stocks page is on screen (`services::stocks`):
@@ -27,7 +27,7 @@ use serde_json::Value;
 
 /// Where the answers come from. The apps read `NEXORA_STOCKS_URL` to point a
 /// test build at another copy of the server.
-pub const BASE: &str = "https://oyenza.trade/dashboard/api/live/";
+pub const BASE: &str = "https://nexora.trade/dashboard/api/live/";
 /// The most stocks a list holds, besides the IHSG.
 pub const MAX: usize = 10;
 /// The index's code in answers and on the page. It always comes first.
@@ -231,7 +231,7 @@ impl Phase {
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Quote {
     pub code: String,
-    /// The short name oyenza.trade shows ("Bank BCA"); the code when it has none.
+    /// The short name nexora.trade shows ("Bank BCA"); the code when it has none.
     pub name: String,
     pub price: f64,
     /// The previous close, which the day's change is from.
@@ -246,7 +246,7 @@ pub struct Quote {
     /// The last 52 weeks' low and high.
     pub w52: Option<(f64, f64)>,
     /// Market cap in rupiah at today's price (stocks only). The answers
-    /// carry no P/E: they need no sign-in, and oyenza.trade keeps what it
+    /// carry no P/E: they need no sign-in, and nexora.trade keeps what it
     /// reads from companies' statements behind it.
     pub mcap: Option<f64>,
     /// The day's line: (minute of the exchange's day, WIB; price), oldest
@@ -311,7 +311,7 @@ pub fn trend_of(now: f64, base: f64) -> Trend {
 pub struct Board {
     /// The answer's version, sent back as `If-None-Match`.
     pub tag: String,
-    /// When oyenza.trade read the prices (Unix seconds)...
+    /// When nexora.trade read the prices (Unix seconds)...
     pub at: i64,
     /// ...and the exchange's time they are from (10 minutes earlier).
     pub t: i64,
@@ -322,7 +322,7 @@ pub struct Board {
     pub delay_s: i64,
     /// Seconds until a fresher answer is due.
     pub every_s: u64,
-    /// The feed has paused (oyenza.trade hasn't read the exchange for a while).
+    /// The feed has paused (nexora.trade hasn't read the exchange for a while).
     pub stale: bool,
     /// The day's sessions, first open to last close (minutes of the day, WIB):
     /// the day line's width.
@@ -1011,8 +1011,8 @@ mod tests {
         assert_eq!(next_ask(Some(15), 1), 15);
         assert_eq!(next_ask(Some(15), 3), 60);
         assert_eq!(next_ask(Some(15), 30), 600);
-        assert_eq!(watch_url(BASE, &["BBCA".into(), "TLKM".into()]), "https://oyenza.trade/dashboard/api/live/watch?s=BBCA,TLKM");
-        assert_eq!(chart_url(BASE, "IHSG"), "https://oyenza.trade/dashboard/api/live/chart?s=IHSG");
+        assert_eq!(watch_url(BASE, &["BBCA".into(), "TLKM".into()]), "https://nexora.trade/dashboard/api/live/watch?s=BBCA,TLKM");
+        assert_eq!(chart_url(BASE, "IHSG"), "https://nexora.trade/dashboard/api/live/chart?s=IHSG");
     }
 
     #[test]

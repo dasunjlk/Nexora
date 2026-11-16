@@ -14,7 +14,7 @@
 //! One whose files this build can't get yet stays off and says so
 //! (`Status::Unpinned`).
 //! Both apps list every add-on ([`OFFERED`]) but Screen recorder, which shows
-//! once Oyenza Studio Recorder is installed ([`rows`]). From seven rows each
+//! once Nexora Recorder is installed ([`rows`]). From seven rows each
 //! is one line: the name, then the line after it.
 //!
 //! A Studio Pro add-on's row says Pro where its size was, for everyone, so
@@ -53,7 +53,7 @@ const BADGE_ONE_LINE: f32 = 24.0;
 /// Between the name and the line after it, on a one-line row.
 const LINE_GAP: f32 = 10.0;
 /// Where a Pro add-on's page sends people: Pro's features and prices.
-const PRICING_URL: &str = "https://studio.oyenza.com/#pricing";
+const PRICING_URL: &str = "https://dasunjlk.github.io/Nexora/#pricing";
 
 /// The add-ons this app has, in the page's order: all of them, on Windows
 /// and on the Mac (whose Prayer times use macOS's location and sounds).
@@ -66,7 +66,7 @@ pub fn height(st: &AppState) -> f32 {
     ROWS_Y + n as f32 * row_h(n)
 }
 
-/// The page's rows: every add-on offered, Screen recorder only once Oyenza
+/// The page's rows: every add-on offered, Screen recorder only once Nexora
 /// Studio Recorder is installed and has spoken to the island
 /// (`AppState::recorder_ready`), Downloader only where it's offered
 /// (`AppState::downloader_offered`).
@@ -145,9 +145,9 @@ fn icon(a: &Addon) -> Icon {
 /// What a Pro add-on does, on the page its row opens.
 fn about(a: &Addon) -> &'static str {
     match a.id {
-        "ai" => "Each AI service on this computer gets a card: your plan, each limit with when it resets, and what's left. Codex, Claude Code, Cursor, Gemini CLI, GitHub Copilot and more. Sign-ins stay here, and nothing about your usage goes to Oyenza.",
-        "notes" => "One click and Oyen listens to your call in Meet, Zoom, Teams or WhatsApp, with no bot joining, then writes up the summary, the decisions and who does what, with the whole transcript. The recording goes to Oyenza's server and is deleted once your notes are saved.",
-        "ielts" => "Oyen asks IELTS Speaking questions out loud, listens to your answers and gives you a band. Your answers go to Oyenza's server to be scored and are deleted once that's done. IELTS® is a trademark of the IELTS partners. Not official IELTS material, not endorsed by them.",
+        "ai" => "Each AI service on this computer gets a card: your plan, each limit with when it resets, and what's left. Codex, Claude Code, Cursor, Gemini CLI, GitHub Copilot and more. Sign-ins stay here, and nothing about your usage goes to Nexora.",
+        "notes" => "One click and Oyen listens to your call in Meet, Zoom, Teams or WhatsApp, with no bot joining, then writes up the summary, the decisions and who does what, with the whole transcript. The recording goes to Nexora's server and is deleted once your notes are saved.",
+        "ielts" => "Oyen asks IELTS Speaking questions out loud, listens to your answers and gives you a band. Your answers go to Nexora's server to be scored and are deleted once that's done. IELTS® is a trademark of the IELTS partners. Not official IELTS material, not endorsed by them.",
         "downloader" => "Paste a link, pick Video or Sound, and watch it come in to Downloads and the Shelf. Only what you have the right to keep.",
         _ => a.blurb,
     }
@@ -263,7 +263,7 @@ fn addon_row(ui: &mut Ui, st: &AppState, r: Rect, i: usize, a: &Addon, card: Opt
     let line_color = if status == Status::Failed { palette::ORANGE } else { palette::TEXT_DIM };
     // Screen recorder came on with the recorder, not by a click here: say so.
     let line = if a.id == addons::SCREEN_RECORDER.id && status == Status::Ready {
-        "On, since Oyenza Studio Recorder is installed".to_string()
+        "On, since Nexora Recorder is installed".to_string()
     } else {
         status.line(a, MAC)
     };
@@ -296,19 +296,19 @@ mod tests {
     use super::*;
     use nexora_core::settings::Settings;
     use nexora_core::store::Store;
-    use crate::state::OyenzaLink;
+    use crate::state::NexoraLink;
 
     #[test]
     fn every_row_offered_fits_the_page() {
         let mut st = AppState::new(Settings::default(), Store::default());
         let without = rows(&st).len();
-        // Oyenza Studio Recorder installed, and signed in with Pro where the
+        // Nexora Recorder installed, and signed in with Pro where the
         // Downloader is offered: the recorder and the Downloader join.
         st.recorder = true;
         st.store.recorder_island = true;
         st.downloader_offered = true;
-        st.oyenza.link = OyenzaLink::Connected { account: "a•••@example.com".into() };
-        st.oyenza.pro = Some(true);
+        st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
+        st.nexora.pro = Some(true);
         assert_eq!(rows(&st).len(), without + 2);
         assert!(height(&st) <= MAX_H, "the window never grows for this page");
         let h = row_h(rows(&st).len());
@@ -319,16 +319,16 @@ mod tests {
     #[test]
     fn pro_add_ons_show_for_everyone_and_say_what_they_do_without_pro() {
         use nexora_core::addons::{AI_USAGE, DOWNLOADER, IELTS, MEETING_NOTES, STOCKS};
-        let connected = || OyenzaLink::Connected { account: "a\u{2022}\u{2022}\u{2022}@example.com".into() };
+        let connected = || NexoraLink::Connected { account: "a\u{2022}\u{2022}\u{2022}@example.com".into() };
         let listed = |st: &AppState, id: &str| rows(st).iter().any(|a| a.id == id);
         let mut st = AppState::new(Settings::default(), Store::default());
         st.downloader_offered = true;
         // The Downloader switched on before, its tools in place.
         st.settings.set_addon(DOWNLOADER.id, true);
         st.addons.insert(DOWNLOADER.id, Status::Ready);
-        for (link, pro) in [(OyenzaLink::Off, None), (connected(), None), (connected(), Some(false))] {
-            st.oyenza.link = link;
-            st.oyenza.pro = pro;
+        for (link, pro) in [(NexoraLink::Off, None), (connected(), None), (connected(), Some(false))] {
+            st.nexora.link = link;
+            st.nexora.pro = pro;
             for a in [&AI_USAGE, &MEETING_NOTES, &IELTS, &DOWNLOADER] {
                 assert!(listed(&st, a.id), "{} listed without Pro ({pro:?})", a.id);
                 assert_eq!(status(&st, a), Status::Off, "{} stays off", a.id);
@@ -338,8 +338,8 @@ mod tests {
             assert!(!st.ai_usage_on());
         }
         // With Pro they switch: AI usage is on already, until switched off.
-        st.oyenza.link = connected();
-        st.oyenza.pro = Some(true);
+        st.nexora.link = connected();
+        st.nexora.pro = Some(true);
         assert_eq!(status(&st, &DOWNLOADER), Status::Ready);
         assert_eq!(status(&st, &AI_USAGE), Status::Ready);
         assert!(st.ai_usage_on() && !locked(&st, &AI_USAGE) && !locked(&st, &IELTS));
@@ -349,13 +349,13 @@ mod tests {
         // One left on when Pro ended still switches off.
         st.settings.set_addon(IELTS.id, true);
         st.addons.insert(IELTS.id, Status::Ready);
-        st.oyenza.pro = Some(false);
+        st.nexora.pro = Some(false);
         assert!(!locked(&st, &IELTS));
         // Not where it isn't offered (the Store build), Pro or not.
         st.downloader_offered = false;
         assert!(!listed(&st, DOWNLOADER.id));
         // A free add-on: listed and on without Pro.
-        st.oyenza = Default::default();
+        st.nexora = Default::default();
         st.settings.set_addon(STOCKS.id, true);
         st.addons.insert(STOCKS.id, Status::Ready);
         assert_eq!(status(&st, &STOCKS), Status::Ready);

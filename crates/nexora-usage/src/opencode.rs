@@ -1,6 +1,6 @@
 //! OpenCode Go: the subscription's 5-hour, weekly and monthly limits, plus
 //! the OpenCode Zen balance (prepaid credit), from opencode.ai with the API
-//! key OpenCode keeps on this computer, or one typed into Oyenza Studio.
+//! key OpenCode keeps on this computer, or one typed into Nexora.
 //!
 //! OpenCode follows the XDG layout on every OS, so its data folder is
 //! `$XDG_DATA_HOME/opencode`, else `~/.local/share/opencode`, on Windows too
@@ -122,7 +122,7 @@ impl Provider for OpenCode {
 /// Where the key came from.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Origin {
-    /// Typed into Oyenza Studio for this service.
+    /// Typed into Nexora for this service.
     Typed,
     /// The Go entry of OpenCode 1's `auth.json`.
     File,

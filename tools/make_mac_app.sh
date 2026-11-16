@@ -1,7 +1,7 @@
 #!/bin/bash
-# Build "Oyenza Studio.app" and its DMG from Nexora's Mac binaries. Runs on a Mac (lipo, codesign, hdiutil).
+# Build "Nexora.app" and its DMG from Nexora's Mac binaries. Runs on a Mac (lipo, codesign, hdiutil).
 #
-#   tools/make_mac_app.sh <arm64 binary> <x86_64 binary | -> <OyenzaStudio.icns | -> <out dir>
+#   tools/make_mac_app.sh <arm64 binary> <x86_64 binary | -> <NexoraStudio.icns | -> <out dir>
 #
 # The app is ad-hoc signed (no Developer ID yet), so the DMG is a test build: macOS asks once, in
 # System Settings > Privacy & Security > Open Anyway, before it first opens. The DMG's window says so
@@ -14,7 +14,7 @@ version="$(cargo metadata --no-deps --format-version 1 --manifest-path "$root/Ca
   | python3 -c 'import sys, json; print(next(p["version"] for p in json.load(sys.stdin)["packages"] if p["name"] == "nexora"))')"
 
 mkdir -p "$out"
-app="$out/Oyenza Studio.app"
+app="$out/Nexora.app"
 rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 
@@ -31,7 +31,7 @@ sed "s/@VERSION@/$version/g" "$root/installer/mac/Info.plist" > "$app/Contents/I
 plutil -lint "$app/Contents/Info.plist"
 printf 'APPL????' > "$app/Contents/PkgInfo"
 if [ "$icns" != "-" ]; then
-  cp "$icns" "$app/Contents/Resources/OyenzaStudio.icns"
+  cp "$icns" "$app/Contents/Resources/NexoraStudio.icns"
 fi
 
 # What plays, from macOS's own now playing (browsers, Spotify, Music): the MediaRemote adapter's framework
@@ -50,7 +50,7 @@ codesign --force --deep --sign - "$app"
 codesign --verify --deep --strict --verbose=2 "$app"
 
 # The DMG: the installer window, with the test build's note on Open Anyway.
-dmg="$out/Oyenza-Studio-$version-mac-unsigned.dmg"
+dmg="$out/Nexora-$version-mac-unsigned.dmg"
 bash "$root/tools/make_mac_dmg.sh" "$app" "$dmg" test
 shasum -a 256 "$dmg"
 echo "built $dmg"

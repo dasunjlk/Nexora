@@ -1,12 +1,12 @@
 # Creator links
 
-Every creator who makes videos about Oyenza Studio gets a short address to say and to put in their bio:
-**studio.oyenza.com/&lt;code&gt;**, for example studio.oyenza.com/budi.
+Every creator who makes videos about Nexora gets a short address to say and to put in their bio:
+**dasunjlk.github.io/Nexora/&lt;code&gt;**, for example dasunjlk.github.io/Nexora/budi.
 
 The address is a tiny page that forwards to the landing page with the creator's tags:
 
 ```
-https://studio.oyenza.com/?utm_source=budi&utm_medium=creator&utm_campaign=pilot-1
+https://dasunjlk.github.io/Nexora/?utm_source=budi&utm_medium=creator&utm_campaign=pilot-1
 ```
 
 The site's visit counter (`site/track.js`) keeps those tags with the visit, so the creator's numbers come

@@ -10,7 +10,7 @@
 //! code and name (type, then Up/Down and Enter, or a click); Edit gives each
 //! row a remove button and a handle to drag it to another place. Rows glide
 //! to their places as they come, go and move. The list lives in data.json
-//! (`store.stocks`); the prices come from oyenza.trade through
+//! (`store.stocks`); the prices come from nexora.trade through
 //! `services::stocks`, asked only while this page is on screen ([`watch`]),
 //! and run 10 minutes behind the exchange, which the page says.
 
@@ -380,7 +380,7 @@ fn list(ui: &mut Ui, st: &mut AppState, r: Rect, dt: f32, moving: &mut bool) {
             save |= !s.editing;
         }
     }
-    let credit = "Prices from oyenza.trade, 10 min behind IDX";
+    let credit = "Prices from nexora.trade, 10 min behind IDX";
     ui.c.text(credit, Rect::new(line.x, add.y + 28.0, line.w, 14.0), &TextStyle::caption().color(palette::TEXT_FAINT));
 
     // The list fades out at an edge that scrolls further.
@@ -618,7 +618,7 @@ fn search(ui: &mut Ui, st: &mut AppState, r: Rect) {
         s.hit = (s.hit as i32 + moves).clamp(0, results.len() as i32 - 1) as usize;
     }
     // A typed code goes in as it is only when the list of names isn't there
-    // to look in (oyenza.trade then says whether it lists it).
+    // to look in (nexora.trade then says whether it lists it).
     let code = stocks::code_of(&s.query);
     let typed = code.clone().filter(|c| names.is_none() && !st.store.stocks.has(c));
     let mut chosen = None;
@@ -633,7 +633,7 @@ fn search(ui: &mut Ui, st: &mut AppState, r: Rect) {
     if results.is_empty() {
         let line = match (&names, st.stocks.names_failed) {
             (_, _) if st.store.stocks.full() => "Your list is full: remove a stock first.".to_string(),
-            (None, false) => "Getting every listed stock from oyenza.trade\u{2026}".to_string(),
+            (None, false) => "Getting every listed stock from nexora.trade\u{2026}".to_string(),
             (_, _) if s.query.trim().is_empty() => "Type a code or a company's name.".to_string(),
             (_, _) if code.as_ref().is_some_and(|c| st.store.stocks.has(c)) => format!("{} is on your list already.", code.unwrap_or_default()),
             (None, true) => match &typed {
@@ -709,8 +709,8 @@ fn detail(ui: &mut Ui, st: &mut AppState, r: Rect) {
     let Some(q) = q else {
         let line = match (board, st.stocks.trouble) {
             (None, Some(t)) => trouble_text(t).to_string(),
-            (None, None) => "Getting prices from oyenza.trade\u{2026}".to_string(),
-            (Some(b), _) if b.missing.contains(&pick) => format!("oyenza.trade doesn't list {pick}."),
+            (None, None) => "Getting prices from nexora.trade\u{2026}".to_string(),
+            (Some(b), _) if b.missing.contains(&pick) => format!("nexora.trade doesn't list {pick}."),
             (Some(_), _) => format!("Getting {pick}\u{2026}"),
         };
         let m = Rect::new(r.x, r.y + CHART_Y, r.w, CHART_H);
@@ -760,7 +760,7 @@ fn detail(ui: &mut Ui, st: &mut AppState, r: Rect) {
             Range::Day if line.values.is_empty() => "The day's line starts at the opening bell.",
             Range::Day => "The day's line fills in as IDX trades.",
             _ if st.stocks.no_year.contains(&pick) => "No chart for this range yet.",
-            _ => "Getting the year from oyenza.trade\u{2026}",
+            _ => "Getting the year from nexora.trade\u{2026}",
         };
         ui.c.text(msg, chart, &TextStyle::footnote().color(palette::TEXT_FAINT).center());
     }
@@ -856,7 +856,7 @@ fn stats(ui: &mut Ui, q: &Quote, r: Rect) {
     } else {
         // Stocks' own set (the previous close is the dotted line and the
         // change), with the rupiah traded where Stocks has the P/E: the
-        // answers carry no P/E, as they need no sign-in on oyenza.trade.
+        // answers carry no P/E, as they need no sign-in on nexora.trade.
         vec![
             ("Open", p(q.open)),
             ("High", p(q.high)),
@@ -895,16 +895,16 @@ fn status_line(st: &AppState, board: Option<&Board>) -> (String, bool) {
 fn trouble_word(t: Trouble) -> &'static str {
     match t {
         Trouble::Offline => "Offline",
-        Trouble::Paused => "Paused on oyenza.trade",
-        Trouble::Server => "oyenza.trade didn't answer",
+        Trouble::Paused => "Paused on nexora.trade",
+        Trouble::Server => "nexora.trade didn't answer",
     }
 }
 
 fn trouble_text(t: Trouble) -> &'static str {
     match t {
-        Trouble::Offline => "Can't reach oyenza.trade. The prices come once you're back online.",
-        Trouble::Paused => "oyenza.trade has its live prices paused for now. Trying again in a few minutes.",
-        Trouble::Server => "oyenza.trade didn't answer properly. Trying again soon.",
+        Trouble::Offline => "Can't reach nexora.trade. The prices come once you're back online.",
+        Trouble::Paused => "nexora.trade has its live prices paused for now. Trying again in a few minutes.",
+        Trouble::Server => "nexora.trade didn't answer properly. Trying again soon.",
     }
 }
 

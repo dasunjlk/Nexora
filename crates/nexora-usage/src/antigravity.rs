@@ -3,7 +3,7 @@
 //! (Gemini, Claude and GPT, one model on its own).
 //!
 //! Google's Code Assist server answers those numbers to Antigravity itself
-//! only: asked as Oyenza Studio it says `UNSUPPORTED_CLIENT`, and we don't
+//! only: asked as Nexora it says `UNSUPPORTED_CLIENT`, and we don't
 //! ask as another app (see the rules in the crate's docs). So the numbers
 //! come from `agy`'s own `/usage` command, which asks Google itself, with no
 //! model turn:

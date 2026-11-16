@@ -40,7 +40,7 @@ jobs:
 
       - name: Install it and self-test it inside the package
         shell: powershell
-        run: ./tools/ci-msix-test.ps1 -Msix "dist\Oyenza-Studio-$env:NEXORA_VERSION.msix" -Out msix-out -TestCopy test-copy
+        run: ./tools/ci-msix-test.ps1 -Msix "dist\Nexora-$env:NEXORA_VERSION.msix" -Out msix-out -TestCopy test-copy
 
       - name: Upload screenshots and logs
         if: always()
@@ -56,13 +56,13 @@ jobs:
       - name: Upload the test copy
         uses: actions/upload-artifact@v4
         with:
-          name: oyenza-studio-test-copy
+          name: nexora-test-copy
           path: test-copy
           if-no-files-found: error
 
       - name: Upload the Store package
         uses: actions/upload-artifact@v4
         with:
-          name: oyenza-studio-msix
-          path: dist/Oyenza-Studio-${{ env.NEXORA_VERSION }}.msix
+          name: nexora-msix
+          path: dist/Nexora-${{ env.NEXORA_VERSION }}.msix
           if-no-files-found: error

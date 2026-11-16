@@ -29,7 +29,7 @@ pub mod notes;
 pub mod notifications;
 pub mod nowplaying;
 pub mod oyen;
-pub mod oyenza;
+pub mod nexora;
 pub mod pairdrop;
 pub mod peek;
 pub mod phonedrop;

@@ -33,7 +33,7 @@ jobs:
   ytdlp:
     name: Pin yt-dlp's latest release
     # Not in forks: the branch and the pull request belong to this repository.
-    if: github.repository == 'lucacadalora/oyenza-studio'
+    if: github.repository == 'dasunjlk/Nexora'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:

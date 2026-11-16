@@ -47,9 +47,9 @@ pub enum PairCmd {
     Remove(String),
 }
 
-/// Requests for the Oyenza worker (`services::oyenza`).
+/// Requests for the Nexora worker (`services::nexora`).
 #[derive(Clone, Debug, PartialEq)]
-pub enum OyenzaCmd {
+pub enum NexoraCmd {
     /// Ask for a sign-in code to show.
     SignIn,
     /// Stop waiting for the code's approval.
@@ -60,7 +60,7 @@ pub enum OyenzaCmd {
     Note(String),
     /// Take back a spend just saved (its id).
     Undo(String),
-    /// The Oyenza tab opened: today's money and the bills, now.
+    /// The Nexora tab opened: today's money and the bills, now.
     Refresh,
     /// The Health tab opened: the steps from the phone, now (unless just asked for).
     RefreshHealth,
@@ -94,11 +94,11 @@ pub enum UsageCmd {
     SetKey { secret: &'static str, key: String },
     /// Forget a typed key.
     ClearKey(&'static str),
-    /// Connect inference.oyenza.com: ask for a code to show.
+    /// Connect inference.nexora.app: ask for a code to show.
     Connect,
     /// Stop waiting for the code's approval.
     CancelConnect,
-    /// Disconnect inference.oyenza.com (its key stops working there too).
+    /// Disconnect inference.nexora.app (its key stops working there too).
     Disconnect,
     /// Start a service's own sign-in on this computer (Claude Code's
     /// `claude auth login`, or the Claude app): `nexora_usage::claude::sign_in`.
@@ -179,7 +179,7 @@ pub enum Command {
     /// The Script page's Paste: the clipboard's text, line breaks kept,
     /// becomes the script.
     ScriptPaste,
-    /// The Script page's Record: Oyenza Studio Recorder records the screen
+    /// The Script page's Record: Nexora Recorder records the screen
     /// the island is on (`services::recorder`).
     RecordScreen,
     /// The Record page's Record: a recording of `settings.record`'s target
@@ -227,7 +227,7 @@ pub enum Command {
     AllowFps,
     Phone(PhoneCmd),
     Pair(PairCmd),
-    Oyenza(OyenzaCmd),
+    Nexora(NexoraCmd),
     Ielts(IeltsCmd),
     Notes(NotesCmd),
     /// Get one of Prayer times' online city files ("ed", "near/55_-5"; the

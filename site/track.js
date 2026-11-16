@@ -1,19 +1,19 @@
-// Visitor counts for studio.oyenza.com (Luca, 29 Oct 2026: "we need to track them all"): a copy of oyenza.com's own
+// Visitor counts for dasunjlk.github.io/Nexora (Luca, 29 Oct 2026: "we need to track them all"): a copy of nexora.com's own
 // small sender (catat landing/track.js) with this site's ids. The site is on GitHub Pages, so it sends straight to our
-// own servers: Umami "Oyenza Studio site" on analytics.vantis.sh and Databuddy "Oyenza Studio site" on data.oyenza.com
+// own servers: Umami "Nexora site" on analytics.vantis.sh and Databuddy "Nexora site" on data.nexora.com
 // (its collector at /ingest/). Both answer this host's cross-site requests.
 //
 // What is sent: the page, its title and language, where the visitor came from (referrer, utm_…), screen size, which
-// link was tapped (what kind: the Windows or Mac download, GitHub, the Oyenza app, a section, or a send-to-computer button; and where on the page),
+// link was tapped (what kind: the Windows or Mac download, GitHub, the Nexora app, a section, or a send-to-computer button; and where on the page),
 // how long the page stayed in front and how far down it was read, load speed and script errors. Never anything typed,
-// never a cookie, nothing stored. Links to oyenza.app carry via=studio.oyenza.com (and ref + utm when counted), so an
+// never a cookie, nothing stored. Links to nexora.app carry via=dasunjlk.github.io/Nexora (and ref + utm when counted), so an
 // account made from here says so.
-// Off on any host but studio.oyenza.com, for automated browsers, with Do Not Track / Global Privacy Control, and when
-// localStorage has oyenza.notrack (our own devices).
+// Off on any host but dasunjlk.github.io/Nexora, for automated browsers, with Do Not Track / Global Privacy Control, and when
+// localStorage has nexora.notrack (our own devices).
 (() => {
   const SITE = 'a319a2c7-b045-42a3-8334-fd8f159d7ad9';      // Umami
   const DB_SITE = '5f21ac14-cf50-4f8a-ae1b-b8ba4c67951a';   // Databuddy
-  const HOSTS = new Set(['studio.oyenza.com']);
+  const HOSTS = new Set(['dasunjlk.github.io/Nexora']);
   const MAX = 300; // per page load and receiver: a stuck loop can never flood the counter
 
   // Links to the app say they came from here (`via`), and, when the visit may be counted, from where the visitor
@@ -26,8 +26,8 @@
       const a = e.target instanceof Element ? e.target.closest('a[href]') : null;
       if (!a) return;
       const u = new URL(a.getAttribute('href') || '', location.href);
-      if (u.host !== 'oyenza.app' || u.searchParams.has('via')) return;
-      u.searchParams.set('via', 'studio.oyenza.com');
+      if (u.host !== 'nexora.app' || u.searchParams.has('via')) return;
+      u.searchParams.set('via', 'dasunjlk.github.io/Nexora');
       for (const [k, v] of Object.entries(carry)) if (!u.searchParams.has(k)) u.searchParams.set(k, v);
       a.setAttribute('href', u.toString());
     } catch { /* an odd link: leave it */ }
@@ -37,7 +37,7 @@
   try {
     if (!HOSTS.has(location.hostname) || navigator.webdriver || typeof fetch !== 'function') return;
     if (navigator.doNotTrack === '1' || window.doNotTrack === '1' || navigator.globalPrivacyControl === true) return;
-    try { if (localStorage.getItem('oyenza.notrack')) return; } catch { /* storage blocked: count as usual */ }
+    try { if (localStorage.getItem('nexora.notrack')) return; } catch { /* storage blocked: count as usual */ }
   } catch { return; }
 
   const clip = (s, n) => String(s ?? '').replace(/\s+/g, ' ').trim().slice(0, n);
@@ -88,7 +88,7 @@
     for (const kind of Object.keys(queues)) {
       const items = queues[kind].splice(0);
       if (!items.length) continue;
-      const url = `https://data.oyenza.com/ingest/${kind}?${ROUTES[kind]}=${DB_SITE}`;
+      const url = `https://data.nexora.com/ingest/${kind}?${ROUTES[kind]}=${DB_SITE}`;
       const body = JSON.stringify(items);
       try {
         // text/plain keeps a leaving beacon free of a preflight; the collector reads JSON from either
@@ -164,7 +164,7 @@
     if (/\.exe$/i.test(u.pathname)) return { to: 'download', target: 'windows' };
     if (/\.dmg$/i.test(u.pathname)) return { to: 'download', target: 'mac' };
     if (u.host === 'github.com') return { to: 'github', target: clip(u.pathname.split('/').slice(3, 4).join('') || 'repo', 20) };
-    if (u.host === 'oyenza.app') return { to: 'app' };
+    if (u.host === 'nexora.app') return { to: 'app' };
     if (u.host !== location.host) return /^https?:$/.test(u.protocol) ? { to: 'out', target: u.host } : null;
     if (u.pathname === path && u.hash) return { to: 'section', target: clip(u.hash.slice(1), 40) };
     return { to: 'page', target: clip(u.pathname.replace(/\/+$/, '') || '/', 80) };

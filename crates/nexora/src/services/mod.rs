@@ -23,7 +23,7 @@ pub mod lyrics;
 pub mod media;
 pub mod mic;
 pub mod notes;
-pub mod oyenza;
+pub mod nexora;
 pub mod pairdrop;
 pub mod phonedrop;
 pub mod power;
@@ -42,7 +42,7 @@ pub mod update;
 pub mod usage;
 pub mod voice;
 
-use crate::commands::{MediaCmd, OyenzaCmd, UsageCmd};
+use crate::commands::{MediaCmd, NexoraCmd, UsageCmd};
 use crate::events::EventSink;
 use crate::state::MediaSession;
 use nexora_core::geom::Color;
@@ -55,7 +55,7 @@ pub struct Services {
     _audio: Option<audio::AudioService>,
     _bluetooth: Option<bluetooth::BluetoothService>,
     fullscreen: Option<fullscreen::FullscreenWatcher>,
-    oyenza: Option<oyenza::OyenzaService>,
+    nexora: Option<nexora::NexoraService>,
     pairdrop: Option<pairdrop::PairDropService>,
     addons: Option<addons::AddonService>,
     /// Started the first time the Stocks page opens ([`Services::stocks_watch`]).
@@ -82,14 +82,14 @@ fn started<T, E: std::fmt::Display>(name: &str, r: Result<T, E>) -> Option<T> {
 }
 
 impl Services {
-    pub fn start(sink: &EventSink, _island: HWND, helper: HWND, settings: &Settings, activity: oyenza::Activity) -> Self {
+    pub fn start(sink: &EventSink, _island: HWND, helper: HWND, settings: &Settings, activity: nexora::Activity) -> Self {
         let media = started("media", media::MediaService::start(sink.clone()));
         let lyrics = started("lyrics", lyrics::LyricsService::start(sink.clone()));
         let audio = started("audio", audio::AudioService::start(sink.clone()));
         let bluetooth = started("bluetooth", bluetooth::BluetoothService::start(sink.clone()));
         let fullscreen = started("fullscreen", fullscreen::FullscreenWatcher::start(helper, sink.clone()));
-        // Idle (no calls) until the person signs in to Oyenza from the tray.
-        let oyenza = started("oyenza", oyenza::OyenzaService::start(sink.clone(), activity));
+        // Idle (no calls) until the person signs in to Nexora from the tray.
+        let nexora = started("nexora", nexora::NexoraService::start(sink.clone(), activity));
         // Asks nothing until a phone is paired.
         let pairdrop = started("pair drop", pairdrop::PairDropService::start(sink.clone()));
         // Asleep unless an add-on is on; then it only checks the files it has.
@@ -104,7 +104,7 @@ impl Services {
             .map(|a| a.id)
             .collect();
         let addons = started("add-ons", addons::AddonService::start(sink.clone(), on));
-        Self { media, lyrics, _audio: audio, _bluetooth: bluetooth, fullscreen, oyenza, pairdrop, addons, stocks: std::cell::OnceCell::new(), usage: std::cell::OnceCell::new(), downloader: std::cell::OnceCell::new(), sink: sink.clone() }
+        Self { media, lyrics, _audio: audio, _bluetooth: bluetooth, fullscreen, nexora, pairdrop, addons, stocks: std::cell::OnceCell::new(), usage: std::cell::OnceCell::new(), downloader: std::cell::OnceCell::new(), sink: sink.clone() }
     }
 
     pub fn stop(self, _helper: HWND) {
@@ -187,15 +187,15 @@ impl Services {
         }
     }
 
-    pub fn oyenza(&self, c: OyenzaCmd) {
-        if let Some(o) = &self.oyenza {
+    pub fn nexora(&self, c: NexoraCmd) {
+        if let Some(o) = &self.nexora {
             o.send(c);
         }
     }
 
-    /// The PC's use or power changed (the Oyenza worker paces itself by it).
-    pub fn oyenza_activity(&self, a: oyenza::Activity) {
-        if let Some(o) = &self.oyenza {
+    /// The PC's use or power changed (the Nexora worker paces itself by it).
+    pub fn nexora_activity(&self, a: nexora::Activity) {
+        if let Some(o) = &self.nexora {
             o.set_activity(a);
         }
     }
@@ -213,7 +213,7 @@ impl Services {
     }
 
     /// Something the AI tab asked its worker for (a key, a refresh, the
-    /// inference.oyenza.com link): it starts the thread if need be.
+    /// inference.nexora.app link): it starts the thread if need be.
     pub fn usage_cmd(&self, c: UsageCmd) {
         if let Some(s) = self.usage.get_or_init(|| started("usage", usage::UsageService::start(self.sink.clone()))) {
             s.command(c);

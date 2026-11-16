@@ -1,10 +1,10 @@
-# Removes the Oyenza Studio test copy and stops trusting its certificate,
-# then starts the usual Oyenza Studio again if it's installed. README.txt has
+# Removes the Nexora test copy and stops trusting its certificate,
+# then starts the usual Nexora again if it's installed. README.txt has
 # the whole story. Windows PowerShell 5.1.
 param([switch]$UntrustOnly)
 
 $ErrorActionPreference = "Stop"
-$cer = Join-Path $PSScriptRoot "oyenza-studio-test.cer"
+$cer = Join-Path $PSScriptRoot "nexora-test.cer"
 $thumb = if (Test-Path $cer) { (New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $cer).Thumbprint } else { "" }
 
 if ($UntrustOnly) {
@@ -13,7 +13,7 @@ if ($UntrustOnly) {
     exit 0
 }
 
-$pkg = Get-AppxPackage -Name "JatevoLabs.OyenzaStudio"
+$pkg = Get-AppxPackage -Name "JatevoLabs.NexoraStudio"
 if ($pkg) {
     "Removing the test copy ($($pkg.Version)) and its settings."
     Remove-AppxPackage -Package $pkg.PackageFullName
@@ -28,6 +28,6 @@ if ($thumb -and (Test-Path "Cert:\LocalMachine\TrustedPeople\$thumb")) {
 
 $usual = Join-Path $env:LOCALAPPDATA "Programs\Nexora\nexora.exe"
 if (Test-Path $usual) {
-    "Starting your usual Oyenza Studio."
+    "Starting your usual Nexora."
     Start-Process $usual
 }

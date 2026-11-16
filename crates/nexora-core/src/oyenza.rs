@@ -1,47 +1,47 @@
-//! Oyenza (oyenza.app), optional: what the island shows from a person's money
+//! Nexora (nexora.app), optional: what the island shows from a person's money
 //! app once they sign in from the tray, and the words it uses.
 //!
 //! Signing in is a device code, the way a TV signs in: the island shows 8
-//! letters, the person approves them in oyenza.app (where they are signed in
+//! letters, the person approves them in nexora.app (where they are signed in
 //! anyway), and the island gets a key of its own (`oyzd_…`). No password is
 //! ever typed into Nexora, and the key opens only the island's routes on
-//! api.oyenza.app (catat-server `routes/island.ts`): money in and out that
+//! api.nexora.app (nexora-notes-server `routes/island.ts`): money in and out that
 //! arrived by itself in the last 2 hours (the notices), the last 7 days of
-//! transactions by day (the Oyenza page's live view), bills due in the next
+//! transactions by day (the Nexora page's live view), bills due in the next
 //! 30 days, saving a spend typed here (with a short Undo), and the daily step
 //! totals the phone sent for the Health page, once the person turned that on
-//! in Oyenza's Health (Sehat). It can't read balances, account numbers, notes
+//! in Nexora's Health (Sehat). It can't read balances, account numbers, notes
 //! or receipts, change or delete anything else, or touch the account.
 //!
 //! Everything here is pure: request bodies and URLs, parsing the answers, the
 //! words of notices and rows, how sums hide on screen, and how often to ask.
 //! The HTTP and the sealed key live in the Windows crate
-//! (`services/oyenza.rs`).
+//! (`services/nexora.rs`).
 
 use crate::datetime::{days_from_civil, civil_from_days, weekday_from_days, LocalDateTime, MONTH_SHORT, WEEKDAY_SHORT};
 use crate::health::HealthSnapshot;
 use crate::urlenc::with_query;
 use serde::{Deserialize, Serialize};
 
-pub const API: &str = "https://api.oyenza.app";
-pub const WEB: &str = "https://oyenza.app";
+pub const API: &str = "https://api.nexora.app";
+pub const WEB: &str = "https://nexora.app";
 pub const APP: &str = "nexora";
 
 /// Money is asked for this often while the PC is in use on mains power...
 pub const MONEY_EVERY_S: u64 = 60;
 /// ...and this often on battery or in battery saver.
 pub const MONEY_EVERY_BATTERY_S: u64 = 180;
-/// Bills change rarely: every half hour, and when the Oyenza tab opens.
+/// Bills change rarely: every half hour, and when the Nexora tab opens.
 pub const BILLS_EVERY_S: u64 = 30 * 60;
-/// While the Oyenza page is open, its day list is checked this often (an
+/// While the Nexora page is open, its day list is checked this often (an
 /// answer with nothing new is a few bytes).
 pub const ACTIVITY_EVERY_S: u64 = 15;
 /// The steps from the phone are asked for this often while the PC is in use,
-/// and when the Health page opens: the phone sends them only while Oyenza is
+/// and when the Health page opens: the phone sends them only while Nexora is
 /// open on it.
 pub const HEALTH_EVERY_S: u64 = 15 * 60;
 /// Bills are asked for this many days ahead: Tomorrow and Later on the
-/// Oyenza tab, and the five weeks on Today.
+/// Nexora tab, and the five weeks on Today.
 pub const BILLS_DAYS: u32 = 35;
 /// A transaction that lands while the page is open glows this long.
 pub const GLOW_S: f64 = 60.0;
@@ -118,7 +118,7 @@ pub fn health_url() -> String {
     format!("{API}/island/health")
 }
 
-/// Whether the signed-in account has Oyenza Studio Pro: `{"pro": bool}`. The
+/// Whether the signed-in account has Nexora Pro: `{"pro": bool}`. The
 /// server decides (who it is is never in the island, which only knows a
 /// masked account).
 pub fn pro_url() -> String {
@@ -137,7 +137,7 @@ pub fn undo_url(id: &str) -> String {
     format!("{API}/island/note/{}", crate::urlenc::encode(id))
 }
 
-/// `platform`: [`PLATFORM`], so oyenza.app shows a Mac as one (a server from
+/// `platform`: [`PLATFORM`], so nexora.app shows a Mac as one (a server from
 /// before 0.2.7's leaves it out and stores every PC as Windows).
 pub fn start_body(pc_name: &str, version: &str, platform: &str) -> String {
     serde_json::json!({ "app": APP, "name": pc_name, "version": version, "platform": platform }).to_string()
@@ -154,10 +154,10 @@ pub fn note_body(text: &str, tz: &str) -> String {
     serde_json::json!({ "text": text, "tz": tz }).to_string()
 }
 
-/// What oyenza.app lists a computer as when the system gives no name.
+/// What nexora.app lists a computer as when the system gives no name.
 const UNNAMED: &str = if cfg!(target_os = "macos") { "Mac" } else { "Windows PC" };
 
-/// The PC's name as oyenza.app will list it: one printable line, 40 characters
+/// The PC's name as nexora.app will list it: one printable line, 40 characters
 /// at most ([`UNNAMED`] when the system gives none).
 pub fn pc_name(raw: &str) -> String {
     let clean: String = raw.chars().filter(|c| !c.is_control()).collect::<String>().split_whitespace().collect::<Vec<_>>().join(" ");
@@ -336,7 +336,7 @@ pub struct Txn {
     /// When it happened ("2026-10-24T12:40:00.000Z").
     #[serde(default)]
     pub at: String,
-    /// Logged by Oyenza itself, from a bank's email or notification.
+    /// Logged by Nexora itself, from a bank's email or notification.
     #[serde(default)]
     pub auto: bool,
 }
@@ -456,7 +456,7 @@ pub fn parse_bills(body: &str) -> Option<BillsFeed> {
 }
 
 /// The steps answer, `{"health": {…} | null}`: `Some(None)` when there are none
-/// to show (the switch is off in Oyenza, the server paused it, or nothing is
+/// to show (the switch is off in Nexora, the server paused it, or nothing is
 /// kept), `None` when the body doesn't read. Keys this version doesn't know are
 /// left out.
 pub fn parse_health(body: &str) -> Option<Option<HealthSnapshot>> {
@@ -548,7 +548,7 @@ pub fn money_notice(arrived: &[Arrival]) -> Option<MoneyNotice> {
     }
     // Both ways at once: each sum with its direction.
     let sums: Vec<String> = arrived.iter().map(|a| format!("{}{}", if a.is_out() { MINUS } else { "+" }, a.text)).collect();
-    Some(MoneyNotice { title: format!("Oyenza · {n} new"), shown: sums.join(" · "), hidden: "Amounts hidden".into(), flow: None })
+    Some(MoneyNotice { title: format!("Nexora · {n} new"), shown: sums.join(" · "), hidden: "Amounts hidden".into(), flow: None })
 }
 
 /// The minus sign, a dash's width like "+".
@@ -556,7 +556,7 @@ const MINUS: &str = "\u{2212}";
 
 // ---------------------------------------------------------------- the day strip
 
-/// A day on the Oyenza page's strip.
+/// A day on the Nexora page's strip.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum DayPick {
     /// `n` days ago: 1 is yesterday, 6 the oldest the page shows.
@@ -639,7 +639,7 @@ fn wallet_name(w: &Option<WalletRef>) -> Option<&str> {
     w.as_ref().map(|w| w.name.trim()).filter(|n| !n.is_empty())
 }
 
-/// A row's title as Oyenza wrote it; without one, a transfer's wallets, else
+/// A row's title as Nexora wrote it; without one, a transfer's wallets, else
 /// the category, else what it was.
 pub fn txn_title(t: &Txn) -> String {
     let title = t.title.trim();
@@ -783,7 +783,7 @@ pub fn bill_title(b: &Bill, today: &str) -> String {
 pub fn bill_subtitles(b: &Bill) -> (String, Option<String>) {
     match (&b.text, b.is_card()) {
         (Some(t), false) => (t.clone(), Some("Amount hidden".into())),
-        _ => ("Open Oyenza for the amount".into(), None),
+        _ => ("Open Nexora for the amount".into(), None),
     }
 }
 
@@ -827,7 +827,7 @@ pub fn saved_line(saved: &[Saved]) -> String {
 }
 
 /// A typed note has an amount the server can read: a digit, or the Jakarta
-/// words for one ("goceng" is 5.000), as Oyenza's own parser reads them.
+/// words for one ("goceng" is 5.000), as Nexora's own parser reads them.
 pub fn has_amount(text: &str) -> bool {
     const WORDS: [&str; 7] = ["cepek", "gopek", "seceng", "noceng", "goceng", "ceban", "goban"];
     text.chars().any(|c| c.is_ascii_digit())
@@ -838,11 +838,11 @@ pub fn has_amount(text: &str) -> bool {
 pub fn note_error_text(code: &str) -> &'static str {
     match code {
         "no_amount" | "empty_text" => "Add an amount, like kopi 25rb",
-        "no_wallet" => "Add a wallet in Oyenza first",
-        "no_space" => "Make a space in Oyenza first",
+        "no_wallet" => "Add a wallet in Nexora first",
+        "no_space" => "Make a space in Nexora first",
         "no_rate" => "That currency can't be converted yet",
-        "ai_busy" | "rate_limited" => "Oyenza is busy. Try again in a minute",
-        "offline" => "Couldn't reach Oyenza. Your text is still here",
+        "ai_busy" | "rate_limited" => "Nexora is busy. Try again in a minute",
+        "offline" => "Couldn't reach Nexora. Your text is still here",
         _ => "Couldn't save it. Your text is still here",
     }
 }
@@ -851,9 +851,9 @@ pub fn note_error_text(code: &str) -> &'static str {
 pub fn connect_failure_text(code: &str) -> (&'static str, &'static str) {
     match code {
         "expired" | "invalid_code" => ("Sign-in code expired", "Start again from the tray"),
-        "denied" => ("Not connected", "The code was refused in oyenza.app"),
-        "offline" => ("Can't reach Oyenza", "Check the connection and try again"),
-        _ => ("Couldn't sign in to Oyenza", "Try again from the tray"),
+        "denied" => ("Not connected", "The code was refused in nexora.app"),
+        "offline" => ("Can't reach Nexora", "Check the connection and try again"),
+        _ => ("Couldn't sign in to Nexora", "Try again from the tray"),
     }
 }
 
@@ -909,7 +909,7 @@ mod tests {
 
     #[test]
     fn pro_answers() {
-        assert_eq!(pro_url(), "https://api.oyenza.app/island/pro");
+        assert_eq!(pro_url(), "https://api.nexora.app/island/pro");
         assert_eq!(parse_pro(r#"{"pro":true}"#), Some(true));
         assert_eq!(parse_pro(r#"{"pro":false}"#), Some(false));
         assert_eq!(parse_pro(r#"{"error":"invalid_key"}"#), None);
@@ -936,12 +936,12 @@ mod tests {
 
     #[test]
     fn urls_and_bodies() {
-        assert_eq!(money_url(None, "+07:00"), "https://api.oyenza.app/island/money?tz=%2B07%3A00&kinds=all");
-        assert_eq!(money_url(Some("123"), "+07:00"), "https://api.oyenza.app/island/money?since=123&tz=%2B07%3A00&kinds=all");
-        assert_eq!(activity_url("+07:00", None), "https://api.oyenza.app/island/activity?tz=%2B07%3A00&days=7");
-        assert_eq!(activity_url("+07:00", Some("9")), "https://api.oyenza.app/island/activity?tz=%2B07%3A00&days=7&since=9");
-        assert_eq!(bills_url("-03:30"), "https://api.oyenza.app/island/bills?tz=-03%3A30&days=35");
-        assert_eq!(undo_url("abc 1/2"), "https://api.oyenza.app/island/note/abc%201%2F2");
+        assert_eq!(money_url(None, "+07:00"), "https://api.nexora.app/island/money?tz=%2B07%3A00&kinds=all");
+        assert_eq!(money_url(Some("123"), "+07:00"), "https://api.nexora.app/island/money?since=123&tz=%2B07%3A00&kinds=all");
+        assert_eq!(activity_url("+07:00", None), "https://api.nexora.app/island/activity?tz=%2B07%3A00&days=7");
+        assert_eq!(activity_url("+07:00", Some("9")), "https://api.nexora.app/island/activity?tz=%2B07%3A00&days=7&since=9");
+        assert_eq!(bills_url("-03:30"), "https://api.nexora.app/island/bills?tz=-03%3A30&days=35");
+        assert_eq!(undo_url("abc 1/2"), "https://api.nexora.app/island/note/abc%201%2F2");
         let b: serde_json::Value = serde_json::from_str(&start_body("DESKTOP-7Q2K", "0.1.5", "windows")).unwrap();
         assert_eq!(b, serde_json::json!({ "app": "nexora", "name": "DESKTOP-7Q2K", "version": "0.1.5", "platform": "windows" }));
         assert_eq!(PLATFORM, if cfg!(target_os = "macos") { "macos" } else { "windows" });
@@ -1054,7 +1054,7 @@ mod tests {
         assert_eq!(bill_title(&card, today), "Kartu Kredit BCA due today");
         assert_eq!(bill_title(&later, today), "Cloud renews on Thu 29 Oct");
         assert_eq!(bill_subtitles(&spotify), ("Rp 54.990".to_string(), Some("Amount hidden".to_string())));
-        assert_eq!(bill_subtitles(&card), ("Open Oyenza for the amount".to_string(), None));
+        assert_eq!(bill_subtitles(&card), ("Open Nexora for the amount".to_string(), None));
 
         let all = vec![spotify.clone(), card.clone(), later.clone()];
         let due: Vec<&str> = bills_to_remind(&all, today, &[]).iter().map(|b| b.name.as_str()).collect();
@@ -1077,7 +1077,7 @@ mod tests {
         assert!(has_amount("parkir goceng"));
         assert!(!has_amount("kopi enak"));
         assert!(!has_amount("gocengan")); // only the whole word
-        assert_eq!(note_error_text("no_wallet"), "Add a wallet in Oyenza first");
+        assert_eq!(note_error_text("no_wallet"), "Add a wallet in Nexora first");
         assert_eq!(note_error_text("whatever"), "Couldn't save it. Your text is still here");
         assert_eq!(connect_failure_text("expired").0, "Sign-in code expired");
         assert_eq!(code_time_left(581.2), "9:42");
@@ -1143,7 +1143,7 @@ mod tests {
         let two = money_notice(&[spent("a", "Rp 89.000", "", None), spent("b", "Rp 25.000", "", None)]).unwrap();
         assert_eq!((two.title.as_str(), two.hidden.as_str()), ("Money out · 2 new", "Amounts and payees hidden"));
         let both = money_notice(&[arrival("a", "Rp 1.250.000", "Gaji", Some("BCA")), spent("b", "Rp 89.000", "", None)]).unwrap();
-        assert_eq!((both.title.as_str(), both.shown.as_str(), both.hidden.as_str(), both.flow), ("Oyenza · 2 new", "+Rp 1.250.000 · \u{2212}Rp 89.000", "Amounts hidden", None));
+        assert_eq!((both.title.as_str(), both.shown.as_str(), both.hidden.as_str(), both.flow), ("Nexora · 2 new", "+Rp 1.250.000 · \u{2212}Rp 89.000", "Amounts hidden", None));
         assert_eq!(money_notice(&[arrival("a", "Rp 1", "", None)]).unwrap().flow, Some(Flow::In));
     }
 
@@ -1173,9 +1173,9 @@ mod tests {
     #[test]
     fn health_parses_the_server_shapes() {
         use crate::health::HealthSource;
-        assert_eq!(health_url(), "https://api.oyenza.app/island/health");
+        assert_eq!(health_url(), "https://api.nexora.app/island/health");
         assert_eq!(HEALTH_EVERY_S, 900);
-        // Off in Oyenza, paused, or nothing kept.
+        // Off in Nexora, paused, or nothing kept.
         assert_eq!(parse_health(r#"{"health":null}"#), Some(None));
         // The contract's example: the second day has no distance or energy.
         let full = parse_health(

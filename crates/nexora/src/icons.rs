@@ -54,19 +54,19 @@ pub enum Icon {
     Sliders,
     Open,
     Phone,
-    /// Oyenza: show a hidden sum.
+    /// Nexora: show a hidden sum.
     Eye,
-    /// Oyenza: money that arrived.
+    /// Nexora: money that arrived.
     MoneyIn,
-    /// Oyenza: money that went out.
+    /// Nexora: money that went out.
     MoneyOut,
-    /// Oyenza: money moved between the person's own wallets.
+    /// Nexora: money moved between the person's own wallets.
     Transfer,
-    /// Oyenza: a credit card bill.
+    /// Nexora: a credit card bill.
     Card,
-    /// Oyenza: the tab.
+    /// Nexora: the tab.
     Wallet,
-    /// Oyenza: signed out.
+    /// Nexora: signed out.
     Unlink,
     /// The header's Settings button.
     Gear,
@@ -86,7 +86,7 @@ pub enum Icon {
     Stop,
     /// A new version: an arrow down into a tray.
     Download,
-    /// Record (Oyenza Studio Recorder): a dot that fits inside `Circle`.
+    /// Record (Nexora Recorder): a dot that fits inside `Circle`.
     Record,
     /// The Stocks tab: a line climbing to the right, its arrowhead at the end.
     Stocks,
@@ -129,9 +129,9 @@ pub enum Icon {
     Zai,
     MiniMax,
     OpenRouter,
-    /// The Oyenza mark (Oyen's head): Oyenza Inference. Not the Oyenza tab,
+    /// The Nexora mark (Oyen's head): Nexora Inference. Not the Nexora tab,
     /// which is `Wallet`.
-    Oyenza,
+    Nexora,
     /// A padlock: an IELTS level not open yet. (The IELTS tab and its answer
     /// button use `Mic`, the Record page's microphone.)
     Lock,
@@ -151,7 +151,7 @@ pub fn service(id: ProviderId) -> Icon {
         ProviderId::Zai => Icon::Zai,
         ProviderId::MiniMax => Icon::MiniMax,
         ProviderId::OpenRouter => Icon::OpenRouter,
-        ProviderId::Oyenza => Icon::Oyenza,
+        ProviderId::Nexora => Icon::Nexora,
     }
 }
 
@@ -380,7 +380,7 @@ pub fn parts(icon: Icon) -> &'static [Part] {
         Zai => p![f(ZAI)],
         MiniMax => p![f(MINIMAX)],
         OpenRouter => p![f(OPENROUTER)],
-        Oyenza => p![f(OYENZA)],
+        Nexora => p![f(NEXORA)],
         Lock => p![
             s("M6.5 11h11A1.5 1.5 0 0 1 19 12.5v6a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 18.5v-6A1.5 1.5 0 0 1 6.5 11z"),
             s("M8 11V8a4 4 0 0 1 8 0v3"),
@@ -392,8 +392,8 @@ pub fn parts(icon: Icon) -> &'static [Part] {
 // a card or a notice is about. They come from CodexBar's provider icons (MIT,
 // github.com/steipete/CodexBar 0.74.1, Sources/CodexBar/Resources/
 // ProviderIcon-*.svg): moved onto the grid, rounded to 0.1, holes turned round
-// for the non-zero rule and OpenRouter's strokes outlined. OYENZA is the
-// Oyenza mark (`nexora_core::oyen::mark`) with its small cut's eyes; a test below
+// for the non-zero rule and OpenRouter's strokes outlined. NEXORA is the
+// Nexora mark (`nexora_core::oyen::mark`) with its small cut's eyes; a test below
 // keeps it the same as the mark.
 const OPENAI: &str = "M20.4 10.2c.2-.6.2-1.3.2-2-.1-.7-.3-1.4-.7-2-1-1.8-3.2-2.8-5.3-2.3-.5-.7-1.3-1.1-2.1-1.4\
     c-.8-.3-1.7-.3-2.5-.1-.9.1-1.7.5-2.3 1.1-.7.6-1.1 1.3-1.4 2.1-.7.2-1.3.5-1.9.9-.5.4-1 .9-1.4 1.5\
@@ -466,7 +466,7 @@ const OPENROUTER: &str = "M1.9 10.2c-.1 0 0 0 .1 0 .1 0 .2 0 .3-.1.3 0 .6-.1 1-.
     c.9 0 1.7-.1 2.6-.1v3.6c-.8 0-1.6.1-2.4.1-.8.1-1.6.1-2.4 0-.4 0-.9-.1-1.3-.1-.4-.1-.9-.2-1.3-.4\
     c-.4-.1-.9-.3-1.3-.5-.5-.3-.9-.6-1.4-.9-.4-.3-.9-.7-1.4-1-.3-.2-.6-.4-.8-.6-.4-.2-.9-.5-1.3-.7\
     c-.6-.4-1.2-.5-1.9-.7-.3-.1-.6-.2-.9-.2-.1-.1-.3-.1-.4-.1 0 0-.1 0 0 0Zm20.3 6.9L16 20.7V13.6Z";
-const OYENZA: &str = "M16.8 3.1q.5-.6 1.3-.4.8.2 1 .9L21 10.8q0 .1 0 .2.8 1.4.8 3.1 0 4.4-1.9 5.8\
+const NEXORA: &str = "M16.8 3.1q.5-.6 1.3-.4.8.2 1 .9L21 10.8q0 .1 0 .2.8 1.4.8 3.1 0 4.4-1.9 5.8\
     Q18 21.3 12 21.3q-6 0-7.9-1.4-1.9-1.4-1.9-5.8 0-1.7.8-3.1 0-.1 0-.2l.9-3.3q.1-.2.3-.4L7.9 4.8q.5-.3.8.1\
     l1.5 1.8q.1 0 .1.1 0 0 .1 0 .1.1.1.1 0 0 .1 0 .1 0 .1 0 .6-.1 1.3-.1.7 0 1.3.1 0 0 .1 0 .1 0 .1 0 0 0 .1-.1\
     q.1 0 .1 0 0-.1.1-.1ZM8.3 4.7q0 .1.1.1 0 0 .1 0 0 .1 0 .1.1.1.1.1l.7 1.6q0 .1 0 .1 0 0 0 .1.1.1.1.1\
@@ -492,7 +492,7 @@ mod tests {
         Icon::Stocks, Icon::Search,
         Icon::Recorder, Icon::Screen, Icon::AppWindow, Icon::Area, Icon::Camera, Icon::Mic, Icon::Bell, Icon::Notes, Icon::Message,
         Icon::Ai, Icon::OpenAi, Icon::Claude, Icon::OpenCode, Icon::Gemini, Icon::Antigravity, Icon::Cursor, Icon::Copilot, Icon::Kimi, Icon::Zai,
-        Icon::MiniMax, Icon::OpenRouter, Icon::Oyenza,
+        Icon::MiniMax, Icon::OpenRouter, Icon::Nexora,
         Icon::Lock,
     ];
 
@@ -526,11 +526,11 @@ mod tests {
         }
     }
 
-    /// OYENZA is `mark::HEAD` and `FOLD` scaled by 3/16 about the mark's centre
+    /// NEXORA is `mark::HEAD` and `FOLD` scaled by 3/16 about the mark's centre
     /// (x 0, y -11.04, where the Mac menu bar centres it) onto the grid's, with
     /// the small cut's eyes as circles. If the mark changes, make it again so.
     #[test]
-    fn oyenza_is_the_oyenza_mark() {
+    fn nexora_is_the_nexora_mark() {
         use nexora_core::oyen::mark;
         use nexora_core::svgpath::{parse, Seg};
         // Each figure's end points' bounds, on the grid.
@@ -551,7 +551,7 @@ mod tests {
             }
             out
         };
-        let ours = figures(OYENZA, true);
+        let ours = figures(NEXORA, true);
         let theirs: Vec<[f32; 4]> = [mark::HEAD, mark::FOLD, mark::EYES_SMALL].into_iter().flat_map(|d| figures(d, false)).collect();
         assert_eq!(ours.len(), theirs.len());
         for (n, (a, b)) in ours.iter().zip(&theirs).enumerate() {

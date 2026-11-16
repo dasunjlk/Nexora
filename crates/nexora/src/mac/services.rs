@@ -4,7 +4,7 @@
 //! readings, the clipboard, Shelf tiles, Phone drop, full-screen apps,
 //! start at login and the AI tab's keychain reads (one file each), plus a
 //! few direct calls (the accent colour, opening and revealing files,
-//! sounds). Oyenza sign-in is the Windows app's worker, shared as is.
+//! sounds). Nexora sign-in is the Windows app's worker, shared as is.
 
 // This file is loaded with #[path], so its modules sit in services/ by path.
 #[path = "services/adzan.rs"]
@@ -63,13 +63,13 @@ pub mod notes;
 mod downloader_live;
 #[path = "../services/cities.rs"]
 pub mod cities;
-// And Oyenza sign-in: its key goes through secret.rs above.
-#[path = "../services/oyenza.rs"]
-pub mod oyenza;
+// And Nexora sign-in: its key goes through secret.rs above.
+#[path = "../services/nexora.rs"]
+pub mod nexora;
 // And the update file's reader, which runs on the add-ons' thread.
 #[path = "../services/update.rs"]
 pub mod update;
-// And the Stocks page's prices from oyenza.trade.
+// And the Stocks page's prices from nexora.trade.
 #[path = "../services/stocks.rs"]
 pub mod stocks;
 // And the AI tab's worker (`nexora_usage` does the reading).
@@ -152,7 +152,7 @@ pub fn trash_app_from_before_rename() -> Option<String> {
             continue;
         }
         let plist = std::fs::read_to_string(old.join("Contents/Info.plist")).unwrap_or_default();
-        if !plist.contains("<string>com.oyenza.nexora</string>") {
+        if !plist.contains("<string>app.nexora.nexora</string>") {
             continue;
         }
         let url = NSURL::fileURLWithPath(&NSString::from_str(&old.to_string_lossy()));

@@ -4,11 +4,11 @@
 //!
 //! A card: the service's mark, name, plan and masked account; a row per
 //! limit (its name, when it resets, a bar and how much is used; "in 2 h 10
-//! min" under the pointer); money left and spent; Oyenza Inference's last
+//! min" under the pointer); money left and spent; Nexora Inference's last
 //! days as small bars. Numbers read from the app's own log, or a while ago,
 //! say so ("From Codex's log, 2 h ago"). A trouble says what's wrong in
 //! plain words with the one button that fixes it (Add key, Connect, Try
-//! again), and a plan that ran out points to Oyenza Inference. A service
+//! again), and a plan that ran out points to Nexora Inference. A service
 //! that isn't on this computer (or has no key) has no card unless the
 //! person added it, and "not asked online yet" is never a trouble.
 //!
@@ -21,7 +21,7 @@
 //! Above the cards: "Tell me before I run out" (the heads-up notices),
 //! when the numbers were read, Refresh, and Services, the list where each
 //! service is shown or hidden, a key is typed (masked) for the services
-//! that take one, and Oyenza Inference connects with a code approved in its
+//! that take one, and Nexora Inference connects with a code approved in its
 //! dashboard. All of it goes out as `Command`s: the page never calls the
 //! worker. The page is as tall as the System page and scrolls inside, so
 //! the window never grows for it, and nothing on it moves by itself.
@@ -34,7 +34,7 @@ use crate::state::{AppState, InferenceLink, Reading};
 use crate::ui::{wid, wid_n, CursorKind, Input, KeyInput, PillStyle, Ui, WidgetId, PILL_GAP, PILL_SMALL};
 use nexora_core::datetime::{civil_from_days, fmt_clock, fmt_date_short, LocalDateTime, MONTH_SHORT, WEEKDAY_SHORT};
 use nexora_core::geom::{palette, Color, Point, Rect};
-use nexora_usage::{self as usage, oyenza, DayUse, KeyAsk, Money, ProviderId, Snapshot, Source, Spend, Trouble, Window};
+use nexora_usage::{self as usage, nexora, DayUse, KeyAsk, Money, ProviderId, Snapshot, Source, Spend, Trouble, Window};
 
 /// The System page's height: the window never grows for this page, and the
 /// cards scroll inside it.
@@ -81,12 +81,12 @@ const FADE_H: f32 = 14.0;
 /// Numbers older than this say how old they are (they refresh every couple
 /// of minutes while the tab is open).
 const OLD_S: i64 = 10 * 60;
-/// The longest key the field takes (Oyenza's own keys stop at 256).
+/// The longest key the field takes (Nexora's own keys stop at 256).
 const KEY_MAX: usize = 256;
 /// A page drawn again after this long starts over (as Today does).
 const STALE_S: f64 = 1.0;
-/// Oyenza's colour, as on the Oyenza page.
-const OYENZA: Color = palette::ORANGE;
+/// Nexora's colour, as on the Nexora page.
+const NEXORA: Color = palette::ORANGE;
 const CHECKING: &str = "Checking…";
 
 pub fn height(_st: &AppState) -> f32 {
@@ -247,14 +247,14 @@ fn top(ui: &mut Ui, st: &mut AppState, r: Rect) {
 // ---------------------------------------------------------------- what shows
 
 /// The service has a card: not hidden, and added by the person, being
-/// connected (Oyenza Inference), or found on this computer or by its key.
+/// connected (Nexora Inference), or found on this computer or by its key.
 pub fn shown(st: &AppState, id: ProviderId) -> bool {
     let u = &st.settings.usage;
     let has = |list: &[String]| list.iter().any(|k| k == id.key());
     if has(&u.hidden) {
         return false;
     }
-    if has(&u.added) || (id == ProviderId::Oyenza && st.usage.inference != InferenceLink::Off) {
+    if has(&u.added) || (id == ProviderId::Nexora && st.usage.inference != InferenceLink::Off) {
         return true;
     }
     match st.usage.readings.get(&id) {
@@ -266,18 +266,18 @@ pub fn shown(st: &AppState, id: ProviderId) -> bool {
 
 /// The numbers a card shows: the last good ones, unless the latest refresh
 /// says they're gone (the app or the key went, the account was switched
-/// off, or this computer was disconnected from Oyenza Inference).
+/// off, or this computer was disconnected from Nexora Inference).
 fn numbers(id: ProviderId, r: &Reading) -> Option<&Snapshot> {
     match r.trouble {
         Some(Trouble::NotFound | Trouble::NeedsKey | Trouble::Disabled) => None,
-        Some(Trouble::Refused) if id == ProviderId::Oyenza => None,
+        Some(Trouble::Refused) if id == ProviderId::Nexora => None,
         _ => r.snapshot.as_ref(),
     }
 }
 
-/// Oyenza Inference is connected (a key is kept, or the code was just approved).
+/// Nexora Inference is connected (a key is kept, or the code was just approved).
 fn connected(st: &AppState) -> bool {
-    matches!(st.usage.inference, InferenceLink::On { .. }) || st.usage.keys.contains(oyenza::SECRET)
+    matches!(st.usage.inference, InferenceLink::On { .. }) || st.usage.keys.contains(nexora::SECRET)
 }
 
 /// The service's mark.
@@ -309,9 +309,9 @@ enum Part {
     Trouble { title: String, line: String, act: Option<Act> },
     /// "Checking…", "Getting a code…".
     Quiet(String),
-    /// Oyenza Inference's connect code, waiting for its approval.
+    /// Nexora Inference's connect code, waiting for its approval.
     Code { code: String, url: String, expires_at: i64 },
-    /// A plan ran out: Oyenza Inference carries on.
+    /// A plan ran out: Nexora Inference carries on.
     Nudge,
 }
 
@@ -327,7 +327,7 @@ enum Does {
     Refresh,
     /// Open this service's key field in the Services list.
     Key,
-    /// Connect Oyenza Inference (again).
+    /// Connect Nexora Inference (again).
     Connect,
     CancelConnect,
     Disconnect,
@@ -351,13 +351,13 @@ struct Card {
 
 /// What the card of `id` says, line by line.
 fn parts(st: &AppState, id: ProviderId) -> Vec<Part> {
-    if id == ProviderId::Oyenza {
+    if id == ProviderId::Nexora {
         match &st.usage.inference {
-            InferenceLink::Starting => return vec![Part::Quiet(oyenza::STARTING.into())],
+            InferenceLink::Starting => return vec![Part::Quiet(nexora::STARTING.into())],
             InferenceLink::Code { code, url, expires_at } => return vec![Part::Code { code: code.clone(), url: url.clone(), expires_at: *expires_at }],
             InferenceLink::Failed(why) => {
-                let (title, line) = oyenza::connect_failure_text(why);
-                return vec![Part::Trouble { title: title.into(), line: line.into(), act: Act::new(oyenza::CONNECT_AGAIN, Does::Connect) }];
+                let (title, line) = nexora::connect_failure_text(why);
+                return vec![Part::Trouble { title: title.into(), line: line.into(), act: Act::new(nexora::CONNECT_AGAIN, Does::Connect) }];
             }
             InferenceLink::Off | InferenceLink::On { .. } => {}
         }
@@ -404,9 +404,9 @@ fn parts(st: &AppState, id: ProviderId) -> Vec<Part> {
         let w = words(id, t);
         out.push(Part::Warn(w.short, w.act));
     }
-    // A plan that ran out points to Oyenza Inference, unless the person hid it.
+    // A plan that ran out points to Nexora Inference, unless the person hid it.
     let out_now = snap.windows.iter().any(|w| w.at(now).used >= 1.0);
-    if out_now && id != ProviderId::Oyenza && !st.settings.usage.hidden.iter().any(|k| k == ProviderId::Oyenza.key()) {
+    if out_now && id != ProviderId::Nexora && !st.settings.usage.hidden.iter().any(|k| k == ProviderId::Nexora.key()) {
         out.push(Part::Nudge);
     }
     out
@@ -428,17 +428,17 @@ fn words(id: ProviderId, t: &Trouble) -> Words {
     let key = usage::provider(id).takes_key().is_some();
     let w = |title: String, line: String, short: String, act: Option<Act>| Words { title, line, short, act };
     let again = || Act::new("Try again", Does::Refresh);
-    if id == ProviderId::Oyenza {
+    if id == ProviderId::Nexora {
         match t {
             Trouble::NeedsKey | Trouble::NotFound => {
-                return w("Not connected".into(), oyenza::CONNECT_LINE.into(), "Not connected".into(), Act::new(oyenza::CONNECT, Does::Connect))
+                return w("Not connected".into(), nexora::CONNECT_LINE.into(), "Not connected".into(), Act::new(nexora::CONNECT, Does::Connect))
             }
             Trouble::Refused => {
-                let (title, line) = oyenza::refused_text(oyenza::Refusal::Key);
-                return w(title.into(), line.into(), title.into(), Act::new(oyenza::CONNECT_AGAIN, Does::Connect));
+                let (title, line) = nexora::refused_text(nexora::Refusal::Key);
+                return w(title.into(), line.into(), title.into(), Act::new(nexora::CONNECT_AGAIN, Does::Connect));
             }
             Trouble::Disabled => {
-                let (title, line) = oyenza::refused_text(oyenza::Refusal::Disabled);
+                let (title, line) = nexora::refused_text(nexora::Refusal::Disabled);
                 return w(title.into(), line.into(), title.into(), None);
             }
             _ => {}
@@ -487,7 +487,7 @@ fn usage_page(id: ProviderId) -> &'static str {
         ProviderId::Zai => "https://z.ai/manage-apikey/coding-plan/personal/my-plan",
         ProviderId::MiniMax => "https://platform.minimax.io/user-center/payment/coding-plan?cycle_type=3",
         ProviderId::OpenRouter => "https://openrouter.ai/activity",
-        ProviderId::Oyenza => oyenza::BASE,
+        ProviderId::Nexora => nexora::BASE,
     }
 }
 
@@ -513,7 +513,7 @@ fn part_h(ui: &mut Ui, p: &Part, w: f32) -> f32 {
             19.0 + lh.ceil() + if act.is_some() { 8.0 + PILL_SMALL } else { 2.0 }
         }
         Part::Code { code, url, .. } => {
-            let (_, ah) = ui.c.measure(&oyenza::approve_text(code, url), &trouble_line(), w);
+            let (_, ah) = ui.c.measure(&nexora::approve_text(code, url), &trouble_line(), w);
             ah.ceil() + 4.0 + CODE_BOX_H + 8.0 + PILL_SMALL
         }
     }
@@ -619,7 +619,7 @@ fn head(ui: &mut Ui, st: &AppState, id: ProviderId, snap: Option<&Snapshot>, r: 
     }
     let account = match (snap.and_then(|s| s.account.as_deref()), &st.usage.inference) {
         (Some(a), _) => Some(a),
-        (None, InferenceLink::On { account }) if id == ProviderId::Oyenza => Some(account.as_str()),
+        (None, InferenceLink::On { account }) if id == ProviderId::Nexora => Some(account.as_str()),
         _ => None,
     };
     // Whole or not at all: a cut email reads as broken.
@@ -701,13 +701,13 @@ fn draw_part(ui: &mut Ui, st: &AppState, p: &Part, r: Rect, view: Rect, n: u64) 
         }
         Part::Nudge => {
             let line = Rect::new(r.x, r.y + 3.0, r.w, 16.0);
-            let does = if connected(st) { Does::Url(oyenza::BASE.into()) } else { Does::Connect };
+            let does = if connected(st) { Does::Url(nexora::BASE.into()) } else { Does::Connect };
             let label_st = TextStyle::footnote().weight(Weight::Semibold);
-            let lw = ui.c.measure(oyenza::NUDGE, &label_st, r.w).0.ceil().min(line.w - 18.0);
+            let lw = ui.c.measure(nexora::NUDGE, &label_st, r.w).0.ceil().min(line.w - 18.0);
             let hit = Rect::new(line.x - 4.0, line.y - 3.0, lw + 26.0, line.h + 6.0);
             let resp = if inside(view, hit) { ui.button(wid_n("usage.nudge", n), hit) } else { Default::default() };
-            let color = if resp.hovered { palette::TEXT } else { OYENZA };
-            ui.c.text(oyenza::NUDGE, Rect::new(line.x, line.y, lw + 1.0, line.h), &label_st.color(color));
+            let color = if resp.hovered { palette::TEXT } else { NEXORA };
+            ui.c.text(nexora::NUDGE, Rect::new(line.x, line.y, lw + 1.0, line.h), &label_st.color(color));
             ui.c.icon(Icon::Open, Rect::new(line.x + lw + 5.0, line.center().y - 6.0, 12.0, 12.0), color);
             resp.clicked.then_some(does)
         }
@@ -718,7 +718,7 @@ fn draw_part(ui: &mut Ui, st: &AppState, p: &Part, r: Rect, view: Rect, n: u64) 
             let a = act.as_ref()?;
             let style = match a.does {
                 Does::Refresh | Does::Url(_) => PillStyle::Utility,
-                Does::Connect => PillStyle::Primary(OYENZA),
+                Does::Connect => PillStyle::Primary(NEXORA),
                 _ => PillStyle::Primary(st.accent),
             };
             let icon = matches!(a.does, Does::Url(_) | Does::SignIn).then_some(Icon::Open);
@@ -794,11 +794,11 @@ fn day_bars(ui: &mut Ui, days: &[DayUse], r: Rect) {
     }
 }
 
-/// Oyenza Inference's code on its card: where to approve it, the code, the
+/// Nexora Inference's code on its card: where to approve it, the code, the
 /// approve page, Cancel, and until when it works.
 fn connect_code(ui: &mut Ui, st: &AppState, r: Rect, view: Rect, code: &str, url: &str, expires_at: i64) -> Option<Does> {
-    // "Approve KPJX-TMNQ on inference.oyenza.com", on two lines on a narrow card.
-    let approve = oyenza::approve_text(code, url);
+    // "Approve KPJX-TMNQ on inference.nexora.app", on two lines on a narrow card.
+    let approve = nexora::approve_text(code, url);
     let (_, ah) = ui.c.measure(&approve, &trouble_line(), r.w);
     ui.c.text(&approve, Rect::new(r.x, r.y, r.w, ah.ceil() + 1.0), &trouble_line());
     let code_r = Rect::new(r.x, r.y + ah.ceil() + 4.0, r.w, CODE_BOX_H);
@@ -813,7 +813,7 @@ fn connect_code(ui: &mut Ui, st: &AppState, r: Rect, view: Rect, code: &str, url
     let open_w = ui.pill_width(&open_label, true, true);
     let open = Rect::new(r.x, y, open_w, PILL_SMALL);
     let mut out = None;
-    if pill_in(ui, view, wid("usage.code-open"), open, &open_label, Some(Icon::Open), PillStyle::Primary(OYENZA)) {
+    if pill_in(ui, view, wid("usage.code-open"), open, &open_label, Some(Icon::Open), PillStyle::Primary(NEXORA)) {
         out = Some(Does::Url(url.to_string()));
     }
     let cancel = Rect::new(open.right() + PILL_GAP, y, cancel_w, PILL_SMALL);
@@ -831,7 +831,7 @@ fn connect_code(ui: &mut Ui, st: &AppState, r: Rect, view: Rect, code: &str, url
 
 // ---------------------------------------------------------------- nothing found
 
-/// No card to show: what the tab looks for, Add a key, and Oyenza Inference.
+/// No card to show: what the tab looks for, Add a key, and Nexora Inference.
 fn empty(ui: &mut Ui, st: &mut AppState, r: Rect) {
     const BADGE: f32 = 52.0;
     let looking = st.usage.readings.is_empty();
@@ -840,7 +840,7 @@ fn empty(ui: &mut Ui, st: &mut AppState, r: Rect) {
     // (OpenCode Go and Kimi Code too, though they also take a key); a key:
     // every service that takes one. The worker's own rule decides which is which.
     let dirs = usage::Dirs::sample(if cfg!(target_os = "macos") { usage::Os::Mac } else { usage::Os::Windows });
-    let ids = ProviderId::ALL.into_iter().filter(|id| *id != ProviderId::Oyenza);
+    let ids = ProviderId::ALL.into_iter().filter(|id| *id != ProviderId::Nexora);
     let found: Vec<ProviderId> = ids.clone().filter(|id| !usage::pace::typed_key_only(&usage::provider(*id).wants(&dirs), false)).collect();
     let keyed: Vec<ProviderId> = ids.filter(|id| usage::provider(*id).takes_key().is_some()).collect();
     let mut body = format!("Studio looks for {} on this computer.", names(&found, "and"));
@@ -874,11 +874,11 @@ fn empty(ui: &mut Ui, st: &mut AppState, r: Rect) {
             open_key(&mut st.ui.usage, id);
         }
     }
-    let label = "Connect Oyenza Inference";
+    let label = "Connect Nexora Inference";
     let cw = ui.pill_width(label, false, true);
     let connect = Rect::new(add.right() + PILL_GAP, y, cw, PILL_SMALL);
     if connect.right() <= r.right() + 0.5 && ui.pill(wid("usage.empty-connect"), connect, label, None, PillStyle::Utility).clicked {
-        act(ui, st, ProviderId::Oyenza, Does::Connect);
+        act(ui, st, ProviderId::Nexora, Does::Connect);
     }
 }
 
@@ -894,9 +894,9 @@ fn names(ids: &[ProviderId], last_word: &str) -> String {
 // ---------------------------------------------------------------- the Services list
 
 /// Every service, in order: shown or hidden, its key (typed into a masked
-/// field that opens under its row), and Oyenza Inference's connection.
+/// field that opens under its row), and Nexora Inference's connection.
 fn list(ui: &mut Ui, st: &mut AppState, view: Rect, dt: f32, moving: &mut bool) {
-    let intro = "Each sign-in is read on this computer and goes only to its own service. Oyenza never sees your other plans.";
+    let intro = "Each sign-in is read on this computer and goes only to its own service. Nexora never sees your other plans.";
     let intro_st = TextStyle::caption().color(palette::TEXT_DIM).wrap().top();
     let intro_h = ui.c.measure(intro, &intro_st, view.w).1.ceil();
     let editing = st.ui.usage.editing.filter(|id| usage::provider(*id).takes_key().is_some());
@@ -977,7 +977,7 @@ fn row(ui: &mut Ui, st: &mut AppState, id: ProviderId, r: Rect, view: Rect) -> O
     let sx = r.x + NAME_X + NAME_W;
     let status_r = Rect::new(sx, r.y, (right - 4.0 - sx).max(0.0), r.h);
     match &st.usage.inference {
-        InferenceLink::Code { code, expires_at, .. } if id == ProviderId::Oyenza => {
+        InferenceLink::Code { code, expires_at, .. } if id == ProviderId::Nexora => {
             let code_st = TextStyle::headline().weight(Weight::Semibold).tabular();
             let cw = ui.c.measure(code, &code_st, status_r.w).0.ceil().min(status_r.w);
             ui.c.text(code, Rect::new(status_r.x, r.y, cw + 1.0, r.h), &code_st);
@@ -995,16 +995,16 @@ fn row(ui: &mut Ui, st: &mut AppState, id: ProviderId, r: Rect, view: Rect) -> O
 
 /// A row's buttons, left to right: a key's (Add key, Change key, Cancel
 /// while its field is open; none for a service found without one), or
-/// Oyenza Inference's connection.
+/// Nexora Inference's connection.
 fn row_buttons(st: &AppState, id: ProviderId) -> Vec<(String, Option<Icon>, PillStyle, Does)> {
     let b = |label: &str, icon: Option<Icon>, style: PillStyle, does: Does| (label.to_string(), icon, style, does);
-    if id == ProviderId::Oyenza {
+    if id == ProviderId::Nexora {
         return match &st.usage.inference {
             InferenceLink::Starting => vec![b("Cancel", None, PillStyle::Utility, Does::CancelConnect)],
-            InferenceLink::Code { url, .. } => vec![b("Open", Some(Icon::Open), PillStyle::Primary(OYENZA), Does::Url(url.clone())), b("Cancel", None, PillStyle::Utility, Does::CancelConnect)],
-            InferenceLink::Failed(_) => vec![b(oyenza::CONNECT_AGAIN, None, PillStyle::Primary(OYENZA), Does::Connect)],
-            _ if connected(st) => vec![b(oyenza::DISCONNECT, None, PillStyle::Utility, Does::Disconnect)],
-            _ => vec![b(oyenza::CONNECT, None, PillStyle::Primary(OYENZA), Does::Connect)],
+            InferenceLink::Code { url, .. } => vec![b("Open", Some(Icon::Open), PillStyle::Primary(NEXORA), Does::Url(url.clone())), b("Cancel", None, PillStyle::Utility, Does::CancelConnect)],
+            InferenceLink::Failed(_) => vec![b(nexora::CONNECT_AGAIN, None, PillStyle::Primary(NEXORA), Does::Connect)],
+            _ if connected(st) => vec![b(nexora::DISCONNECT, None, PillStyle::Utility, Does::Disconnect)],
+            _ => vec![b(nexora::CONNECT, None, PillStyle::Primary(NEXORA), Does::Connect)],
         };
     }
     let Some(ask) = usage::provider(id).takes_key() else { return Vec::new() };
@@ -1023,12 +1023,12 @@ fn row_buttons(st: &AppState, id: ProviderId) -> Vec<(String, Option<Icon>, Pill
 /// What the Services list says of a service beside its name.
 fn status(st: &AppState, id: ProviderId) -> (String, Color) {
     let (dim, warn) = (palette::TEXT_DIM, palette::ORANGE);
-    if id == ProviderId::Oyenza {
+    if id == ProviderId::Nexora {
         return match &st.usage.inference {
-            InferenceLink::Starting => (oyenza::STARTING.into(), dim),
+            InferenceLink::Starting => (nexora::STARTING.into(), dim),
             InferenceLink::Code { code, .. } => (code.clone(), palette::TEXT),
-            InferenceLink::Failed(why) => (oyenza::connect_failure_text(why).0.into(), warn),
-            InferenceLink::On { account } => (oyenza::connected_text(account), dim),
+            InferenceLink::Failed(why) => (nexora::connect_failure_text(why).0.into(), warn),
+            InferenceLink::On { account } => (nexora::connected_text(account), dim),
             InferenceLink::Off => match st.usage.readings.get(&id).and_then(|r| r.trouble.clone()) {
                 Some(t @ (Trouble::Refused | Trouble::Disabled)) => (words(id, &t).short, warn),
                 _ if connected(st) => ("Connected".into(), dim),
@@ -1182,14 +1182,14 @@ fn act(ui: &mut Ui, st: &mut AppState, id: ProviderId, does: Does) {
         Does::Connect => {
             // Its card shows the code: bring it into view, shown even if it was hidden.
             st.cmd(Command::Usage(UsageCmd::Connect));
-            if st.settings.usage.hidden.iter().any(|k| k == ProviderId::Oyenza.key()) {
-                st.cmd(Command::Usage(UsageCmd::Show(ProviderId::Oyenza)));
+            if st.settings.usage.hidden.iter().any(|k| k == ProviderId::Nexora.key()) {
+                st.cmd(Command::Usage(UsageCmd::Show(ProviderId::Nexora)));
             }
             if matches!(st.usage.inference, InferenceLink::Off | InferenceLink::Failed(_)) {
                 st.usage.inference = InferenceLink::Starting;
             }
             if !st.ui.usage.services {
-                st.ui.usage.reveal = Some(ProviderId::Oyenza);
+                st.ui.usage.reveal = Some(ProviderId::Nexora);
             }
         }
         Does::CancelConnect => {
@@ -1341,7 +1341,7 @@ fn money_words(m: &Money) -> (String, String) {
 /// Local time minus UTC, in seconds (to the quarter hour, as the app's
 /// other clocks read it).
 fn offset_s(st: &AppState) -> i64 {
-    nexora_core::oyenza::offset_minutes(&st.local, st.unix) as i64 * 60
+    nexora_core::nexora::offset_minutes(&st.local, st.unix) as i64 * 60
 }
 
 /// Unix seconds on this computer's clock.
@@ -1424,19 +1424,19 @@ fn soon(retry_after_s: Option<u64>) -> String {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Picture {
     /// Codex, Claude Code (past the notice line on its 5-hour limit),
-    /// OpenCode Go and Oyenza Inference connected; notices on.
+    /// OpenCode Go and Nexora Inference connected; notices on.
     Plans,
     /// A trouble mix: Codex's sign-in expired (numbers from its log), Claude
-    /// Code used up (pointing to Oyenza Inference), Gemini CLI offline,
+    /// Code used up (pointing to Nexora Inference), Gemini CLI offline,
     /// GitHub Copilot's account switched off, an OpenRouter key refused.
     Troubles,
     /// Nothing found: what the tab looks for, Add a key.
     Empty,
     /// The first opening, before anything is read.
     Looking,
-    /// Connecting Oyenza Inference: the code on its card, beside Codex.
+    /// Connecting Nexora Inference: the code on its card, beside Codex.
     Connect,
-    /// Oyenza Inference connected: its balance, spend and last 14 days,
+    /// Nexora Inference connected: its balance, spend and last 14 days,
     /// beside Codex.
     Inference,
     /// The Services list from its top: the privacy line, each service
@@ -1497,7 +1497,7 @@ pub fn picture(st: &mut AppState, shows: Picture, now: f64) {
     };
     let inference = |st: &AppState| {
         let usd = [0.10, 0.32, 0.0, 0.18, 0.64, 0.41, 0.22, 0.05, 0.38, 0.71, 0.55, 0.12, 0.90, 0.42];
-        let mut s = snap(Oyenza, "Pay as you go", Vec::new());
+        let mut s = snap(Nexora, "Pay as you go", Vec::new());
         s.balance = Some(Money::usd(18.4));
         let sum = |d: &[f64]| d.iter().sum::<f64>();
         s.spend = vec![
@@ -1526,7 +1526,7 @@ pub fn picture(st: &mut AppState, shows: Picture, now: f64) {
     // Every service answers a refresh: those not on this computer say so.
     if shows != Picture::Looking {
         for id in ProviderId::ALL {
-            let none = if usage::provider(id).takes_key().is_some() || id == Oyenza { Trouble::NeedsKey } else { Trouble::NotFound };
+            let none = if usage::provider(id).takes_key().is_some() || id == Nexora { Trouble::NeedsKey } else { Trouble::NotFound };
             put(st, id, Err(none));
         }
     }
@@ -1539,9 +1539,9 @@ pub fn picture(st: &mut AppState, shows: Picture, now: f64) {
     match shows {
         Picture::Plans | Picture::Services | Picture::Key => {
             let inf = inference(st);
-            readings(st, vec![(Codex, Ok(codex())), (Claude, Ok(claude())), (OpenCode, Ok(opencode())), (Oyenza, Ok(inf))]);
+            readings(st, vec![(Codex, Ok(codex())), (Claude, Ok(claude())), (OpenCode, Ok(opencode())), (Nexora, Ok(inf))]);
             st.usage.inference = InferenceLink::On { account: "a•••@example.com".into() };
-            st.usage.keys.insert(oyenza::SECRET);
+            st.usage.keys.insert(nexora::SECRET);
             st.settings.usage.notices = shows == Picture::Plans;
         }
         Picture::Troubles => {
@@ -1568,13 +1568,13 @@ pub fn picture(st: &mut AppState, shows: Picture, now: f64) {
             readings(st, vec![(Codex, Ok(codex()))]);
             // A code just asked for: good for ten minutes from now, on a whole minute.
             let expires_at = (unix + 10 * 60).div_euclid(60) * 60;
-            st.usage.inference = InferenceLink::Code { code: "KPJX-TMNQ".into(), url: format!("{}/app/connect?code=KPJXTMNQ", oyenza::BASE), expires_at };
+            st.usage.inference = InferenceLink::Code { code: "KPJX-TMNQ".into(), url: format!("{}/app/connect?code=KPJXTMNQ", nexora::BASE), expires_at };
         }
         Picture::Inference => {
             let inf = inference(st);
-            readings(st, vec![(Codex, Ok(codex())), (Oyenza, Ok(inf))]);
+            readings(st, vec![(Codex, Ok(codex())), (Nexora, Ok(inf))]);
             st.usage.inference = InferenceLink::On { account: "a•••@example.com".into() };
-            st.usage.keys.insert(oyenza::SECRET);
+            st.usage.keys.insert(nexora::SECRET);
         }
     }
     if matches!(shows, Picture::Services | Picture::Key) {
@@ -1678,42 +1678,42 @@ mod tests {
     }
 
     #[test]
-    fn a_used_up_plan_points_to_oyenza_inference() {
+    fn a_used_up_plan_points_to_nexora_inference() {
         let mut st = state();
         let mut s = Snapshot::new(ProviderId::Claude, st.unix, Source::Online);
         s.windows.push(Window::new(usage::WindowKind::Session, "5-hour", 1.0).resets(Some(st.unix + 600)));
         read(&mut st, ProviderId::Claude, Some(s.clone()), None);
         assert_eq!(parts(&st, ProviderId::Claude).last(), Some(&Part::Nudge));
-        // Not once the reset has passed, nor when the person hid Oyenza Inference.
+        // Not once the reset has passed, nor when the person hid Nexora Inference.
         s.windows[0].resets_at = Some(st.unix - 1);
         read(&mut st, ProviderId::Claude, Some(s.clone()), None);
         assert!(!parts(&st, ProviderId::Claude).contains(&Part::Nudge));
         s.windows[0].resets_at = Some(st.unix + 600);
         read(&mut st, ProviderId::Claude, Some(s), None);
-        st.settings.usage.hidden.push("oyenza".into());
+        st.settings.usage.hidden.push("nexora".into());
         assert!(!parts(&st, ProviderId::Claude).contains(&Part::Nudge));
     }
 
     #[test]
-    fn oyenza_inference_follows_its_connection() {
+    fn nexora_inference_follows_its_connection() {
         let mut st = state();
-        read(&mut st, ProviderId::Oyenza, None, Some(Trouble::NeedsKey));
-        assert!(!shown(&st, ProviderId::Oyenza), "not connected, not added: in the Services list only");
-        st.usage.inference = InferenceLink::Code { code: "KPJX-TMNQ".into(), url: "https://inference.oyenza.com/app/connect?code=KPJXTMNQ".into(), expires_at: st.unix + 600 };
-        assert!(shown(&st, ProviderId::Oyenza));
-        assert!(matches!(&parts(&st, ProviderId::Oyenza)[..], [Part::Code { .. }]));
-        st.usage.inference = InferenceLink::Failed(oyenza::EXPIRED.into());
-        let p = parts(&st, ProviderId::Oyenza);
+        read(&mut st, ProviderId::Nexora, None, Some(Trouble::NeedsKey));
+        assert!(!shown(&st, ProviderId::Nexora), "not connected, not added: in the Services list only");
+        st.usage.inference = InferenceLink::Code { code: "KPJX-TMNQ".into(), url: "https://inference.nexora.app/app/connect?code=KPJXTMNQ".into(), expires_at: st.unix + 600 };
+        assert!(shown(&st, ProviderId::Nexora));
+        assert!(matches!(&parts(&st, ProviderId::Nexora)[..], [Part::Code { .. }]));
+        st.usage.inference = InferenceLink::Failed(nexora::EXPIRED.into());
+        let p = parts(&st, ProviderId::Nexora);
         assert!(matches!(&p[..], [Part::Trouble { title, act: Some(Act { does: Does::Connect, .. }), .. }] if title == "Code expired"), "{p:?}");
         // Disconnected in the dashboard: its old balance goes, Connect again comes.
         st.usage.inference = InferenceLink::On { account: "a•••@example.com".into() };
-        let mut s = Snapshot::new(ProviderId::Oyenza, st.unix, Source::Online);
+        let mut s = Snapshot::new(ProviderId::Nexora, st.unix, Source::Online);
         s.balance = Some(Money::usd(4.2));
-        read(&mut st, ProviderId::Oyenza, Some(s), Some(Trouble::Refused));
-        let p = parts(&st, ProviderId::Oyenza);
+        read(&mut st, ProviderId::Nexora, Some(s), Some(Trouble::Refused));
+        let p = parts(&st, ProviderId::Nexora);
         assert!(matches!(&p[..], [Part::Trouble { title, act: Some(Act { does: Does::Connect, .. }), .. }] if title == "No longer connected"), "{p:?}");
-        read(&mut st, ProviderId::Oyenza, None, Some(Trouble::Disabled));
-        assert!(matches!(&parts(&st, ProviderId::Oyenza)[..], [Part::Trouble { act: None, .. }]));
+        read(&mut st, ProviderId::Nexora, None, Some(Trouble::Disabled));
+        assert!(matches!(&parts(&st, ProviderId::Nexora)[..], [Part::Trouble { act: None, .. }]));
     }
 
     #[test]
@@ -1783,10 +1783,10 @@ mod tests {
         assert_eq!(labels(&st), ["Change key"]);
         st.ui.usage.editing = Some(id);
         assert_eq!(labels(&st), ["Cancel"]);
-        // Oyenza Inference: its connection instead.
-        assert_eq!(row_buttons(&st, ProviderId::Oyenza).into_iter().map(|b| b.0).collect::<Vec<_>>(), [oyenza::CONNECT]);
+        // Nexora Inference: its connection instead.
+        assert_eq!(row_buttons(&st, ProviderId::Nexora).into_iter().map(|b| b.0).collect::<Vec<_>>(), [nexora::CONNECT]);
         st.usage.inference = InferenceLink::On { account: "a•••@example.com".into() };
-        assert_eq!(row_buttons(&st, ProviderId::Oyenza).into_iter().map(|b| b.0).collect::<Vec<_>>(), [oyenza::DISCONNECT]);
+        assert_eq!(row_buttons(&st, ProviderId::Nexora).into_iter().map(|b| b.0).collect::<Vec<_>>(), [nexora::DISCONNECT]);
     }
 
     #[test]
@@ -1805,10 +1805,10 @@ mod tests {
             let ids: Vec<ProviderId> = ProviderId::ALL.into_iter().filter(|id| shown(&st, *id)).collect();
             use ProviderId::*;
             let want: &[ProviderId] = match p {
-                Picture::Plans | Picture::Services | Picture::Key => &[Codex, Claude, OpenCode, Oyenza],
+                Picture::Plans | Picture::Services | Picture::Key => &[Codex, Claude, OpenCode, Nexora],
                 Picture::Troubles => &[Codex, Claude, Gemini, Copilot, OpenRouter],
                 Picture::Empty | Picture::Looking => &[],
-                Picture::Connect | Picture::Inference => &[Codex, Oyenza],
+                Picture::Connect | Picture::Inference => &[Codex, Nexora],
             };
             assert_eq!(ids, want, "{p:?}");
             assert!(st.ui.usage.still, "{p:?} holds still");

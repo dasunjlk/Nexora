@@ -1,7 +1,7 @@
 # Meeting notes — complete implementation
 
-> Status in Nexora: **ported as-built**, rebranded (Oyen → Nova, Oyenza →
-> Nexora, `api.oyenza.app` → `api.nexora.app`). This document is the complete
+> Status in Nexora: **ported as-built**, rebranded (Oyen → Nova, Nexora →
+> Nexora, `api.nexora.app` → `api.nexora.app`). This document is the complete
 > implementation reference: behaviour, state machines, wire contract, storage,
 > failure handling and tests. It is written so the feature could be
 > re-implemented from this file alone.
@@ -406,11 +406,11 @@ and the app's side is exercised by the scripted self-test
 
 | | Upstream | Nexora |
 |---|---|---|
-| API base | `https://api.oyenza.app` (`crate::oyenza::API`) | `https://api.nexora.app` (`crate::nexora::API`) |
-| Auth key file | `%LOCALAPPDATA%\Nexora\oyenza-link.bin` | `%LOCALAPPDATA%\Nexora\nexora-link.bin` |
-| Notes output folder | `Documents\Oyenza Studio\Notes` | `Documents\Nexora\Notes` |
+| API base | `https://api.nexora.app` (`crate::nexora::API`) | `https://api.nexora.app` (`crate::nexora::API`) |
+| Auth key file | `%LOCALAPPDATA%\Nexora\nexora-link.bin` | `%LOCALAPPDATA%\Nexora\nexora-link.bin` |
+| Notes output folder | `Documents\Nexora\Notes` | `Documents\Nexora\Notes` |
 | Audio root | `%LOCALAPPDATA%\Nexora\notes\` | `%LOCALAPPDATA%\Nexora\notes\` |
 | Threads | `nexora-notes`, `nexora-notes-send` | `nexora-notes`, `nexora-notes-send` |
 | App-data override | `NEXORA_HOME` | `NEXORA_HOME` |
-| Copy/persona | "Oyen listens…", "Notes by Oyen, in Oyenza Studio" | "Nova listens…", "Notes by Nova, in Nexora" |
-| Server codename | catat-server | nexora notes server (contract unchanged apart from the base URL) |
+| Copy/persona | "Oyen listens…", "Notes by Oyen, in Nexora" | "Nova listens…", "Notes by Nova, in Nexora" |
+| Server codename | nexora-notes-server | nexora notes server (contract unchanged apart from the base URL) |

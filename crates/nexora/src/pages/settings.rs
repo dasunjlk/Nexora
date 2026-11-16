@@ -4,8 +4,8 @@
 //! window opens, so the two never overlap. The window draws this page's
 //! account row, switch, picker and Check now.
 //!
-//! The Oyenza account comes first: the Oyenza app's icon, then signing in
-//! (the code itself shows on the Oyenza page), who is signed in, and
+//! The Nexora account comes first: the Nexora app's icon, then signing in
+//! (the code itself shows on the Nexora page), who is signed in, and
 //! Disconnect. Under a line, what the tray menu also changes: the theme and
 //! the idle look as pickers, four switches, and Hide or Stay on top in
 //! full-screen apps; this copy's version; and which of the island's own pages
@@ -19,16 +19,16 @@
 //! the island closes or Settings does.
 
 use crate::activities::{text_with_dim, text_with_dim_width};
-use crate::commands::{Command, OyenzaCmd};
+use crate::commands::{Command, NexoraCmd};
 use crate::gfx::{TextStyle, Weight};
 use crate::icons::Icon;
 use crate::pages::PageKind;
 use crate::pill::status;
-use crate::state::{AppState, OyenzaLink, Said};
+use crate::state::{AppState, NexoraLink, Said};
 use crate::ui::{wid, wid_n, PillStyle, Ui, PILL_GAP, PILL_REGULAR, PILL_SMALL};
 use crate::version::VERSION;
 use nexora_core::geom::{palette, Color, Point, Rect};
-use nexora_core::oyenza;
+use nexora_core::nexora;
 use nexora_core::phonedrop::fmt_bytes;
 use nexora_core::settings::{IdleStyle, Theme};
 use nexora_core::update::Release;
@@ -42,7 +42,7 @@ const TABS_Y: f32 = SWITCHES_Y + ROWS as f32 * ROW_H;
 const ADVANCED_Y: f32 = TABS_Y + ROW_H;
 const HEIGHT: f32 = ADVANCED_Y + ROW_H;
 const ACCOUNT_H: f32 = 44.0;
-/// The Oyenza app's icon, and the text column right of it.
+/// The Nexora app's icon, and the text column right of it.
 const ICON: f32 = 36.0;
 const TEXT_X: f32 = 48.0;
 const RULE_Y: f32 = 54.0;
@@ -76,8 +76,8 @@ const CHECK_H: f32 = 22.0;
 const ADVANCED_ICON: f32 = 15.0;
 const SWITCH_H: f32 = 18.0;
 const KNOB_INSET: f32 = 2.0;
-/// Oyenza's colour, as on the Oyenza page.
-const OYENZA: Color = palette::ORANGE;
+/// Nexora's colour, as on the Nexora page.
+const NEXORA: Color = palette::ORANGE;
 /// The tabs row's chips, like the Record page's inputs.
 const CHIP_H: f32 = 24.0;
 const CHIP_PAD: f32 = 8.0;
@@ -153,7 +153,7 @@ pub fn height(st: &AppState) -> f32 {
 
 /// While a sign-in code waits, its time left counts down each second.
 pub fn next_wake(st: &AppState) -> Option<f64> {
-    matches!(st.oyenza.link, OyenzaLink::Connecting { .. }).then(|| st.now.floor() + 1.0)
+    matches!(st.nexora.link, NexoraLink::Connecting { .. }).then(|| st.now.floor() + 1.0)
 }
 
 pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect) {
@@ -459,9 +459,9 @@ fn draw_sheet(ui: &mut Ui, st: &mut AppState, area: Rect, rel: &Release) {
     text_with_dim(ui, title, &rel.version, Rect::new(x, cy - 19.0, w, 20.0), TextStyle::headline());
     let size = rel.download(cfg!(target_os = "macos")).map(|d| fmt_bytes(d.size)).unwrap_or_default();
     let line = if ready {
-        "A new version of Oyenza Studio is ready to be installed.".to_string()
+        "A new version of Nexora is ready to be installed.".to_string()
     } else {
-        format!("A new version of Oyenza Studio is ready to download ({size}).")
+        format!("A new version of Nexora is ready to download ({size}).")
     };
     ui.c.text(&line, Rect::new(x, cy + 1.0, w, 17.0), &TextStyle::footnote().color(palette::TEXT_DIM));
 
@@ -481,7 +481,7 @@ fn draw_sheet(ui: &mut Ui, st: &mut AppState, area: Rect, rel: &Release) {
         };
         vec![(Get::InstallNow, Icon::Download, "Install now".to_string(), "Closes, updates and opens again"), next]
     } else if cfg!(target_os = "macos") {
-        vec![(Get::Download, Icon::Download, format!("Download {}", rel.version), "Downloads the DMG: open it and drag Oyenza Studio to Applications.")]
+        vec![(Get::Download, Icon::Download, format!("Download {}", rel.version), "Downloads the DMG: open it and drag Nexora to Applications.")]
     } else {
         vec![(Get::Download, Icon::Download, format!("Download {}", rel.version), "Opens its release page: run the Setup there, your settings stay.")]
     };
@@ -497,7 +497,7 @@ fn draw_sheet(ui: &mut Ui, st: &mut AppState, area: Rect, rel: &Release) {
         }
     }
 
-    let notes = format!("See what's new in Oyenza Studio {}", rel.version);
+    let notes = format!("See what's new in Nexora {}", rel.version);
     let nw = ui.pill_width(&notes, true, true).min(area.w);
     let nr = Rect::new(area.x, area.y + NOTES_Y, nw, PILL_SMALL);
     if ui.pill(wid("update.notes"), nr, &notes, Some(Icon::Open), PillStyle::Utility).clicked {
@@ -569,46 +569,46 @@ fn flip(st: &mut AppState, sw: Switch, on: Option<bool>) {
 pub(crate) fn draw_account(ui: &mut Ui, st: &mut AppState, r: Rect) {
     let cy = r.center().y;
     crate::oyen::app_icon(ui.c, Point::new(r.x + ICON / 2.0, cy), ICON);
-    match st.oyenza.link.clone() {
-        OyenzaLink::Off => {
-            let label = "Sign in with Oyenza";
+    match st.nexora.link.clone() {
+        NexoraLink::Off => {
+            let label = "Sign in with Nexora";
             let w = ui.pill_width(label, false, false);
             let b = Rect::new(r.right() - w, cy - PILL_REGULAR / 2.0, w, PILL_REGULAR);
-            if ui.pill(wid("settings.sign-in"), b, label, None, PillStyle::Primary(OYENZA)).clicked {
-                st.cmd(Command::Oyenza(OyenzaCmd::SignIn));
+            if ui.pill(wid("settings.sign-in"), b, label, None, PillStyle::Primary(NEXORA)).clicked {
+                st.cmd(Command::Nexora(NexoraCmd::SignIn));
             }
-            account_text(ui, r, b.x, "Oyenza", "Sign in to see money in and bills due here.");
+            account_text(ui, r, b.x, "Nexora", "Sign in to see money in and bills due here.");
         }
-        OyenzaLink::Connecting { code, until, .. } => {
+        NexoraLink::Connecting { code, until, .. } => {
             let cancel_w = ui.pill_width("Cancel", false, true);
             let cancel = Rect::new(r.right() - cancel_w, cy - PILL_SMALL / 2.0, cancel_w, PILL_SMALL);
             if ui.pill(wid("settings.cancel"), cancel, "Cancel", None, PillStyle::Utility).clicked {
-                st.cmd(Command::Oyenza(OyenzaCmd::Cancel));
+                st.cmd(Command::Nexora(NexoraCmd::Cancel));
             }
             let show_w = ui.pill_width("Show code", false, true);
             let show = Rect::new(cancel.x - PILL_GAP - show_w, cancel.y, show_w, PILL_SMALL);
-            if ui.pill(wid("settings.show-code"), show, "Show code", None, PillStyle::Primary(OYENZA)).clicked {
-                st.cmd(Command::SetPage(PageKind::Oyenza));
+            if ui.pill(wid("settings.show-code"), show, "Show code", None, PillStyle::Primary(NEXORA)).clicked {
+                st.cmd(Command::SetPage(PageKind::Nexora));
             }
-            let line = format!("Code {code} · works for {}", oyenza::code_time_left(until - st.now));
-            account_text(ui, r, show.x, "Signing in to Oyenza", &line);
+            let line = format!("Code {code} · works for {}", nexora::code_time_left(until - st.now));
+            account_text(ui, r, show.x, "Signing in to Nexora", &line);
         }
-        OyenzaLink::Connected { account } => {
+        NexoraLink::Connected { account } => {
             let dis_w = ui.pill_width("Disconnect", false, true);
             let dis = Rect::new(r.right() - dis_w, cy - PILL_SMALL / 2.0, dis_w, PILL_SMALL);
             if ui.pill(wid("settings.disconnect"), dis, "Disconnect", None, PillStyle::Utility).clicked {
-                st.cmd(Command::Oyenza(OyenzaCmd::Disconnect));
+                st.cmd(Command::Nexora(NexoraCmd::Disconnect));
             }
             // Sums and senders straight away on the island (off: they wait for Show).
             let label = "Show amounts";
             let lw = ui.c.measure(label, &TextStyle::body(), 300.0).0.ceil();
             let row = Rect::new(dis.x - 2.0 * ROW_BLEED - lw - 10.0 - SWITCH_W, cy - ROW_H / 2.0, lw + 10.0 + SWITCH_W, ROW_H);
-            let on = st.settings.oyenza_show_amounts;
+            let on = st.settings.nexora_show_amounts;
             if switch_row(ui, wid("settings.amounts"), row, label, Some(on), st.accent) {
-                st.settings.oyenza_show_amounts = !on;
+                st.settings.nexora_show_amounts = !on;
                 st.cmd(Command::SaveSettings);
             }
-            account_text(ui, r, row.x - ROW_BLEED, "Oyenza", &format!("Signed in as {account}"));
+            account_text(ui, r, row.x - ROW_BLEED, "Nexora", &format!("Signed in as {account}"));
         }
     }
 }

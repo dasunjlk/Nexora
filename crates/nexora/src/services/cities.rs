@@ -11,7 +11,7 @@ use crate::services::http::{Client, MtaGuard};
 use nexora_core::prayer::{world, World};
 use std::time::Duration;
 
-const USER_AGENT: &str = concat!("OyenzaStudio/", env!("CARGO_PKG_VERSION"), " (+https://github.com/lucacadalora/oyenza-studio)");
+const USER_AGENT: &str = concat!("NexoraStudio/", env!("CARGO_PKG_VERSION"), " (+https://github.com/dasunjlk/Nexora)");
 
 /// The biggest file is under 100 KB; this is plenty on a slow line.
 const TIMEOUT: Duration = Duration::from_secs(10);

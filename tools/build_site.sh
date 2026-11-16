@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Assemble the website (served by GitHub Pages, see .github/workflows/pages.yml)
 # into _site/: the page and its screenshots from site/, plus docs/brand as brand/,
-# and the creator links studio.oyenza.com/<code> (docs/creators.md).
+# and the creator links dasunjlk.github.io/Nexora/<code> (docs/creators.md).
 #
 # Preview locally:  tools/build_site.sh && python3 -m http.server -d _site 8000
 # New screenshots:  python3 tools/site_shots.py SELFTEST_DIR classic|oyen

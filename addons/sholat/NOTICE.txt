@@ -1,10 +1,10 @@
-Prayer times add-on for Oyenza Studio: what it holds and where it comes from
+Prayer times add-on for Nexora: what it holds and where it comes from
 
 places.json
   Every location in Kemenag RI's (Bimas Islam) prayer schedule, named as
   Kemenag writes them, each with a reference point fitted to Kemenag's
   published 2026 schedule; plus Makkah, Madinah and Jeddah (coordinates
-  from en.wikipedia.org). Part of Oyenza Studio, under its MIT license.
+  from en.wikipedia.org). Part of Nexora, under its MIT license.
 
 adzan.m4a
   "The Adhan - Muslim Call to Prayer - Aaqib Azeez" by Atcovi, from

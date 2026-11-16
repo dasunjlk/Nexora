@@ -4,7 +4,7 @@
 //! then the plan's name from `GET <server>/me`.
 //!
 //! What it asks with, first found wins:
-//! 1. A Kimi Code API key typed into Oyenza Studio (`sk-kimi-…`, made in the
+//! 1. A Kimi Code API key typed into Nexora (`sk-kimi-…`, made in the
 //!    Kimi Code console). It never expires, so it is the steady way. Nothing
 //!    in a key says which of Kimi Code's two servers made it (kimi.ai for
 //!    most of the world, kimi.com for mainland China), so it goes first to
@@ -18,7 +18,7 @@
 //!    minutes and only Kimi Code renews it (the refresh token is never used
 //!    here), so an old one is [`Trouble::Expired`]: open Kimi Code once.
 //!
-//! Asked as Oyenza Studio. Kimi Code's own usage request carries only the
+//! Asked as Nexora. Kimi Code's own usage request carries only the
 //! token and `Accept`, and so does this one: never Kimi's `X-Msh-*` device
 //! headers or its User-Agent (Kimi's rules count imitating its client as
 //! abuse). Should Kimi ever answer only its own client, that shows as

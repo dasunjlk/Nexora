@@ -1,4 +1,4 @@
-//! Oyenza Studio Recorder on the Mac: the separate recorder app built from
+//! Nexora Recorder on the Mac: the separate recorder app built from
 //! Cap. The island starts, pauses and stops its recordings through the
 //! recorder's own links (`nexora_core::recorder`), and the recorder tells the
 //! island how they go through the island's message port ([`listen`]): the
@@ -16,11 +16,11 @@ use nexora_core::recorder;
 use std::ffi::c_void;
 
 /// The island's message port, which the recorder looks up by this name.
-const PORT: &str = "com.oyenza.nexora.recorder";
+const PORT: &str = "app.nexora.nexora.recorder";
 /// The recorder's bundle identifier (its `branding/apply.py`).
-const RECORDER_ID: &str = "com.oyenza.studio.recorder";
+const RECORDER_ID: &str = "com.nexora.studio.recorder";
 
-/// Whether some app opens `oyenza-recorder:` links, i.e. the recorder is
+/// Whether some app opens `nexora-recorder:` links, i.e. the recorder is
 /// installed. Read when the menu bar's menu is built.
 pub fn installed() -> bool {
     let Some(url) = NSURL::URLWithString(&NSString::from_str(&format!("{}://", recorder::SCHEME))) else {

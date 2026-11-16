@@ -21,7 +21,7 @@ mkdir -p "$ROOT/dist"
 cp "$EXE" "$ROOT/dist/nexora.exe"
 # Portable build inside its own folder, so nexora.exe never sits loose next to
 # other downloads (Windows looks for some DLLs in the exe's folder first).
-( cd "$ROOT/dist" && rm -rf Nexora "Oyenza-Studio-$VERSION-portable.zip" && mkdir Nexora && cp nexora.exe "$ROOT/THIRD-PARTY-NOTICES.txt" Nexora/ && zip -qr "Oyenza-Studio-$VERSION-portable.zip" Nexora && rm -rf Nexora )
+( cd "$ROOT/dist" && rm -rf Nexora "Nexora-$VERSION-portable.zip" && mkdir Nexora && cp nexora.exe "$ROOT/THIRD-PARTY-NOTICES.txt" Nexora/ && zip -qr "Nexora-$VERSION-portable.zip" Nexora && rm -rf Nexora )
 
 if [[ -n "${NSIS_HOST:-}" ]]; then
   REMOTE_DIR="nexora-pkg"
@@ -32,7 +32,7 @@ if [[ -n "${NSIS_HOST:-}" ]]; then
   scp -q -o BatchMode=yes "$ROOT/THIRD-PARTY-NOTICES.txt" "$NSIS_HOST:$REMOTE_DIR/"
   scp -q -o BatchMode=yes "$EXE" "$NSIS_HOST:$REMOTE_DIR/nexora.exe"
   ssh -o BatchMode=yes "$NSIS_HOST" "cd ~/$REMOTE_DIR && makensis -V2 -DEXE=\$HOME/$REMOTE_DIR/nexora.exe -DOUTDIR=\$HOME/$REMOTE_DIR/dist installer/nexora.nsi"
-  scp -q -o BatchMode=yes "$NSIS_HOST:$REMOTE_DIR/dist/Oyenza-Studio-Setup-$VERSION.exe" "$ROOT/dist/"
+  scp -q -o BatchMode=yes "$NSIS_HOST:$REMOTE_DIR/dist/Nexora-Setup-$VERSION.exe" "$ROOT/dist/"
 elif command -v makensis >/dev/null; then
   makensis -V2 -DEXE="$EXE" -DOUTDIR="$ROOT/dist" "$ROOT/installer/nexora.nsi"
 else
