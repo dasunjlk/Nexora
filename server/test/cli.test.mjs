@@ -23,7 +23,11 @@ function run(args, env = {}) {
   return { child, exited, firstLine, output: () => ({ out, err }) };
 }
 
-test('starts on a free port, says so in one line without secrets, stops on SIGTERM', async () => {
+// Windows kills children with no exit code, so the signal hand-off below
+// only holds on POSIX; CI runs this suite on Linux.
+const posixSignals = process.platform !== 'win32';
+
+test('starts on a free port, says so in one line without secrets, stops on SIGTERM', { skip: !posixSignals }, async () => {
   const p = run(['--port', '0', '--data', tempDir()], { TURN_KEY_ID: 'cli-key-id', TURN_KEY_API_TOKEN: 'cli-secret-token' });
   const line = await p.firstLine;
   assert.match(line, /^drop-server listening on http:\/\/127\.0\.0\.1:\d+ \(relay on\)$/);
@@ -37,7 +41,7 @@ test('starts on a free port, says so in one line without secrets, stops on SIGTE
   assert.equal(err, '');
 });
 
-test('without a relay key it says relay off', async () => {
+test('without a relay key it says relay off', { skip: !posixSignals }, async () => {
   const p = run(['--port', '0', '--data', tempDir()], { TURN_KEY_ID: '', TURN_KEY_API_TOKEN: '' });
   assert.match(await p.firstLine, /\(relay off\)$/);
   p.child.kill('SIGINT');
