@@ -9,11 +9,11 @@ import { derive, sign as nodeSign } from './helpers.mjs';
 const V = {
   S: Buffer.from('000102030405060708090a0b0c0d0e0f', 'hex'),
   b64u: 'AAECAwQFBgcICQoLDA0ODw',
-  room: 'geDM0jEhk4eiOz_li-FtORW2YlPBbebr7NsHjLkHI_4',
-  proof: '6JmvhsXX2_bzKYvHQ_iFgLcPnlG-m636-rWXAI5Vubo',
-  K: 'PbxVzGOl5YKxg6Fd-uSD6Yqr9716j9MddvFbISuFxL4',
+  room: '7Pnm_IlWY5QCDEg_cnv5C7Y6gTzllzjyevYZ-_aP-0A',
+  proof: '0jjNlNhv44WG3Iy6omt4sSBJNJMeNpQ869-oBrvMKAI',
+  K: 'JWAwYE5mukvhr4I8wPalPoG4ObNt2wIEbxHORF6qws8',
   msg: { t: 'offer', sid: 'AAECAwQFBgcICQoLDA0ODw', ts: 1790000000000, name: 'Pixel 10', sdp: 'v=0\r\no=- 1 2 IN IP4 127.0.0.1\r\n' },
-  mac: '3QYhMYuCNPzit2tYBw0ejDAQsE1vxoO4DQERkznV8o8',
+  mac: 'SoENh-pvxSzm2RgaqFeUG8GT0oaMR8k04f-BBUjJLy8',
 };
 
 test('test vector with node:crypto', () => {

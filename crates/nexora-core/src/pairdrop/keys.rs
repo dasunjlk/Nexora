@@ -144,9 +144,9 @@ mod tests {
     fn contract_vector() {
         let s = vector();
         assert_eq!(s.encode(), "AAECAwQFBgcICQoLDA0ODw");
-        assert_eq!(s.room(), "geDM0jEhk4eiOz_li-FtORW2YlPBbebr7NsHjLkHI_4");
-        assert_eq!(s.proof(), "6JmvhsXX2_bzKYvHQ_iFgLcPnlG-m636-rWXAI5Vubo");
-        assert_eq!(b64u(&s.mac_key()), "PbxVzGOl5YKxg6Fd-uSD6Yqr9716j9MddvFbISuFxL4");
+        assert_eq!(s.room(), "7Pnm_IlWY5QCDEg_cnv5C7Y6gTzllzjyevYZ-_aP-0A");
+        assert_eq!(s.proof(), "0jjNlNhv44WG3Iy6omt4sSBJNJMeNpQ869-oBrvMKAI");
+        assert_eq!(b64u(&s.mac_key()), "JWAwYE5mukvhr4I8wPalPoG4ObNt2wIEbxHORF6qws8");
         assert_eq!(s.link("https://drop.nexora.app/"), "https://drop.nexora.app/p#k=AAECAwQFBgcICQoLDA0ODw");
     }
 

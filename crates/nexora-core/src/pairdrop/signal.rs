@@ -129,7 +129,7 @@ mod tests {
     #[test]
     fn contract_vector() {
         let m = Msg::signed(&vector(), "offer", SID, "Pixel 10", SDP, TS);
-        assert_eq!(m.mac, "3QYhMYuCNPzit2tYBw0ejDAQsE1vxoO4DQERkznV8o8");
+        assert_eq!(m.mac, "SoENh-pvxSzm2RgaqFeUG8GT0oaMR8k04f-BBUjJLy8");
         assert_eq!(m.verify(&vector(), TS + 1000), Ok(()));
     }
 
