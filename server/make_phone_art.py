@@ -49,10 +49,12 @@ def head(d: ImageDraw.ImageDraw, cx: float, cy: float, r: float, eyes="open", ti
     for sx in (-1, 1):
         ex = cx + sx * hw * 0.62
         ey = cy - hh * 0.62
-        ear = [(ex - r * 0.34, ey - r * 0.52), (ex + r * 0.36, ey + r * 0.12), (ex - r * 0.02, ey + r * 0.34)]
+        ear = [(ex - r * 0.44, ey - r * 0.34), (ex + r * 0.46, ey + r * 0.16), (ex - r * 0.02, ey + r * 0.40)]
         d.polygon([(x * SS, y * SS) for x, y in ear], fill=FUR)
+        gx = sum(p[0] for p in ear) / 3
+        gy = sum(p[1] for p in ear) / 3
         d.polygon(
-            [(x * SS + sx * r * 0.05, (y + r * 0.06) * SS) for x, y in ear],
+            [((gx + (x - gx) * 0.55) * SS, (gy + (y - gy) * 0.55) * SS) for x, y in ear],
             fill=INNER,
         )
     # skull: a squashed circle with cheeks
@@ -155,18 +157,17 @@ def shelf(w: int, h: int):
 def asleep(w: int, h: int):
     """Curled up, eyes closed, dreaming."""
     img, d, _ = canvas(w, h)
-    cx = w * 0.52
-    cy = h * 0.66
-    ellipse(d, [cx - w * 0.30, cy - h * 0.16, cx + w * 0.30, cy + h * 0.20], fill=FUR)
+    cx = w * 0.46
+    cy = h * 0.68
+    ellipse(d, [cx - w * 0.28, cy - h * 0.14, cx + w * 0.30, cy + h * 0.18], fill=FUR)
     d.arc(
-        [(cx + w * 0.22) * SS, (cy - h * 0.18) * SS, (cx + w * 0.52) * SS, (cy + h * 0.22) * SS],
-        250, 90, fill=FUR_DARK, width=round(h * 0.055 * SS),
+        [(cx + w * 0.16) * SS, (cy - h * 0.14) * SS, (cx + w * 0.36) * SS, (cy + h * 0.18) * SS],
+        250, 90, fill=FUR_DARK, width=round(h * 0.05 * SS),
     )
-    head(d, cx - w * 0.22, cy - h * 0.13, w * 0.15, eyes="closed")
-    ellipse(d, [cx - w * 0.335, cy - h * 0.155, cx - w * 0.10, cy - h * 0.03], fill=INNER)
-    for i, (zx, zy, r) in enumerate([(0.66, 0.38, 0.035), (0.74, 0.28, 0.05), (0.84, 0.16, 0.068)]):
+    head(d, cx - w * 0.20, cy - h * 0.13, w * 0.14, eyes="closed")
+    for i, (zx, zy, r) in enumerate([(0.70, 0.42, 0.03), (0.78, 0.30, 0.043), (0.87, 0.17, 0.06)]):
         zr = r * w
-        ellipse(d, [w * zx - zr, h * zy - zr * 0.55, w * zx + zr, h * zy + zr * 0.55], outline=INK, width=round(w * 0.016 * SS))
+        ellipse(d, [w * zx - zr, h * zy - zr * 0.55, w * zx + zr, h * zy + zr * 0.55], outline=INK, width=round(w * 0.014 * SS))
     save(img, w, h, "nova-asleep.webp")
 
 
@@ -174,20 +175,19 @@ def note(w: int, h: int):
     """Holding the meeting notes."""
     img, d, _ = canvas(w, h)
     cx = w * 0.5
-    ground = h * 0.92
-    body_h = h * 0.26
+    ground = h * 0.94
+    body_h = h * 0.24
     rrect(d, [cx - w * 0.26, ground - body_h, cx + w * 0.26, ground + body_h * 0.14], w * 0.2, fill=FUR)
-    head(d, cx, ground - body_h - h * 0.10, w * 0.155)
-    # the notepad between her paws
-    px, pw, ph = cx - w * 0.16, w * 0.32, h * 0.26
-    py = ground - body_h - ph * 0.4
+    head(d, cx, ground - body_h - h * 0.115, w * 0.155)
+    # the notepad, held below her chin
+    px, pw, ph = cx - w * 0.17, w * 0.34, h * 0.24
+    py = ground - body_h * 0.72
     rrect(d, [px, py, px + pw, py + ph], h * 0.03, fill=WHITE)
-    for i in range(4):
-        y = py + ph * 0.22 + i * ph * 0.18
-        d.line([px + pw * 0.14, y, px + pw * (0.86 if i % 2 == 0 else 0.62), y], fill="#8B6CFF", width=round(h * 0.014 * SS))
-    d.line([cx, py - h * 0.012, cx, py], fill="#6E4BE8", width=round(h * 0.012 * SS))
+    for i in range(3):
+        y = py + ph * 0.30 + i * ph * 0.2
+        d.line([(px + pw * 0.14) * SS, y * SS, (px + pw * (0.86 if i % 2 == 0 else 0.6)) * SS, y * SS], fill="#8B6CFF", width=round(h * 0.013 * SS))
     for sx in (-1, 1):
-        paw(d, cx + sx * pw * 0.44, py + ph * 0.18, w * 0.075)
+        paw(d, cx + sx * pw * 0.42, py + ph * 0.16, w * 0.07)
     save(img, w, h, "nova-note.webp")
 
 
