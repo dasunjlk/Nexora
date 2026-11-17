@@ -13,9 +13,9 @@ use sha2::{Digest, Sha256};
 /// Bytes in a pairing secret.
 pub const SECRET_LEN: usize = 16;
 
-const ROOM: &[u8] = b"oyen-drop/1 room";
-const PROOF: &[u8] = b"oyen-drop/1 proof";
-const MAC: &[u8] = b"oyen-drop/1 mac";
+const ROOM: &[u8] = b"nova-drop/1 room";
+const PROOF: &[u8] = b"nova-drop/1 proof";
+const MAC: &[u8] = b"nova-drop/1 mac";
 
 /// A pairing secret. The Windows crate fills it from the system RNG.
 #[derive(Clone, PartialEq, Eq)]

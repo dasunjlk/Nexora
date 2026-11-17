@@ -34,9 +34,9 @@ https://drop.nexora.app/p#k=<b64u(S)>
 
 | Name | Value | Used for |
 |---|---|---|
-| `room` | `b64u(SHA256("oyen-drop/1 room" ‖ S))` | the address of this pair on the meeting server |
-| `proof` | `b64u(SHA256("oyen-drop/1 proof" ‖ S))` | shown to the meeting server with every request; it keeps `SHA256(proof)` per room (first use wins) |
-| `K` | `SHA256("oyen-drop/1 mac" ‖ S)` (32 raw bytes) | HMAC key for every signalling message |
+| `room` | `b64u(SHA256("nova-drop/1 room" ‖ S))` | the address of this pair on the meeting server |
+| `proof` | `b64u(SHA256("nova-drop/1 proof" ‖ S))` | shown to the meeting server with every request; it keeps `SHA256(proof)` per room (first use wins) |
+| `K` | `SHA256("nova-drop/1 mac" ‖ S)` (32 raw bytes) | HMAC key for every signalling message |
 
 The meeting server sees `room` and `proof`, never `S` or `K`, so it can't
 make or alter a signed message. Every SDP is signed, and an SDP carries the
@@ -60,7 +60,7 @@ object with these fields:
 `text` is these lines joined with `\n` (the SDP verbatim, `\r\n` and all):
 
 ```
-oyen-drop/1
+nova-drop/1
 <room>
 <t>
 <sid>
@@ -118,7 +118,7 @@ The server keeps everything in memory except the `gone` list.
 
 ## The data channel
 
-The phone makes the offer with one data channel labelled `oyen-drop`
+The phone makes the offer with one data channel labelled `nova-drop`
 (ordered, reliable). Text frames are JSON; binary frames are file bytes.
 
 | From | Message | Meaning |

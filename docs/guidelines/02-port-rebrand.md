@@ -27,11 +27,11 @@ upstream branding left.
    `crates/nexora → crates/nexora`, `crates/nexora-core → crates/nexora-core`,
    `crates/nexora-usage → crates/nexora-usage`,
    `crates/nexora-diorama → crates/nexora-diorama`,
-   `src/oyen.rs → src/nova.rs`, `src/oyen/ → src/nova/`,
+   `src/nova.rs → src/nova.rs`, `src/nova/ → src/nova/`,
    `res/nexora.{ico,rc,manifest} → res/nexora.*`,
    `installer/nexora.{iss,nsi} → installer/nexora.*`,
-   brand asset filenames (`oyen-mark* → nova-mark*`, `nexora-logo* →
-   nexora-logo*`, mascot images `oyen-* → nova-*`).
+   brand asset filenames (`nova-mark* → nova-mark*`, `nexora-logo* →
+   nexora-logo*`, mascot images `nova-* → nova-*`).
 3. **Token replacements** across every text file, longest-first so compound
    names resolve once:
    repo slug → `dasunjlk/Nexora`; `app.nexora.nexora` → `app.nexora.nexora`;
@@ -41,7 +41,7 @@ upstream branding left.
    nexora.trade`, `dasunjlk.github.io/Nexora → dasunjlk.github.io/Nexora`);
    `nxis_` → `nxis_`; `nexora-notes-server` → `nexora-notes-server`; then the
    case variants `Nexora`, `Nexora`, `nexora`, `Nexora`,
-   `NEXORA`, `nexora`, `Oyen`, `OYEN`, `oyen`, `nexora-usage`/`nexora_usage`,
+   `NEXORA`, `nexora`, `Nova`, `NOVA`, `nova`, `nexora-usage`/`nexora_usage`,
    `nexora-diorama`/`nexora_diorama`, `Nexora`, `NEXORA`, `nexora`.
 4. **Version reset**: workspace version `0.2.30 → 0.1.0` in `Cargo.toml`,
    the CI env, both installer scripts and the website's fallback version;
@@ -66,6 +66,6 @@ upstream branding left.
 
 ## Acceptance
 
-- `grep -ri "nexora\|nexora\|oyen" --include="*"` over tracked text files
+- `grep -ri "nexora\|nexora\|nova" --include="*"` over tracked text files
   returns only licence/attribution contexts.
 - Workspace tests pass; `nexora.exe` builds.

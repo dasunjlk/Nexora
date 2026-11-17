@@ -28,9 +28,9 @@ pub enum Theme {
     /// The plain black island.
     #[default]
     Classic,
-    /// Oyen, the Nexora cat, lives in the island: he peeks over its edge
-    /// while it rests, bobs to the music and takes Oyen's orange as accent.
-    Oyen,
+    /// Nova, the Nexora cat, lives in the island: he peeks over its edge
+    /// while it rests, bobs to the music and takes Nova's orange as accent.
+    Nova,
     /// Liquid glass: the island bends, frosts and tints what's under it.
     Glass,
     /// Pill: the island floats a little below the top edge as a black
@@ -141,7 +141,7 @@ pub struct Settings {
     /// Notifications' choices: which apps the island shows, and
     /// whether who it's from and the message show at once.
     pub notifications: crate::notifications::NotificationSettings,
-    /// How Oyen talks on the IELTS page (Sopan, Gaul or Ngegas, the default).
+    /// How Nova talks on the IELTS page (Sopan, Gaul or Ngegas, the default).
     pub ielts_spice: Spice,
 }
 
@@ -467,8 +467,8 @@ mod tests {
         // Files written before themes existed keep the black island.
         let s: Settings = serde_json::from_str(r#"{"idle_style":"eyes"}"#).unwrap();
         assert_eq!(s.theme, Theme::Classic);
-        let s: Settings = serde_json::from_str(r#"{"theme":"oyen"}"#).unwrap();
-        assert_eq!(s.theme, Theme::Oyen);
+        let s: Settings = serde_json::from_str(r#"{"theme":"nova"}"#).unwrap();
+        assert_eq!(s.theme, Theme::Nova);
         let s: Settings = serde_json::from_str(r#"{"theme":"glass"}"#).unwrap();
         assert_eq!(s.theme, Theme::Glass);
         let s: Settings = serde_json::from_str(r#"{"theme":"pill"}"#).unwrap();
@@ -483,12 +483,12 @@ mod tests {
         // it has its name here, and then the loop below asks for it.
         let name = |t: Theme| match t {
             Theme::Classic => "classic",
-            Theme::Oyen => "oyen",
+            Theme::Nova => "nova",
             Theme::Glass => "glass",
             Theme::Pill => "pill",
             Theme::Diorama => "diorama",
         };
-        for theme in [Theme::Classic, Theme::Oyen, Theme::Glass, Theme::Pill, Theme::Diorama] {
+        for theme in [Theme::Classic, Theme::Nova, Theme::Glass, Theme::Pill, Theme::Diorama] {
             let s = Settings { theme, ..Settings::default() };
             let j = serde_json::to_string(&s).unwrap();
             assert!(j.contains(&format!(r#""theme":"{}""#, name(theme))), "{theme:?}: {j}");
@@ -526,8 +526,8 @@ mod tests {
     #[test]
     fn files_with_clipboard_history_still_load_and_drop_it() {
         // Files from 0.2.8 and before hold the key: it's ignored, and gone after a save.
-        let s = serde_json::from_str::<Settings>(r#"{"settings_version":4,"clipboard_history":true,"theme":"oyen"}"#).unwrap().sanitized();
-        assert_eq!(s.theme, Theme::Oyen);
+        let s = serde_json::from_str::<Settings>(r#"{"settings_version":4,"clipboard_history":true,"theme":"nova"}"#).unwrap().sanitized();
+        assert_eq!(s.theme, Theme::Nova);
         assert!(!serde_json::to_string(&s).unwrap().contains("clipboard"));
         // A Clipboard start page from before 0.2.7 opens Music.
         let s = serde_json::from_str::<Settings>(r#"{"settings_version":3,"start_page":"clipboard"}"#).unwrap().sanitized();

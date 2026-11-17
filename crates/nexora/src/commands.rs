@@ -146,7 +146,7 @@ pub enum IeltsCmd {
 /// The Notes page's buttons (the Meeting notes add-on).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum NotesCmd {
-    /// Take notes: Oyen starts listening.
+    /// Take notes: Nova starts listening.
     Start,
     /// Stop: the meeting is over, its notes get written.
     Stop,

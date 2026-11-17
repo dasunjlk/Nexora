@@ -5,7 +5,7 @@
 Writes installer/mac/dmg/background.png (the notarized DMG) and background-test.png (the ad-hoc test DMG, which
 also says how to get past Open Anyway), each at 660x420 and at 2x as <name>@2x.png. dmgbuild joins each pair into
 one HiDPI TIFF, so Finder shows the sharp one on a Retina screen (tools/make_mac_dmg.sh). Rerun this after
-changing the page, the logo or the Oyen art, and commit the PNGs: the Mac builds read them, not the page.
+changing the page, the logo or the Nova art, and commit the PNGs: the Mac builds read them, not the page.
 
 Needs Playwright for Python with Chromium (pip install playwright, then playwright install chromium) and Pillow.
 """

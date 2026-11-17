@@ -86,7 +86,7 @@ fn capsule(w: f32) -> Geom {
 
 pub fn geom(a: Activity, st: &AppState) -> Option<Geom> {
     let w = match a {
-        // Oyen's head, listening or writing, is the same pill in every theme.
+        // Nova's head, listening or writing, is the same pill in every theme.
         Activity::Media | Activity::Notes => return None,
         Activity::Timer if long_countdown(st) => TIMER_LONG_W,
         Activity::Timer => TIMER_W,

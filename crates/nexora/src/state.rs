@@ -341,10 +341,10 @@ pub struct PageUiState {
     pub peek_until: f64,
     /// Header tab under the pointer and since when (for hover labels).
     pub tab_hover: Option<(usize, f64)>,
-    /// Oyen in the Nexora tab: his last move of his own and when it started
-    /// (`oyen::tab`). None while the island is closed: the next opening is
+    /// Nova in the Nexora tab: his last move of his own and when it started
+    /// (`nova::tab`). None while the island is closed: the next opening is
     /// his arrival.
-    pub oyen_tab: Option<(crate::oyen::TabMove, f64)>,
+    pub nova_tab: Option<(crate::nova::TabMove, f64)>,
     /// The module the System page shows under its strip.
     pub system_module: nexora_core::sysmon::Module,
     /// The last System reading had a GPU (keeps its chip while the next one is on its way).
@@ -356,8 +356,8 @@ pub struct PageUiState {
     pub before_settings: Option<PageKind>,
     /// Start with Windows, as last read off the UI thread (None until Settings first opens).
     pub autostart: Option<bool>,
-    /// Oyen theme: the music notes floating up in the media pill.
-    pub notes: crate::oyen::Notes,
+    /// Nova theme: the music notes floating up in the media pill.
+    pub notes: crate::nova::Notes,
     /// The Eyes look on a MacBook's notch: the pointer the eyes follow and
     /// the side of the camera they peek out from (`mac/notch.rs`).
     #[cfg(target_os = "macos")]
@@ -371,7 +371,7 @@ pub struct PageUiState {
     pub downloads: crate::pages::downloads::DownloadsUi,
     /// The AI tab's own state while it shows (`pages::usage`).
     pub usage: crate::pages::usage::UsageUi,
-    /// The Notes page: when the last notes were saved (Oyen's tick), a short
+    /// The Notes page: when the last notes were saved (Nova's tick), a short
     /// line beside them until a time ("Copied"), and whether a recording is
     /// kept on this PC for Try again.
     pub notes_saved_at: f64,
@@ -444,7 +444,7 @@ pub enum AgendaState {
 }
 
 /// What the Nexora tab and its notices show (`pages::nexora`), and the Today
-/// page's day (`pages::today`). Oyen's moods never read any of it: money
+/// page's day (`pages::today`). Nova's moods never read any of it: money
 /// never makes him happier or a bill sadder.
 #[derive(Clone, Debug, Default)]
 pub struct NexoraState {
@@ -840,7 +840,7 @@ pub struct AppState {
     pub notify_can: bool,
     /// The AI tab's readings (its choices: `settings.usage`).
     pub usage: UsageState,
-    /// The IELTS page's session with Oyen (the IELTS add-on).
+    /// The IELTS page's session with Nova (the IELTS add-on).
     pub ielts: nexora_core::ielts::Coach,
     /// The Notes page's meeting (the Meeting notes add-on).
     pub notes: nexora_core::notes::Taker,
@@ -1242,9 +1242,9 @@ impl AppState {
     }
 
     /// Accent for media UI: art colour when available, else the system accent.
-    /// The Oyen theme keeps to Oyen's orange.
+    /// The Nova theme keeps to Nova's orange.
     pub fn media_accent(&self) -> Color {
-        if self.settings.theme == nexora_core::settings::Theme::Oyen {
+        if self.settings.theme == nexora_core::settings::Theme::Nova {
             return self.accent;
         }
         self.media.as_ref().and_then(|m| m.art_color).unwrap_or(self.accent)

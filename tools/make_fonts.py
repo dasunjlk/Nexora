@@ -2,7 +2,7 @@
 """Build the fonts Nexora ships (crates/nexora/res/fonts) from Outfit.
 
 Outfit (SIL Open Font License 1.1, github.com/Outfitio/Outfit-Fonts) is the
-Nexora website's typeface; the Oyen theme writes every Latin letter in it.
+Nexora website's typeface; the Nova theme writes every Latin letter in it.
 Google Fonts publishes it as one variable font. The island wants four plain
 weights (Regular, Medium, SemiBold, Bold) that every Windows text stack loads,
 so this script cuts them out of the variable font, and adds the pinyin tone

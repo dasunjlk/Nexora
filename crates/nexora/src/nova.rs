@@ -1,29 +1,29 @@
-//! The Oyen theme: Oyen, the Nexora cat, living in the island.
+//! The Nova theme: Nova, the Nexora cat, living in the island.
 //!
-//! Oyen is drawn from the Nexora app's own built face ([`nexora_core::oyen`]),
+//! Nova is drawn from the Nexora app's own built face ([`nexora_core::nova`]),
 //! never from a picture, so he is the same character, with the same moods, as
 //! in the app. He peeks over a line near the island's bottom edge the way the
 //! Nexora logo does, his chin hidden behind it. (The logo's cream paws are
-//! left out: at island size they read as teeth, and Oyen has no mouth.)
+//! left out: at island size they read as teeth, and Nova has no mouth.)
 //!
 //! Moods only ever follow what the island is doing (resting, music, the
 //! cursor, the night), never an amount of money.
 
 use crate::gfx::Canvas;
 use nexora_core::geom::{Color, Point, Rect};
-use nexora_core::oyen::{self, Affine, Element, Frame, Input, Mood, Paint, Path, Place};
+use nexora_core::nova::{self, Affine, Element, Frame, Input, Mood, Paint, Path, Place};
 use nexora_core::settings::Theme;
 use nexora_core::svgpath::{self, Seg};
 use std::f32::consts::TAU;
 use std::f64::consts::PI;
 use std::sync::OnceLock;
 
-/// Oyen's orange: the theme's accent.
-pub const ORANGE: Color = Color::hex(oyen::ORANGE);
-const FOLD: Color = Color::hex(oyen::FOLD_ORANGE);
-const INK: Color = Color::hex(oyen::INK);
-const PINK: Color = Color::hex(oyen::PINK);
-const GREEN: Color = Color::hex(oyen::GREEN);
+/// Nova's orange: the theme's accent.
+pub const ORANGE: Color = Color::hex(nova::ORANGE);
+const FOLD: Color = Color::hex(nova::FOLD_ORANGE);
+const INK: Color = Color::hex(nova::INK);
+const PINK: Color = Color::hex(nova::PINK);
+const GREEN: Color = Color::hex(nova::GREEN);
 /// The Nexora app icon's ground.
 const ICON_TILE: Color = Color::hex(0x171717);
 /// Shapes that float around the head (thinking dots, z's) are ink on a light
@@ -39,12 +39,12 @@ const BAR_TOP: f32 = 23.0;
 const SMALL_EYES: f64 = 1.19;
 
 /// How long one rest cycle lasts: a blink at its start, an ear flick every
-/// third cycle. Between moves Oyen is a still frame, so the app sleeps.
+/// third cycle. Between moves Nova is a still frame, so the app sleeps.
 const REST_CYCLE: f64 = 6.5;
 const BLINK_WINDOW: f64 = 0.4;
 
 pub fn on(theme: Theme) -> bool {
-    theme == Theme::Oyen
+    theme == Theme::Nova
 }
 
 /// Is a rest move (blink or ear flick) under way at `now`?
@@ -58,13 +58,13 @@ pub fn next_rest_move(now: f64) -> f64 {
 }
 
 /// Is a rest move under way at `now`, or within `margin` seconds of one? The
-/// self-test waits for a still Oyen before it takes a picture.
+/// self-test waits for a still Nova before it takes a picture.
 pub fn mid_rest_move(now: f64, margin: f64) -> bool {
     let phase = now.rem_euclid(REST_CYCLE);
     phase < BLINK_WINDOW + margin || phase > REST_CYCLE - margin
 }
 
-/// What Oyen does while the island rests. `look` is the cursor's horizontal
+/// What Nova does while the island rests. `look` is the cursor's horizontal
 /// place over the island (-1 left .. 1 right) while it hovers: his eyes
 /// follow it, glancing down towards it. Returns the frame and whether it
 /// moves on its own (the caller then keeps frames coming).
@@ -76,20 +76,20 @@ pub fn rest(now: f64, night: bool, look: Option<f32>) -> (Frame, bool) {
 fn rest_eyes(now: f64, night: bool, look: Option<f32>, eyes: f64) -> (Frame, bool) {
     if night {
         // Asleep, drawn still: no breathing frames at night.
-        return (oyen::frame(Mood::Sleep, 0.6, Input::default(), eyes), false);
+        return (nova::frame(Mood::Sleep, 0.6, Input::default(), eyes), false);
     }
     if let Some(x) = look {
         let input = Input { pencil: x.clamp(-1.0, 1.0) as f64, ..Input::default() };
-        return (oyen::frame(Mood::Nulis, 0.0, input, eyes), false);
+        return (nova::frame(Mood::Nulis, 0.0, input, eyes), false);
     }
     let phase = now.rem_euclid(REST_CYCLE);
     if !rest_moving(now) {
-        return (oyen::frame(Mood::Oyen, 0.0, Input::default(), eyes), false);
+        return (nova::frame(Mood::Nova, 0.0, Input::default(), eyes), false);
     }
     // The idle mood blinks at 1.7 s and flicks the folded ear at 0.6 s.
     let flick = (now / REST_CYCLE).floor() as i64 % 3 == 2;
     let t = if flick { 0.55 + phase } else { 1.6 + phase };
-    (oyen::frame(Mood::Oyen, t, Input::default(), eyes), true)
+    (nova::frame(Mood::Nova, t, Input::default(), eyes), true)
 }
 
 /// Bopping to the music while it plays: eyes shut in a smile, bouncing on the
@@ -97,19 +97,19 @@ fn rest_eyes(now: f64, night: bool, look: Option<f32>, eyes: f64) -> (Frame, boo
 /// (the lean straightens out first).
 pub fn music(now: f64, playing: bool, paused_at: Option<f64>) -> Frame {
     let (mut f, lean) = if playing {
-        (oyen::frame(Mood::Happy, now.rem_euclid(Mood::Happy.loop_secs()), Input::default(), SMALL_EYES), lean(now))
+        (nova::frame(Mood::Happy, now.rem_euclid(Mood::Happy.loop_secs()), Input::default(), SMALL_EYES), lean(now))
     } else {
         let left = paused_at.map_or(0.0, |p| 1.0 - smooth(((now - p) / SETTLE) as f32) as f64);
-        (oyen::frame(Mood::Oyen, 0.0, Input::default(), SMALL_EYES), paused_at.map_or(0.0, lean) * left)
+        (nova::frame(Mood::Nova, 0.0, Input::default(), SMALL_EYES), paused_at.map_or(0.0, lean) * left)
     };
     if lean != 0.0 {
-        f.head = f.head.then(Affine::rotation_about(lean, oyen::Point::new(0.0, oyen::CHIN)));
+        f.head = f.head.then(Affine::rotation_about(lean, nova::Point::new(0.0, nova::CHIN)));
     }
     f
 }
 
 /// Does the media pill still move on its own: music playing, notes still in
-/// the air, or Oyen straightening up after a pause?
+/// the air, or Nova straightening up after a pause?
 pub fn music_moving(now: f64, playing: bool, paused_at: Option<f64>, notes: &Notes) -> bool {
     playing || notes.flying() || paused_at.is_some_and(|p| now < p + SETTLE)
 }
@@ -122,17 +122,17 @@ fn lean(t: f64) -> f64 {
 
 // ---------------------------------------------------------------- notes
 
-/// Oyen's beat while music plays: the happy mood bounces twice a loop, so his
+/// Nova's beat while music plays: the happy mood bounces twice a loop, so his
 /// head lands every 0.6 s (100 bpm). A note leaves on each landing.
 pub const BEAT: f64 = 0.6;
-/// How long a note floats, from leaving Oyen to gone.
+/// How long a note floats, from leaving Nova to gone.
 pub const NOTE_LIFE: f64 = 1.9;
 /// A note's pop as it leaves.
 const POP: f64 = 0.22;
 /// A gap this long between frames means the pill was away (paused, a page
 /// open): the notes start afresh on the next beat instead of catching up.
 const GAP: f64 = 0.25;
-/// How far Oyen leans at the top of a bounce (degrees), and how long he takes
+/// How far Nova leans at the top of a bounce (degrees), and how long he takes
 /// to straighten up when the music pauses.
 const LEAN_DEG: f64 = 5.0;
 const SETTLE: f64 = 0.3;
@@ -171,9 +171,9 @@ impl Notes {
     }
 }
 
-/// One note's way up: where it leaves (DIPs right of Oyen's middle), how far
+/// One note's way up: where it leaves (DIPs right of Nova's middle), how far
 /// it drifts sideways while rising, a pair (♫) or one (♪), deep orange or
-/// Oyen's own (a little smaller), and where its sway starts (in turns).
+/// Nova's own (a little smaller), and where its sway starts (in turns).
 struct Flight {
     x: f32,
     drift: f32,
@@ -214,7 +214,7 @@ fn glyph(pair: bool) -> &'static [Seg] {
     &g[pair as usize]
 }
 
-/// The notes in the air, around Oyen at (`cx`, `bar_y`) (his place in the
+/// The notes in the air, around Nova at (`cx`, `bar_y`) (his place in the
 /// pill), inside `clip`. `left` dims the ones on his left, where a new
 /// track's title passes.
 pub fn notes(c: &mut Canvas, notes: &Notes, now: f64, cx: f32, bar_y: f32, clip: Rect, left: f32) {
@@ -287,7 +287,7 @@ fn back_out(x: f32) -> f32 {
     1.0 + v * v * ((S + 1.0) * v + S)
 }
 
-/// Oyen peeking over the line at `bar_y`, his head `w` DIPs wide and centred
+/// Nova peeking over the line at `bar_y`, his head `w` DIPs wide and centred
 /// on `cx`. Only what is above the line shows (nothing above `top` either).
 pub fn peek(c: &mut Canvas, frame: &Frame, cx: f32, bar_y: f32, w: f32, top: f32) {
     let k = w / MARK_W;
@@ -299,13 +299,13 @@ pub fn peek(c: &mut Canvas, frame: &Frame, cx: f32, bar_y: f32, w: f32, top: f32
 
 // ---------------------------------------------------------------- the Nexora tab
 
-/// How long Oyen takes to rise into the Nexora tab as the island opens.
+/// How long Nova takes to rise into the Nexora tab as the island opens.
 const TAB_RISE: f64 = 0.45;
 /// His arrival, rise and wave: the Hello mood's wave is over by 1.2 s (its
 /// last 0.4 s only hold still), so the frames stop there.
 const TAB_ARRIVE: f64 = 1.2;
 
-/// A move Oyen makes in the Nexora tab, by himself, once.
+/// A move Nova makes in the Nexora tab, by himself, once.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TabMove {
     /// The island opened: he rises into his tab, waving (the Hello mood).
@@ -314,7 +314,7 @@ pub enum TabMove {
     Picked,
 }
 
-/// Oyen as the Nexora tab's icon: the Nexora mark, his whole head `w` DIPs
+/// Nova as the Nexora tab's icon: the Nexora mark, his whole head `w` DIPs
 /// wide, centred on `center` and kept inside `clip` (the tab). `moved`: his
 /// last move of his own and when it started; after it he rests (a blink, an
 /// ear flick now and then) and, with the pointer over the tab row, watches it
@@ -327,10 +327,10 @@ pub fn tab(c: &mut Canvas, center: Point, w: f32, clip: Rect, now: f64, moved: O
     let (frame, rise, moving) = match moved.map(|(m, at)| (m, now - at)) {
         Some((TabMove::Arrive, s)) if s < arrive => {
             let rise = 1.0 - back_out((s / TAB_RISE) as f32);
-            let frame = if night { oyen::frame(Mood::Sleep, 0.6, Input::default(), SMALL_EYES) } else { oyen::frame(Mood::Hello, s, Input::default(), SMALL_EYES) };
+            let frame = if night { nova::frame(Mood::Sleep, 0.6, Input::default(), SMALL_EYES) } else { nova::frame(Mood::Hello, s, Input::default(), SMALL_EYES) };
             (frame, rise, true)
         }
-        Some((TabMove::Picked, s)) if s < Mood::Happy.loop_secs() && !night => (oyen::frame(Mood::Happy, s, Input::default(), SMALL_EYES), 0.0, true),
+        Some((TabMove::Picked, s)) if s < Mood::Happy.loop_secs() && !night => (nova::frame(Mood::Happy, s, Input::default(), SMALL_EYES), 0.0, true),
         _ => {
             let (frame, moving) = rest(now, night, look);
             (frame, 0.0, moving)
@@ -345,7 +345,7 @@ pub fn tab(c: &mut Canvas, center: Point, w: f32, clip: Rect, now: f64, moved: O
 
 // ---------------------------------------------------------------- the IELTS page
 
-/// What Oyen does on the IELTS page, as the examiner.
+/// What Nova does on the IELTS page, as the examiner.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Coach {
     /// Between turns: a blink now and then, eyes on the pointer while it's
@@ -370,7 +370,7 @@ pub enum Coach {
     Logged { since: f64 },
 }
 
-/// Syllables a second while Oyen talks, a phrase's length, and how much of
+/// Syllables a second while Nova talks, a phrase's length, and how much of
 /// each phrase he talks (the rest is a breath).
 const TALK_HZ: f64 = 4.2;
 const PHRASE_S: f64 = 1.7;
@@ -382,7 +382,7 @@ const PROUD_S: f64 = 2.4;
 /// One line of writing, while a meeting's notes are made.
 const WRITE_LINE_S: f64 = 1.6;
 
-/// Oyen on the IELTS page: his whole head `w` DIPs wide, head and ears
+/// Nova on the IELTS page: his whole head `w` DIPs wide, head and ears
 /// centred on `center`. Returns whether he moves by himself (the page keeps
 /// frames coming meanwhile).
 pub fn coach(c: &mut Canvas, center: Point, w: f32, now: f64, what: Coach) -> bool {
@@ -391,24 +391,24 @@ pub fn coach(c: &mut Canvas, center: Point, w: f32, now: f64, what: Coach) -> bo
         Coach::Rest { look } => rest_eyes(now, false, look, eyes),
         Coach::Talk { since } => (talk((now - since).max(0.0), eyes), true),
         Coach::Listen { level } => {
-            let mut f = oyen::frame(Mood::Nulis, 0.0, Input::default(), eyes);
+            let mut f = nova::frame(Mood::Nulis, 0.0, Input::default(), eyes);
             f.head = f.head.then(Affine::translation(0.0, -LISTEN_LIFT * level.clamp(0.0, 1.0) as f64));
             (f, false)
         }
-        Coach::Think => (oyen::frame(Mood::Think, now.rem_euclid(Mood::Think.loop_secs()), Input::default(), eyes), true),
-        Coach::Proud { since } if now - since < PROUD_S => (oyen::frame(Mood::Happy, (now - since).max(0.0), Input::default(), eyes), true),
+        Coach::Think => (nova::frame(Mood::Think, now.rem_euclid(Mood::Think.loop_secs()), Input::default(), eyes), true),
+        Coach::Proud { since } if now - since < PROUD_S => (nova::frame(Mood::Happy, (now - since).max(0.0), Input::default(), eyes), true),
         Coach::Proud { .. } => rest_eyes(now, false, None, eyes),
         Coach::Sorry { since } => {
             let t = (now - since).max(0.0);
-            (oyen::frame(Mood::Sad, t, Input::default(), eyes), t < Mood::Sad.loop_secs())
+            (nova::frame(Mood::Sad, t, Input::default(), eyes), t < Mood::Sad.loop_secs())
         }
         Coach::Write => {
             // Across the line in 1.6 s, then back to the next one.
             let line = (now / WRITE_LINE_S).fract();
             let pencil = Input { pencil: 2.0 * line - 1.0, ..Input::default() };
-            (oyen::frame(Mood::Nulis, now.rem_euclid(Mood::Nulis.loop_secs()), pencil, eyes), true)
+            (nova::frame(Mood::Nulis, now.rem_euclid(Mood::Nulis.loop_secs()), pencil, eyes), true)
         }
-        Coach::Logged { since } if now - since < Mood::Tercatat.loop_secs() => (oyen::frame(Mood::Tercatat, (now - since).max(0.0), Input::default(), eyes), true),
+        Coach::Logged { since } if now - since < Mood::Tercatat.loop_secs() => (nova::frame(Mood::Tercatat, (now - since).max(0.0), Input::default(), eyes), true),
         Coach::Logged { .. } => rest_eyes(now, false, None, eyes),
     };
     let k = w / MARK_W;
@@ -416,36 +416,36 @@ pub fn coach(c: &mut Canvas, center: Point, w: f32, now: f64, what: Coach) -> bo
     moving
 }
 
-/// Oyen saying a line, `t` seconds in. He has no mouth (the mark has none),
+/// Nova saying a line, `t` seconds in. He has no mouth (the mark has none),
 /// so his head does the talking: a squash and lift on each syllable, a breath
 /// between phrases, and the folded ear's flick as each phrase starts.
 fn talk(t: f64, eyes: f64) -> Frame {
     let p = t.rem_euclid(PHRASE_S);
     // The idle mood's ear flick runs from 0.55 s.
     let mood_t = if p < 0.45 { 0.55 + p } else { 0.0 };
-    let mut f = oyen::frame(Mood::Oyen, mood_t, Input::default(), eyes);
+    let mut f = nova::frame(Mood::Nova, mood_t, Input::default(), eyes);
     let talking = PHRASE_S * PHRASE_ON;
     // Eased in and out at the phrase's ends, so a breath never jumps.
     let edge = (p / 0.12).min((talking - p) / 0.12).clamp(0.0, 1.0);
     let b = if p < talking { (PI * TALK_HZ * t).sin().abs().powf(1.6) * edge } else { 0.0 };
-    let syllable = Affine::translation(0.0, -oyen::CHIN)
+    let syllable = Affine::translation(0.0, -nova::CHIN)
         .then(Affine::scale(1.0 + 0.025 * b, 1.0 - 0.045 * b))
-        .then(Affine::translation(0.0, oyen::CHIN - 2.5 * b));
+        .then(Affine::translation(0.0, nova::CHIN - 2.5 * b));
     f.head = f.head.then(syllable);
     f
 }
 
-/// Oyen whole and still, as on the Nexora mark: his head `w` DIPs wide, head
+/// Nova whole and still, as on the Nexora mark: his head `w` DIPs wide, head
 /// and ears centred on `center`. The mark fits a 108-unit square whose
 /// middle is 12 units above its origin.
 fn badge(c: &mut Canvas, center: Point, w: f32) {
     let k = w / MARK_W;
     let eyes = if w * c.scale() <= 32.0 { SMALL_EYES } else { 1.0 };
-    let frame = oyen::frame(Mood::Oyen, 0.0, Input::default(), eyes);
+    let frame = nova::frame(Mood::Nova, 0.0, Input::default(), eyes);
     draw(c, &frame, Point::new(center.x, center.y + 12.0 * k), k);
 }
 
-/// The Nexora app's icon, `size` DIPs square and centred on `center`: Oyen on
+/// The Nexora app's icon, `size` DIPs square and centred on `center`: Nova on
 /// the icon's near-black tile (catat assets/images/icon.png: his head is
 /// 61.7 % of the tile, his middle 1.3 % below its centre), with the rounded
 /// corners phones give it. Its own colours in every theme.
@@ -457,7 +457,7 @@ pub fn app_icon(c: &mut Canvas, center: Point, size: f32) {
 
 /// One frame of the face, the mark's (0, 0) at `origin`, `k` DIPs per unit.
 /// Same layering as the app: a raised ear tip behind the head, a folded one
-/// on it, then eyes and extras. Oyen keeps his own colours in every theme.
+/// on it, then eyes and extras. Nova keeps his own colours in every theme.
 fn draw(c: &mut Canvas, f: &Frame, origin: Point, k: f32) {
     let look = c.look();
     let float = if look.light { look.ink.with_alpha(FLOAT_ON_LIGHT) } else { FLOAT };
@@ -466,7 +466,7 @@ fn draw(c: &mut Canvas, f: &Frame, origin: Point, k: f32) {
 
 fn draw_face(c: &mut Canvas, f: &Frame, origin: Point, k: f32, float: Color) {
     let h = f.head;
-    let map = |p: oyen::Point| {
+    let map = |p: nova::Point| {
         let q = h.apply(p);
         Point::new(origin.x + q.x as f32 * k, origin.y + q.y as f32 * k)
     };
@@ -476,7 +476,7 @@ fn draw_face(c: &mut Canvas, f: &Frame, origin: Point, k: f32, float: Color) {
     if f.tip.behind_head {
         c.path(&segs(&f.tip.path, &map), Some(tip), None);
     }
-    c.path(&segs(oyen::head_path(), &map), Some(ORANGE), None);
+    c.path(&segs(nova::head_path(), &map), Some(ORANGE), None);
     if !f.tip.behind_head {
         c.path(&segs(&f.tip.path, &map), Some(tip), None);
     }
@@ -496,7 +496,7 @@ fn draw_face(c: &mut Canvas, f: &Frame, origin: Point, k: f32, float: Color) {
     }
 }
 
-fn segs(p: &Path, map: &impl Fn(oyen::Point) -> Point) -> Vec<Seg> {
+fn segs(p: &Path, map: &impl Fn(nova::Point) -> Point) -> Vec<Seg> {
     p.elements
         .iter()
         .map(|e| match *e {
@@ -566,7 +566,7 @@ mod tests {
     }
 
     #[test]
-    fn oyen_lands_upright_and_straightens_after_a_pause() {
+    fn nova_lands_upright_and_straightens_after_a_pause() {
         let lean = |f: &Frame| f.head.b.atan2(f.head.a).to_degrees();
         assert!(lean(&music(6.0, true, None)).abs() < 1e-6);
         assert!((lean(&music(6.3, true, None)) - LEAN_DEG).abs() < 0.2);
@@ -575,14 +575,14 @@ mod tests {
     }
 
     #[test]
-    fn oyen_talks_in_phrases_and_rests_between_them() {
+    fn nova_talks_in_phrases_and_rests_between_them() {
         let height = |f: &Frame| f.head.d;
         // Mid-phrase he squashes on a syllable; in the breath he's himself.
         assert!(height(&talk(0.37, 1.0)) < 0.97);
-        let rest = oyen::frame(Mood::Oyen, 0.0, Input::default(), 1.0);
+        let rest = nova::frame(Mood::Nova, 0.0, Input::default(), 1.0);
         assert!((height(&talk(1.55, 1.0)) - height(&rest)).abs() < 1e-9);
         // The phrase starts (with the ear's flick) and ends without a jump.
-        let flick = oyen::frame(Mood::Oyen, 0.55, Input::default(), 1.0);
+        let flick = nova::frame(Mood::Nova, 0.55, Input::default(), 1.0);
         assert!((height(&talk(0.0, 1.0)) - height(&flick)).abs() < 1e-9);
         assert!((height(&talk(PHRASE_S * PHRASE_ON - 1e-6, 1.0)) - height(&rest)).abs() < 1e-3);
     }

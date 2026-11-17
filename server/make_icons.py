@@ -3,7 +3,7 @@
 
   icon-192.png          the logo as it is (purpose "any")
   icon-512.png          full-bleed orange, the logo's tile at 66 % so the island and
-                        Oyen stay inside the 40 %-radius circle every mask keeps (purpose "maskable")
+                        Nova stay inside the 40 %-radius circle every mask keeps (purpose "maskable")
   apple-touch-icon.png  180 px, full-bleed square (iOS rounds the corners itself)
 
 Run: python3 server/make_icons.py   (needs Pillow)

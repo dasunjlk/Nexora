@@ -1,4 +1,4 @@
-//! Oyen's IELTS coach on the Mac, as in the Windows app (`../app.rs`): the
+//! Nova's IELTS coach on the Mac, as in the Windows app (`../app.rs`): the
 //! session is `nexora_core::ielts::Coach` in `AppState`, and this carries out
 //! what it asks for with the shared `services::ielts::Kit` (the calls, and
 //! the Mac's microphone and voice: `mac/services/mic.rs`, `voice.rs`). A
@@ -77,7 +77,7 @@ impl App {
         self.ielts_do(fx);
     }
 
-    /// Oyen's line ended, or couldn't play on. A stopped line's late report
+    /// Nova's line ended, or couldn't play on. A stopped line's late report
     /// doesn't end the one playing now.
     pub(super) fn ielts_voice_ended(&mut self) {
         if !self.ielts_live() || self.ielts.voice.playing() {

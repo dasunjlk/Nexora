@@ -1,4 +1,4 @@
-//! Nexora page, always in the tab row with Oyen himself as its tab.
+//! Nexora page, always in the tab row with Nova himself as its tab.
 //!
 //! Signed out: what signing in brings, with Sign in with Nexora.
 //!
@@ -17,7 +17,7 @@
 //! unless "Show amounts on the island" is on: the island may be on a shared
 //! screen.
 //!
-//! Oyen's moods never read anything here.
+//! Nova's moods never read anything here.
 
 use crate::commands::{Command, NexoraCmd};
 use crate::gfx::{TextStyle, Weight};
@@ -135,7 +135,7 @@ pub(crate) fn sign_in_card(ui: &mut Ui, st: &mut AppState, area: Rect, title: &s
     // Text and button as one block, centred on the page like the icon.
     let block = title_h + 3.0 + body_h + 14.0 + PILL_SMALL;
     let mut y = area.y + ((area.h - block) / 2.0).max(0.0);
-    crate::oyen::app_icon(ui.c, Point::new(area.x + ICON / 2.0, area.y + area.h / 2.0), ICON);
+    crate::nova::app_icon(ui.c, Point::new(area.x + ICON / 2.0, area.y + area.h / 2.0), ICON);
     ui.c.text(title, Rect::new(x, y, w, title_h + 1.0), &title_st);
     y += title_h + 3.0;
     ui.c.text(body, Rect::new(x, y, w, body_h + 1.0), &body_st);

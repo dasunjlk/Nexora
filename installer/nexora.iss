@@ -50,7 +50,7 @@ SetupIconFile=..\crates\nexora\res\nexora.ico
 UninstallDisplayIcon={app}\{#AppExe}
 UninstallDisplayName={#AppName}
 WizardStyle=modern
-; Oyen hanging from the island on the finish page, Nexora's logo in the header (both from tools/make_brand.py).
+; Nova hanging from the island on the finish page, Nexora's logo in the header (both from tools/make_brand.py).
 ; Setup picks the file closest to its image area: 100%, 150% and 200% scaling.
 WizardImageFile=art\wizard-202x386.png,art\wizard-336x643.png,art\wizard-430x824.png
 WizardSmallImageFile=art\wizard-small-58.png,art\wizard-small-77.png,art\wizard-small-97.png,art\wizard-small-116.png,art\wizard-small-124.png,art\wizard-small-143.png,art\wizard-small-159.png

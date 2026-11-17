@@ -1,4 +1,4 @@
-//! Oyen's IELTS speaking coach, the IELTS add-on: Oyen plays a GoPrep-style
+//! Nova's IELTS speaking coach, the IELTS add-on: Nova plays a GoPrep-style
 //! IELTS Speaking examiner. He asks the Part 1 to 3 questions out loud,
 //! listens to each answer through the microphone, follows up on what was
 //! said, and ends with a band score in the four criteria and a roast in
@@ -7,7 +7,7 @@
 //!
 //! The thinking happens on the server (nexora-notes-server `routes/ielts.ts`, under
 //! `/island/ielts` on api.nexora.app, with the PC's Nexora key): it hears the
-//! answer, writes Oyen's next turn and voices it as mp3 clips. Everything
+//! answer, writes Nova's next turn and voices it as mp3 clips. Everything
 //! here is pure and runs anywhere:
 //! - the five routes: URLs, request bodies, the answers ([`Me`], [`Turn`],
 //!   [`Verdict`]) and what went wrong in plain words ([`Problem`]);
@@ -49,10 +49,10 @@ const READ_MIN_S: f64 = 2.0;
 const READ_MAX_S: f64 = 9.0;
 /// Opening the page asks for the ladder again only after this.
 const ME_FRESH_S: f64 = 60.0;
-/// Oyen says one of his thinking lines this long into the wait for an
+/// Nova says one of his thinking lines this long into the wait for an
 /// answer's reply (the server takes about 7 to 9 s), unless the reply came.
 const FILLER_AFTER_S: f64 = 1.5;
-/// Oyen's clips are seconds long: one still "playing" after this has a
+/// Nova's clips are seconds long: one still "playing" after this has a
 /// player that will never say it ended, and the session goes on without it.
 const CLIP_MAX_S: f64 = 45.0;
 /// Levels go 1 to 5.
@@ -60,7 +60,7 @@ pub const LEVELS: u8 = 5;
 
 // ---------------------------------------------------------------- spice
 
-/// How Oyen talks in Indonesian (reactions, notes, roasts). The examiner's
+/// How Nova talks in Indonesian (reactions, notes, roasts). The examiner's
 /// questions are always plain English. Settings keep its name.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -130,7 +130,7 @@ fn list<T>(v: &Value, f: impl Fn(&Value) -> T) -> Vec<T> {
     v.as_array().map_or_else(Vec::new, |a| a.iter().map(f).collect())
 }
 
-/// A clip of Oyen's voice, base64 in the JSON.
+/// A clip of Nova's voice, base64 in the JSON.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Audio {
     pub mime: String,
@@ -152,7 +152,7 @@ impl Audio {
     }
 }
 
-/// One thing Oyen says. `audio` comes with the answer; the app saves it to a
+/// One thing Nova says. `audio` comes with the answer; the app saves it to a
 /// file (`clip`) and drops the base64 at once ([`Turn::save_clips`]).
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Say {
@@ -229,7 +229,7 @@ pub struct CueCard {
     pub closing: String,
 }
 
-/// One of Oyen's turns: what he says (one to three lines, in order) and
+/// One of Nova's turns: what he says (one to three lines, in order) and
 /// what he expects back.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Turn {
@@ -277,7 +277,7 @@ impl Turn {
     }
 }
 
-/// One criterion's band and Oyen's line about it (gaul, in the session's spice).
+/// One criterion's band and Nova's line about it (gaul, in the session's spice).
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Band {
     pub band: f32,
@@ -360,7 +360,7 @@ pub struct Today {
     pub cap: u32,
 }
 
-/// `GET /me`: the ladder, the person's level, whether Oyen has a voice
+/// `GET /me`: the ladder, the person's level, whether Nova has a voice
 /// today, and today's sessions against the cap.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Me {
@@ -424,7 +424,7 @@ pub fn parse_me(body: &str) -> Option<Me> {
 }
 
 /// `POST /session`: the session, its first turn (the intro, then the first
-/// question), and Oyen's thinking lines for the waits while an answer is
+/// question), and Nova's thinking lines for the waits while an answer is
 /// heard (said one a wait, in turn).
 #[derive(Clone, Debug, PartialEq)]
 pub struct Started {
@@ -439,7 +439,7 @@ pub fn parse_started(body: &str) -> Option<Started> {
     (!id.is_empty() && v["turn"].is_object()).then(|| Started { id, turn: Turn::read(&v["turn"]), fillers: list(&v["fillers"], Say::read) })
 }
 
-/// `POST /session/:id/answer`: what the server heard and Oyen's next turn;
+/// `POST /session/:id/answer`: what the server heard and Nova's next turn;
 /// after the last answer, `done` with the verdict.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Answered {
@@ -461,7 +461,7 @@ pub fn parse_skipped(body: &str) -> Option<Answered> {
     parse_answered(body)
 }
 
-/// What Oyen says about a refused call (a capped day, a locked level carry
+/// What Nova says about a refused call (a capped day, a locked level carry
 /// his own line), from the error's body.
 pub fn problem_say(body: &str) -> Vec<Say> {
     json(body).map_or_else(Vec::new, |v| list(&v["say"], Say::read))
@@ -600,11 +600,11 @@ impl Problem {
             Problem::ProRequired => "Latihan IELTS khusus Studio Pro",
             Problem::NoSession => "Sesinya udah berhenti",
             Problem::TooBig => "Jawabannya kepanjangan",
-            Problem::Busy(_) => "Oyen lagi rame",
-            Problem::AiFailed => "Oyen gagal mikir",
+            Problem::Busy(_) => "Nova lagi rame",
+            Problem::AiFailed => "Nova gagal mikir",
             Problem::Offline => "Nggak nyambung ke Nexora",
             Problem::SignedOut => "Kamu udah keluar dari Nexora",
-            Problem::StillThinking => "Oyen masih mikirin jawabanmu",
+            Problem::StillThinking => "Nova masih mikirin jawabanmu",
             Problem::BadLevel => "Level itu nggak ada",
             Problem::BadAudio => "Rekamanmu nggak kebaca",
             Problem::Server => "Ada yang error di server",
@@ -617,7 +617,7 @@ impl Problem {
     /// What to do about it. `mac`: the Mac's words for the microphone switch.
     pub fn line(self, mac: bool) -> String {
         match self {
-            Problem::Paused => "Oyen istirahat dulu. Coba lagi nanti ya.".into(),
+            Problem::Paused => "Nova istirahat dulu. Coba lagi nanti ya.".into(),
             Problem::DailyCap => "Sesi latihan hari ini udah kepakai semua. Lanjut besok ya.".into(),
             Problem::TooFast => "Kebanyakan permintaan dalam sejam ini. Tunggu sebentar, terus coba lagi.".into(),
             Problem::LevelLocked => "Capai target band di level sebelumnya dulu.".into(),
@@ -969,7 +969,7 @@ pub enum Phase {
     Home,
     /// Asking the server for a session.
     Starting,
-    /// Oyen says the turn's lines.
+    /// Nova says the turn's lines.
     Talking,
     /// Part 2's preparation, until mono time `until`; then the recording starts by itself.
     Prep { until: f64 },
@@ -977,9 +977,9 @@ pub enum Phase {
     Ready,
     /// Recording since `since`; it stops by itself at `until`.
     Recording { since: f64, until: f64 },
-    /// The answer (or a skip) is on its way: Oyen thinks.
+    /// The answer (or a skip) is on its way: Nova thinks.
     Thinking,
-    /// The band, the criteria, the roast and the tips (Oyen says the verdict and the roast).
+    /// The band, the criteria, the roast and the tips (Nova says the verdict and the roast).
     Result,
     /// Something stopped the session ([`Coach::problem`]), with a way on.
     Stuck,
@@ -997,7 +997,7 @@ pub enum Reply {
     /// Skipping goes on to the next question, or ends the test (`done`).
     Skipped { turn: Turn, done: bool, result: Option<Verdict> },
     Ended,
-    /// `say`: Oyen's own line about it, when the server sent one.
+    /// `say`: Nova's own line about it, when the server sent one.
     Failed { call: CallKind, problem: Problem, say: Vec<Say> },
 }
 
@@ -1087,11 +1087,11 @@ pub struct Coach {
     /// The turn on screen (its lines move to the queue as they're said).
     pub turn: Option<Turn>,
     queue: VecDeque<Say>,
-    /// The line Oyen says, or said last (the question, once he's done).
+    /// The line Nova says, or said last (the question, once he's done).
     pub say: Option<Say>,
     /// A clip of `say` plays now.
     pub voiced: bool,
-    /// When Oyen began saying `say` (mono seconds; his talking bob runs from it).
+    /// When Nova began saying `say` (mono seconds; his talking bob runs from it).
     pub said_at: f64,
     /// `say` has no voice: it shows until this mono time.
     text_until: Option<f64>,
@@ -1109,7 +1109,7 @@ pub struct Coach {
     pub meter: f32,
     /// Answers the server took this session.
     pub answers: u32,
-    /// Oyen's thinking lines for this session, said in turn (kept, and
+    /// Nova's thinking lines for this session, said in turn (kept, and
     /// deleted, with the session).
     fillers: VecDeque<Say>,
     /// While an answer is heard: when one of them is due (one a wait).
@@ -1140,7 +1140,7 @@ impl Coach {
         }
     }
 
-    /// Oyen is saying something now (his talking bob).
+    /// Nova is saying something now (his talking bob).
     pub fn talking(&self) -> bool {
         self.voiced || self.text_until.is_some()
     }
@@ -1168,10 +1168,10 @@ impl Coach {
     }
 
     /// The page came on screen (`true`) or went: a tab switch, the island
-    /// closing, the PC locked. Away, Oyen stops mid-line (the line waits to
+    /// closing, the PC locked. Away, Nova stops mid-line (the line waits to
     /// be said again; a thinking line just stops), a recording is dropped and
     /// Part 2's minute ends: the person taps the mic when back. Back, the
-    /// ladder is read again when it's old, and Oyen goes on talking.
+    /// ladder is read again when it's old, and Nova goes on talking.
     pub fn show(&mut self, shown: bool, now: f64) -> Vec<Effect> {
         if shown == self.shown {
             return Vec::new();
@@ -1276,7 +1276,7 @@ impl Coach {
         self.filler_at = None;
         let h = Held { heard, turn, result };
         if self.filler {
-            // Oyen's thinking line goes to its end first.
+            // Nova's thinking line goes to its end first.
             self.held = Some(h);
         } else {
             fx.extend(self.apply(h, now));
@@ -1300,7 +1300,7 @@ impl Coach {
         match call {
             CallKind::Me => self.me_problem = Some(problem),
             CallKind::Start if self.phase == Phase::Starting => {
-                // Back to the ladder (read again), and Oyen says why: a capped
+                // Back to the ladder (read again), and Nova says why: a capped
                 // day and a locked level come with his own line.
                 self.phase = Phase::Home;
                 self.pending = None;
@@ -1343,7 +1343,7 @@ impl Coach {
         self.next_line(now)
     }
 
-    /// The last answer's verdict: the result shows while Oyen says the
+    /// The last answer's verdict: the result shows while Nova says the
     /// verdict turn's lines (closing, roast, then a level opened or goodbye),
     /// and the result's own roast only when the turn doesn't say it.
     fn finish(&mut self, mut turn: Turn, mut v: Verdict, now: f64) -> Vec<Effect> {
@@ -1405,7 +1405,7 @@ impl Coach {
                 fx
             }
             Phase::Talking => {
-                // Part 2's minute starts once Oyen has said the card.
+                // Part 2's minute starts once Nova has said the card.
                 let prep = self.turn.as_ref().filter(|t| t.wants_answer()).map_or(0.0, |t| t.prep_secs) as f64;
                 self.phase = if prep > 0.0 { Phase::Prep { until: now + prep } } else { Phase::Ready };
                 Vec::new()
@@ -1472,8 +1472,8 @@ impl Coach {
         }
     }
 
-    /// One of Oyen's thinking lines while the answer is heard (the next in
-    /// turn; only voiced ones: "Oyen mikir…" says the rest).
+    /// One of Nova's thinking lines while the answer is heard (the next in
+    /// turn; only voiced ones: "Nova mikir…" says the rest).
     fn say_filler(&mut self, now: f64) -> Vec<Effect> {
         let Some(f) = self.fillers.pop_front() else { return Vec::new() };
         self.fillers.push_back(f.clone());
@@ -1485,7 +1485,7 @@ impl Coach {
         vec![Effect::PauseMusic, Effect::Play(clip)]
     }
 
-    /// The mic button: answer (Oyen may still be talking), or stop the answer.
+    /// The mic button: answer (Nova may still be talking), or stop the answer.
     pub fn tap(&mut self, now: f64) -> Vec<Effect> {
         match self.phase {
             Phase::Ready | Phase::Prep { .. } => self.record(now),
@@ -1663,7 +1663,7 @@ fn clips_of(turn: &Turn, result: Option<&Verdict>) -> Vec<PathBuf> {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Sample {
     Home,
-    /// Oyen reacting to an answer, in gaul.
+    /// Nova reacting to an answer, in gaul.
     Talking,
     /// The person answering a Part 1 question.
     Recording,
@@ -1813,7 +1813,7 @@ mod tests {
         let fx = c.start(Spice::Ngegas);
         assert_eq!(fx, [Effect::Call(Call::Start { level: 2, spice: Spice::Ngegas })]);
         assert_eq!(c.phase, Phase::Starting);
-        let t = turn(1, Kind::Intro, vec![say("Hi, I'm Oyen.", Some("a.mp3")), say("Where are you from?", Some("b.mp3"))]);
+        let t = turn(1, Kind::Intro, vec![say("Hi, I'm Nova.", Some("a.mp3")), say("Where are you from?", Some("b.mp3"))]);
         c.reply(Reply::Started { id: "s1".into(), turn: t, fillers: Vec::new() }, 1.0)
     }
 
@@ -1855,7 +1855,7 @@ mod tests {
         // A skip that ends the test brings the verdict, like a last answer.
         let end = parse_skipped(r#"{"done":true,"turn":{"kind":"verdict","expect":"none"},"result":{"band":5.5}}"#).unwrap();
         assert!(end.done && end.result.is_some());
-        // The fillers come with the session; a refusal can carry Oyen's own line.
+        // The fillers come with the session; a refusal can carry Nova's own line.
         let s = parse_started(r#"{"id":"x","turn":{},"fillers":[{"text":"Hmm, bentar.","lang":"id","audio":null}]}"#).unwrap();
         assert_eq!(s.fillers[0].text, "Hmm, bentar.");
         assert_eq!(problem_say(r#"{"error":"daily_cap","say":[{"text":"Udah lima kali, besok lagi.","lang":"id"}]}"#)[0].lang, "id");
@@ -2067,7 +2067,7 @@ mod tests {
         let fx = started(&mut c);
         assert_eq!(fx, [Effect::PauseMusic, Effect::Play("a.mp3".into())]);
         assert!(c.holds() && c.talking() && c.phase == Phase::Talking);
-        assert_eq!(c.say.as_ref().unwrap().text, "Hi, I'm Oyen.");
+        assert_eq!(c.say.as_ref().unwrap().text, "Hi, I'm Nova.");
         // A clip ends: deleted, the next one plays; then it's the person's turn.
         assert_eq!(c.voice_ended(2.0), [Effect::Delete("a.mp3".into()), Effect::PauseMusic, Effect::Play("b.mp3".into())]);
         assert_eq!(c.voice_ended(3.0), [Effect::Delete("b.mp3".into())]);
@@ -2098,7 +2098,7 @@ mod tests {
         // It stops by itself at max_secs.
         assert_eq!(c.tick(208.3), [Effect::StopRecord]);
         c.recorded("ans2.wav".into(), 120.0, 208.3);
-        // The verdict: the result shows while Oyen says its three lines (closing,
+        // The verdict: the result shows while Nova says its three lines (closing,
         // roast, the level that opened); the result's own copy of the roast isn't
         // said twice. Then the music comes back.
         let end = turn(
@@ -2129,7 +2129,7 @@ mod tests {
     fn lines_without_a_voice_show_for_their_reading_time() {
         let mut c = coach();
         c.start(Spice::Sopan);
-        let t = turn(1, Kind::Intro, vec![say("Halo, aku Oyen. Kita mulai ya.", None), say("Do you work or study?", None)]);
+        let t = turn(1, Kind::Intro, vec![say("Halo, aku Nova. Kita mulai ya.", None), say("Do you work or study?", None)]);
         assert_eq!(c.reply(Reply::Started { id: "s".into(), turn: t, fillers: Vec::new() }, 10.0), [Effect::PauseMusic]);
         assert!(c.talking() && !c.voiced);
         let until = c.deadline().unwrap();
@@ -2245,7 +2245,7 @@ mod tests {
     }
 
     #[test]
-    fn answering_while_oyen_talks_cuts_him_short() {
+    fn answering_while_nova_talks_cuts_him_short() {
         let mut c = coach();
         started(&mut c);
         assert_eq!(c.tap(1.5), [Effect::StopVoice, Effect::Delete("a.mp3".into()), Effect::Delete("b.mp3".into()), Effect::PauseMusic, Effect::Record]);
@@ -2335,7 +2335,7 @@ mod tests {
     fn a_day_used_up_and_the_microphone_blocked() {
         let mut c = coach();
         c.start(Spice::Ngegas);
-        // Oyen says why himself (his line comes with the refusal), and the ladder is read again.
+        // Nova says why himself (his line comes with the refusal), and the ladder is read again.
         let why = vec![say("Udah lima kali hari ini, besok lagi.", Some("cap.mp3"))];
         let fx = c.reply(Reply::Failed { call: CallKind::Start, problem: Problem::DailyCap, say: why }, 1.0);
         assert_eq!(fx, [Effect::Call(Call::Me), Effect::PauseMusic, Effect::Play("cap.mp3".into())]);

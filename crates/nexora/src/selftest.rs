@@ -112,7 +112,7 @@ const SOFT_GPU_SETTLE_TIMEOUT: f64 = 8.0;
 /// Seconds to wait for a simulated tab click to switch the page.
 const CLICK_TIMEOUT: f64 = 1.5;
 /// Stop visiting scenes after this many seconds. The 89 scenes take about
-/// 45 s under Wine at 100 % (a busy machine is the slow end); on CI the Oyen
+/// 45 s under Wine at 100 % (a busy machine is the slow end); on CI the Nova
 /// theme with Japanese lyrics is the slowest run, about 63 s with 85 (it
 /// reached the old 50 s at scene 80 once the Today scenes came in, and 65 s
 /// was tight for four more). With 121 (Notifications, the AI tab and IELTS
@@ -915,7 +915,7 @@ fn seed_notes(st: &mut AppState, scene: Scene, now: f64) {
         }
         Scene::NotesReady => {
             st.notes.reply(Reply::Saved(Box::new(sample_notes())), now);
-            // Oyen's tick long since drawn: at rest in the picture.
+            // Nova's tick long since drawn: at rest in the picture.
             st.ui.notes_saved_at = f64::NEG_INFINITY;
         }
         _ => {}
@@ -1238,13 +1238,13 @@ enum Scene {
     AiNoticeOut,
     /// IELTS signed out: the Nexora sign-in card, saying what the coach does.
     IeltsSignedOut,
-    /// IELTS: Oyen reacting to an answer, in gaul (`ielts::Sample::Talking`).
+    /// IELTS: Nova reacting to an answer, in gaul (`ielts::Sample::Talking`).
     IeltsTalking,
     /// IELTS: a Part 1 answer recording, the voice's level round the mic.
     IeltsRecording,
     /// IELTS: Part 2's card, during the minute to prepare.
     IeltsCueCard,
-    /// IELTS: the band, the criteria with Oyen's notes, the roast and the tips.
+    /// IELTS: the band, the criteria with Nova's notes, the roast and the tips.
     IeltsResult,
     /// IELTS: Windows' privacy switch keeps the microphone from desktop apps.
     IeltsMicDenied,
@@ -1254,13 +1254,13 @@ enum Scene {
     /// Settings in the Store copy: Notifications' chip beside the island's
     /// own pages, on as everyone's starts, and its bell in the header's row.
     SettingsTabsStore,
-    /// Meeting notes: Oyen listening, 0:42 in, both bars moving.
+    /// Meeting notes: Nova listening, 0:42 in, both bars moving.
     NotesListening,
-    /// Meeting notes: the meeting handed over, Oyen writing.
+    /// Meeting notes: the meeting handed over, Nova writing.
     NotesWriting,
     /// Meeting notes: the notes saved, with Open, Copy, the folder and Done.
     NotesReady,
-    /// Meeting notes on the closed island: Oyen listening, 12:34 in.
+    /// Meeting notes on the closed island: Nova listening, 12:34 in.
     NotesActivity,
     /// Meeting notes signed in without Studio Pro: the Pro card.
     NotesPro,
@@ -1540,7 +1540,7 @@ const SCENES: [Scene; 144] = [
     // Its heads-up notices on the closed island.
     Scene::AiNotice,
     Scene::AiNoticeOut,
-    // The IELTS add-on: signed out, the ladder, Oyen talking, an answer
+    // The IELTS add-on: signed out, the ladder, Nova talking, an answer
     // recording, Part 2's card, the result and a blocked microphone, all
     // made up (`ielts::Coach::sample`).
     Scene::IeltsSignedOut,
@@ -1554,7 +1554,7 @@ const SCENES: [Scene; 144] = [
     // the Store copy, with Notifications' chip.
     Scene::SettingsTabs,
     Scene::SettingsTabsStore,
-    // Meeting notes: the page before a meeting (the notes saved last), Oyen
+    // Meeting notes: the page before a meeting (the notes saved last), Nova
     // listening, writing, the notes, and the closed island while he listens,
     // all made up (`seed_notes`).
     Scene::Page(PageKind::Notes),
@@ -2236,7 +2236,7 @@ pub fn fetch_phone_page(url: &str) -> (bool, String) {
 
 /// The key the run's calls carry (never a real one).
 const IELTS_KEY: &str = "oyzd_selftest_not_a_real_key_0000000000000000000";
-/// A step's budget: the ladder, Oyen's intro, the verdict, Udahan.
+/// A step's budget: the ladder, Nova's intro, the verdict, Udahan.
 const IELTS_STEP_S: f64 = 20.0;
 const IELTS_SESSION: &str = "smoke-1";
 
@@ -2244,7 +2244,7 @@ const IELTS_SESSION: &str = "smoke-1";
 enum IeltsStep {
     /// Waiting for the ladder (GET /me).
     Ladder,
-    /// Mulai pressed: waiting for Oyen's intro to end on the person's turn.
+    /// Mulai pressed: waiting for Nova's intro to end on the person's turn.
     Intro,
     /// The answer sent: waiting for the verdict to be said.
     Verdict,
@@ -2262,7 +2262,7 @@ enum IeltsStep {
 /// 127.0.0.1 answers `/island/ielts/*` the way nexora-notes-server's do, a tone in
 /// a 16 kHz WAV stands in for the microphone, and the app's own coach,
 /// worker, voice (a 0.4 s clip) and files do the rest: the ladder, Mulai,
-/// Oyen's intro, the answer's upload, the verdict and the roast, Selesai and
+/// Nova's intro, the answer's upload, the verdict and the roast, Selesai and
 /// the ladder again (no DELETE: the server ends a session with its verdict),
 /// then a second session left with Udahan (DELETE). The check reads what the
 /// server saw, the band shown, and the files left.
@@ -2450,7 +2450,7 @@ fn ielts_server(listener: std::net::TcpListener, seen: &Mutex<Vec<String>>, stop
                 line.push_str(&format!(" level={} spice={}{}", json["level"], json["spice"], if tz { " tz" } else { "" }));
                 let turn = format!(
                     r#"{{"part":1,"kind":"intro","expect":"answer","max_secs":30,"prep_secs":0,"cue_card":null,"say":[{},{{"text":"Where are you from?","lang":"en","audio":null}}]}}"#,
-                    clip("Hi, I'm Oyen. Let's begin.")
+                    clip("Hi, I'm Nova. Let's begin.")
                 );
                 (200, format!(r#"{{"id":"{IELTS_SESSION}","turn":{turn},"fillers":[{}]}}"#, clip("Hmm, bentar ya.")))
             }
@@ -2786,7 +2786,7 @@ pub struct SelfTest {
     /// the next line on a held clock, one frame per refresh at that rate.
     scroll_hz: Option<f64>,
     dpi_applied: bool,
-    /// NEXORA_SELFTEST_THEME=oyen|glass|pill|diorama: run every scene in that theme.
+    /// NEXORA_SELFTEST_THEME=nova|glass|pill|diorama: run every scene in that theme.
     theme: Theme,
     /// NEXORA_SELFTEST_DIORAMA=only, in the Diorama theme: its own pictures
     /// (`RESTS`) and no scene.
@@ -2853,7 +2853,7 @@ impl SelfTest {
     pub fn new(dir: String) -> Self {
         let track_key = MediaSession::make_track_key(TITLE, ARTIST, ALBUM);
         let theme = match std::env::var("NEXORA_SELFTEST_THEME").map(|v| v.trim().to_ascii_lowercase()).as_deref() {
-            Ok("oyen") => Theme::Oyen,
+            Ok("nova") => Theme::Nova,
             Ok("glass") => Theme::Glass,
             Ok("pill") => Theme::Pill,
             Ok("diorama") => Theme::Diorama,
@@ -2990,7 +2990,7 @@ impl SelfTest {
             let works = crate::services::romanize::analyzer_works();
             self.checks.push(check("japanese-analyzer", works.is_ok(), works.err().unwrap_or_else(|| "Windows' analyzer reads Japanese".into())));
         }
-        // NEXORA_SELFTEST_JA_DICT=<file> (CI passes the repo's copy): Oyen
+        // NEXORA_SELFTEST_JA_DICT=<file> (CI passes the repo's copy): Nova
         // Nexora's own dictionary, put where the Japanese readings add-on keeps
         // it, so the run reads Japanese the way a PC with the add-on does.
         if let Ok(src) = std::env::var("NEXORA_SELFTEST_JA_DICT") {
@@ -3160,8 +3160,8 @@ impl SelfTest {
                 let steps = steps + 1;
                 let waited = now - since;
                 let timed_out = waited > self.settle_limit(app);
-                // No picture mid-blink: the eyes, and Oyen in the Nexora tab.
-                let blinking = (scene == Scene::IdleEyes && mid_blink()) || (scene.expanded() && crate::oyen::mid_rest_move(clock::mono(), 0.3));
+                // No picture mid-blink: the eyes, and Nova in the Nexora tab.
+                let blinking = (scene == Scene::IdleEyes && mid_blink()) || (scene.expanded() && crate::nova::mid_rest_move(clock::mono(), 0.3));
                 let ready = steps >= MIN_STEPS && stable >= STABLE_STEPS && !blinking;
                 if ready || timed_out {
                     self.capture(app, Shot::Scene(i), !timed_out || settled, waited);
@@ -3667,7 +3667,7 @@ impl SelfTest {
         if st.settings.theme != self.theme {
             st.settings.theme = self.theme;
             st.accent = match self.theme {
-                Theme::Oyen => crate::oyen::ORANGE,
+                Theme::Nova => crate::nova::ORANGE,
                 // Diorama's own, as the app keeps it (`theme_accent`).
                 Theme::Diorama => nexora_core::look::DIORAMA_ACCENT,
                 _ => palette::BLUE,
@@ -3900,8 +3900,8 @@ impl SelfTest {
             st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
             st.nexora.pro = Some(true);
         }
-        // Oyen in the Nexora tab long since arrived: at rest in every picture.
-        st.ui.oyen_tab = Some((crate::oyen::TabMove::Arrive, f64::NEG_INFINITY));
+        // Nova in the Nexora tab long since arrived: at rest in every picture.
+        st.ui.nova_tab = Some((crate::nova::TabMove::Arrive, f64::NEG_INFINITY));
         if scene.media_playing() {
             st.lyrics.wants_ja_readings = self.lyrics.wants_ja_readings || matches!(scene, Scene::JaOffer | Scene::JaGetting);
         }
@@ -4420,7 +4420,7 @@ impl SelfTest {
             checks.push(check("script-hidden-from-capture", hidden == can || (wine && !hidden), format!("display affinity: {said}, Windows build {build:?}{note}")));
         }
         if scene == Scene::NotesActivity {
-            // A meeting being taken down rests on the closed island: Oyen, the dot, the time.
+            // A meeting being taken down rests on the closed island: Nova, the dot, the time.
             let (mode, _) = app.selftest_mode();
             let want = Mode::Activity(crate::activities::Activity::Notes);
             checks.push(check("notes-pill", mode == want, format!("{mode:?}, want {want:?}")));

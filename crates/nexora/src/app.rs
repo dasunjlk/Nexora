@@ -8,7 +8,7 @@ use crate::events::{AppEvent, AppleMusicStatus, EventSink, NexoraEvent, SendHwnd
 use crate::gfx::{px_rect, px_union, scale_about, union_rect, Canvas, Gfx, HitMask};
 use crate::icons::Icon;
 use crate::island::{Geom, Island, SHOULDER};
-use crate::oyen;
+use crate::nova;
 use crate::pages::{self, PageKind};
 use crate::paths;
 use crate::pill;
@@ -993,7 +993,7 @@ impl App {
     /// (a theme switch into or out of Pill, the self-test picking its theme
     /// after start, or the outline docking at the edge after rising back to
     /// it): lay the window out again for the new room, grown for the gap and
-    /// the shadow or given back, so Classic, Oyen and Glass keep exactly the
+    /// the shadow or given back, so Classic, Nova and Glass keep exactly the
     /// window they start with and Pill gets its own. Called every frame
     /// after the island steps; a layout only on that change.
     fn sync_room(&mut self) {
@@ -1407,7 +1407,7 @@ impl App {
                 }
                 if msg == WM_SETTINGCHANGE && self.st.settings.theme == Theme::Glass {
                     self.st.accent = theme_accent(Theme::Glass);
-                } else if msg == WM_SETTINGCHANGE && !oyen::on(self.st.settings.theme) && self.st.settings.theme != Theme::Diorama {
+                } else if msg == WM_SETTINGCHANGE && !nova::on(self.st.settings.theme) && self.st.settings.theme != Theme::Diorama {
                     if let Some(a) = services::system_accent() {
                         self.st.accent = a;
                     }
@@ -2844,8 +2844,8 @@ impl App {
             }
             self.set_stats(false);
             self.set_sysmon(false);
-            // Oyen arrives in his tab again at the next opening.
-            self.st.ui.oyen_tab = None;
+            // Nova arrives in his tab again at the next opening.
+            self.st.ui.nova_tab = None;
             // Sums shown in the Nexora tab hide again, and it opens on Today next time.
             self.st.nexora.reveal = false;
             self.st.nexora.day = nexora::DayPick::Today;
@@ -4581,7 +4581,7 @@ impl App {
     // ------------------------------------------------------------ Meeting notes
 
     /// Each frame while a meeting is recorded: how loud each source is, for
-    /// Oyen's head and the page's bars.
+    /// Nova's head and the page's bars.
     fn notes_tick(&mut self) {
         if let Some(r) = &self.notes_rec {
             (self.st.notes.mic, self.st.notes.pc) = r.levels();
@@ -4701,7 +4701,7 @@ impl App {
         }
         if let Some((title, subtitle, good)) = end {
             if !(self.expanded && self.st.page == PageKind::Notes) {
-                let color = if good { crate::oyen::ORANGE } else { palette::TEXT_DIM };
+                let color = if good { crate::nova::ORANGE } else { palette::TEXT_DIM };
                 self.st.notify(Icon::Notes, color, title, subtitle, 8.0, Some(crate::state::NoticeAction::OpenPage(PageKind::Notes)));
             }
         }
@@ -5621,11 +5621,11 @@ impl App {
     }
 }
 
-/// Oyen's orange in his theme, Diorama's own (which its day and night looks
+/// Nova's orange in his theme, Diorama's own (which its day and night looks
 /// paint as theirs), Windows' accent colour otherwise.
 fn theme_accent(theme: Theme) -> Color {
-    if oyen::on(theme) {
-        oyen::ORANGE
+    if nova::on(theme) {
+        nova::ORANGE
     } else if theme == Theme::Diorama {
         nexora_core::look::DIORAMA_ACCENT
     } else if theme == Theme::Glass {

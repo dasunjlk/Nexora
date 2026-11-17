@@ -58,7 +58,7 @@ need nothing online afterwards.
   exact, and every miss sits within seconds of a minute boundary.
 - Kanwil Kemenag Jawa Tengah's Ramadan 1447 H schedule for Kota Semarang,
   21 times, all exact.
-- Oyen Umroh's prayer engine (adhan-js with the same rules) on 18,225
+- Nova Umroh's prayer engine (adhan-js with the same rules) on 18,225
   place-days from 2026 to 2075, all identical to the minute.
 - adhan-js itself on 47 cities abroad (each country's method, Hanafi Ashar
   where the list says so), every 9 days of 2026 and 2027: identical to the

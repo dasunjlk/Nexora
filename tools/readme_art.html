@@ -8,7 +8,7 @@
      docs/brand/readme/NAME.webp. Every island is a real self-test screenshot
      at 200 % (site/assets/shots, cut by tools/site_shots.py), shown at true
      size or scaled with data-scale, hanging from the top edge of the website's
-     morning sky the way it hangs from the top of a screen. Oyen is the brand
+     morning sky the way it hangs from the top of a screen. Nova is the brand
      art in docs/brand/art. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600&display=block">
 <style>
@@ -27,7 +27,7 @@ img { display: block; }
 .card { position: relative; width: 880px; margin: 0 0 48px; border-radius: 22px; overflow: hidden; }
 .grid { display: grid; gap: 8px; }
 .cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-/* One "top of a screen": the sky, the island hanging from its top edge, Oyen
+/* One "top of a screen": the sky, the island hanging from its top edge, Nova
    standing on its bottom edge beside the island (never over it). */
 .stage { position: relative; display: flex; justify-content: center; align-items: flex-start; background: #f4d2b8 url("../site/assets/wall/morning.jpg") center 30% / cover no-repeat; overflow: hidden; }
 .stage.dusk::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(23, 18, 40, 0.62), rgba(40, 22, 30, 0.38)); }
@@ -45,8 +45,8 @@ img { display: block; }
 </head>
 <body>
 
-<!-- Hero: the open island on the Music page, and Oyen peeking over a playing
-     island below it (data-at: Oyen's left edge, in px, instead of beside the island). -->
+<!-- Hero: the open island on the Music page, and Nova peeking over a playing
+     island below it (data-at: Nova's left edge, in px, instead of beside the island). -->
 <figure class="card" id="hero">
   <div class="stage" data-pad="190">
     <img class="isl" src="../site/assets/shots/classic/page-media.webp" alt="">
@@ -58,7 +58,7 @@ img { display: block; }
 <figure class="card" id="music">
   <div class="stage" data-pad="30">
     <img class="isl" data-scale="0.9" src="../site/assets/shots/classic/page-media-ko.webp" alt="">
-    <img class="pose" data-side="right" data-w="118" src="../docs/brand/art/poses/oyen-music.webp" alt="">
+    <img class="pose" data-side="right" data-w="118" src="../docs/brand/art/poses/nova-music.webp" alt="">
   </div>
 </figure>
 
@@ -78,7 +78,7 @@ img { display: block; }
 <figure class="card" id="phone">
   <div class="stage" data-pad="30">
     <img class="isl" data-scale="0.9" src="../site/assets/shots/classic/page-shelf-phone-ask.webp" alt="">
-    <img class="pose" data-side="left" data-w="118" src="../docs/brand/art/poses/oyen-shelf.webp" alt="">
+    <img class="pose" data-side="left" data-w="118" src="../docs/brand/art/poses/nova-shelf.webp" alt="">
   </div>
 </figure>
 
@@ -86,7 +86,7 @@ img { display: block; }
 <figure class="card" id="games">
   <div class="grid">
     <div class="stage dusk" data-pad="46"><img class="isl" src="../site/assets/shots/classic/game-stats.webp" alt=""><span class="tag">Over a game</span></div>
-    <div class="stage" data-pad="46"><img class="isl" data-scale="0.9" src="../site/assets/shots/classic/page-system-games.webp" alt=""><img class="pose" data-side="right" data-w="118" src="../docs/brand/art/poses/oyen-games.webp" alt=""><span class="tag">System › Games</span></div>
+    <div class="stage" data-pad="46"><img class="isl" data-scale="0.9" src="../site/assets/shots/classic/page-system-games.webp" alt=""><img class="pose" data-side="right" data-w="118" src="../docs/brand/art/poses/nova-games.webp" alt=""><span class="tag">System › Games</span></div>
   </div>
 </figure>
 
@@ -94,7 +94,7 @@ img { display: block; }
 <figure class="card" id="system">
   <div class="stage" data-pad="30">
     <img class="isl" data-scale="0.9" src="../site/assets/shots/classic/page-system.webp" alt="">
-    <img class="pose" data-side="right" data-w="118" src="../docs/brand/art/poses/oyen-system.webp" alt="">
+    <img class="pose" data-side="right" data-w="118" src="../docs/brand/art/poses/nova-system.webp" alt="">
   </div>
 </figure>
 
@@ -108,14 +108,14 @@ img { display: block; }
   </div>
 </figure>
 
-<!-- Themes: Classic, Oyen, Glass (its shots are whole screen corners), Pill,
+<!-- Themes: Classic, Nova, Glass (its shots are whole screen corners), Pill,
      open and playing (its shots keep the gap it floats in below the top edge),
      and Diorama's resting pill by day and at night (the 400 % shots, so the
      pill shows at twice its size with every art pixel whole). -->
 <figure class="card" id="themes">
   <div class="grid cols-2">
     <div class="stage" data-pad="44"><img class="isl" data-scale="0.64" src="../site/assets/shots/classic/page-media.webp" alt=""><span class="tag">Classic</span></div>
-    <div class="stage" data-pad="44"><img class="isl" data-scale="0.64" src="../site/assets/shots/oyen/page-media.webp" alt=""><span class="tag">Oyen</span></div>
+    <div class="stage" data-pad="44"><img class="isl" data-scale="0.64" src="../site/assets/shots/nova/page-media.webp" alt=""><span class="tag">Nova</span></div>
     <div class="full"><img src="../site/assets/shots/glass/light-page-media.webp" alt=""><span class="tag">Glass, light</span></div>
     <div class="full"><img src="../site/assets/shots/glass/dark-page-media.webp" alt=""><span class="tag">Glass, dark</span></div>
     <div class="stage" data-pad="44"><img class="isl" data-scale="0.64" src="../site/assets/shots/pill/page-media.webp" alt=""><span class="tag">Pill</span></div>
@@ -137,7 +137,7 @@ img { display: block; }
 <figure class="card" id="prayer">
   <div class="grid">
     <div class="stage" data-pad="46"><img class="isl" src="../site/assets/shots/classic/prayer-countdown.webp" alt=""><span class="tag">Before each prayer</span></div>
-    <div class="stage" data-pad="46"><img class="isl" data-scale="0.9" src="../site/assets/shots/classic/page-prayer.webp" alt=""><img class="pose" data-side="right" data-w="118" src="../docs/brand/art/poses/oyen-prayer.webp" alt=""><span class="tag">Prayer tab</span></div>
+    <div class="stage" data-pad="46"><img class="isl" data-scale="0.9" src="../site/assets/shots/classic/page-prayer.webp" alt=""><img class="pose" data-side="right" data-w="118" src="../docs/brand/art/poses/nova-prayer.webp" alt=""><span class="tag">Prayer tab</span></div>
   </div>
 </figure>
 
@@ -151,7 +151,7 @@ img { display: block; }
 </figure>
 
 <script>
-// True size = half the 200 % shot, times data-scale. Oyen stands on the bottom
+// True size = half the 200 % shot, times data-scale. Nova stands on the bottom
 // edge, centred in the space beside the island, and never wider than it.
 function layout() {
   for (const img of document.querySelectorAll(".isl")) {

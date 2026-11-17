@@ -20,7 +20,7 @@ use crate::icons::Icon;
 use crate::island::{Geom, Island, HIT_MARGIN, SHOULDER};
 use crate::menubar::{Login, MenuBar, MenuCmd};
 use crate::notch::{self, Fit, Notch};
-use crate::oyen;
+use crate::nova;
 use crate::pages::{self, PageKind};
 use crate::paths;
 use crate::pill;
@@ -2285,7 +2285,7 @@ impl App {
     }
 
     /// How the island paints: the theme's look, or around a notch the one
-    /// that meets its black (Oyen goes black there); Diorama's by day or at
+    /// that meets its black (Nova goes black there); Diorama's by day or at
     /// night, as its picture shows (it floats below a notch).
     fn look(&self) -> &'static Look {
         pill::look(&self.st, self.screen.notch.is_some())
@@ -2778,8 +2778,8 @@ impl App {
             }
             self.set_stats(false);
             self.set_sysmon(false);
-            // Oyen arrives in his tab again at the next opening.
-            self.st.ui.oyen_tab = None;
+            // Nova arrives in his tab again at the next opening.
+            self.st.ui.nova_tab = None;
             // Settings closes with the island: it opens again on the page it was opened from.
             if self.st.page == PageKind::Settings {
                 self.st.page = self.st.ui.before_settings.take().filter(|p| pages::tabs(&self.st).contains(p)).unwrap_or_else(|| pages::first_tab(&self.st));
@@ -4380,7 +4380,7 @@ impl App {
                 services::media::smoke_rest();
             }
             "now-playing-browser" => services::media::smoke_sound(),
-            // The themes on the real window: Glass, then Oyen and Glass
+            // The themes on the real window: Glass, then Nova and Glass
             // around a notch (one the screen pretends to have; CI's Macs
             // have none), open and resting in the menu bar's line.
             "glass-open" => {
@@ -4388,7 +4388,7 @@ impl App {
                 self.st.page = PageKind::Today;
                 self.expand();
             }
-            "glass-collapsed" | "notch-oyen-collapsed" | "pill-collapsed" => self.collapse(),
+            "glass-collapsed" | "notch-nova-collapsed" | "pill-collapsed" => self.collapse(),
             // Around the notch Pill's music floats below the menu bar even with
             // no line to sing (as in an intro, a break or a pause): the song
             // plays on with its lyrics dropped, and no timer.
@@ -4472,7 +4472,7 @@ impl App {
                 self.on_pointer(Point::new(self.cx, pill::TOP_GAP / 2.0));
                 self.cancel_hover();
             }
-            "notch-oyen-open" => {
+            "notch-nova-open" => {
                 // The pointer from pill-hover leaves first, and the timer set
                 // aside for pill-music-cost comes back.
                 self.leave();
@@ -4481,7 +4481,7 @@ impl App {
                 }
                 window::fake_notch(Some(Notch::MACBOOK));
                 self.refresh_screen();
-                self.on_menu(MenuCmd::SetTheme(Theme::Oyen));
+                self.on_menu(MenuCmd::SetTheme(Theme::Nova));
                 self.st.page = PageKind::Today;
                 self.expand();
             }
@@ -4858,10 +4858,10 @@ impl App {
                 let what = glass::kind().unwrap_or("no glass view");
                 Some(("glass-theme", glass::shown() && self.look().material == Material::Glass, format!("{what} under the open island, {notch}")))
             }
-            "notch-oyen-open" | "notch-oyen-collapsed" => {
+            "notch-nova-open" | "notch-nova-collapsed" => {
                 let look = self.look();
-                let ok = self.screen.notch.is_some() && *look == nexora_core::look::OYEN_NIGHT && !glass::shown();
-                Some(("oyen-around-notch", ok, format!("ground {:?}, ink {:?}, font {:?}", look.ground, look.ink, look.font)))
+                let ok = self.screen.notch.is_some() && *look == nexora_core::look::NOVA_NIGHT && !glass::shown();
+                Some(("nova-around-notch", ok, format!("ground {:?}, ink {:?}, font {:?}", look.ground, look.ink, look.font)))
             }
             "pill-open" | "pill-collapsed" | "notch-pill-open" | "notch-pill-collapsed" => Some(self.pill_report()),
             "notch-pill-music" => {
@@ -5621,10 +5621,10 @@ fn system_report(st: &AppState) -> (bool, String) {
     (ok, detail)
 }
 
-/// Oyen's orange in his theme, the Mac's accent colour otherwise.
+/// Nova's orange in his theme, the Mac's accent colour otherwise.
 pub(crate) fn theme_accent(theme: Theme) -> Color {
-    if oyen::on(theme) {
-        oyen::ORANGE
+    if nova::on(theme) {
+        nova::ORANGE
     } else if theme == Theme::Diorama {
         // Its own, which its day and night looks paint as theirs.
         nexora_core::look::DIORAMA_ACCENT
@@ -5737,8 +5737,8 @@ const SMOKE_STEPS: [&str; 90] = [
     "pill-drag",
     "pill-drag-open",
     "pill-drag-centre",
-    "notch-oyen-open",
-    "notch-oyen-collapsed",
+    "notch-nova-open",
+    "notch-nova-collapsed",
     "notch-glass-open",
     "notch-pill-open",
     "notch-pill-music",

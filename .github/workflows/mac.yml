@@ -68,7 +68,7 @@ jobs:
       - name: Unit tests (the island around a notch, the renders)
         run: cargo test -p nexora --release --target aarch64-apple-darwin -- notch::tests render::tests
 
-      # Every island state with sample data, Classic, Oyen, Glass (a
+      # Every island state with sample data, Classic, Nova, Glass (a
       # smoked stand-in for macOS's glass), Pill and Diorama (Pill with a
       # picture in its resting pill, drawn through a day), without and with
       # a MacBook's notch. The runner has no notch, so this is where the
@@ -77,12 +77,12 @@ jobs:
         run: |
           bin=target/aarch64-apple-darwin/release/nexora
           $bin --render mac-renders
-          $bin --render mac-renders --theme oyen
+          $bin --render mac-renders --theme nova
           $bin --render mac-renders --theme glass
           $bin --render mac-renders --theme pill
           $bin --render mac-renders --theme diorama
           $bin --render mac-renders --notch
-          $bin --render mac-renders --theme oyen --notch
+          $bin --render mac-renders --theme nova --notch
           $bin --render mac-renders --theme glass --notch
           $bin --render mac-renders --theme pill --notch
           $bin --render mac-renders --theme diorama --notch
@@ -118,7 +118,7 @@ jobs:
       # Today with live stats), the timer, a notice, the volume and charging
       # pop-ups, files dropped on the Shelf, a Spotify "now playing"
       # notification with its lyrics looked up on LRCLIB, the Glass theme,
-      # Pill floating below the top edge, Oyen, Glass, Pill and Diorama around
+      # Pill floating below the top edge, Nova, Glass, Pill and Diorama around
       # a notch the app pretends the screen has, the adapter's test player in
       # macOS's own now playing, a tab playing in the runner's Edge (YouTube's
       # way of naming a song), the AI tab's keychain reads (test items of its
@@ -505,7 +505,7 @@ jobs:
 
   # The Mac app on the release: Nexora-<version>-mac.dmg, plus
   # Nexora-Mac.dmg, the fixed name the README's and the website's Mac
-  # buttons download from releases/latest, and Oyen-Nexora-Mac.dmg, the fixed
+  # buttons download from releases/latest, and Nova-Nexora-Mac.dmg, the fixed
   # name from before the rename (0.1.17 to the last 0.1.x), which links out there still
   # use. ci publishes the release once the Windows build, installer and install
   # test pass, so this waits for it. It
@@ -551,12 +551,12 @@ jobs:
           src=$(ls dist/*.dmg | head -1)
           [ "$src" = "dist/Nexora-${tag#v}-mac.dmg" ] || cp "$src" "dist/Nexora-${tag#v}-mac.dmg"
           cp "$src" dist/Nexora-Mac.dmg
-          cp "$src" dist/Oyen-Nexora-Mac.dmg
+          cp "$src" dist/Nova-Nexora-Mac.dmg
           for i in $(seq 1 90); do
             gh release view "$tag" > /dev/null 2>&1 && break
             sleep 30
           done
-          gh release upload "$tag" "dist/Nexora-${tag#v}-mac.dmg" dist/Nexora-Mac.dmg dist/Oyen-Nexora-Mac.dmg --clobber
+          gh release upload "$tag" "dist/Nexora-${tag#v}-mac.dmg" dist/Nexora-Mac.dmg dist/Nova-Nexora-Mac.dmg --clobber
       # latest.json tells Macs about a release only once its DMG is there
       # (docs/updates.md): have the Website workflow write it again now.
       - name: Let the update file name the DMG

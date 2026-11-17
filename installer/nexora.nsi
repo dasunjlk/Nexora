@@ -66,7 +66,7 @@ VIAddVersionKey "LegalCopyright" "Copyright (C) 2026 ${PUBLISHER}"
 !macroend
 !define MUI_ICON "../crates/nexora/res/nexora.ico"
 !define MUI_UNICON "../crates/nexora/res/nexora.ico"
-; Oyen hanging from the island on the welcome and finish pages, Nexora's logo in the header (tools/make_brand.py).
+; Nova hanging from the island on the welcome and finish pages, Nexora's logo in the header (tools/make_brand.py).
 !define MUI_WELCOMEFINISHPAGE_BITMAP "art/nsis-welcome.bmp"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_RIGHT

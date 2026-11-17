@@ -146,8 +146,8 @@ fn icon(a: &Addon) -> Icon {
 fn about(a: &Addon) -> &'static str {
     match a.id {
         "ai" => "Each AI service on this computer gets a card: your plan, each limit with when it resets, and what's left. Codex, Claude Code, Cursor, Gemini CLI, GitHub Copilot and more. Sign-ins stay here, and nothing about your usage goes to Nexora.",
-        "notes" => "One click and Oyen listens to your call in Meet, Zoom, Teams or WhatsApp, with no bot joining, then writes up the summary, the decisions and who does what, with the whole transcript. The recording goes to Nexora's server and is deleted once your notes are saved.",
-        "ielts" => "Oyen asks IELTS Speaking questions out loud, listens to your answers and gives you a band. Your answers go to Nexora's server to be scored and are deleted once that's done. IELTS® is a trademark of the IELTS partners. Not official IELTS material, not endorsed by them.",
+        "notes" => "One click and Nova listens to your call in Meet, Zoom, Teams or WhatsApp, with no bot joining, then writes up the summary, the decisions and who does what, with the whole transcript. The recording goes to Nexora's server and is deleted once your notes are saved.",
+        "ielts" => "Nova asks IELTS Speaking questions out loud, listens to your answers and gives you a band. Your answers go to Nexora's server to be scored and are deleted once that's done. IELTS® is a trademark of the IELTS partners. Not official IELTS material, not endorsed by them.",
         "downloader" => "Paste a link, pick Video or Sound, and watch it come in to Downloads and the Shelf. Only what you have the right to keep.",
         _ => a.blurb,
     }
@@ -164,8 +164,8 @@ fn draw_about(ui: &mut Ui, st: &mut AppState, area: Rect, a: &Addon) {
     let title_w = ui.c.measure(a.title, &TextStyle::headline(), w.max(1.0)).0.ceil();
     ui.c.text(a.title, Rect::new(x, area.y + 3.0, title_w + 1.0, 20.0), &TextStyle::headline());
     let tag = Rect::new(x + title_w + 8.0, area.y + 4.0, 36.0, 18.0);
-    ui.c.fill_rrect(tag, 9.0, crate::oyen::ORANGE.with_alpha(0.2));
-    ui.c.text("PRO", tag, &TextStyle::caption().weight(Weight::Bold).center().color(crate::oyen::ORANGE));
+    ui.c.fill_rrect(tag, 9.0, crate::nova::ORANGE.with_alpha(0.2));
+    ui.c.text("PRO", tag, &TextStyle::caption().weight(Weight::Bold).center().color(crate::nova::ORANGE));
     ui.c.text(a.blurb, Rect::new(x, area.y + 23.0, w, 17.0), &TextStyle::footnote().color(palette::TEXT_DIM));
     let para = TextStyle::footnote().wrap().top();
     let body = about(a);
@@ -252,7 +252,7 @@ fn addon_row(ui: &mut Ui, st: &AppState, r: Rect, i: usize, a: &Addon, card: Opt
     let mut text_right = edge - 16.0;
     if status == Status::Off {
         let size = if a.pro { "Pro".to_string() } else if a.downloads() { fmt_bytes(a.size()) } else { "Built in".to_string() };
-        let style = if a.pro { TextStyle::footnote().weight(Weight::Semibold).color(crate::oyen::ORANGE).right() } else { TextStyle::footnote().color(palette::TEXT_DIM).right() };
+        let style = if a.pro { TextStyle::footnote().weight(Weight::Semibold).color(crate::nova::ORANGE).right() } else { TextStyle::footnote().color(palette::TEXT_DIM).right() };
         let w = ui.c.measure(&size, &style, 200.0).0.ceil();
         ui.c.text(&size, Rect::new(edge - 10.0 - w, r.y, w, r.h), &style);
         text_right = edge - 10.0 - w - 16.0;

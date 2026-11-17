@@ -12,7 +12,7 @@ theme under "recorder": every entry has a light and a dark value, except under
 palette or editor entry ("palette.blue-9") instead of a colour, and a colour
 without alpha is opaque. The
 recorder keeps a pinned copy and generates its Rust constants from it
-(apps/desktop-gpui/branding/tokens.py in oyen-studio-cap), so a change here
+(apps/desktop-gpui/branding/tokens.py in nova-studio-cap), so a change here
 reaches the recorder only when that copy is synced.
 
 On the site the tokens are CSS custom properties, written between the two
