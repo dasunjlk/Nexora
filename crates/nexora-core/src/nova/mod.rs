@@ -27,9 +27,9 @@ use std::sync::OnceLock;
 // The colours, as 0xRRGGBB (what `geom::Color::hex` takes).
 
 /// The head, and the ear tip's front while it stands up.
-pub const ORANGE: u32 = 0xF0892E;
+pub const FUR: u32 = 0xB49BFF;
 /// The ear tip's back, which shows while it lies folded.
-pub const FOLD_ORANGE: u32 = 0xC9581A;
+pub const FOLD: u32 = 0x8F73F2;
 /// The eyes.
 pub const INK: u32 = 0x171717;
 /// Love's hearts.

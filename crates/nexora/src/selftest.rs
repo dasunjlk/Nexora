@@ -3667,7 +3667,7 @@ impl SelfTest {
         if st.settings.theme != self.theme {
             st.settings.theme = self.theme;
             st.accent = match self.theme {
-                Theme::Nova => crate::nova::ORANGE,
+                Theme::Nova => crate::nova::FUR,
                 // Diorama's own, as the app keeps it (`theme_accent`).
                 Theme::Diorama => nexora_core::look::DIORAMA_ACCENT,
                 _ => palette::BLUE,

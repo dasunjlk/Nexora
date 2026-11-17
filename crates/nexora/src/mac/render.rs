@@ -970,7 +970,7 @@ fn base_state(theme: Theme) -> AppState {
     st.unix = NOW_UNIX;
     st.local = LocalDateTime { year: 2026, month: 10, day: 24, hour: 9, minute: 41, second: 0 };
     st.accent = match theme {
-        Theme::Nova => crate::nova::ORANGE,
+        Theme::Nova => crate::nova::FUR,
         Theme::Diorama => nexora_core::look::DIORAMA_ACCENT,
         _ => palette::BLUE,
     };

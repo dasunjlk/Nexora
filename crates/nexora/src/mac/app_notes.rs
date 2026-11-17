@@ -131,7 +131,7 @@ impl App {
         }
         if let Some((title, subtitle, good)) = end {
             if !(self.expanded && self.st.page == PageKind::Notes) {
-                let color = if good { crate::nova::ORANGE } else { palette::TEXT_DIM };
+                let color = if good { crate::nova::FUR } else { palette::TEXT_DIM };
                 self.st.notify(Icon::Notes, color, title, subtitle, 8.0, Some(crate::state::NoticeAction::OpenPage(PageKind::Notes)));
             }
         }
