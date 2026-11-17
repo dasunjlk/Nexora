@@ -30,4 +30,4 @@ P	Pedra Preta		BR		-16.623	-54.474	0
 P	Aragarças	aragarcas	BR		-15.898	-52.251	1
 P	Alto Araguaia		BR		-17.315	-53.215	0
 P	São Simão	sao simao	BR		-18.991	-50.544	1
-P	Caiapônia	caianexoraa	BR		-16.957	-51.810	1
+P	Caiapônia	caiaponia	BR		-16.957	-51.810	1

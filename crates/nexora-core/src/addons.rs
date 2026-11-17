@@ -126,7 +126,7 @@ pub const PRAYER_TIMES: Addon = Addon {
     files: &[
         AddonFile { name: "places.json", size: 79_687, sha256: "4d2e1cd6c277b97273f415cf0460579db143fe92ac88f6e4bddb79cdf8cbf69b", url: None },
         AddonFile { name: "adzan.m4a", size: 878_695, sha256: "6b8097fa7dfa43bd61ce65894396518ea65dd9d940e56b251ffc4ae5e78c7420", url: None },
-        AddonFile { name: "NOTICE.txt", size: 971, sha256: "166776256a3a8cb67e1ea42cd9b0f5ae17ddeca5bf7f35b72a0cd001a942ac2c", url: None },
+        AddonFile { name: "NOTICE.txt", size: 957, sha256: "f3b7a1847b0ae9b1c22facad8131320a78cdf8e9b4720cfd502728d2118f5217", url: None },
     ],
     pro: false,
 };
@@ -150,7 +150,7 @@ pub const JAPANESE_READINGS: Addon = Addon {
     tag: "addon-ja-1",
     files: &[
         AddonFile { name: JA_READINGS_FILE, size: 3_790_036, sha256: "4950e5e42a2a48ad50396304c6bfbb8f9a97b33947e147007943361d65d856c8", url: None },
-        AddonFile { name: "NOTICE.txt", size: 4_786, sha256: "fb8cd0420c2a8b04404c17a1a2ada30e0e1bbd73e54ef548bb60ede42198e079", url: None },
+        AddonFile { name: "NOTICE.txt", size: 4_779, sha256: "951a33f72fc3ea2b70cac8b52cbf2086197744b27214d8b7ed5075508b2a94b8", url: None },
     ],
     pro: false,
 };
@@ -281,7 +281,7 @@ pub const DOWNLOADER_WINDOWS: Addon = Addon {
         },
         // tools/build-ffmpeg-min.sh's build (FFmpeg 9.0.2, the same bytes every time).
         AddonFile { name: "ffmpeg.exe", size: 2_298_880, sha256: "8a42638bc2c9bed20670a3e89ccb7117345a941e245d8151aa60066cac0b3993", url: None },
-        AddonFile { name: "NOTICE.txt", size: 32_624, sha256: "01fb0f44904d1f4789a5bc048fc1b2c29d1a36c25d91469632af03d2402331a0", url: None },
+        AddonFile { name: "NOTICE.txt", size: 32_576, sha256: "5a136722d27cf155c11e17ad0a0e2c592538fc51261947d7ad6d4b9a4725aba9", url: None },
     ],
     pro: true,
 };
@@ -305,7 +305,7 @@ pub const DOWNLOADER_MAC: Addon = Addon {
         // mac.yml's downloader-tools job (QuickJS-ng v0.17.0; FFmpeg 9.0.2, tools/build-ffmpeg-min.sh darwin).
         AddonFile { name: "qjs", size: 2_456_496, sha256: "d4526ffc81f4251e7e835d789a441e367b03ba1700bd111e9ce1a1a5bec0134a", url: None },
         AddonFile { name: "ffmpeg", size: 4_307_968, sha256: "fb47d9aa82cf1e61aa49b54d1989fffef98571d1cec3d0f9a5133e0b63468724", url: None },
-        AddonFile { name: "NOTICE.txt", size: 33_065, sha256: "aac524dad1d9ce62dbf07b9e8a5bd597461d21443e75feca087fb207fe231704", url: None },
+        AddonFile { name: "NOTICE.txt", size: 32_999, sha256: "faccdda1a83806f214e825c740845e3e6319f43191ab29a76e69de3448d88518", url: None },
     ],
     ..DOWNLOADER_WINDOWS
 };
@@ -585,7 +585,7 @@ mod tests {
     fn files_come_from_the_release() {
         let a = Addon::find("sholat").unwrap();
         assert_eq!(a.url(&a.files[1]), "https://github.com/dasunjlk/Nexora/releases/download/addon-sholat-3/adzan.m4a");
-        assert_eq!(a.size(), 959_353);
+        assert_eq!(a.size(), 959_339);
         assert!(Addon::find("nope").is_none());
     }
 

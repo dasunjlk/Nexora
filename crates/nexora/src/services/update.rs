@@ -387,7 +387,7 @@ mod tests {
     #[test]
     fn a_signed_file_is_believed() {
         let r = believe(SAMPLE).expect("the sample's signature checks out");
-        assert_eq!((r.version.as_str(), r.headline.as_str()), ("0.2.3", "Sing along from the closed island"));
+        assert_eq!((r.version.as_str(), r.headline.as_str()), ("0.1.0", "Nexora 0.1.0"));
         assert_eq!(r.windows.as_ref().map(|d| d.size), Some(2457657));
     }
 

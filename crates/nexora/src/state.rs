@@ -1460,7 +1460,9 @@ mod tests {
         a.subtitle = "Resets 2:20 PM".into();
         assert_eq!(usage_notice(&a, accent, 0.0).subtitle, "Resets 2:20 PM \u{b7} Keep going on Nexora Inference");
         // ...else it stands alone (the AI tab has the reset time).
-        for long in ["Resets 10:20 AM", "Resets Thu 09:00", "Resets Tue 3 Nov", "None left for now", "Premium requests \u{b7} resets Tue 1 Dec"] {
+        // "Resets 10:20 AM" and "None left for now" now fit beside the nudge (the
+        // rebranded line is a touch narrower): the longest lines stand alone.
+        for long in ["Resets Thu 09:00", "Resets Tue 3 Nov", "Resets tomorrow at 9", "Resets Wednesday 09:00", "Premium requests \u{b7} resets Tue 1 Dec"] {
             a.subtitle = long.into();
             assert_eq!(usage_notice(&a, accent, 0.0).subtitle, "Keep going on Nexora Inference", "{long}");
         }
