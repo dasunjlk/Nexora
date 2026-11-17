@@ -46,7 +46,7 @@ P	Nava		MX		28.421	-100.766	1
 P	Allende		MX		28.341	-100.851	1
 P	San Buenaventura		MX		27.062	-101.549	1
 P	Parque Industrial Ciudad Mitras		MX		25.789	-100.448	1
-P	Mitras Nexoraente		MX		25.776	-100.426	1
+P	Mitras Poniente		MX		25.776	-100.426	1
 P	Palaú	palau	MX		27.892	-101.423	1
 P	Anáhuac	anahuac	MX		27.241	-100.133	0
 P	Hidalgo		MX		25.972	-100.452	1
