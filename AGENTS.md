@@ -17,9 +17,9 @@ Nexora sits on screen all day, so how little it costs is part of the product. Th
 
 ## Names that stay
 
-The app is Nexora; it was Nexora until 0.2.0. Only the names people see changed. `nexora.exe`, its folders, the uninstall key, the Run value, `Local\Nexora.Island`, the Mac bundle id `app.nexora.nexora`, the crates, the `NEXORA_*` variables and the Nexora sign-in app id `nexora` stay as they are, so older copies update in place and stay signed in. Every release also carries `Nova-Nexora-Setup.exe` and `Nova-Nexora-Mac.dmg` next to the new names, because links to them are out there.
+The app is Nexora. `nexora.exe`, its folders, the uninstall key, the Run value, `Local\Nexora.Island`, the Mac bundle id `app.nexora.nexora`, the crates, the `NEXORA_*` variables and the Nexora sign-in app id `nexora` are its names from 0.1.0 and stay as they are, so installed copies update in place and stay signed in.
 
-Never create a repository named `lucacadalora/nexora`: GitHub forwards that old name to this repository, and the add-on downloads of the 0.1.x versions go through it.
+Nexora is a rebrand of an MIT-licensed reference implementation, `lucacadalora/oyenza-studio` (credited in `THIRD-PARTY-NOTICES.txt`). Its releases and add-on downloads live only under `dasunjlk/Nexora`; never point Nexora's installer or add-on URLs at the upstream repository.
 
 ## Every release updates the website
 

@@ -7,12 +7,13 @@ Shelf, Tasks, Focus, AI and Nexora, plus the add-ons' Health, IELTS, Notes,
 System, Script, Prayer, Stocks, Caffeine and Downloads pages once they are switched on). The Shelf's Phone drop serves a
 small web page on the local network so a phone can send files to it.
 
-It was called Nexora until 0.2.0, and plain Nexora before that. The code keeps the
-old short name where people don't see it: the crates (`nexora`, `nexora-core`), `nexora.exe`,
+It is a full rebrand of an MIT-licensed reference implementation (see docs/rebranding.md).
+The internal names are Nexora's from the first release: the crates (`nexora`,
+`nexora-core`), `nexora.exe`,
 its folders (`%LOCALAPPDATA%\Programs\Nexora`, `%APPDATA%\Nexora`), the uninstall key and
 Run value, `Local\Nexora.Island`, the Mac bundle id `app.nexora.nexora` and the `NEXORA_*`
 variables. Changing those would break upgrades and settings, so they stay. New
-crates take the new name (`nexora-usage`, `nexora-diorama`).
+crates take the same name (`nexora-usage`, `nexora-diorama`).
 
 ## Crates
 

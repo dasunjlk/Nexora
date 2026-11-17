@@ -722,12 +722,9 @@ jobs:
         with:
           name: nexora-setup
           path: dist
-      # Nova-Nexora-Setup.exe is the fixed name before the rename (0.1.2 to the last 0.1.x). Links to it are
-      # out there (nexora.com, shared links, old README copies), so every release keeps carrying it.
-      - name: Copy the installer to the fixed names the download links use
+      - name: Copy the installer to the fixed name the download links use
         run: |
           cp "dist/Nexora-Setup-$NEXORA_VERSION.exe" dist/Nexora-Setup.exe
-          cp "dist/Nexora-Setup-$NEXORA_VERSION.exe" dist/Nova-Nexora-Setup.exe
       - name: Publish as the latest release
         if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
@@ -739,7 +736,6 @@ jobs:
           files: |
             dist/Nexora-Setup-${{ env.NEXORA_VERSION }}.exe
             dist/Nexora-Setup.exe
-            dist/Nova-Nexora-Setup.exe
             dist/Nexora-${{ env.NEXORA_VERSION }}-portable.zip
           fail_on_unmatched_files: true
       - name: What a tag would publish (dry run, nothing is published)
@@ -756,7 +752,7 @@ jobs:
             echo "A \`v$NEXORA_VERSION\` tag would publish **Nexora $NEXORA_VERSION** as the latest release, with \`$notes\` as its text and these files:"
             echo
             echo '```'
-            (cd dist && sha256sum "Nexora-Setup-$NEXORA_VERSION.exe" Nexora-Setup.exe Nova-Nexora-Setup.exe "Nexora-$NEXORA_VERSION-portable.zip" && ls -l "Nexora-Setup-$NEXORA_VERSION.exe" Nexora-Setup.exe Nova-Nexora-Setup.exe "Nexora-$NEXORA_VERSION-portable.zip")
+            (cd dist && sha256sum "Nexora-Setup-$NEXORA_VERSION.exe" Nexora-Setup.exe "Nexora-$NEXORA_VERSION-portable.zip" && ls -l "Nexora-Setup-$NEXORA_VERSION.exe" Nexora-Setup.exe "Nexora-$NEXORA_VERSION-portable.zip")
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
 

@@ -505,10 +505,8 @@ jobs:
 
   # The Mac app on the release: Nexora-<version>-mac.dmg, plus
   # Nexora-Mac.dmg, the fixed name the README's and the website's Mac
-  # buttons download from releases/latest, and Nova-Nexora-Mac.dmg, the fixed
-  # name from before the rename (0.1.17 to the last 0.1.x), which links out there still
-  # use. ci publishes the release once the Windows build, installer and install
-  # test pass, so this waits for it. It
+  # buttons download from releases/latest. ci publishes the release once the
+  # Windows build, installer and install test pass, so this waits for it. It
   # takes the sign job's DMG when there is one; when signing failed it still
   # adds the ad-hoc DMG, so the Mac buttons never break, and warns.
   release:
@@ -551,12 +549,11 @@ jobs:
           src=$(ls dist/*.dmg | head -1)
           [ "$src" = "dist/Nexora-${tag#v}-mac.dmg" ] || cp "$src" "dist/Nexora-${tag#v}-mac.dmg"
           cp "$src" dist/Nexora-Mac.dmg
-          cp "$src" dist/Nova-Nexora-Mac.dmg
           for i in $(seq 1 90); do
             gh release view "$tag" > /dev/null 2>&1 && break
             sleep 30
           done
-          gh release upload "$tag" "dist/Nexora-${tag#v}-mac.dmg" dist/Nexora-Mac.dmg dist/Nova-Nexora-Mac.dmg --clobber
+          gh release upload "$tag" "dist/Nexora-${tag#v}-mac.dmg" dist/Nexora-Mac.dmg --clobber
       # latest.json tells Macs about a release only once its DMG is there
       # (docs/updates.md): have the Website workflow write it again now.
       - name: Let the update file name the DMG

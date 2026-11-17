@@ -5,7 +5,7 @@ ja-readings.dic.zst
   Japanese lyrics on PCs where Windows has no Japanese reading data. Built
   by tools/make_ja_dict.py from mecab-ipadic (below), compiled for vibrato
   and packed with zstd. The same file is crates/nexora-core/data/ja-readings.dic.zst
-  in https://github.com/lucacadalora/nexora.
+  in https://github.com/dasunjlk/Nexora.
 
 mecab-ipadic 2.7.0-20070801
 

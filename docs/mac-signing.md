@@ -6,7 +6,7 @@ The `mac` workflow does this by itself on every release tag once five secrets ex
 
 What the workflow does, in `.github/workflows/mac.yml` and `tools/sign_mac_dmg.sh`:
 
-- **`sign` (release tags, or by hand with `sign` on):** re-signs the app with the hardened runtime, a secure timestamp and `installer/mac/nexora.entitlements`, builds and signs the DMG, sends it to Apple's notary service, staples the ticket, checks it the way Gatekeeper will, and runs the smoke test on the signed app. The release job then uploads that DMG under all its names, the old `Nova-Nexora-Mac.dmg` included. If signing fails, the release still gets the ad-hoc DMG, with a warning in the run.
+- **`sign` (release tags, or by hand with `sign` on):** re-signs the app with the hardened runtime, a secure timestamp and `installer/mac/nexora.entitlements`, builds and signs the DMG, sends it to Apple's notary service, staples the ticket, checks it the way Gatekeeper will, and runs the smoke test on the signed app. The release job then uploads that DMG under its two names. If signing fails, the release still gets the ad-hoc DMG, with a warning in the run.
 - **`sign-check` (everything else, pull requests included):** the same signing with a throwaway certificate and no notarization, plus the smoke run under the hardened runtime, so the path is tested before a release needs it.
 
 ## 1. The Developer ID Application certificate (about 10 minutes, on your Mac)
@@ -47,7 +47,7 @@ Make a new key for this rather than reusing one that can manage the iPhone app: 
 
 ## 3. The secrets, in the `release` environment (about 5 minutes)
 
-1. Open https://github.com/dasunjlk/Nexora (this repository; GitHub forwards the old lucacadalora/nexora address) > **Settings > Environments > New environment**. Name it `release` and click **Configure environment**.
+1. Open https://github.com/dasunjlk/Nexora (this repository) > **Settings > Environments > New environment**. Name it `release` and click **Configure environment**.
 2. **Deployment branches and tags:** choose **Selected branches and tags**. Add a tag rule `v*`, and a branch rule `main` for the test in step 4. Other branches and pull requests then can't reach these secrets.
 3. **Required reviewers** (optional): add yourself if every signed release should wait for your click on the run. Releases often come several times a day, so leaving it off is reasonable: only you, or a session you told to tag, push tags.
 4. Under **Environment secrets**, click **Add secret** five times:
