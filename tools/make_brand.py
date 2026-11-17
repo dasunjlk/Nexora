@@ -1,9 +1,9 @@
 """Draw Nexora's brand files: the app icon, the installer pictures and the logo used in the docs.
 
-Nexora belongs to the Nova family. Nova is the orange cat of the Nexora logo; docs/brand/nova-mark*.svg are
-that logo, copied unchanged from the brand kit. The logo is an orange tile with Nexora's island hanging from its top
-edge, playing music (album cover and equalizer, as on the real island), and the white Nova below it. The plush Nova
-pictures in docs/brand/art are the source for the installer's welcome picture.
+Nova is the cat of the Nexora logo; docs/brand/nova-mark*.svg are her mark, carried over from the
+brand kit (the geometry is hers, the colours are Nexora's). The logo is a violet tile with Nexora's
+island hanging from its top edge, playing music (album cover and equalizer, as on the real island),
+and the white Nova below it. The installer's welcome picture puts the logo tile on a lavender field.
 
 Run: python3 tools/make_brand.py  (needs Pillow)
 
@@ -26,9 +26,11 @@ BRAND = ROOT / "docs" / "brand"
 RES = ROOT / "crates" / "nexora" / "res"
 ART = ROOT / "installer" / "art"
 
-ORANGE, FOLD, INK = "#F0892E", "#C9581A", "#171717"
-ISLAND, EQ, SUN = "#0A0A0A", "#FFA24A", "#FFE2B8"
-COVER = [(0.0, "#FFB37A"), (0.45, "#F0708A"), (0.55, "#2B4F86"), (1.0, "#1B2F55")]  # sunset over the sea
+INK = "#171717"
+TILE_TOP, TILE_BOTTOM = "#8B6CFF", "#6E4BE8"  # the tile's violet, light over dark
+ISLAND, EQ, SUN = "#0A0A0A", "#B49BFF", "#E6E0FF"
+COVER = [(0.0, "#C9BAFF"), (0.45, "#8F73F2"), (0.55, "#3D2E8C"), (1.0, "#191244")]  # dusk over the hills
+FIELD = [(0.0, "#F5F2FF"), (1.0, "#D9D1FF")]  # the installer's lavender field
 ICO_SIZES = [16, 20, 24, 32, 40, 48, 64, 96, 128, 256]
 # Inno Setup picks the file closest to its image area: 100%, 150% and 200% scaling.
 WIZARD_SIZES = [(202, 386), (336, 643), (430, 824)]
@@ -128,7 +130,7 @@ def draw_logo(size: int, ss: int = 8) -> Image.Image:
     tile = Image.new("L", (s, s), 0)
     ImageDraw.Draw(tile).rounded_rectangle([inset, inset, inset + t, inset + t], radius=TILE_R * t, fill=255)
     img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
-    img.paste(ORANGE, (0, 0), tile)
+    img.paste(gradient(s, s, [(0.0, TILE_TOP), (1.0, TILE_BOTTOM)]).convert("RGBA"), (0, 0), tile)
 
     # The island hangs from the tile's top edge; its flared corners follow the tile's rounded corners.
     isl = Image.new("L", (s, s), 0)
@@ -178,8 +180,9 @@ def logo_svg() -> str:
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {s:g} {s:g}"><title>Nexora</title>'
         f'<defs><clipPath id="tile"><rect x="{inset:.1f}" y="{inset:.1f}" width="{t:.1f}" height="{t:.1f}" rx="{TILE_R * t:.1f}"/></clipPath>'
+        f'<linearGradient id="tileg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{TILE_TOP}"/><stop offset="1" stop-color="{TILE_BOTTOM}"/></linearGradient>'
         f'<linearGradient id="cover" x1="0" y1="0" x2="0" y2="1">{stops}</linearGradient></defs>'
-        f'<g clip-path="url(#tile)"><rect x="0" y="0" width="{s:g}" height="{s:g}" fill="{ORANGE}"/>'
+        f'<g clip-path="url(#tile)"><rect x="0" y="0" width="{s:g}" height="{s:g}" fill="url(#tileg)"/>'
         f'<path d="{island_points(s / 2, inset - 4, L["w"], L["h"] + 4, ISL_R * t, ISL_FLARE * t)}" fill="{ISLAND}"/></g>'
         f'<rect x="{x:.1f}" y="{y:.1f}" width="{a:.1f}" height="{a:.1f}" rx="{0.24 * a:.1f}" fill="url(#cover)"/>'
         f'<path d="M{x + 0.66 * a - r:.1f} {y + 0.5 * a:.1f}a{r:.1f} {r:.1f} 0 0 1 {2 * r:.1f} 0Z" fill="{SUN}"/>'
@@ -190,18 +193,12 @@ def logo_svg() -> str:
     )
 
 
-def trimmed(path: Path) -> Image.Image:
-    im = Image.open(path).convert("RGBA")
-    return im.crop(im.getchannel("A").point(lambda v: 255 if v > 32 else 0).getbbox())
-
-
-def wizard_image(w: int, h: int, nova: Image.Image) -> Image.Image:
-    """Welcome/finish picture: Nova on the island, playing music, on a warm cream field."""
-    img = gradient(w, h, [(0.0, "#FFF6EC"), (1.0, "#FFE3C4")]).convert("RGBA")
-    ow = round(w * 0.88)
-    oh = round(nova.height * ow / nova.width)
-    art = nova.resize((ow, oh), Image.LANCZOS)
-    img.alpha_composite(art, ((w - ow) // 2, round(h * 0.47 - oh / 2)))
+def wizard_image(w: int, h: int, logo: Image.Image) -> Image.Image:
+    """Welcome/finish picture: the logo tile, large, on the lavender field."""
+    img = gradient(w, h, FIELD).convert("RGBA")
+    side = round(w * 0.62)
+    art = logo.resize((side, side), Image.LANCZOS)
+    img.alpha_composite(art, ((w - side) // 2, round(h * 0.46 - side / 2)))
     return img
 
 
@@ -219,12 +216,12 @@ def main() -> int:
     ART.mkdir(exist_ok=True)
     for n in WIZARD_SMALL_SIZES:
         draw_logo(n).save(ART / f"wizard-small-{n}.png", optimize=True)
-    nova = trimmed(BRAND / "art" / "nexora-sit.webp")
+    logo512 = draw_logo(512)
     for w, h in WIZARD_SIZES:
-        wizard_image(w, h, nova).convert("RGB").save(ART / f"wizard-{w}x{h}.png", optimize=True)
+        wizard_image(w, h, logo512).convert("RGB").save(ART / f"wizard-{w}x{h}.png", optimize=True)
 
     # NSIS (MUI2) only takes 24-bit BMPs: 164x314 welcome/finish picture, 150x57 header.
-    wizard_image(164, 314, nova).convert("RGB").save(ART / "nsis-welcome.bmp")
+    wizard_image(164, 314, logo512).convert("RGB").save(ART / "nsis-welcome.bmp")
     header = Image.new("RGBA", (150, 57), "white")
     header.alpha_composite(draw_logo(48), (150 - 48 - 6, (57 - 48) // 2))
     header.convert("RGB").save(ART / "nsis-header.bmp")
