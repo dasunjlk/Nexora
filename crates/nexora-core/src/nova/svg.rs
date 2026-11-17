@@ -4,7 +4,7 @@
 
 use super::geometry::{max, number};
 use super::{
-    fold_path, head_path, Affine, Frame, Paint, Place, Shape, FOLD_ORANGE, GREEN, INK, ORANGE, PINK,
+    fold_path, head_path, Affine, Frame, Paint, Place, Shape, FOLD, GREEN, INK, FUR, PINK,
 };
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -51,7 +51,7 @@ impl Canvas {
     }
 }
 
-/// `0xRRGGBB` the way CSS and the Swift port write it: "#F0892E".
+/// `0xRRGGBB` the way CSS and the Swift port write it: "#B49BFF".
 pub fn css(rgb: u32) -> String {
     format!("#{rgb:06X}")
 }
@@ -127,15 +127,15 @@ fn colour_body(frame: &Frame, parts: &Parts, ink: &str, id: &str) -> String {
     let mut defs = String::new();
     let mut out = String::new();
     let tip_fill = css(if frame.tip.faces_up {
-        ORANGE
+        FUR
     } else {
-        FOLD_ORANGE
+        FOLD
     });
     let tip = format!("{} fill=\"{tip_fill}\"/>", parts.tip);
     if frame.tip.behind_head {
         out += &tip;
     }
-    out += &format!("{} fill=\"{}\"/>", parts.head, css(ORANGE));
+    out += &format!("{} fill=\"{}\"/>", parts.head, css(FUR));
     if !frame.tip.behind_head {
         out += &tip;
     }
@@ -260,7 +260,7 @@ mod tests {
         );
         assert!(svg.contains("<mask id=\"tm\""));
         assert!(svg.contains("mask=\"url(#tm)\""));
-        assert!(!svg.contains(&css(ORANGE)));
+        assert!(!svg.contains(&css(FUR)));
         assert!(!svg.contains(&css(INK)));
         assert!(svg.starts_with("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"-54 -66 108 108\">"));
     }
@@ -273,8 +273,8 @@ mod tests {
             Canvas::face(96.0),
             "nova",
         );
-        assert!(svg.contains("fill=\"#F0892E\""));
-        assert!(svg.contains("fill=\"#C9581A\""));
+        assert!(svg.contains("fill=\"#B49BFF\""));
+        assert!(svg.contains("fill=\"#8F73F2\""));
         assert!(svg.contains("fill=\"#171717\""));
         assert!(!svg.contains("<mask"));
     }
@@ -329,8 +329,8 @@ mod tests {
 
     #[test]
     fn colours_are_written_as_css_hex() {
-        assert_eq!(css(ORANGE), "#F0892E");
-        assert_eq!(css(FOLD_ORANGE), "#C9581A");
+        assert_eq!(css(FUR), "#B49BFF");
+        assert_eq!(css(FOLD), "#8F73F2");
         assert_eq!(css(INK), "#171717");
         assert_eq!(css(PINK), "#FF4F8B");
         assert_eq!(css(GREEN), "#1E9E4A");

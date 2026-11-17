@@ -44,7 +44,7 @@ const BUTTON_Y: f32 = 124.0;
 const BAR_H: f32 = 6.0;
 const METER_ROW: f32 = 26.0;
 /// Nova's orange: the page's accent in every theme.
-const ACCENT: Color = nova::ORANGE;
+const ACCENT: Color = nova::FUR;
 const REC: Color = palette::RED;
 const MIC_SETTINGS: &str =
     if cfg!(target_os = "macos") { "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone" } else { "ms-settings:privacy-microphone" };

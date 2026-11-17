@@ -19,8 +19,8 @@ use std::f64::consts::PI;
 use std::sync::OnceLock;
 
 /// Nova's orange: the theme's accent.
-pub const ORANGE: Color = Color::hex(nova::ORANGE);
-const FOLD: Color = Color::hex(nova::FOLD_ORANGE);
+pub const FUR: Color = Color::hex(nova::FUR);
+const FOLD: Color = Color::hex(nova::FOLD);
 const INK: Color = Color::hex(nova::INK);
 const PINK: Color = Color::hex(nova::PINK);
 const GREEN: Color = Color::hex(nova::GREEN);
@@ -236,7 +236,7 @@ pub fn notes(c: &mut Canvas, notes: &Notes, now: f64, cx: f32, bar_y: f32, clip:
         let at = Point::new(cx + f.x + f.drift * rise + 1.4 * turn.sin(), bar_y - NOTE_START - NOTE_RISE * rise);
         let spin = f.x.signum() * 9.0 + 12.0 * (0.85 * turn + 0.6).sin();
         let size = if f.deep { 0.8 } else { 0.72 } * (0.4 + 0.6 * back_out((age / POP) as f32)) * (1.0 - 0.15 * u);
-        let color = if f.deep { FOLD } else { ORANGE };
+        let color = if f.deep { FOLD } else { FUR };
         let segs = place(glyph(f.pair), at, spin, size);
         c.with_alpha(alpha, |c| c.unthemed(|c| c.path(&segs, Some(color), None)));
     }
@@ -472,11 +472,11 @@ fn draw_face(c: &mut Canvas, f: &Frame, origin: Point, k: f32, float: Color) {
     };
     // Strokes scale with the head (it squashes a few percent when bouncing).
     let stroke_k = k * ((h.a * h.d - h.b * h.c).abs().sqrt() as f32);
-    let tip = if f.tip.faces_up { ORANGE } else { FOLD };
+    let tip = if f.tip.faces_up { FUR } else { FOLD };
     if f.tip.behind_head {
         c.path(&segs(&f.tip.path, &map), Some(tip), None);
     }
-    c.path(&segs(nova::head_path(), &map), Some(ORANGE), None);
+    c.path(&segs(nova::head_path(), &map), Some(FUR), None);
     if !f.tip.behind_head {
         c.path(&segs(&f.tip.path, &map), Some(tip), None);
     }

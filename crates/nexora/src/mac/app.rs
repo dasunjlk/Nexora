@@ -5624,7 +5624,7 @@ fn system_report(st: &AppState) -> (bool, String) {
 /// Nova's orange in his theme, the Mac's accent colour otherwise.
 pub(crate) fn theme_accent(theme: Theme) -> Color {
     if nova::on(theme) {
-        nova::ORANGE
+        nova::FUR
     } else if theme == Theme::Diorama {
         // Its own, which its day and night looks paint as theirs.
         nexora_core::look::DIORAMA_ACCENT

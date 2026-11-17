@@ -43,7 +43,7 @@ const FOOT_H: f32 = 14.0;
 /// The ladder's rows.
 const ROW_H: f32 = 30.0;
 /// Nova's orange: his page's accent in every theme.
-const ACCENT: Color = nova::ORANGE;
+const ACCENT: Color = nova::FUR;
 const REC: Color = palette::RED;
 const DISCLAIMER: &str = "IELTS\u{ae} is a trademark of the IELTS partners. Not official IELTS material, not endorsed by them.";
 /// Where the microphone switch is: Windows Settings › Privacy & security ›
