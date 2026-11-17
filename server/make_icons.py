@@ -15,13 +15,13 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 LOGO = ROOT / "docs" / "brand" / "nexora-logo-512.png"
 OUT = ROOT / "server" / "public"
-ORANGE = (0xF0, 0x89, 0x2E, 255)  # the tile colour (#F0892E)
+TILE = (0x6E, 0x4B, 0xE8, 255)  # the tile's bottom violet (#6E4BE8)
 
 
 def full_bleed(logo: Image.Image) -> Image.Image:
     """The tile cropped to its edges, transparent corners filled with the tile colour."""
     tile = logo.crop(logo.getchannel("A").getbbox())
-    square = Image.new("RGBA", tile.size, ORANGE)
+    square = Image.new("RGBA", tile.size, TILE)
     square.alpha_composite(tile)
     return square
 
@@ -35,7 +35,7 @@ def main() -> None:
 
     size = 512
     inner = round(size * 0.66)
-    maskable = Image.new("RGBA", (size, size), ORANGE)
+    maskable = Image.new("RGBA", (size, size), TILE)
     small = tile.resize((inner, inner), Image.LANCZOS)
     maskable.alpha_composite(small, ((size - inner) // 2, (size - inner) // 2))
     maskable.convert("RGB").save(OUT / "icon-512.png", optimize=True)
