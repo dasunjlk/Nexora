@@ -101,8 +101,8 @@ pub enum Shape {
     Pill,
 }
 
-const NOVA_ORANGE: Color = Color::hex(crate::nova::ORANGE);
-const NOVA_FOLD: Color = Color::hex(crate::nova::FOLD_ORANGE);
+const NOVA_FUR: Color = Color::hex(crate::nova::FUR);
+const NOVA_FOLD: Color = Color::hex(crate::nova::FOLD);
 
 pub const CLASSIC: Look = Look {
     ground: Color::black(1.0),
@@ -117,21 +117,21 @@ pub const CLASSIC: Look = Look {
     swaps: &[],
 };
 
-/// Nova: warm cream paper, espresso ink, Nova's orange, and Outfit (the Nova
+/// Nova: cool porcelain paper, indigo ink, Nova's violet, and Outfit (the
 /// Nexora website's typeface) for every Latin letter.
 pub const NOVA: Look = Look {
-    ground: Color::hex(0xFFF1DE),
-    ink: Color::hex(0x2B1B10),
-    accent: Some(NOVA_ORANGE),
-    border: Color::rgba(0.55, 0.30, 0.10, 0.22),
+    ground: Color::hex(0xF3F0FF),
+    ink: Color::hex(0x271E4A),
+    accent: Some(NOVA_FUR),
+    border: Color::rgba(0.24, 0.20, 0.45, 0.22),
     light: true,
     font: Some("Outfit"),
     material: Material::Solid,
     shape: Shape::Notch,
     frame: None,
     swaps: &[
-        Swap { from: NOVA_ORANGE, fill: NOVA_ORANGE, text: NOVA_FOLD },
-        Swap { from: palette::ORANGE, fill: NOVA_ORANGE, text: NOVA_FOLD },
+        Swap { from: NOVA_FUR, fill: NOVA_FUR, text: NOVA_FOLD },
+        Swap { from: palette::ORANGE, fill: NOVA_FUR, text: NOVA_FOLD },
         Swap { from: palette::GREEN, fill: Color::hex(0x2DB45A), text: Color::hex(0x1B7F3E) },
         Swap { from: palette::RED, fill: Color::hex(0xE5484D), text: Color::hex(0xC9302C) },
         Swap { from: palette::BLUE, fill: Color::hex(0x2F7CF6), text: Color::hex(0x1A5FCC) },
@@ -145,22 +145,22 @@ pub const NOVA: Look = Look {
 /// Nova around a MacBook's camera notch. The notch is black hardware that no
 /// pixel can colour, so a cream island would wear a black hole in its top
 /// edge: here the island is black like the notch (and Classic), and Nova
-/// stays in everything on it: cream ink, his orange, Outfit, his face.
+/// stays in everything on it: porcelain ink, her violet, Outfit, her face.
 pub const NOVA_NIGHT: Look = Look {
     ground: Color::black(1.0),
-    ink: Color::hex(0xFFF1DE),
-    accent: Some(NOVA_ORANGE),
-    border: Color::rgba(1.0, 0.945, 0.871, 0.07),
+    ink: Color::hex(0xF3F0FF),
+    accent: Some(NOVA_FUR),
+    border: Color::rgba(0.87, 0.85, 1.0, 0.07),
     light: false,
     font: Some("Outfit"),
     material: Material::Solid,
     shape: Shape::Notch,
     frame: None,
-    // His orange reads on black as it is, in fills and in text alike; the
+    // Her violet reads on black as it is, in fills and in text alike; the
     // palette's other accents are made for a dark ground already.
     swaps: &[
-        Swap { from: NOVA_ORANGE, fill: NOVA_ORANGE, text: NOVA_ORANGE },
-        Swap { from: palette::ORANGE, fill: NOVA_ORANGE, text: NOVA_ORANGE },
+        Swap { from: NOVA_FUR, fill: NOVA_FUR, text: NOVA_FUR },
+        Swap { from: palette::ORANGE, fill: NOVA_FUR, text: NOVA_FUR },
     ],
 };
 
@@ -407,7 +407,7 @@ mod tests {
     fn nova_swaps_accents_and_deepens_them_for_text() {
         let fill = NOVA.paint(palette::ORANGE);
         let text = NOVA.paint_text(palette::ORANGE);
-        assert_eq!(fill, NOVA_ORANGE);
+        assert_eq!(fill, NOVA_FUR);
         assert_eq!(text, NOVA_FOLD);
         assert!(text.luminance() < fill.luminance());
         // Opacity survives the swap.
@@ -428,9 +428,9 @@ mod tests {
         assert_eq!(NOVA_NIGHT.paint(Color::white(1.0)), NOVA.ground);
         assert_eq!(NOVA_NIGHT.paint(palette::TEXT_DIM), NOVA.ground.with_alpha(0.62));
         // His orange in fills and text, bright enough on black.
-        assert_eq!(NOVA_NIGHT.paint(palette::ORANGE), NOVA_ORANGE);
-        assert_eq!(NOVA_NIGHT.paint_text(palette::ORANGE), NOVA_ORANGE);
-        assert!(NOVA_ORANGE.luminance() > 0.3);
+        assert_eq!(NOVA_NIGHT.paint(palette::ORANGE), NOVA_FUR);
+        assert_eq!(NOVA_NIGHT.paint_text(palette::ORANGE), NOVA_FUR);
+        assert!(NOVA_FUR.luminance() > 0.3);
         // The palette's dark-ground accents and the content on them stay.
         assert_eq!(NOVA_NIGHT.paint(palette::GREEN), palette::GREEN);
         assert_eq!(NOVA_NIGHT.paint_text(palette::ON_ACCENT), palette::ON_ACCENT);
