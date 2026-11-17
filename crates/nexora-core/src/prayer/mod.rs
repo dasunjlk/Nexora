@@ -1,7 +1,7 @@
 //! Prayer times for the Prayer times add-on: the five daily prayers plus Imsak
 //! and Terbit for one place, the next and current prayer, and the qibla.
 //!
-//! Indonesian places use Kemenag RI's (Bimas Islam) rules, the engine Oyen
+//! Indonesian places use Kemenag RI's (Bimas Islam) rules, the engine Nova
 //! Umroh runs, checked here against Kemenag's published 2026 schedule for
 //! all 517 of its locations (see tests.rs):
 //! - Subuh: sun 20° below the horizon; Isya: 18° below (21° and 19° in six
@@ -631,7 +631,7 @@ fn umm_al_qura(site: &Site, day: i64, y: i32, m: u8, d: u8) -> Option<[i64; 6]> 
 }
 
 /// Ramadan in the Umm al-Qura calendar: (first day as days since 1970, length).
-/// From ICU's islamic-umalqura calendar, which Oyen Umroh's engine reads
+/// From ICU's islamic-umalqura calendar, which Nova Umroh's engine reads
 /// through `Intl`; 1440-1501 AH.
 const RAMADAN_UMM_AL_QURA: [(i64, i64); 62] = [
     (18022, 29), (18376, 30), (18730, 30), (19084, 30), (19438, 29), (19792, 30), (20147, 29), (20502, 30), (20857, 29), (21211, 30),

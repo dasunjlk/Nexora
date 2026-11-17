@@ -39,7 +39,7 @@ test('test vector with drop-core.js (WebCrypto)', async () => {
   }
   assert.equal(
     core.macText(V.room, V.msg),
-    `oyen-drop/1\n${V.room}\noffer\nAAECAwQFBgcICQoLDA0ODw\n1790000000000\nPixel 10\nv=0\r\no=- 1 2 IN IP4 127.0.0.1\r\n`,
+    `nova-drop/1\n${V.room}\noffer\nAAECAwQFBgcICQoLDA0ODw\n1790000000000\nPixel 10\nv=0\r\no=- 1 2 IN IP4 127.0.0.1\r\n`,
   );
 });
 

@@ -204,7 +204,7 @@ mod tests {
     #[test]
     fn matches_the_link_the_recorder_parses() {
         // The value in the recorder's own test, parses_record_screen_action_url
-        // (apps/desktop-gpui/src/deeplink.rs in lucacadalora/oyen-rekam).
+        // (apps/desktop-gpui/src/deeplink.rs in lucacadalora/nova-rekam).
         assert_eq!(
             record_screen_link("Odyssey G93SC"),
             "nexora-recorder://action?value=%7B%22record_screen%22%3A%7B%22screen%22%3A%22Odyssey%20G93SC%22%7D%7D"

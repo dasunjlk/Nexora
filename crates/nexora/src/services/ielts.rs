@@ -1,5 +1,5 @@
-//! Oyen's IELTS coach on this PC: the calls to the server, the microphone
-//! and Oyen's voice. The session itself is `nexora_core::ielts::Coach` in
+//! Nova's IELTS coach on this PC: the calls to the server, the microphone
+//! and Nova's voice. The session itself is `nexora_core::ielts::Coach` in
 //! `AppState`; the app carries out what it asks for ([`Effect`]s) with a
 //! [`Kit`].
 //!
@@ -7,7 +7,7 @@
 //! the first call (the IELTS page opening asks for the ladder) and ends once
 //! the page is closed with nothing in flight; the microphone's thread runs
 //! only while recording (`services/mic.rs`); the player only while a clip
-//! plays (`services/voice.rs`). Oyen's clips and the answer are files in
+//! plays (`services/voice.rs`). Nova's clips and the answer are files in
 //! `%LOCALAPPDATA%\Nexora\ielts\`, each deleted once used; anything left over
 //! (the app closed mid-session) goes when the next session starts or the
 //! add-on is switched off.
@@ -286,7 +286,7 @@ impl Calls {
                 let body = self.send(Method::Post, &ielts::session_url(&self.base), Some(&ielts::session_body(level, spice, &tz)), START_TIMEOUT)?;
                 let mut s = ielts::parse_started(&body).ok_or(plain(Problem::Server))?;
                 self.save(&mut s.turn, None);
-                // Oyen's thinking lines, kept for the session's waits.
+                // Nova's thinking lines, kept for the session's waits.
                 let dir = crate::paths::ielts_dir();
                 for (i, f) in s.fillers.iter_mut().enumerate() {
                     f.save_clip(&dir, &format!("f{i}"));
@@ -359,7 +359,7 @@ impl Calls {
         self.key.clone()
     }
 
-    /// The answer's body, or what went wrong with Oyen's own line about it
+    /// The answer's body, or what went wrong with Nova's own line about it
     /// when the server sent one (a capped day, a locked level).
     fn send(&mut self, method: Method, url: &str, json: Option<&str>, timeout: Duration) -> Result<String, (Problem, Vec<ielts::Say>)> {
         let key = self.key().ok_or((Problem::SignedOut, Vec::new()))?;

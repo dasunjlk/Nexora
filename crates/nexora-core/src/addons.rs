@@ -337,8 +337,8 @@ pub const AI_USAGE: Addon = Addon {
     pro: true,
 };
 
-/// IELTS: Oyen's IELTS Speaking coach, the IELTS page (`crate::ielts`):
-/// Oyen asks the questions out loud, listens to the answers through the
+/// IELTS: Nova's IELTS Speaking coach, the IELTS page (`crate::ielts`):
+/// Nova asks the questions out loud, listens to the answers through the
 /// microphone and gives a band score, through the Nexora account. Its code
 /// is in the app, so there is nothing to download. Off, there is no IELTS
 /// tab, and nothing of it runs: no microphone, no player, no calls. Part of
@@ -347,14 +347,14 @@ pub const AI_USAGE: Addon = Addon {
 pub const IELTS: Addon = Addon {
     id: "ielts",
     title: "IELTS",
-    blurb: "Practise IELTS Speaking out loud: Oyen asks, listens and gives you a band.",
+    blurb: "Practise IELTS Speaking out loud: Nova asks, listens and gives you a band.",
     mac_blurb: None,
     tag: "",
     files: &[],
     pro: true,
 };
 
-/// Meeting notes: the Notes page (`crate::notes`). One click and Oyen listens
+/// Meeting notes: the Notes page (`crate::notes`). One click and Nova listens
 /// to the microphone and the computer's own sound (a call in Meet, Zoom,
 /// Teams; on a Mac through a Core Audio tap, macOS 14.2 and later), then the
 /// Nexora account writes the notes. Its code is in the
@@ -365,7 +365,7 @@ pub const IELTS: Addon = Addon {
 pub const MEETING_NOTES: Addon = Addon {
     id: "notes",
     title: "Meeting notes",
-    blurb: "One click and Oyen listens to your meeting, Meet, Zoom or Teams, and writes the notes.",
+    blurb: "One click and Nova listens to your meeting, Meet, Zoom or Teams, and writes the notes.",
     mac_blurb: None,
     tag: "",
     files: &[],

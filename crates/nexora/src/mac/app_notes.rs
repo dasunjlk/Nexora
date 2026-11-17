@@ -14,7 +14,7 @@ use nexora_core::notes::{CaptureIssue, Problem, Reply};
 
 impl App {
     /// Each frame while a meeting is recorded: how loud each source is, for
-    /// Oyen's head and the page's bars.
+    /// Nova's head and the page's bars.
     pub(super) fn notes_tick(&mut self) {
         if let Some(r) = &self.notes_rec {
             (self.st.notes.mic, self.st.notes.pc) = r.levels();
@@ -131,7 +131,7 @@ impl App {
         }
         if let Some((title, subtitle, good)) = end {
             if !(self.expanded && self.st.page == PageKind::Notes) {
-                let color = if good { crate::oyen::ORANGE } else { palette::TEXT_DIM };
+                let color = if good { crate::nova::ORANGE } else { palette::TEXT_DIM };
                 self.st.notify(Icon::Notes, color, title, subtitle, 8.0, Some(crate::state::NoticeAction::OpenPage(PageKind::Notes)));
             }
         }

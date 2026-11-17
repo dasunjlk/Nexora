@@ -58,8 +58,8 @@ API = "https://api.github.com"
 # The page's picture, copied next to the page so it never links into main.
 ART = ROOT / "docs/brand/art/nexora-peek.webp"
 
-# Oyen's look (crates/nexora-core/src/look.rs) on a cream card. The bars are a
-# step deeper than Oyen's orange so they keep 3:1 contrast on the cream.
+# Nova's look (crates/nexora-core/src/look.rs) on a cream card. The bars are a
+# step deeper than Nova's orange so they keep 3:1 contrast on the cream.
 CREAM = "#FFF1DE"
 INK = "#2B1B10"
 SECONDARY = "#6B5442"
@@ -88,8 +88,8 @@ def kind(file: str) -> str:
     if file.endswith("-portable.zip"):
         return "zip"
     # The website's and README's Download link: releases/latest/download/Nexora-Setup.exe
-    # (Oyen-Nexora-Setup.exe before the rename, which every release still carries for older links).
-    if re.fullmatch(r"(Oyen-)?Nexora-Setup\.exe|Nexora-Setup\.exe", file):
+    # (Nova-Nexora-Setup.exe before the rename, which every release still carries for older links).
+    if re.fullmatch(r"(Nova-)?Nexora-Setup\.exe|Nexora-Setup\.exe", file):
         return "button"
     if file.endswith(".exe"):
         return "installer"
@@ -489,7 +489,7 @@ def page(s: dict, days: list[tuple[date, int]], steps: dict, traffic: list[dict]
     stamp = parse_time(s["checked_at"])
     out = []
     if has_art:
-        out += [f'<p align="center"><img src="art/{ART.name}" width="260" alt="Oyen peeking over a playing island"></p>', ""]
+        out += [f'<p align="center"><img src="art/{ART.name}" width="260" alt="Nova peeking over a playing island"></p>', ""]
     out += [f'<h1 align="center">{plural(s["downloads"], "download")}</h1>', ""]
     facts = []
     if s["latest"]:

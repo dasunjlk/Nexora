@@ -1,16 +1,16 @@
-//! IELTS page, the IELTS add-on's (off until switched on): Oyen as a
+//! IELTS page, the IELTS add-on's (off until switched on): Nova as a
 //! GoPrep-style IELTS Speaking examiner (`nexora_core::ielts`).
 //!
 //! - Signed out: the Nexora sign-in card, saying what the coach does.
 //! - Home: the five levels (open ones can be picked, each with its target
-//!   band and the best so far), today's sessions, how Oyen talks (Sopan,
+//!   band and the best so far), today's sessions, how Nova talks (Sopan,
 //!   Gaul, Ngegas) and Mulai.
-//! - A session: Oyen big on the left with the mic under him (tap to answer,
+//! - A session: Nova big on the left with the mic under him (tap to answer,
 //!   tap to stop; it stops by itself at the turn's limit), its level and
 //!   time; on the right the Part, the line he says, or Part 2's card with
-//!   its minute to prepare; "Oyen mikir…" while the answer is on its way;
+//!   its minute to prepare; "Nova mikir…" while the answer is on its way;
 //!   Lewati and Udahan.
-//! - The result: the band, the four criteria with Oyen's notes, his roast
+//! - The result: the band, the four criteria with Nova's notes, his roast
 //!   (said out loud), three tips, and the level that opened.
 //! - What went wrong, in plain words, with a way on; a blocked microphone
 //!   gets a button to Windows' microphone settings.
@@ -18,12 +18,12 @@
 //!
 //! The page only draws and asks (`Command::Ielts`); the app runs the session
 //! (`AppState::ielts`), the microphone and the voice. It moves only while
-//! Oyen talks, listens, thinks or counts down.
+//! Nova talks, listens, thinks or counts down.
 
 use crate::commands::{Command, IeltsCmd};
 use crate::gfx::{TextStyle, Weight};
 use crate::icons::Icon;
-use crate::oyen::{self, Coach as Oyen};
+use crate::nova::{self, Coach as Nova};
 use crate::state::{AppState, NexoraLink};
 use crate::ui::{wid, wid_n, PillStyle, Resp, Ui, PILL_GAP, PILL_SMALL};
 use nexora_core::geom::{palette, Color, Point, Rect};
@@ -34,7 +34,7 @@ use nexora_core::ielts::{self, MicIssue, Phase, Problem, Spice};
 const HEIGHT: f32 = 248.0;
 /// Signed out: the Nexora sign-in card's height.
 const SIGNED_OUT_H: f32 = 156.0;
-/// Oyen's column, and the gap to the right one.
+/// Nova's column, and the gap to the right one.
 const LEFT_W: f32 = 168.0;
 const COL_GAP: f32 = 18.0;
 const HEAD_W: f32 = 96.0;
@@ -42,16 +42,16 @@ const MIC_R: f32 = 25.0;
 const FOOT_H: f32 = 14.0;
 /// The ladder's rows.
 const ROW_H: f32 = 30.0;
-/// Oyen's orange: his page's accent in every theme.
-const ACCENT: Color = oyen::ORANGE;
+/// Nova's orange: his page's accent in every theme.
+const ACCENT: Color = nova::ORANGE;
 const REC: Color = palette::RED;
 const DISCLAIMER: &str = "IELTS\u{ae} is a trademark of the IELTS partners. Not official IELTS material, not endorsed by them.";
 /// Where the microphone switch is: Windows Settings › Privacy & security ›
 /// Microphone, or System Settings › Privacy & Security › Microphone.
 const MIC_SETTINGS: &str =
     if cfg!(target_os = "macos") { "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone" } else { "ms-settings:privacy-microphone" };
-const SIGN_IN_TITLE: &str = "Latihan IELTS Speaking bareng Oyen";
-const SIGN_IN_BODY: &str = "Oyen jadi examiner IELTS kamu: nanya Part 1 sampai 3, dengerin jawabanmu, kasih band score, terus nge-roast. Masuk ke Nexora dulu buat mulai.";
+const SIGN_IN_TITLE: &str = "Latihan IELTS Speaking bareng Nova";
+const SIGN_IN_BODY: &str = "Nova jadi examiner IELTS kamu: nanya Part 1 sampai 3, dengerin jawabanmu, kasih band score, terus nge-roast. Masuk ke Nexora dulu buat mulai.";
 
 pub fn height(st: &AppState) -> f32 {
     if !signed_in(st) {
@@ -91,14 +91,14 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect) {
     ui.c.text(DISCLAIMER, Rect::new(area.x, area.bottom() - FOOT_H, area.w, FOOT_H), &TextStyle::caption().color(palette::TEXT_FAINT));
 }
 
-/// Oyen, `w` wide at `center`; frames keep coming while he moves.
-fn head(ui: &mut Ui, center: Point, w: f32, what: Oyen) {
-    if oyen::coach(ui.c, center, w, ui.now, what) {
+/// Nova, `w` wide at `center`; frames keep coming while he moves.
+fn head(ui: &mut Ui, center: Point, w: f32, what: Nova) {
+    if nova::coach(ui.c, center, w, ui.now, what) {
         ui.request_live();
     }
 }
 
-/// Where the pointer is beside Oyen (-1 .. 1) while it's over the page.
+/// Where the pointer is beside Nova (-1 .. 1) while it's over the page.
 fn look(ui: &Ui, at: Point, page: Rect) -> Option<f32> {
     ui.input.mouse.filter(|m| page.contains(*m)).map(|m| ((m.x - at.x) / 220.0).clamp(-1.0, 1.0))
 }
@@ -121,10 +121,10 @@ fn pill_off(ui: &mut Ui, r: Rect, label: &str) {
 fn draw_home(ui: &mut Ui, st: &mut AppState, left: Rect, right: Rect) {
     let page = Rect::new(left.x, left.y, right.right() - left.x, left.h);
     let at = Point::new(left.center().x, left.y + 56.0);
-    let what = if st.ielts.talking() { Oyen::Talk { since: st.ielts.said_at } } else { Oyen::Rest { look: look(ui, at, page) } };
+    let what = if st.ielts.talking() { Nova::Talk { since: st.ielts.said_at } } else { Nova::Rest { look: look(ui, at, page) } };
     head(ui, at, HEAD_W, what);
     ui.c.text("Latihan IELTS", Rect::new(left.x, left.y + 110.0, left.w, 20.0), &TextStyle::headline().center());
-    ui.c.text("Oyen jadi examiner kamu", Rect::new(left.x, left.y + 131.0, left.w, 16.0), &TextStyle::footnote().color(palette::TEXT_DIM).center());
+    ui.c.text("Nova jadi examiner kamu", Rect::new(left.x, left.y + 131.0, left.w, 16.0), &TextStyle::footnote().color(palette::TEXT_DIM).center());
     if let Some(me) = &st.ielts.me {
         let today = format!("Hari ini {} dari {} sesi", me.today.used.min(me.today.cap), me.today.cap);
         ui.c.text(&today, Rect::new(left.x, left.y + 151.0, left.w, 15.0), &TextStyle::caption().color(palette::TEXT_FAINT).center());
@@ -153,7 +153,7 @@ fn draw_home(ui: &mut Ui, st: &mut AppState, left: Rect, right: Rect) {
         }
     }
 
-    // How Oyen talks, and Mulai.
+    // How Nova talks, and Mulai.
     let y = right.y + 5.0 * ROW_H + 8.0;
     let names: Vec<&str> = Spice::ALL.iter().map(|s| s.name()).collect();
     let sel = Spice::ALL.iter().position(|s| *s == st.settings.ielts_spice).unwrap_or(2);
@@ -171,7 +171,7 @@ fn draw_home(ui: &mut Ui, st: &mut AppState, left: Rect, right: Rect) {
     } else {
         pill_off(ui, go, label);
     }
-    // Oyen's own line about a refused Mulai (a capped day, a locked level)
+    // Nova's own line about a refused Mulai (a capped day, a locked level)
     // takes the two lines under the choice.
     if let Some(said) = st.ielts.say.as_ref().filter(|_| st.ielts.problem.is_some()) {
         let r = Rect::new(right.x, y + 34.0, right.w, 32.0);
@@ -241,10 +241,10 @@ fn draw_session(ui: &mut Ui, st: &mut AppState, left: Rect, right: Rect) {
     let at = Point::new(left.center().x, left.y + 54.0);
     let what = match phase {
         // Talking, or one of his thinking lines while the answer is heard.
-        Phase::Talking | Phase::Thinking if c.talking() => Oyen::Talk { since: c.said_at },
-        Phase::Recording { .. } => Oyen::Listen { level: c.meter },
-        Phase::Thinking | Phase::Starting => Oyen::Think,
-        _ => Oyen::Rest { look: look(ui, at, page) },
+        Phase::Talking | Phase::Thinking if c.talking() => Nova::Talk { since: c.said_at },
+        Phase::Recording { .. } => Nova::Listen { level: c.meter },
+        Phase::Thinking | Phase::Starting => Nova::Think,
+        _ => Nova::Rest { look: look(ui, at, page) },
     };
     head(ui, at, HEAD_W, what);
 
@@ -272,7 +272,7 @@ fn draw_session(ui: &mut Ui, st: &mut AppState, left: Rect, right: Rect) {
         _ => {}
     }
 
-    // The Part, then the line Oyen says (or Part 2's card).
+    // The Part, then the line Nova says (or Part 2's card).
     let c = &st.ielts;
     let part = c.turn.as_ref().map_or("Intro", ielts::part_label);
     ui.c.text(&part.to_uppercase(), Rect::new(right.x, right.y, 120.0, 16.0), &TextStyle::caption().weight(Weight::Bold).color(ACCENT));
@@ -292,14 +292,14 @@ fn draw_session(ui: &mut Ui, st: &mut AppState, left: Rect, right: Rect) {
     // What he heard, what's happening, and the way out.
     let c = &st.ielts;
     if !c.heard.is_empty() && matches!(phase, Phase::Talking | Phase::Thinking) && body_free(c) {
-        let heard = format!("Oyen dengar: \u{201c}{}\u{201d}", c.heard);
+        let heard = format!("Nova dengar: \u{201c}{}\u{201d}", c.heard);
         ui.c.text(&heard, Rect::new(right.x, buttons_y - 44.0, right.w, 16.0), &TextStyle::caption().color(palette::TEXT_FAINT));
     }
     // While the answer is heard (7 to 9 s), the dots keep going.
-    let thinking = ["Oyen mikir.", "Oyen mikir..", "Oyen mikir..."];
+    let thinking = ["Nova mikir.", "Nova mikir..", "Nova mikir..."];
     let status = match phase {
-        Phase::Starting => "Oyen siap-siap\u{2026}",
-        Phase::Talking => "Oyen lagi ngomong\u{2026}",
+        Phase::Starting => "Nova siap-siap\u{2026}",
+        Phase::Talking => "Nova lagi ngomong\u{2026}",
         Phase::Prep { .. } => "Siapin jawabanmu. Rekaman mulai sendiri pas waktunya habis.",
         Phase::Ready => c.hint.map_or("Giliran kamu. Ketuk mic buat jawab.", |h| h.line()),
         Phase::Recording { .. } => "Ngerekam\u{2026} ketuk lagi kalau udah.",
@@ -321,7 +321,7 @@ fn draw_session(ui: &mut Ui, st: &mut AppState, left: Rect, right: Rect) {
     }
 }
 
-/// The person can answer now (Oyen may still be talking).
+/// The person can answer now (Nova may still be talking).
 fn answer_now(st: &AppState) -> bool {
     st.ielts.turn.as_ref().is_some_and(|t| t.wants_answer())
 }
@@ -357,7 +357,7 @@ fn draw_mic(ui: &mut Ui, st: &AppState, c: Point) -> bool {
     resp.clicked
 }
 
-/// What Oyen says: large while it fits in three lines, a size down when longer.
+/// What Nova says: large while it fits in three lines, a size down when longer.
 fn draw_line(ui: &mut Ui, r: Rect, text: &str) {
     let big = TextStyle::value().wrap().top();
     let st = if ui.c.measure(text, &big, r.w).1 <= 3.0 * 25.0 { big } else { TextStyle::headline().wrap().top() };
@@ -428,7 +428,7 @@ fn draw_result(ui: &mut Ui, st: &mut AppState, left: Rect, right: Rect) {
         st.cmd(Command::Ielts(IeltsCmd::Quit));
     }
 
-    // The criteria with Oyen's notes.
+    // The criteria with Nova's notes.
     let name_st = TextStyle::footnote().weight(Weight::Semibold);
     let band_st = TextStyle::footnote().weight(Weight::Bold).tabular().right();
     let note_st = TextStyle::caption().color(palette::TEXT_DIM);
@@ -438,12 +438,12 @@ fn draw_result(ui: &mut Ui, st: &mut AppState, left: Rect, right: Rect) {
         ui.c.text(&ielts::fmt_band(b.band), Rect::new(right.right() - 40.0, y, 40.0, 15.0), &band_st);
         ui.c.text(&b.note, Rect::new(right.x, y + 15.0, right.w, 14.0), &note_st);
     }
-    // The roast, with Oyen saying it.
+    // The roast, with Nova saying it.
     let c = &st.ielts;
     let y = right.y + 124.0;
-    let what = if c.talking() { Oyen::Talk { since: c.said_at } } else if reached { Oyen::Proud { since: c.said_at } } else { Oyen::Rest { look: None } };
+    let what = if c.talking() { Nova::Talk { since: c.said_at } } else if reached { Nova::Proud { since: c.said_at } } else { Nova::Rest { look: None } };
     head(ui, Point::new(right.x + 13.0, y + 15.0), 26.0, what);
-    // While Oyen talks, the line he says (closing, roast, the level); then the roast.
+    // While Nova talks, the line he says (closing, roast, the level); then the roast.
     let line = c.say.as_ref().filter(|_| c.talking()).map_or(v.roast.text.as_str(), |s| s.text.as_str());
     let roast = Rect::new(right.x + 34.0, y, right.w - 34.0, 34.0);
     ui.c.clip(roast);
@@ -451,7 +451,7 @@ fn draw_result(ui: &mut Ui, st: &mut AppState, left: Rect, right: Rect) {
     ui.c.unclip();
     // Three tips.
     let y = right.y + 164.0;
-    ui.c.text("TIPS DARI OYEN", Rect::new(right.x, y, right.w, 14.0), &TextStyle::caption().weight(Weight::Bold).color(palette::TEXT_FAINT));
+    ui.c.text("TIPS DARI NOVA", Rect::new(right.x, y, right.w, 14.0), &TextStyle::caption().weight(Weight::Bold).color(palette::TEXT_FAINT));
     for (i, tip) in v.tips.iter().take(3).enumerate() {
         let r = Rect::new(right.x, y + 16.0 + i as f32 * 15.0, right.w, 15.0);
         ui.c.text(&format!("\u{2022}  {tip}"), r, &TextStyle::caption().color(palette::TEXT_DIM));
@@ -462,7 +462,7 @@ fn draw_result(ui: &mut Ui, st: &mut AppState, left: Rect, right: Rect) {
 
 fn draw_stuck(ui: &mut Ui, st: &mut AppState, left: Rect, right: Rect) {
     let p = st.ielts.problem.unwrap_or(Problem::Server);
-    head(ui, Point::new(left.center().x, left.y + 74.0), HEAD_W, Oyen::Sorry { since: f64::NEG_INFINITY });
+    head(ui, Point::new(left.center().x, left.y + 74.0), HEAD_W, Nova::Sorry { since: f64::NEG_INFINITY });
     let r = Rect::new(right.x, right.y + 34.0, right.w.min(400.0), 120.0);
     let bottom = problem_text(ui, r, p);
     let y = bottom + 14.0;

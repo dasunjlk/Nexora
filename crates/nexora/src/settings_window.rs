@@ -386,7 +386,7 @@ const SOUNDS: [(PrayerSound, &str); 3] = [(PrayerSound::Adzan, "Adzan"), (Prayer
 const FOLLOWS: [(PrayerFollow, &str); 2] = [(PrayerFollow::Kemenag, "Kemenag"), (PrayerFollow::Muhammadiyah, "Muhammadiyah (KHGT)")];
 const THEMES: [(Theme, &str, &str); 5] = [
     (Theme::Classic, "Classic", "A black island at the top edge"),
-    (Theme::Oyen, "Oyen", "Oyen lives in the island"),
+    (Theme::Nova, "Nova", "Nova lives in the island"),
     (Theme::Glass, "Glass", "Frosted glass over your screen"),
     (Theme::Pill, "Pill", "Floats just below the top edge"),
     (Theme::Diorama, "Diorama", "A little place that keeps your day"),
@@ -422,7 +422,7 @@ fn nearest(list: &[(u32, &str)], ms: u32) -> Option<usize> {
 fn idle_name(s: IdleStyle, theme: Theme) -> &'static str {
     match s {
         IdleStyle::Clock => "Clock",
-        IdleStyle::Eyes if theme == Theme::Oyen => "Oyen",
+        IdleStyle::Eyes if theme == Theme::Nova => "Nova",
         IdleStyle::Eyes => "Eyes",
         IdleStyle::Minimal => "Minimal",
         IdleStyle::Hidden => "Hidden",
@@ -1243,12 +1243,12 @@ fn draw_close(ui: &mut Ui, card: Rect, m: &mut Motion) -> bool {
     resp.clicked
 }
 
-/// The sidebar: Oyen's tile and the window's name, then a row per section
+/// The sidebar: Nova's tile and the window's name, then a row per section
 /// (About at the bottom). The highlight glides to the section picked.
 /// `top`: room for the Mac's window buttons.
 fn draw_sidebar(ui: &mut Ui, st: &mut AppState, side: Rect, section: Section, top: f32, m: &mut Motion) -> Option<Section> {
     let icon_c = Point::new(side.x + 20.0 + 12.0, side.y + top + 32.0);
-    crate::oyen::app_icon(ui.c, icon_c, 24.0);
+    crate::nova::app_icon(ui.c, icon_c, 24.0);
     ui.c.text("Advanced settings", Rect::new(icon_c.x + 20.0, side.y + top + 20.0, side.w - 60.0, 24.0), &TextStyle::headline());
     let list = sections(st);
     let about_at = side.bottom() - 12.0 - NAV_H;
@@ -1283,7 +1283,7 @@ fn draw_sidebar(ui: &mut Ui, st: &mut AppState, side: Rect, section: Section, to
         }
         let tile = Rect::new(r.x + 8.0, r.center().y - NAV_TILE / 2.0, NAV_TILE, NAV_TILE);
         if *s == Section::About {
-            crate::oyen::app_icon(ui.c, tile.center(), NAV_TILE);
+            crate::nova::app_icon(ui.c, tile.center(), NAV_TILE);
         } else {
             ui.c.fill_rrect(tile, 6.0, s.tint());
             ui.c.icon(s.icon(), Rect::from_center(tile.center(), 14.0, 14.0), palette::ON_ACCENT);
@@ -1570,14 +1570,14 @@ fn fill_row(ui: &mut Ui, row: Rect, c: Color, (first, last): (bool, bool)) {
     ui.c.unclip();
 }
 
-/// The version card: Oyen's tile, "Nexora" and this version, and
+/// The version card: Nova's tile, "Nexora" and this version, and
 /// Check now; with a later version out, what it brings and how to get it
 /// (the island's Update sheet does the same).
 fn draw_version(ui: &mut Ui, st: &mut AppState, r: Rect, view: Rect, sf: &Surfaces) {
     fill_group(ui, r, sf.group);
     let head = Rect::new(r.x + ROW_PAD, r.y, r.w - 2.0 * ROW_PAD, 72.0);
     let cy = head.center().y;
-    crate::oyen::app_icon(ui.c, Point::new(head.x + 20.0, cy), 40.0);
+    crate::nova::app_icon(ui.c, Point::new(head.x + 20.0, cy), 40.0);
     let tx = head.x + 54.0;
     let clickable = visible(r, view).is_some_and(|v| v.h >= r.h - 0.5);
     let check = clickable.then(|| crate::pages::settings::check_slot(ui, st, head)).flatten();
@@ -1744,7 +1744,7 @@ fn diorama_spot(screen: Rect, px: (u32, u32), scale: f32) -> Rect {
 }
 
 /// A theme's island on a small screen: hanging from its top edge, glass,
-/// with Oyen's eyes, floating below it, or floating there as Diorama's
+/// with Nova's eyes, floating below it, or floating there as Diorama's
 /// picture. Drawn as it is, in either mode.
 fn draw_theme_preview(c: &mut Canvas, theme: Theme, screen: Rect) {
     c.clip(screen);
@@ -1753,15 +1753,15 @@ fn draw_theme_preview(c: &mut Canvas, theme: Theme, screen: Rect) {
     let cx = screen.center().x;
     let clock = TextStyle::caption().weight(Weight::Semibold).tabular().center();
     match theme {
-        Theme::Classic | Theme::Oyen | Theme::Glass => {
+        Theme::Classic | Theme::Nova | Theme::Glass => {
             let body = Rect::new(cx - 34.0, screen.y, 68.0, 20.0);
             let (fill, border) = match theme {
                 Theme::Glass => (Color::white(0.30), Some(Color::white(0.45))),
                 _ => (palette::ISLAND, None),
             };
             c.notch(body, 9.0, 5.0, fill, border);
-            if theme == Theme::Oyen {
-                // Oyen's eyes peek over the island's edge.
+            if theme == Theme::Nova {
+                // Nova's eyes peek over the island's edge.
                 for dx in [-6.0, 6.0] {
                     c.fill_rrect(Rect::from_center(Point::new(cx + dx, body.center().y), 5.0, 8.0), 2.5, palette::ORANGE);
                 }
@@ -2066,8 +2066,8 @@ mod tests {
         assert!(!looks(&st).contains(&"Status"));
         st.settings.theme = Theme::Pill;
         assert!(looks(&st).contains(&"Status"));
-        st.settings.theme = Theme::Oyen;
-        assert!(looks(&st).contains(&"Oyen"));
+        st.settings.theme = Theme::Nova;
+        assert!(looks(&st).contains(&"Nova"));
         // Diorama rests as its picture: with the time, alone, or hidden. It
         // draws its clock for a status bar picked in Pill, and the picture
         // alone for eyes picked elsewhere.
@@ -2093,7 +2093,7 @@ mod tests {
     fn place(t: Theme) -> usize {
         match t {
             Theme::Classic => 0,
-            Theme::Oyen => 1,
+            Theme::Nova => 1,
             Theme::Glass => 2,
             Theme::Pill => 3,
             Theme::Diorama => 4,
@@ -2102,7 +2102,7 @@ mod tests {
 
     #[test]
     fn every_theme_has_a_card_in_the_pickers_order() {
-        assert_eq!(THEMES.map(|t| t.1), ["Classic", "Oyen", "Glass", "Pill", "Diorama"]);
+        assert_eq!(THEMES.map(|t| t.1), ["Classic", "Nova", "Glass", "Pill", "Diorama"]);
         for (i, (theme, name, line)) in THEMES.iter().enumerate() {
             assert_eq!(place(*theme), i, "{name}");
             assert!(!line.is_empty(), "{name} says what it is");

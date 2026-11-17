@@ -11,7 +11,7 @@ user-visible was rebranded to Nexora. This page is the mapping and the rules.
 | Nexora (product) | **Nexora** | all user-visible strings, docs, installers, site |
 | Nexora / Nexora (old product names) | removed | history notes |
 | `nexora` / `Nexora` (internal codename) | `nexora` / `Nexora` | crates (`nexora`, `nexora-core`, `nexora-usage`, `nexora-diorama`), `nexora.exe`, `NEXORA_*` env vars, `%APPDATA%\Nexora`, `%LOCALAPPDATA%\Nexora`, `Local\Nexora.Island`, Mac bundle id `app.nexora.nexora`, uninstall key, Run value, threads (`nexora-notes`), self-test vars |
-| Oyen (mascot cat) | **Nova** | `nexora_core::nova` (`src/nova/`), `src/nova.rs`, the "Nova" theme, `Nova's notes`, docs |
+| Nova (mascot cat) | **Nova** | `nexora_core::nova` (`src/nova/`), `src/nova.rs`, the "Nova" theme, `Nova's notes`, docs |
 | `nexora.app` (account) | `nexora.app` | sign-in, money/agenda features (service placeholder) |
 | `api.nexora.app` | `api.nexora.app` | account API, meeting notes API (`/island/notes`) |
 | `drop.nexora.app` | `drop.nexora.app` | paired phone drop relay (`server/`) |
@@ -19,16 +19,16 @@ user-visible was rebranded to Nexora. This page is the mapping and the rules.
 | `nexora.trade` | `nexora.trade` | Stocks page prices |
 | `dasunjlk.github.io/Nexora` | `dasunjlk.github.io/Nexora/` | website, update feed |
 | `dasunjlk/Nexora` | `dasunjlk/Nexora` | repo URLs, release/download links, badges |
-| `oyen-drop-server` (npm name) | `nexora-drop-server` | `server/package.json` |
+| `nova-drop-server` (npm name) | `nexora-drop-server` | `server/package.json` |
 | `nexora-notes-server` (notes backend codename) | `nexora notes server` | docs only |
 | Jatevo Labs (upstream copyright) | kept as upstream attribution only | `THIRD-PARTY-NOTICES.txt` |
-| Oyen drop-server paths/images (`oyen-*.webp`) | `nova-*.webp` | `server/public/` |
+| Nova drop-server paths/images (`nova-*.webp`) | `nova-*.webp` | `server/public/` |
 
 ## Rename policy
 
 **Renamed** (mechanically, case-preserving): `nexora→nexora`, `Nexora→Nexora`,
-`NEXORA→NEXORA`, `nexora→nexora`, `Nexora→Nexora`, `NEXORA→NEXORA`, `oyen→nova`,
-`Oyen→Nova`, `OYEN→NOVA`, plus domains and repo slugs above.
+`NEXORA→NEXORA`, `nexora→nexora`, `Nexora→Nexora`, `NEXORA→NEXORA`, `nova→nova`,
+`Nova→Nova`, `NOVA→NOVA`, plus domains and repo slugs above.
 
 **Never renamed** (would break third-party contracts, not branding):
 - External API wire formats: LRCLIB, Apple Music, GitHub API, GeoNames, IDX

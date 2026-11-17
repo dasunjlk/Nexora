@@ -1,6 +1,6 @@
 # Meeting notes — complete implementation
 
-> Status in Nexora: **ported as-built**, rebranded (Oyen → Nova, Nexora →
+> Status in Nexora: **ported as-built**, rebranded (Nova → Nova, Nexora →
 > Nexora, `api.nexora.app` → `api.nexora.app`). This document is the complete
 > implementation reference: behaviour, state machines, wire contract, storage,
 > failure handling and tests. It is written so the feature could be
@@ -412,5 +412,5 @@ and the app's side is exercised by the scripted self-test
 | Audio root | `%LOCALAPPDATA%\Nexora\notes\` | `%LOCALAPPDATA%\Nexora\notes\` |
 | Threads | `nexora-notes`, `nexora-notes-send` | `nexora-notes`, `nexora-notes-send` |
 | App-data override | `NEXORA_HOME` | `NEXORA_HOME` |
-| Copy/persona | "Oyen listens…", "Notes by Oyen, in Nexora" | "Nova listens…", "Notes by Nova, in Nexora" |
+| Copy/persona | "Nova listens…", "Notes by Nova, in Nexora" | "Nova listens…", "Notes by Nova, in Nexora" |
 | Server codename | nexora-notes-server | nexora notes server (contract unchanged apart from the base URL) |

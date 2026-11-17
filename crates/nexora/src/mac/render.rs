@@ -1,4 +1,4 @@
-//! `nexora --render <dir> [--theme classic|oyen|glass|pill|diorama] [--notch]`: draw the island's
+//! `nexora --render <dir> [--theme classic|nova|glass|pill|diorama] [--notch]`: draw the island's
 //! states with sample data into PNGs, offscreen, through the Mac renderer.
 //! CI runs it on a Mac with no notch and no person at the screen, so this is
 //! how the Mac drawing gets looked at: every page and activity, each theme,
@@ -190,8 +190,8 @@ enum Scene {
     Downloads,
     DownloadActivity,
     AddonsDownloader,
-    /// Meeting notes, signed in with Studio Pro: the page while Oyen listens
-    /// (42 s in), the closed island 12 minutes in (around a notch, Oyen in
+    /// Meeting notes, signed in with Studio Pro: the page while Nova listens
+    /// (42 s in), the closed island 12 minutes in (around a notch, Nova in
     /// one ear and the time in the other), and the Add-ons tab with every
     /// Pro add-on listed.
     NotesListening,
@@ -457,7 +457,7 @@ pub fn run(dir: &str, args: &[String]) -> i32 {
         return 2;
     }
     let theme = match args.iter().position(|a| a == "--theme").and_then(|i| args.get(i + 1)).map(|s| s.as_str()) {
-        Some("oyen") => Theme::Oyen,
+        Some("nova") => Theme::Nova,
         Some("glass") => Theme::Glass,
         Some("pill") => Theme::Pill,
         Some("diorama") => Theme::Diorama,
@@ -466,7 +466,7 @@ pub fn run(dir: &str, args: &[String]) -> i32 {
     let notch = args.iter().any(|a| a == "--notch").then_some(Notch::MACBOOK);
     let name = match theme {
         Theme::Classic => "",
-        Theme::Oyen => "-oyen",
+        Theme::Nova => "-nova",
         Theme::Glass => "-glass",
         Theme::Pill => "-pill",
         Theme::Diorama => "-diorama",
@@ -723,7 +723,7 @@ fn render_morph(gfx: &mut Gfx, theme: Theme, notch: Option<Notch>, path: &Path) 
 /// The Eyes look around notch `n` as it moves (stills can't show it), a
 /// frame a row, a fifteenth of a second apart: the pointer (drawn, so each
 /// frame says what the eyes follow) wanders right of the camera and crosses
-/// over; the eyes (Oyen, in his theme) duck behind the camera and come out
+/// over; the eyes (Nova, in his theme) duck behind the camera and come out
 /// on its left, follow it up into the menu bar and back under the camera.
 fn render_peek(gfx: &mut Gfx, theme: Theme, n: Notch, path: &Path) -> Result<(), String> {
     /// The pointer from the island's top centre (DIPs) at each time
@@ -970,15 +970,15 @@ fn base_state(theme: Theme) -> AppState {
     st.unix = NOW_UNIX;
     st.local = LocalDateTime { year: 2026, month: 10, day: 24, hour: 9, minute: 41, second: 0 };
     st.accent = match theme {
-        Theme::Oyen => crate::oyen::ORANGE,
+        Theme::Nova => crate::nova::ORANGE,
         Theme::Diorama => nexora_core::look::DIORAMA_ACCENT,
         _ => palette::BLUE,
     };
     st.volume = VolumeState { level: 0.64, muted: false, known: true };
     st.power = PowerState { has_battery: true, percent: 76, charging: false, on_ac: false, saver: false };
     st.stats = SysStats { valid: true, cpu: 0.23, mem_used: 9 << 30, mem_total: 16 << 30, disk_free: 212 << 30, disk_total: 476 << 30, uptime_s: 3 * 86_400 + 4 * 3600 };
-    // Oyen in the Nexora tab long since arrived: at rest in every picture.
-    st.ui.oyen_tab = Some((crate::oyen::TabMove::Arrive, f64::NEG_INFINITY));
+    // Nova in the Nexora tab long since arrived: at rest in every picture.
+    st.ui.nova_tab = Some((crate::nova::TabMove::Arrive, f64::NEG_INFINITY));
     seed(&mut st);
     st
 }
@@ -1175,7 +1175,7 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
     let mode = match scene {
         Scene::IdleClock => Mode::Idle,
         // Around a notch the eyes look at the pointer: down at it in the
-        // window under the menu bar (Oyen rests again a while after it
+        // window under the menu bar (Nova rests again a while after it
         // moved), and over the notch while it hovers there.
         Scene::IdleEyes => {
             st.settings.idle_style = IdleStyle::Eyes;

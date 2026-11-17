@@ -1,8 +1,8 @@
-//! The IELTS coach's voice on the Mac: plays Oyen's lines (the server's mp3
+//! The IELTS coach's voice on the Mac: plays Nova's lines (the server's mp3
 //! or wav files) with AppKit's `NSSound`, as the adzan does. NSSound reads
 //! what Core Audio reads, mp3 included, and never tells macOS's Now Playing
 //! about itself, so the island's music card, the media keys and the music
-//! the page pauses while Oyen talks all stay with the person's own player.
+//! the page pauses while Nova talks all stay with the person's own player.
 //!
 //! One line at a time; a new one replaces it. `AppEvent::VoiceEnded` comes
 //! when a line plays to its end or can't play on (on the main thread), never
@@ -72,7 +72,7 @@ struct Ivars {
 }
 
 impl Drop for VoicePlayer {
-    /// The page closed: Oyen stops mid-line.
+    /// The page closed: Nova stops mid-line.
     fn drop(&mut self) {
         self.stop();
     }

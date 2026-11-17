@@ -1,4 +1,4 @@
-//! Checks against Oyen Umroh's engine (the reference this module ports) and
+//! Checks against Nova Umroh's engine (the reference this module ports) and
 //! against Kemenag's own published schedule.
 
 use super::*;
@@ -7,7 +7,7 @@ use std::io::Read;
 const PLACES: &str = include_str!("../../../../addons/sholat/places.json");
 /// Kemenag's published 2026 schedules (via api.myquran.com), one line per place and day.
 const KEMENAG: &[u8] = include_bytes!("../../tests/fixtures/prayer/kemenag-2026.txt.zst");
-/// Oyen Umroh's engine on the same places for 2026-2027 and a few later years.
+/// Nova Umroh's engine on the same places for 2026-2027 and a few later years.
 const GOLDEN: &[u8] = include_bytes!("../../tests/fixtures/prayer/engine-golden.txt.zst");
 
 fn unpack(packed: &[u8]) -> String {
@@ -60,7 +60,7 @@ fn computed(site: &Site, day: i64) -> [i64; 7] {
 }
 
 #[test]
-fn matches_oyen_umroh_engine_to_the_minute() {
+fn matches_nova_umroh_engine_to_the_minute() {
     let list = places();
     let rows = rows(&unpack(GOLDEN));
     assert!(rows.len() > 18_000, "{}", rows.len());

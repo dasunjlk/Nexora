@@ -1,13 +1,13 @@
-//! Oyen's voice on the IELTS page: plays the server's clips (mp3, or WAV)
+//! Nova's voice on the IELTS page: plays the server's clips (mp3, or WAV)
 //! one at a time with WinRT's `MediaPlayer`, built like the adzan's
-//! (`services/adzan.rs`): its automatic media controls are off, so Oyen never
+//! (`services/adzan.rs`): its automatic media controls are off, so Nova never
 //! shows up as a playing song (in Windows' volume flyout or on the Music page).
 //!
 //! `AppEvent::VoiceEnded` comes when a clip finishes or fails, from a
 //! thread-pool thread. A clip stopped on purpose may still report; the app
 //! asks [`VoicePlayer::playing`] to tell the current clip's end from a
 //! stale one, and [`VoicePlayer::failed`] whether it played at all (with no
-//! sound device, Oyen's words then show for their reading time). The player
+//! sound device, Nova's words then show for their reading time). The player
 //! exists only while a clip plays.
 
 use crate::events::{AppEvent, EventSink};
@@ -36,7 +36,7 @@ impl VoicePlayer {
         let path = std::path::absolute(path).unwrap_or_else(|_| path.to_path_buf());
         let uri = Uri::CreateUri(&HSTRING::from(super::adzan::file_uri(&path))).map_err(|e| format!("bad path ({e})"))?;
         let player = MediaPlayer::new().map_err(|e| format!("no media player ({e})"))?;
-        // No media session: Oyen isn't a song.
+        // No media session: Nova isn't a song.
         if let Ok(cm) = player.CommandManager() {
             let _ = cm.SetIsEnabled(false);
         }

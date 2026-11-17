@@ -65,18 +65,18 @@ pub enum PageKind {
     /// AI usage: how much of each AI coding plan is left (`pages::usage`).
     /// Part of Studio Pro: in the row with it, until switched off.
     Ai,
-    /// Nexora, with Oyen himself as its tab (`oyen::tab`): signed out, the
+    /// Nexora, with Nova himself as its tab (`nova::tab`): signed out, the
     /// way to sign in; signed in, the money by day.
     Nexora,
     /// The Health add-on's page, while it is on ([`tabs`]): the steps
     /// Nexora sends, so its tab sits beside Nexora's.
     Health,
-    /// The IELTS add-on's page, while it is on ([`tabs`]): Oyen as an IELTS
+    /// The IELTS add-on's page, while it is on ([`tabs`]): Nova as an IELTS
     /// Speaking examiner, through the Nexora account, so its tab follows
     /// Nexora's and Health's.
     Ielts,
     /// The Meeting notes add-on's page, while it is on ([`tabs`]; Windows):
-    /// Oyen listens to a meeting and the Nexora account writes its notes, so
+    /// Nova listens to a meeting and the Nexora account writes its notes, so
     /// its tab follows IELTS'.
     Notes,
     /// The System add-on's page, while it is on ([`tabs`]).
@@ -343,10 +343,10 @@ pub fn next_wake(page: PageKind, st: &AppState) -> Option<f64> {
         PageKind::Notes => notes::next_wake(st),
         _ => None,
     };
-    // Oyen in the Nexora tab (and beside the pin in his theme) blinks and
+    // Nova in the Nexora tab (and beside the pin in his theme) blinks and
     // flicks an ear now and then; asleep at night, he stays still.
-    let oyen = (!crate::activities::night(st)).then(|| crate::oyen::next_rest_move(st.now));
-    match (wake, oyen) {
+    let nova = (!crate::activities::night(st)).then(|| crate::nova::next_rest_move(st.now));
+    match (wake, nova) {
         (Some(a), Some(b)) => Some(a.min(b)),
         (a, b) => a.or(b),
     }
@@ -489,9 +489,9 @@ const TAB_H: f32 = 28.0;
 const TAB_W: f32 = 30.0;
 const TAB_GAP: f32 = 2.0;
 const TAB_ICON: f32 = 16.0;
-/// Oyen's head in the Nexora tab (a little wider than the icons: his ears
+/// Nova's head in the Nexora tab (a little wider than the icons: his ears
 /// take the top of it).
-const OYEN_TAB_W: f32 = 18.0;
+const NOVA_TAB_W: f32 = 18.0;
 /// The active tab's label starts this far in and ends `TAB_LABEL_END` before its edge.
 const TAB_LABEL_X: f32 = 28.0;
 const TAB_LABEL_END: f32 = 12.0;
@@ -502,10 +502,10 @@ const PIN_GAP: f32 = 10.0;
 const PIN: f32 = 28.0;
 const GEAR: f32 = 28.0;
 const GEAR_GAP: f32 = 2.0;
-/// His theme: Oyen peeks up beside the pin, as he does beside the clock when
+/// His theme: Nova peeks up beside the pin, as he does beside the clock when
 /// the island is closed.
-const OYEN_W: f32 = 24.0;
-const OYEN_GAP: f32 = 6.0;
+const NOVA_W: f32 = 24.0;
+const NOVA_GAP: f32 = 6.0;
 /// Hover labels: dwell, fade-in, capsule metrics.
 const TIP_DELAY: f64 = 0.4;
 const TIP_FADE: f64 = 0.12;
@@ -570,9 +570,9 @@ pub(crate) fn draw_header(ui: &mut Ui, st: &mut AppState, r: Rect, page: PageKin
         ui.c.with_alpha(1.0 - gear_k, |c| c.fill_rrect(pill, TAB_H / 2.0, Color::white(0.14)));
     }
 
-    // Each opening of the island is Oyen's arrival in his tab.
-    if st.ui.oyen_tab.is_none() {
-        st.ui.oyen_tab = Some((crate::oyen::TabMove::Arrive, ui.now));
+    // Each opening of the island is Nova's arrival in his tab.
+    if st.ui.nova_tab.is_none() {
+        st.ui.nova_tab = Some((crate::nova::TabMove::Arrive, ui.now));
     }
     let mut hover: Option<(usize, Rect)> = None;
     for (i, &p) in row.iter().enumerate() {
@@ -584,7 +584,7 @@ pub(crate) fn draw_header(ui: &mut Ui, st: &mut AppState, r: Rect, page: PageKin
             hover = Some((i, tr));
         }
         if p == PageKind::Nexora {
-            draw_oyen_tab(ui, st, r, tr);
+            draw_nova_tab(ui, st, r, tr);
         } else {
             let k = if active { e } else if from.tabbed() && i == fi { 1.0 - e } else { 0.0 };
             let ic = if resp.hovered { palette::TEXT } else { Color::lerp(palette::TEXT_FAINT, palette::TEXT, k) };
@@ -594,7 +594,7 @@ pub(crate) fn draw_header(ui: &mut Ui, st: &mut AppState, r: Rect, page: PageKin
         if resp.clicked && !active {
             st.cmd(Command::SetPage(p));
             if p == PageKind::Nexora {
-                st.ui.oyen_tab = Some((crate::oyen::TabMove::Picked, ui.now));
+                st.ui.nova_tab = Some((crate::nova::TabMove::Picked, ui.now));
             }
         }
     }
@@ -629,15 +629,15 @@ pub(crate) fn draw_header(ui: &mut Ui, st: &mut AppState, r: Rect, page: PageKin
 
     let gear_r = Rect::new(snap(left - PIN_GAP - GEAR, scale), cy - GEAR / 2.0, GEAR, GEAR);
     let pin_r = Rect::new(snap(gear_r.x - GEAR_GAP - PIN, scale), cy - PIN / 2.0, PIN, PIN);
-    let oyen_cx = pin_r.x - OYEN_GAP - OYEN_W / 2.0;
-    if crate::oyen::on(st.settings.theme) && oyen_cx - OYEN_W / 2.0 > tabs_end + 12.0 {
+    let nova_cx = pin_r.x - NOVA_GAP - NOVA_W / 2.0;
+    if crate::nova::on(st.settings.theme) && nova_cx - NOVA_W / 2.0 > tabs_end + 12.0 {
         // Eyes on the cursor while it is over the island; asleep at night.
         let look = ui.input.mouse.map(|p| ((p.x - r.center().x) / (r.w / 2.0)).clamp(-1.0, 1.0));
-        let (frame, moving) = crate::oyen::rest(st.now, st.local.hour < 5, look);
+        let (frame, moving) = crate::nova::rest(st.now, st.local.hour < 5, look);
         if moving {
             ui.request_anim();
         }
-        crate::oyen::peek(ui.c, &frame, oyen_cx, cy + 9.0, OYEN_W, r.y);
+        crate::nova::peek(ui.c, &frame, nova_cx, cy + 9.0, NOVA_W, r.y);
     }
     if pin_r.x > tabs_end + 8.0 {
         let pinned = st.pinned;
@@ -700,14 +700,14 @@ pub(crate) fn draw_header(ui: &mut Ui, st: &mut AppState, r: Rect, page: PageKin
     Some(Tip { anchor, text, alpha })
 }
 
-/// The Nexora tab's icon: Oyen himself, the Nexora mark, in his own colours
-/// whether the tab is picked or not (`oyen::tab`). His eyes follow the pointer
+/// The Nexora tab's icon: Nova himself, the Nexora mark, in his own colours
+/// whether the tab is picked or not (`nova::tab`). His eyes follow the pointer
 /// while it is over the tab `row`.
-fn draw_oyen_tab(ui: &mut Ui, st: &AppState, row: Rect, tab: Rect) {
+fn draw_nova_tab(ui: &mut Ui, st: &AppState, row: Rect, tab: Rect) {
     let c = Point::new(tab.x + TAB_W / 2.0, row.center().y);
     let look = ui.input.mouse.filter(|m| row.contains(*m)).map(|m| ((m.x - c.x) / (row.w / 2.0)).clamp(-1.0, 1.0));
     let clip = Rect::new(tab.x, tab.y, TAB_W, tab.h);
-    if crate::oyen::tab(ui.c, c, OYEN_TAB_W, clip, ui.now, st.ui.oyen_tab, crate::activities::night(st), look) {
+    if crate::nova::tab(ui.c, c, NOVA_TAB_W, clip, ui.now, st.ui.nova_tab, crate::activities::night(st), look) {
         ui.request_anim();
     }
 }

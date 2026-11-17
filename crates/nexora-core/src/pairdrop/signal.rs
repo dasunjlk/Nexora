@@ -53,7 +53,7 @@ impl Msg {
     }
 
     fn text(&self, room: &str) -> String {
-        format!("oyen-drop/1\n{room}\n{}\n{}\n{}\n{}\n{}", self.t, self.sid, self.ts, self.name, self.sdp)
+        format!("nova-drop/1\n{room}\n{}\n{}\n{}\n{}\n{}", self.t, self.sid, self.ts, self.name, self.sdp)
     }
 
     fn tag(&self, secret: &Secret) -> [u8; 32] {

@@ -125,11 +125,11 @@ if (document.fonts) {
   if (document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', () => requestAnimationFrame(fit));
 }
 
-/** Swap an Oyen picture, with a little pop; `move` = 'hop' plays a happy jump. */
+/** Swap an Nova picture, with a little pop; `move` = 'hop' plays a happy jump. */
 export function pose(id, name, move = '') {
   const img = $(id);
   if (!img) return;
-  const src = `/oyen-${name}.webp`;
+  const src = `/nova-${name}.webp`;
   const changed = !img.getAttribute('src') || !img.getAttribute('src').endsWith(src);
   if (changed) {
     const dims = { peek: [640, 353], sit: [420, 564], asleep: [560, 407], shelf: [320, 440], note: [320, 318] }[name];
@@ -148,7 +148,7 @@ export function pose(id, name, move = '') {
   }
 }
 
-/** Oyen carries the files while they travel. */
+/** Nova carries the files while they travel. */
 export function carrying(id, on) {
   const img = $(id);
   if (img) img.classList.toggle('carrying', on);

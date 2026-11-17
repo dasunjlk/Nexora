@@ -90,7 +90,7 @@ pub fn addons_dir() -> PathBuf {
     cache_dir().join("addons")
 }
 
-/// The IELTS page's audio: Oyen's clips and the answer being recorded, each
+/// The IELTS page's audio: Nova's clips and the answer being recorded, each
 /// deleted once used.
 pub fn ielts_dir() -> PathBuf {
     cache_dir().join("ielts")

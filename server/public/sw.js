@@ -2,12 +2,12 @@
 // Keeps the page opening without a connection (network first, cache as the
 // fallback; /api/ is never cached) and receives Android's share sheet:
 // POST /share (multipart/form-data, field "files") goes into IndexedDB
-// ("oyen-drop" / "shared"), then the page opens at /?share=<id>.
+// ("nova-drop" / "shared"), then the page opens at /?share=<id>.
 
-const CACHE = 'oyen-drop-shell-v2';
+const CACHE = 'nova-drop-shell-v2';
 const SHELL = [
   '/', '/app.js', '/app.css', '/drop-core.js', '/island.js', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png',
-  '/oyen-peek.webp', '/oyen-sit.webp', '/oyen-asleep.webp', '/oyen-shelf.webp', '/oyen-note.webp',
+  '/nova-peek.webp', '/nova-sit.webp', '/nova-asleep.webp', '/nova-shelf.webp', '/nova-note.webp',
   '/outfit-400.woff2', '/outfit-500.woff2', '/outfit-600.woff2', '/outfit-700.woff2',
 ];
 const DAY = 24 * 3600 * 1000;
@@ -81,7 +81,7 @@ function randomId() {
 
 function openDb() {
   return new Promise((resolve, reject) => {
-    const r = indexedDB.open('oyen-drop', 1);
+    const r = indexedDB.open('nova-drop', 1);
     r.onupgradeneeded = () => {
       if (!r.result.objectStoreNames.contains('shared')) r.result.createObjectStore('shared');
     };

@@ -198,7 +198,7 @@ pub enum AppEvent {
     Backdrop,
     /// The IELTS worker's answer (`services::ielts`).
     Ielts(Box<nexora_core::ielts::Reply>),
-    /// Oyen's clip finished playing, or couldn't play on (`services::voice`).
+    /// Nova's clip finished playing, or couldn't play on (`services::voice`).
     VoiceEnded,
     /// The microphone stopped mid-answer (`services::mic`): why, for the log.
     MicFailed(String),

@@ -10,7 +10,7 @@ for x86_64-pc-windows-msvc, as `cargo tree` resolves them for that target:
 `cargo metadata` would also count features that only other platforms turn
 on; build tools and proc macros leave nothing in the exe) and carries each
 one's MIT license text with its copyright line, identical texts once. Every
-crate in that list offers MIT (some also Apache-2.0 or the Unlicense), so Oyen
+crate in that list offers MIT (some also Apache-2.0 or the Unlicense), so Nova
 Nexora uses each under MIT; a crate that doesn't offer MIT stops the script,
 unless it is in BY_HAND and its notice is written by hand above. A crate that
 ships no license file gets it from tools/notices/<crate>.txt.

@@ -1,29 +1,29 @@
 //! Notes page, the Meeting notes add-on's (off until switched on; Windows):
-//! one click and Oyen listens to a meeting, then the Nexora account writes
+//! one click and Nova listens to a meeting, then the Nexora account writes
 //! its notes (`nexora_core::notes`).
 //!
 //! - Signed out: the Nexora sign-in card, saying what the notes do.
 //! - Signed in without Studio Pro (the server's word, `GET /island/pro`):
 //!   what the notes do and that they're part of Pro; nothing records.
-//! - Before a meeting: Oyen beside the record button, what he hears (the
+//! - Before a meeting: Nova beside the record button, what he hears (the
 //!   microphone and the PC's own sound: a call in Meet, Zoom or Teams, with
 //!   no bot joining it), and the notes saved last with Open.
 //! - Listening: his head lifts with the voices, the time under him, a bar
 //!   for each source, and Stop.
-//! - After Stop: the meeting going up, then Oyen writing.
+//! - After Stop: the meeting going up, then Nova writing.
 //! - The notes: the title, the summary's first lines, how many action
 //!   items, and Open, Copy, the folder and a new meeting.
 //! - What went wrong, in plain words, with Try again while the recording
 //!   is kept.
 //!
 //! The page only draws and asks (`Command::Notes`); the app runs the
-//! recording and the handing over (`services::notes`). It moves while Oyen
+//! recording and the handing over (`services::notes`). It moves while Nova
 //! listens or writes, and rests otherwise.
 
 use crate::commands::{Command, NotesCmd};
 use crate::gfx::{TextStyle, Weight};
 use crate::icons::Icon;
-use crate::oyen::{self, Coach as Oyen};
+use crate::nova::{self, Coach as Nova};
 use crate::state::{AppState, NexoraLink};
 use crate::ui::{wid, PillStyle, Ui, PILL_GAP, PILL_SMALL};
 use nexora_core::geom::{palette, Color, Point, Rect};
@@ -33,7 +33,7 @@ use nexora_core::notes::{fmt_length, CaptureIssue, Phase, Problem};
 const HEIGHT: f32 = 180.0;
 /// Signed out: the Nexora sign-in card's height.
 const SIGNED_OUT_H: f32 = 156.0;
-/// Oyen's column, and the gap to the right one.
+/// Nova's column, and the gap to the right one.
 const LEFT_W: f32 = 150.0;
 const COL_GAP: f32 = 18.0;
 const HEAD_W: f32 = 84.0;
@@ -43,15 +43,15 @@ const BUTTON_Y: f32 = 124.0;
 /// The level bars' rows.
 const BAR_H: f32 = 6.0;
 const METER_ROW: f32 = 26.0;
-/// Oyen's orange: the page's accent in every theme.
-const ACCENT: Color = oyen::ORANGE;
+/// Nova's orange: the page's accent in every theme.
+const ACCENT: Color = nova::ORANGE;
 const REC: Color = palette::RED;
 const MIC_SETTINGS: &str =
     if cfg!(target_os = "macos") { "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone" } else { "ms-settings:privacy-microphone" };
 /// What the computer's own sound is called on this one.
 const OWN_SOUND: &str = if cfg!(target_os = "macos") { "the Mac's sound" } else { "the PC's sound" };
-const SIGN_IN_TITLE: &str = "Meeting notes by Oyen";
-const SIGN_IN_BODY: &str = "One click and Oyen listens to your meeting, Meet, Zoom, Teams or in the room, then writes the notes and the transcript. Sign in to Nexora to start.";
+const SIGN_IN_TITLE: &str = "Meeting notes by Nova";
+const SIGN_IN_BODY: &str = "One click and Nova listens to your meeting, Meet, Zoom, Teams or in the room, then writes the notes and the transcript. Sign in to Nexora to start.";
 
 pub fn height(st: &AppState) -> f32 {
     if signed_in(st) || st.notes.live() {
@@ -61,7 +61,7 @@ pub fn height(st: &AppState) -> f32 {
     }
 }
 
-/// The time under Oyen moves on each second while he listens.
+/// The time under Nova moves on each second while he listens.
 pub fn next_wake(st: &AppState) -> Option<f64> {
     st.notes.next_second(st.now).map(|b| st.now + b)
 }
@@ -89,13 +89,13 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect) {
     let phase = st.notes.phase.clone();
     let at = Point::new(left.center().x, left.y + HEAD_Y);
     let what = match &phase {
-        Phase::Listening { .. } => Oyen::Listen { level: st.notes.mic.max(st.notes.pc) },
-        Phase::Sending { .. } | Phase::Writing { .. } => Oyen::Write,
-        Phase::Ready => Oyen::Logged { since: st.ui.notes_saved_at },
-        Phase::Failed(_) => Oyen::Sorry { since: f64::NEG_INFINITY },
-        Phase::Idle => Oyen::Rest { look: look(ui, at, area) },
+        Phase::Listening { .. } => Nova::Listen { level: st.notes.mic.max(st.notes.pc) },
+        Phase::Sending { .. } | Phase::Writing { .. } => Nova::Write,
+        Phase::Ready => Nova::Logged { since: st.ui.notes_saved_at },
+        Phase::Failed(_) => Nova::Sorry { since: f64::NEG_INFINITY },
+        Phase::Idle => Nova::Rest { look: look(ui, at, area) },
     };
-    if oyen::coach(ui.c, at, HEAD_W, ui.now, what) {
+    if nova::coach(ui.c, at, HEAD_W, ui.now, what) {
         ui.request_live();
     }
     draw_button(ui, st, &phase, Point::new(left.center().x, left.y + BUTTON_Y));
@@ -109,12 +109,12 @@ pub fn draw(ui: &mut Ui, st: &mut AppState, area: Rect) {
     }
 }
 
-/// Signed in without Studio Pro: Oyen, what the notes do, and that they're
+/// Signed in without Studio Pro: Nova, what the notes do, and that they're
 /// part of Pro (in early access: there is nothing to buy yet).
 fn draw_pro(ui: &mut Ui, st: &AppState, area: Rect) {
     let left = Rect::new(area.x, area.y, LEFT_W, area.h);
     let at = Point::new(left.center().x, left.y + HEAD_Y);
-    if oyen::coach(ui.c, at, HEAD_W, ui.now, Oyen::Rest { look: look(ui, at, area) }) {
+    if nova::coach(ui.c, at, HEAD_W, ui.now, Nova::Rest { look: look(ui, at, area) }) {
         ui.request_live();
     }
     let tag = Rect::new(left.center().x - 22.0, left.y + BUTTON_Y - 11.0, 44.0, 22.0);
@@ -122,19 +122,19 @@ fn draw_pro(ui: &mut Ui, st: &AppState, area: Rect) {
     ui.c.text("PRO", tag, &TextStyle::caption().weight(Weight::Bold).center().color(ACCENT));
     let r = Rect::new(area.x + LEFT_W + COL_GAP, area.y + 4.0, (area.w - LEFT_W - COL_GAP).max(0.0).min(420.0), area.h);
     let y = headline(ui, r, "Meeting notes are part of Studio Pro");
-    let body = "One click and Oyen listens to your meeting, Meet, Zoom, Teams or in the room, then writes the notes and the whole transcript. Studio Pro is in early access, so it isn't on this account yet.";
+    let body = "One click and Nova listens to your meeting, Meet, Zoom, Teams or in the room, then writes the notes and the whole transcript. Studio Pro is in early access, so it isn't on this account yet.";
     let y = para(ui, Rect::new(r.x, y + 6.0, r.w, 80.0), body, palette::TEXT_DIM);
     if let NexoraLink::Connected { account } = &st.nexora.link {
         para(ui, Rect::new(r.x, y + 10.0, r.w, 20.0), &format!("Signed in as {account}"), palette::TEXT_FAINT);
     }
 }
 
-/// Where the pointer is beside Oyen (-1 .. 1) while it's over the page.
+/// Where the pointer is beside Nova (-1 .. 1) while it's over the page.
 fn look(ui: &Ui, at: Point, page: Rect) -> Option<f32> {
     ui.input.mouse.filter(|m| page.contains(*m)).map(|m| ((m.x - at.x) / 220.0).clamp(-1.0, 1.0))
 }
 
-/// The round button under Oyen: record (Take notes), Stop while listening,
+/// The round button under Nova: record (Take notes), Stop while listening,
 /// faint while the notes are on their way. Its line under it.
 fn draw_button(ui: &mut Ui, st: &mut AppState, phase: &Phase, c: Point) {
     let listening = matches!(phase, Phase::Listening { .. });
@@ -199,7 +199,7 @@ fn buttons(ui: &mut Ui, x: f32, y: f32, list: &[(&str, &str, Option<Icon>, PillS
 
 fn draw_idle(ui: &mut Ui, st: &mut AppState, r: Rect) {
     let r = Rect::new(r.x, r.y + 4.0, r.w.min(420.0), r.h);
-    let y = headline(ui, r, "Oyen takes your meeting notes");
+    let y = headline(ui, r, "Nova takes your meeting notes");
     let body = if cfg!(target_os = "macos") {
         "He listens to your microphone and your Mac's sound, so a call in Meet, Zoom or Teams is heard with no bot joining. Stop when it's over: the notes and the transcript are saved to Documents \u{203a} Nexora \u{203a} Notes."
     } else {
@@ -226,7 +226,7 @@ fn draw_idle(ui: &mut Ui, st: &mut AppState, r: Rect) {
 
 fn draw_listening(ui: &mut Ui, st: &mut AppState, r: Rect) {
     let r = Rect::new(r.x, r.y + 4.0, r.w.min(420.0), r.h);
-    let y = headline(ui, r, "Oyen is listening");
+    let y = headline(ui, r, "Nova is listening");
     let y = para(ui, Rect::new(r.x, y + 4.0, r.w, 40.0), "Stop when the meeting ends, and he'll write it up.", palette::TEXT_DIM) + 14.0;
     let rows = [("You", "microphone", st.notes.mic_on, st.notes.mic), ("The call", OWN_SOUND, st.notes.pc_on, st.notes.pc)];
     for (i, (name, source, on, level)) in rows.into_iter().enumerate() {
@@ -252,7 +252,7 @@ fn draw_listening(ui: &mut Ui, st: &mut AppState, r: Rect) {
 
 fn draw_sending(ui: &mut Ui, r: Rect, sent: u32, parts: u32) {
     let r = Rect::new(r.x, r.y + 4.0, r.w.min(420.0), r.h);
-    let y = headline(ui, r, "Sending the meeting to Oyen");
+    let y = headline(ui, r, "Sending the meeting to Nova");
     let line = if parts > 1 { format!("Part {} of {parts}", (sent + 1).min(parts)) } else { "One part".to_string() };
     let y = para(ui, Rect::new(r.x, y + 4.0, r.w, 20.0), &line, palette::TEXT_DIM) + 12.0;
     let bar = Rect::new(r.x, y, r.w, BAR_H);
@@ -264,7 +264,7 @@ fn draw_sending(ui: &mut Ui, r: Rect, sent: u32, parts: u32) {
 
 fn draw_writing(ui: &mut Ui, st: &AppState, r: Rect, since: f64) {
     let r = Rect::new(r.x, r.y + 4.0, r.w.min(420.0), r.h);
-    let y = headline(ui, r, "Oyen is writing your notes\u{2026}");
+    let y = headline(ui, r, "Nova is writing your notes\u{2026}");
     // About a minute for each 20 minutes of meeting, as the server takes it.
     let mins = (st.notes.secs / 1200.0).ceil().max(1.0) as u32;
     let line = format!("{} so far \u{b7} usually about {mins} min for a meeting this long", fmt_length(st.now - since));

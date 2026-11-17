@@ -28,7 +28,7 @@ pub mod mediaremote;
 pub mod notes;
 pub mod notifications;
 pub mod nowplaying;
-pub mod oyen;
+pub mod nova;
 pub mod nexora;
 pub mod pairdrop;
 pub mod peek;
