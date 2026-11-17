@@ -21,13 +21,13 @@ green before a merge into `dev`.
 | # | Sub-task | Branch | Status |
 |---|----------|--------|--------|
 | 02.0 | Task guideline | merged with 01 | ✅ done |
-| 02a | Port the reference tree as-is (5 granular commits) | `feature/02a-port-codebase` | ⏳ in progress |
-| 02b | Rename tree: crates, src dirs, res, installer, brand files | `feature/02b-rename-tree` | ⬜ pending |
+| 02a | Port the reference tree as-is (5 granular commits) | `feature/02a-port-codebase` | ✅ merged |
+| 02b | Rename tree: crates, src dirs, res, installer, brand files | `feature/02b-rename-tree` | ✅ merged |
 | 02c | Rebrand Rust names: `nexora*`/`NEXORA*` → `nexora*`, `studio-*` crates | `feature/02c-rebrand-rust-names` | ⬜ pending |
 | 02d | Rebrand mascot: `nova*` → `nova*`, `nxis_` → `nxis_` | `feature/02d-rebrand-mascot` | ⬜ pending |
 | 02e | Rebrand domains, product name, repo refs, `nexora-notes-server` | `feature/02e-rebrand-domains` | ⬜ pending |
-| 02f | Version 0.1.0 + installer/MSIX identity (new GUIDs) | `feature/02f-version-identity` | ⬜ pending |
-| 02g | Regenerate `Cargo.lock`, notices/tokens checks | `feature/02g-lockfile-checks` | ⬜ pending |
+| 02f | Version 0.1.0 + installer/MSIX identity (new GUIDs) | `feature/02f-version-identity` | ✅ merged |
+| 02g | `Cargo.lock`, contract vectors, add-on pins, update sample; **workspace tests green (1156 passed)** | `feature/02g-lockfile-checks` | ✅ merged |
 
 ## Task 03 — Nexora brand assets
 
