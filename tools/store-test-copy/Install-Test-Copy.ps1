@@ -49,7 +49,7 @@ try {
     Invoke-WebRequest -Uri "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx" -OutFile $vclibs -UseBasicParsing
     Add-AppxPackage -Path $msix.FullName -DependencyPath $vclibs -ForceApplicationShutdown
 }
-$pkg = Get-AppxPackage -Name "JatevoLabs.NexoraStudio"
+$pkg = Get-AppxPackage -Name "DasunJayasanka.Nexora"
 if (-not $pkg) { throw "The test copy didn't install." }
 "Installed $($pkg.Version). Starting it."
 Start-Process "shell:AppsFolder\$($pkg.PackageFamilyName)!Nexora"

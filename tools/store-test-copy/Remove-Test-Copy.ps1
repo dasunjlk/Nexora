@@ -13,7 +13,7 @@ if ($UntrustOnly) {
     exit 0
 }
 
-$pkg = Get-AppxPackage -Name "JatevoLabs.NexoraStudio"
+$pkg = Get-AppxPackage -Name "DasunJayasanka.Nexora"
 if ($pkg) {
     "Removing the test copy ($($pkg.Version)) and its settings."
     Remove-AppxPackage -Package $pkg.PackageFullName

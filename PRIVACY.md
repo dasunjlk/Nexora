@@ -1,6 +1,6 @@
 # Nexora privacy
 
-Nexora is made by Jatevo Labs. It needs no account, and has no ads, no analytics and no tracking. Unless you sign in to Nexora or connect Nexora Inference, it never sends us anything about you. On its own it reads one public file from our website, to see whether a new version is out; the Stocks add-on, once you switch it on, also reads public prices from nexora.trade.
+Nexora is made by Dasun Jayasanka. It needs no account, and has no ads, no analytics and no tracking. Unless you sign in to Nexora or connect Nexora Inference, it never sends us anything about you. On its own it reads one public file from our website, to see whether a new version is out; the Stocks add-on, once you switch it on, also reads public prices from nexora.trade.
 
 ## What leaves your PC
 

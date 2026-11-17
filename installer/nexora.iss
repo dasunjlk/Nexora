@@ -3,7 +3,7 @@
 ; Releases ship installer/nexora.nsi (NSIS), which 0.1.x installs came from; CI builds this one too as a check.
 ;
 ; Build after `cargo build -p nexora --release`:
-;   iscc installer\nexora.iss                      -> dist\Nexora-Setup-0.2.30.exe
+;   iscc installer\nexora.iss                      -> dist\Nexora-Setup-0.1.0.exe
 ;   iscc /DAppVersion=0.2.0 installer\nexora.iss   (another version)
 ;
 ; Per-user install: no admin rights and no UAC prompt. The app goes to
@@ -11,7 +11,7 @@
 ; survive uninstalling (only the cache in %LOCALAPPDATA%\Nexora is removed).
 
 #ifndef AppVersion
-  #define AppVersion "0.2.30"
+  #define AppVersion "0.1.0"
 #endif
 #ifndef ExeSource
   #define ExeSource "..\target\release\nexora.exe"
@@ -19,14 +19,14 @@
 #define AppName "Nexora"
 ; Folder, data and Run value names stay "Nexora" (the app and 0.1.x installs use them).
 #define AppDir "Nexora"
-#define AppPublisher "Jatevo Labs"
+#define AppPublisher "Dasun Jayasanka"
 #define AppExe "nexora.exe"
 ; The island window's class (crates/nexora/src/window.rs), used to ask a running copy to quit.
 #define IslandClass "Nexora.Island"
 
 [Setup]
-; Never change the AppId: upgrades and the uninstaller find the install by it.
-AppId={{6F1D2B7A-3C84-4E59-A1D6-8B2E5F0C9A47}
+; Nexora's own AppId: upgrades and the uninstaller find the install by it.
+AppId={{72C6A207-2DC8-48F2-9170-E153553DD817}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}

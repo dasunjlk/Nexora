@@ -10,9 +10,9 @@ param(
     [string]$OutDir = "dist",
     # Partner Center > Nexora > Product identity. These are stand-ins until
     # the name is reserved; the Store refuses a package whose identity differs.
-    [string]$IdentityName = "JatevoLabs.NexoraStudio",
-    [string]$Publisher = "CN=Jatevo Labs",
-    [string]$PublisherDisplayName = "Jatevo Labs"
+    [string]$IdentityName = "DasunJayasanka.Nexora",
+    [string]$Publisher = "CN=Dasun Jayasanka",
+    [string]$PublisherDisplayName = "Dasun Jayasanka"
 )
 
 $ErrorActionPreference = "Stop"
