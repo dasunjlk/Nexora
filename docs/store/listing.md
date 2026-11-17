@@ -19,7 +19,7 @@ Text to paste into Partner Center. The package itself comes from the `store` wor
 | Website | https://github.com/dasunjlk/Nexora |
 | Support contact | https://github.com/dasunjlk/Nexora/issues |
 | Privacy policy URL | https://github.com/dasunjlk/Nexora/blob/main/PRIVACY.md |
-| Copyright | © 2026 Jatevo Labs |
+| Copyright | © 2026 Dasun Jayasanka |
 
 ## Store listing (English)
 

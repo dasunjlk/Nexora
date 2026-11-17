@@ -13,7 +13,7 @@ SetCompressor /SOLID lzma
 
 !define APPNAME "Nexora"
 !define VERSION "0.1.0"
-!define PUBLISHER "Jatevo Labs"
+!define PUBLISHER "Dasun Jayasanka"
 !define UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Nexora"
 !define RUN_KEY "Software\Microsoft\Windows\CurrentVersion\Run"
 
