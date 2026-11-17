@@ -12,7 +12,7 @@ Target amd64-unicode
 SetCompressor /SOLID lzma
 
 !define APPNAME "Nexora"
-!define VERSION "0.2.30"
+!define VERSION "0.1.0"
 !define PUBLISHER "Jatevo Labs"
 !define UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Nexora"
 !define RUN_KEY "Software\Microsoft\Windows\CurrentVersion\Run"
@@ -31,7 +31,7 @@ InstallDir "$LOCALAPPDATA\Programs\Nexora"
 InstallDirRegKey HKCU "Software\Nexora" "InstallDir"
 BrandingText "${APPNAME} ${VERSION}"
 
-VIProductVersion "0.2.30.0"
+VIProductVersion "0.1.0.0"
 VIAddVersionKey "ProductName" "${APPNAME}"
 VIAddVersionKey "CompanyName" "${PUBLISHER}"
 VIAddVersionKey "FileDescription" "Nexora installer"
