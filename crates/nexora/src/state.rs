@@ -377,8 +377,6 @@ pub struct PageUiState {
     pub notes_saved_at: f64,
     pub notes_note: Option<(String, f64)>,
     pub notes_kept: bool,
-    /// The Pro add-on whose "what it does" page shows on the Add-ons page.
-    pub addon_about: Option<&'static str>,
 }
 
 /// Whether Windows lets Nexora read a game's frames. Its event tracing
@@ -487,9 +485,6 @@ pub struct NexoraState {
     pub agenda_state: AgendaState,
     /// Signing in started from the Today page: back to it once connected.
     pub from_today: bool,
-    /// Whether the account has Studio Pro, as the server last said (None:
-    /// not asked yet). Signing out forgets it with the rest.
-    pub pro: Option<bool>,
 }
 
 
@@ -1027,10 +1022,10 @@ impl AppState {
         self.addon(nexora_core::addons::CAFFEINE.id) == AddonStatus::Ready
     }
 
-    /// The Downloader add-on is on, with its tools in place, for an account
-    /// with Studio Pro: the Downloads tab shows.
+    /// The Downloader add-on is on, with its tools in place: the Downloads
+    /// tab shows.
     pub fn downloader_on(&self) -> bool {
-        self.downloader_offered && self.studio_pro() == Some(true) && self.addon(nexora_core::addons::DOWNLOADER.id) == AddonStatus::Ready
+        self.downloader_offered && self.addon(nexora_core::addons::DOWNLOADER.id) == AddonStatus::Ready
     }
 
     /// Notifications is on: its tab shows, and new notifications from the
@@ -1047,24 +1042,15 @@ impl AppState {
         p.hideable() && self.settings.hidden_tabs.iter().any(|k| k == p.key())
     }
 
-    /// The IELTS add-on is on, and the server hasn't said the account is
-    /// without Studio Pro: the IELTS tab shows (signed out, its sign-in card).
+    /// The IELTS add-on is on: the IELTS tab shows (signed out, its
+    /// sign-in card).
     pub fn ielts_on(&self) -> bool {
-        self.addon(nexora_core::addons::IELTS.id) == AddonStatus::Ready && self.nexora.pro != Some(false)
+        self.addon(nexora_core::addons::IELTS.id) == AddonStatus::Ready
     }
 
-    /// AI usage is on: the AI tab shows and its readers may run. It takes an
-    /// account the server says has Studio Pro.
+    /// AI usage is on: the AI tab shows and its readers may run.
     pub fn ai_usage_on(&self) -> bool {
-        self.settings.ai_usage_on(self.studio_pro() == Some(true))
-    }
-
-    /// The signed-in account has Studio Pro, as the server last said.
-    pub fn studio_pro(&self) -> Option<bool> {
-        match self.nexora.link {
-            NexoraLink::Connected { .. } => self.nexora.pro,
-            _ => Some(false),
-        }
+        self.settings.ai_usage_on()
     }
 
     /// The Meeting notes add-on is on: the Notes tab shows.
