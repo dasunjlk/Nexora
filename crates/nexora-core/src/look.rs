@@ -102,6 +102,9 @@ pub enum Shape {
 }
 
 const NOVA_FUR: Color = Color::hex(crate::nova::FUR);
+/// The theme's accent: the deep tile violet, so rings and times keep the
+/// contrast the light fur can't give on the porcelain ground.
+const NOVA_ACCENT: Color = Color::hex(0x6E4BE8);
 const NOVA_FOLD: Color = Color::hex(crate::nova::FOLD);
 
 pub const CLASSIC: Look = Look {
@@ -122,7 +125,7 @@ pub const CLASSIC: Look = Look {
 pub const NOVA: Look = Look {
     ground: Color::hex(0xF3F0FF),
     ink: Color::hex(0x271E4A),
-    accent: Some(NOVA_FUR),
+    accent: Some(NOVA_ACCENT),
     border: Color::rgba(0.24, 0.20, 0.45, 0.22),
     light: true,
     font: Some("Outfit"),
