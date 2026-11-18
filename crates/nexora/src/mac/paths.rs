@@ -1,0 +1,129 @@
+//! Where Nexora keeps its files on a Mac.
+//!
+//! - Settings + data: `~/Library/Application Support/Nexora/`
+//! - Cache:           `~/Library/Caches/Nexora/`
+//! - Log:             `~/Library/Logs/Nexora/nexora.log` (Console.app lists it)
+//!
+//! `NEXORA_HOME` overrides all three (used by `--render` and `--smoke` to stay
+//! isolated).
+
+use std::path::PathBuf;
+
+fn home_override() -> Option<PathBuf> {
+    std::env::var_os("NEXORA_HOME").map(PathBuf::from)
+}
+
+fn library() -> PathBuf {
+    std::env::var_os("HOME").map(PathBuf::from).unwrap_or_else(|| PathBuf::from(".")).join("Library")
+}
+
+pub fn data_dir() -> PathBuf {
+    home_override().unwrap_or_else(|| library().join("Application Support").join("Nexora"))
+}
+
+pub fn cache_dir() -> PathBuf {
+    home_override().map(|h| h.join("cache")).unwrap_or_else(|| library().join("Caches").join("Nexora"))
+}
+
+pub fn settings_path() -> PathBuf {
+    data_dir().join("settings.json")
+}
+
+pub fn store_path() -> PathBuf {
+    data_dir().join("data.json")
+}
+
+pub fn log_path() -> PathBuf {
+    home_override().map(|h| h.join("nexora.log")).unwrap_or_else(|| library().join("Logs").join("Nexora").join("nexora.log"))
+}
+
+/// Held while Nexora runs, so a second copy quits at start.
+pub fn lock_path() -> PathBuf {
+    cache_dir().join("nexora.lock")
+}
+
+/// Where files from a phone land (Phone drop): `~/Downloads/Nexora`, or
+/// `~/Downloads/Nexora` where a copy from before the rename made it: Shelf
+/// items link to the files in it.
+pub fn phone_inbox_dir() -> PathBuf {
+    if let Some(h) = home_override() {
+        return h.join("phone-drop");
+    }
+    let downloads = std::env::var_os("HOME").map(PathBuf::from).unwrap_or_else(|| PathBuf::from(".")).join("Downloads");
+    let before_rename = downloads.join("Nexora");
+    if before_rename.is_dir() { before_rename } else { downloads.join("Nexora") }
+}
+
+/// Where the Downloader saves videos and sound: `~/Downloads`, as a browser
+/// would. An app may create files there without asking (macOS asks before
+/// it reads one it didn't make). Under `NEXORA_HOME` for the smoke run.
+pub fn media_downloads_dir() -> PathBuf {
+    if let Some(h) = home_override() {
+        return h.join("downloads");
+    }
+    std::env::var_os("HOME").map(PathBuf::from).unwrap_or_else(|| PathBuf::from(".")).join("Downloads")
+}
+
+/// A meeting's audio while it is recorded and handed over (Meeting notes),
+/// deleted once its notes are saved.
+pub fn notes_audio_dir() -> PathBuf {
+    cache_dir().join("notes")
+}
+
+/// Where meeting notes are saved, as Markdown: `~/Documents/Nexora/Notes`.
+/// Under `NEXORA_HOME` for the smoke run.
+pub fn notes_dir() -> PathBuf {
+    if let Some(h) = home_override() {
+        return h.join("notes-saved");
+    }
+    std::env::var_os("HOME").map(PathBuf::from).unwrap_or_else(|| PathBuf::from(".")).join("Documents").join("Nexora").join("Notes")
+}
+
+pub fn lyrics_cache_dir() -> PathBuf {
+    cache_dir().join("lyrics")
+}
+
+/// Add-on files, one folder per add-on (`services::addons`), only there
+/// while the add-on is switched on. A Mac that clears its caches downloads
+/// them again.
+pub fn addons_dir() -> PathBuf {
+    cache_dir().join("addons")
+}
+
+/// The IELTS page's audio: Nova's clips and the answer being recorded, each
+/// deleted once used.
+pub fn ielts_dir() -> PathBuf {
+    cache_dir().join("ielts")
+}
+
+/// The Nexora sign-in (this Mac's key and the masked account), in a file
+/// only this Mac account can read (`services::secret`). Signing out removes
+/// it. With the settings, not the cache: macOS may empty caches by itself.
+pub fn nexora_link_path() -> PathBuf {
+    data_dir().join("nexora-link.bin")
+}
+
+/// A key signed out while Nexora couldn't be reached, kept only to tell the
+/// server once it can.
+pub fn nexora_revoke_path() -> PathBuf {
+    data_dir().join("nexora-revoke.bin")
+}
+
+/// A key typed into the AI tab for one service, or the inference.nexora.app
+/// key (`usage-<name>.bin`), in a file only this Mac account can read
+/// (`services::secret`). With the settings, not the cache: macOS may empty
+/// caches by itself.
+pub fn usage_key_path(name: &str) -> PathBuf {
+    data_dir().join(format!("usage-{name}.bin"))
+}
+
+/// The person's Apple Music token (owner-only file; uninstalling with the
+/// cache folder removes it).
+pub fn apple_music_token_path() -> PathBuf {
+    cache_dir().join("apple-music-token.bin")
+}
+
+/// The Apple Music web player's (public) developer token, cached until it expires.
+pub fn apple_music_web_token_path() -> PathBuf {
+    cache_dir().join("apple-music-web.json")
+}

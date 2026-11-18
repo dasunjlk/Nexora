@@ -1,0 +1,6 @@
+{
+  "about": "Nexora's update sample. payload is signed (ECDSA P-256, SHA-256) with the key named by key; see docs/updates.md. This copy is a fixture: v0.1.0 is not out, and the signing key's private half was discarded after the sample was made.",
+  "payload": "{\"schema\":1,\"version\":\"0.1.0\",\"date\":\"2026-11-18\",\"headline\":\"Nexora 0.1.0\",\"notes\":\"https://github.com/dasunjlk/Nexora/releases/tag/v0.1.0\",\"windows\":{\"url\":\"https://github.com/dasunjlk/Nexora/releases/download/v0.1.0/Nexora-Setup-0.1.0.exe\",\"size\":2457657,\"sha256\":\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"}}",
+  "signature": "Qr2objUBzTncPRQMDJ1DzVcZLDn2e4VLBKsPrxO1vEBjnAxfNvJVOVU26WC2k6C5NJzyTVO98AjvUoWkeAn6yg==",
+  "key": "94dd546e3c559e2a"
+}
