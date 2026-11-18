@@ -258,8 +258,8 @@ def social_card():
     tag = ImageFont.truetype(font_med, round(h * 0.055 * SS))
     d.text((w * 0.415 * SS, h * 0.36 * SS), "Nexora", font=name, fill=(255, 255, 255, 255))
     d.text((w * 0.42 * SS, h * 0.60 * SS), "A living notch for Windows and Mac", font=tag, fill=(180, 155, 255, 255))
-    img.resize((w, h), Image.LANCZOS).save(ROOT / "social-preview.png", quality=95)
-    print("social-preview.png  1280x640")
+    img.resize((w, h), Image.LANCZOS).save(OUT / "social-preview.png", quality=95)
+    print("art/social-preview.png  1280x640")
 
 
 def main():
