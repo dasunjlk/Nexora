@@ -51,7 +51,7 @@ impl Canvas {
     }
 }
 
-/// `0xRRGGBB` the way CSS and the Swift port write it: "#B49BFF".
+/// `0xRRGGBB` the way CSS and the Swift port write it: "#7C5CFF".
 pub fn css(rgb: u32) -> String {
     format!("#{rgb:06X}")
 }
@@ -273,8 +273,8 @@ mod tests {
             Canvas::face(96.0),
             "nova",
         );
-        assert!(svg.contains("fill=\"#B49BFF\""));
-        assert!(svg.contains("fill=\"#8F73F2\""));
+        assert!(svg.contains("fill=\"#7C5CFF\""));
+        assert!(svg.contains("fill=\"#5B3FD6\""));
         assert!(svg.contains("fill=\"#171717\""));
         assert!(!svg.contains("<mask"));
     }
@@ -329,8 +329,8 @@ mod tests {
 
     #[test]
     fn colours_are_written_as_css_hex() {
-        assert_eq!(css(FUR), "#B49BFF");
-        assert_eq!(css(FOLD), "#8F73F2");
+        assert_eq!(css(FUR), "#7C5CFF");
+        assert_eq!(css(FOLD), "#5B3FD6");
         assert_eq!(css(INK), "#171717");
         assert_eq!(css(PINK), "#FF4F8B");
         assert_eq!(css(GREEN), "#1E9E4A");

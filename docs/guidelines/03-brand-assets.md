@@ -18,7 +18,7 @@ the ported tools so they can be redrawn at will.
 | Equalizer / lavender accents | `#B49BFF` |
 | Dusk album cover | `#C9BAFF` → `#8F73F2` → `#3D2E8C` → `#191244` |
 | Ink | `#171717` |
-| Mascot fur / fold | `#B49BFF` / `#8F73F2` (Task 03c recolours the app's cat to match) |
+| Mascot fur / fold | `#7C5CFF` / `#5B3FD6` (the brand accent itself: one accent reads on both the porcelain theme and black) |
 
 ## 03a — logo, icon, installer art (`tools/make_brand.py`)
 
