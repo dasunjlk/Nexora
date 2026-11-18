@@ -2,7 +2,8 @@
 /dist
 *.log
 .DS_Store
-/selftest-out
+/selftest-out*
+/selftest-*/
 /.claude/
 /design-review
 /after
