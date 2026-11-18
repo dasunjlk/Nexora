@@ -19,9 +19,9 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "server" / "public"
 
-FUR = "#B49BFF"
-FUR_DARK = "#8F73F2"
-INNER = "#D9CCFF"
+FUR = "#7C5CFF"
+FUR_DARK = "#5B3FD6"
+INNER = "#A78BFA"
 INK = "#171717"
 FIELD = "#EFEAFF"
 WHITE = "#FFFFFF"
