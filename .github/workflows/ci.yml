@@ -637,7 +637,7 @@ jobs:
           if-no-files-found: error
 
   install-test:
-    name: Install over 0.1.1, check and uninstall (Windows)
+    name: Install over the last release, check and uninstall (Windows)
     needs: installer
     runs-on: windows-2025
     steps:
@@ -646,11 +646,31 @@ jobs:
         with:
           name: nexora-setup
           path: dist
-      - name: Fetch the release to upgrade from
+      - name: Find the release to upgrade from
+        id: find
         shell: pwsh
-        # 0.1.1 is the installer people have today; the check upgrades from it.
-        run: Invoke-WebRequest -Uri "https://github.com/dasunjlk/Nexora/releases/download/v0.1.1/Nexora-Setup-0.1.1.exe" -OutFile previous-setup.exe
+        # The installer people have today: the repo's latest release, if one
+        # is out. Nexora's first release has nothing to upgrade from, so the
+        # job says so and skips its fetch and check until one is published.
+        run: |
+          $tag = $null
+          try {
+            $r = Invoke-RestMethod -Uri "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/latest" -ErrorAction Stop
+            $tag = $r.tag_name
+          } catch {}
+          if (-not $tag) {
+            "has_previous=false" | Out-File $env:GITHUB_OUTPUT -Append
+            "::notice::No release is out yet, so there is nothing to upgrade from; the install test skips until the first release is published." | Out-File $env:GITHUB_STEP_SUMMARY -Append
+          } else {
+            "has_previous=true" | Out-File $env:GITHUB_OUTPUT -Append
+            "tag=$tag" | Out-File $env:GITHUB_OUTPUT -Append
+          }
+      - name: Fetch the release to upgrade from
+        if: steps.find.outputs.has_previous == 'true'
+        shell: pwsh
+        run: Invoke-WebRequest -Uri "https://github.com/$env:GITHUB_REPOSITORY/releases/download/$($steps.find.outputs.tag)/Nexora-Setup-$($steps.find.outputs.tag.TrimStart('v')).exe" -OutFile previous-setup.exe
       - name: Install, check, uninstall
+        if: steps.find.outputs.has_previous == 'true'
         shell: pwsh
         run: ./tools/ci-installer.ps1 -Setup "dist\Nexora-Setup-$env:NEXORA_VERSION.exe" -Version $env:NEXORA_VERSION -Previous previous-setup.exe -Out installer-out
       - name: Upload screenshots and results
