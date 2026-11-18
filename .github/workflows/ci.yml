@@ -667,8 +667,10 @@ jobs:
           }
       - name: Fetch the release to upgrade from
         if: steps.find.outputs.has_previous == 'true'
+        env:
+          PREVIOUS_TAG: ${{ steps.find.outputs.tag }}
         shell: pwsh
-        run: Invoke-WebRequest -Uri "https://github.com/$env:GITHUB_REPOSITORY/releases/download/$($steps.find.outputs.tag)/Nexora-Setup-$($steps.find.outputs.tag.TrimStart('v')).exe" -OutFile previous-setup.exe
+        run: Invoke-WebRequest -Uri "https://github.com/$env:GITHUB_REPOSITORY/releases/download/$env:PREVIOUS_TAG/Nexora-Setup-$($env:PREVIOUS_TAG.TrimStart('v')).exe" -OutFile previous-setup.exe
       - name: Install, check, uninstall
         if: steps.find.outputs.has_previous == 'true'
         shell: pwsh
