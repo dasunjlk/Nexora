@@ -39,6 +39,12 @@ jobs:
       # (nova-studio-cap) generates its theme from a pinned copy of it.
       - name: Design tokens up to date
         run: python3 tools/tokens.py --check
+      # The exe's version resource is hand-written (res/nexora.rc): a release
+      # whose Properties say another version fails the installer's checks.
+      - name: Windows version resource matches the version
+        run: |
+          grep -q "FILEVERSION ${NEXORA_VERSION//./,},0" crates/nexora/res/nexora.rc
+          grep -q "VALUE \"ProductVersion\", \"$NEXORA_VERSION" crates/nexora/res/nexora.rc
 
   # nexora.exe is built once, here. The unit tests, the self-tests and the
   # installer each run on their own machine, side by side.

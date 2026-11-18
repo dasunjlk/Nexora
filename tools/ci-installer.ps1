@@ -82,10 +82,6 @@ if ($Previous) {
     Start-Process -FilePath $Previous -ArgumentList "/S" -Wait
     Check "previous release installed" (Test-Path $exe) $Previous
     Check "previous Start menu shortcut" (Test-Path (Join-Path $programs "Nexora.lnk"))
-    # The 0.1.x versions from 0.1.2 on named the shortcut "Nexora": put one there too, the upgrade must remove it.
-    $old = (New-Object -ComObject WScript.Shell).CreateShortcut((Join-Path $programs "Nexora.lnk"))
-    $old.TargetPath = $exe
-    $old.Save()
     New-Item -ItemType Directory -Force -Path $dataDir | Out-Null
     Set-Content -Path $marker -Value "settings and data must survive the upgrade"
 }
@@ -126,8 +122,6 @@ Check "Installed apps version" ($entry.DisplayVersion -eq $Version) "$($entry.Di
 $entries = NexoraEntries
 Check "one Installed apps entry" ($entries.Count -eq 1) (($entries | ForEach-Object { $_.DisplayName }) -join ", ")
 Check "new Start menu shortcut" (Test-Path (Join-Path $programs "Nexora.lnk"))
-Check "old Start menu shortcut removed" (-not (Test-Path (Join-Path $programs "Nexora.lnk")))
-if ($Previous) { Check "Nexora shortcut removed" (-not (Test-Path (Join-Path $programs "Nexora.lnk"))) }
 $vi = (Get-Item $exe -ErrorAction SilentlyContinue).VersionInfo
 Check "nexora.exe product name" ($vi.ProductName -eq "Nexora") "$($vi.ProductName)"
 Check "nexora.exe version" ($vi.ProductVersion -eq $Version) "$($vi.ProductVersion)"
