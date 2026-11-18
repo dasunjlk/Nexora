@@ -1,1 +1,15 @@
-oyenza-studio-main/
+/target
+/dist
+*.log
+.DS_Store
+/selftest-out*
+/selftest-*/
+/.claude/
+/design-review
+/after
+/ci-artifacts
+/_site
+__pycache__/
+
+# local reference tree (upstream, never committed)
+/oyenza-studio-main/
