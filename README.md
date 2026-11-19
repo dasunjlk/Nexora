@@ -1,23 +1,23 @@
 <p align="center"><img src="art/nexora-peek.webp" width="260" alt="Nova peeking over a playing island"></p>
 
-<h1 align="center">5 downloads</h1>
+<h1 align="center">6 downloads</h1>
 
-<p align="center">of Nexora for Windows, from GitHub since 18 Nov 2026<br>Latest release, 0.1.0: <b>5</b> · Last 7 days: <b>5</b> · <b>0</b> stars on GitHub</p>
+<p align="center">of Nexora for Windows, from GitHub since 18 Nov 2026<br>Latest release, 0.1.0: <b>6</b> · Last 7 days: <b>6</b> · <b>0</b> stars on GitHub</p>
 
-<p align="center"><img src="downloads.svg" width="820" alt="Bar chart of downloads per release: 0.1.0 5"></p>
+<p align="center"><img src="downloads.svg" width="820" alt="Bar chart of downloads per release: 0.1.0 6"></p>
 
 ## Per release
 
 | Release | Published | Download button | Versioned installer | Portable zip | Other files | Total |
 | --- | --- | --: | --: | --: | --: | --: |
-| [0.1.0](https://github.com/dasunjlk/Nexora/releases/tag/v0.1.0) | 18 Nov 2026 | 1 | 3 | 1 | 0 | 5 |
-| **All releases** | | **1** | **3** | **1** | **0** | **5** |
+| [0.1.0](https://github.com/dasunjlk/Nexora/releases/tag/v0.1.0) | 18 Nov 2026 | 1 | 4 | 1 | 0 | 6 |
+| **All releases** | | **1** | **4** | **1** | **0** | **6** |
 
 ## Per day
 
 | Day | Downloads |
 | --- | --: |
-| Today | 5 |
+| Today | 6 |
 
 ## On GitHub
 
@@ -35,4 +35,4 @@
 
 </details>
 
-<sub>Updated 19 Nov 2026, 00:44 UTC by [Download stats](https://github.com/dasunjlk/Nexora/actions/workflows/metrics.yml), every hour · Data: [downloads](data/downloads.csv), [CI downloads](data/ci-downloads.csv), [stars](data/repo.csv), [summary.json](summary.json)</sub>
+<sub>Updated 19 Nov 2026, 17:39 UTC by [Download stats](https://github.com/dasunjlk/Nexora/actions/workflows/metrics.yml), every hour · Data: [downloads](data/downloads.csv), [CI downloads](data/ci-downloads.csv), [stars](data/repo.csv), [summary.json](summary.json)</sub>
