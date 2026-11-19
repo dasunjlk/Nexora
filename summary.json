@@ -1,15 +1,38 @@
 {
   "repo": "dasunjlk/Nexora",
-  "checked_at": "2026-11-18T17:47:07Z",
-  "since": null,
-  "downloads": 0,
-  "github_count": 0,
+  "checked_at": "2026-11-19T00:44:36Z",
+  "since": "2026-11-18",
+  "downloads": 5,
+  "github_count": 5,
   "ci_count": 0,
-  "last_7_days": 0,
-  "latest": null,
+  "last_7_days": 5,
+  "latest": {
+    "release": "v0.1.0",
+    "downloads": 5
+  },
   "stars": 0,
   "forks": 0,
   "watchers": 0,
-  "releases": [],
-  "days": []
+  "releases": [
+    {
+      "release": "v0.1.0",
+      "published": "2026-11-18T19:57:19Z",
+      "downloads": 5,
+      "github_count": 5,
+      "ci_count": 0,
+      "files": {
+        "Nexora-0.1.0-mac.dmg": 0,
+        "Nexora-0.1.0-portable.zip": 1,
+        "Nexora-Mac.dmg": 0,
+        "Nexora-Setup-0.1.0.exe": 3,
+        "Nexora-Setup.exe": 1
+      }
+    }
+  ],
+  "days": [
+    {
+      "date": "2026-11-19",
+      "downloads": 5
+    }
+  ]
 }
