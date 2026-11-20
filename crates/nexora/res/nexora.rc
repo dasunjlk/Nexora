@@ -11,14 +11,14 @@ BEGIN
   BEGIN
     BLOCK "040904B0"
     BEGIN
-      VALUE "CompanyName", "Jatevo Labs\0"
+      VALUE "CompanyName", "Dasun Jayasanka\0"
       VALUE "FileDescription", "Nexora - a living notch for Windows\0"
-      VALUE "FileVersion", "0.2.30\0"
+      VALUE "FileVersion", "0.1.0\0"
       VALUE "InternalName", "nexora\0"
-      VALUE "LegalCopyright", "Copyright (C) 2026 Jatevo Labs\0"
+      VALUE "LegalCopyright", "Copyright (C) 2026 Dasun Jayasanka\0"
       VALUE "OriginalFilename", "nexora.exe\0"
       VALUE "ProductName", "Nexora\0"
-      VALUE "ProductVersion", "0.2.30\0"
+      VALUE "ProductVersion", "0.1.0\0"
     END
   END
   BLOCK "VarFileInfo"

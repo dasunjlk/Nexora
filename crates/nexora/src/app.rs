@@ -1557,9 +1557,6 @@ impl App {
                 }
             },
         }
-        if self.settings_win.as_ref().is_some_and(|w| w.view.section == Section::Addons) {
-            self.nexora(NexoraCmd::CheckPro);
-        }
         self.paint_settings(deferred);
     }
 
@@ -1577,16 +1574,10 @@ impl App {
             self.st.now = self.st.now.max(clock::mono());
             let now = self.st.now;
             let Some(w) = self.settings_win.as_mut() else { return };
-            let before = w.view.section;
             let out = w.paint(&mut self.st, now, None, false);
-            let after = w.view.section;
             if out.close {
                 self.close_settings_window();
                 return;
-            }
-            // Add-ons lists IELTS and Meeting notes by the account's Pro, as its tab does.
-            if after != before && after == Section::Addons {
-                self.nexora(NexoraCmd::CheckPro);
             }
             let ran = !self.st.cmds.is_empty();
             if ran {
@@ -2021,11 +2012,9 @@ impl App {
     fn on_nexora(&mut self, ev: NexoraEvent) {
         let now = self.st.now;
         let link_before = self.st.nexora.link.clone();
-        let pro_before = self.st.studio_pro() == Some(true);
         match ev {
             NexoraEvent::Restored { account } => {
                 self.st.nexora.link = NexoraLink::Connected { account };
-                self.ask_pro();
             }
             NexoraEvent::Connecting { code, url, expires_in_s } => {
                 self.st.nexora.link = NexoraLink::Connecting { code, url, until: now + expires_in_s as f64 };
@@ -2041,7 +2030,6 @@ impl App {
                 self.end_sign_in();
                 self.st.notify(Icon::Check, palette::GREEN, "Connected to Nexora", format!("as {account}"), 6.0, Some(NoticeAction::OpenPage(PageKind::Nexora)));
                 self.st.nexora.link = NexoraLink::Connected { account };
-                self.ask_pro();
                 // Signed in from the Today page: back to it, where the day comes in.
                 if std::mem::take(&mut self.st.nexora.from_today) {
                     self.st.page = PageKind::Today;
@@ -2098,7 +2086,6 @@ impl App {
                 self.st.nexora.agenda_state = crate::state::AgendaState::Unavailable;
             }
             NexoraEvent::DayFailed => self.st.nexora.agenda_state = crate::state::AgendaState::Failed,
-            NexoraEvent::Pro(pro) => self.st.nexora.pro = Some(pro),
             // Steps asked for before Health was switched off stay out.
             NexoraEvent::Health(next) if self.st.health_on() => {
                 if let Some(steps) = self.st.take_health(next) {
@@ -2140,32 +2127,6 @@ impl App {
         // Signed in or out, the Nexora page's height changes: the window fits the tallest page again.
         if self.st.nexora.link != link_before {
             self.layout_surface();
-        }
-        if (self.st.studio_pro() == Some(true)) != pro_before {
-            self.pro_changed();
-        }
-    }
-
-    /// Signed in (at start, or just now) with AI usage or the Downloader on:
-    /// whether the account has Studio Pro, now, so their tabs don't wait for
-    /// the Add-ons page to open (`pages::addons::pro_wanted`).
-    fn ask_pro(&self) {
-        if pages::addons::pro_wanted(&self.st) {
-            self.nexora(NexoraCmd::CheckPro);
-        }
-    }
-
-    /// Studio Pro came, or went (the server's word, or signing out): the
-    /// Downloader's downloads stop as it goes, and its files come with it
-    /// (`Services::set_pro`). Its tab follows by itself (`downloader_on`), and
-    /// its page on screen leaves for Add-ons.
-    fn pro_changed(&mut self) {
-        let pro = self.st.studio_pro() == Some(true);
-        if !pro {
-            self.downloads_off();
-        }
-        if let Some(s) = self.services.as_ref() {
-            s.set_pro(pro);
         }
     }
 
@@ -2814,8 +2775,6 @@ impl App {
                 self.nexora(NexoraCmd::RefreshHealth);
             } else if self.st.page == PageKind::Notifications {
                 self.notify_cmd(NotifyCmd::Check);
-            } else if matches!(self.st.page, PageKind::Notes | PageKind::Ielts | PageKind::Addons | PageKind::Ai) {
-                self.nexora(NexoraCmd::CheckPro);
             }
         }
         self.request_frame();
@@ -4626,8 +4585,7 @@ impl App {
 
     /// Take notes: the microphone and the PC's sound start recording.
     fn notes_start(&mut self) {
-        // Studio Pro only: the page shows its Pro card instead of the button.
-        if self.notes_rec.is_some() || self.st.notes.live() || self.notes_take.is_some() || self.st.studio_pro() == Some(false) {
+        if self.notes_rec.is_some() || self.st.notes.live() || self.notes_take.is_some() {
             return;
         }
         // Whatever an earlier meeting left (the app closed on it) goes first.
@@ -4743,7 +4701,6 @@ impl App {
     fn set_page(&mut self, p: PageKind) {
         if p != self.st.page {
             self.st.page = p;
-            self.st.ui.addon_about = None;
             // Settings is never where the island opens next time.
             if p != PageKind::Settings {
                 self.st.update.sheet = false;
@@ -4766,8 +4723,6 @@ impl App {
                 self.nexora(NexoraCmd::RefreshHealth);
             } else if p == PageKind::Notifications {
                 self.notify_cmd(NotifyCmd::Check);
-            } else if matches!(p, PageKind::Notes | PageKind::Ielts | PageKind::Addons | PageKind::Ai) {
-                self.nexora(NexoraCmd::CheckPro);
             }
         }
     }
