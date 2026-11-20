@@ -239,7 +239,7 @@ honoured). Mapping (`nexora_core::notes::problem`):
 | 503 | `paused` | `Paused` — feature switched off server-side | yes |
 | 429 | `daily_cap` | `DailyCap` — today's minutes used | yes |
 | 413 | `too_long` | `TooLong` | **no** |
-| 403 | `pro_required` | `ProRequired` | yes |
+| 403 | `pro_required` | `ProRequired` — the server's word only; Nexora's client never gates on Pro (everything is free) | yes |
 | — | `nothing_heard` | `NothingHeard` | **no** |
 | — / 404 | `no_notes` / any 404 | `Gone` — server forgot; resend once | yes |
 | — | `ai_busy`, any 429/503 | `Busy(Some(wait_s))` | yes |

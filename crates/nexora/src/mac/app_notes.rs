@@ -58,8 +58,7 @@ impl App {
 
     /// Take notes: the microphone and the Mac's sound start recording.
     fn notes_start(&mut self) {
-        // Studio Pro only: the page shows its Pro card instead of the button.
-        if self.notes_rec.is_some() || self.st.notes.live() || self.notes_take.is_some() || self.st.studio_pro() == Some(false) {
+        if self.notes_rec.is_some() || self.st.notes.live() || self.notes_take.is_some() {
             return;
         }
         // Whatever an earlier meeting left (the app closed on it) goes first.

@@ -252,8 +252,8 @@ impl Section {
         }
     }
 
-    /// Prayer times and Caffeine have a section only while their add-ons are
-    /// on, AI usage only with Studio Pro.
+    /// Prayer times and Caffeine have a section only while their add-ons
+    /// are on.
     pub fn shown(self, st: &AppState) -> bool {
         match self {
             Section::Prayer => st.prayer_on(),

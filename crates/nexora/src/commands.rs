@@ -66,9 +66,6 @@ pub enum NexoraCmd {
     RefreshHealth,
     /// Today's Try again: the day, now (unless just asked for).
     RefreshDay,
-    /// A Pro add-on's page, or Add-ons, opened: whether the account has
-    /// Studio Pro, now (unless just asked).
-    CheckPro,
 }
 
 /// Requests for Notifications (`services::notifications`).
@@ -165,6 +162,8 @@ pub enum NotesCmd {
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Command {
+    /// The Controls tab: a tile tap for the OS to carry out.
+    Controls(nexora_core::controls::ControlsCmd),
     Media(MediaCmd),
     /// Open a file/folder with its default handler.
     OpenPath(String),
