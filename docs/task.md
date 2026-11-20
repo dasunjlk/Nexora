@@ -70,19 +70,19 @@ branch and re-pushed, never merged red.
 
 | Sub-task | Branch | Status |
 |---|---|---|
-| Default `expanded_width` 620 → 540 DIP; the smoke reads the width from the smoke home instead of a constant | `fix/expanded-size` | ✅ merged to `dev` |
+| Default `expanded_width` 620 → 540 DIP; the smoke reads the width from the smoke home instead of a constant; the exe's version resource follows 0.1.0 with a CI guard; the install test skips until a release is out | `fix/expanded-size` | ✅ merged through the ladder |
 
 ## Task 08 — everything is free (no Pro) ✅
 
 | Sub-task | Branch | Status |
 |---|---|---|
-| `Addon::pro` gone; the Add-ons page has no Pro rows; the account plumbing (the `/island/pro` ask, `NexoraEvent::Pro`, `studio_pro`) is out; the self-test drops the Pro scenes; the site's pricing section and every Pro tag gone; docs follow | `fix/no-pro` | ✅ merged to `dev` |
+| `Addon::pro` gone; the Add-ons page has no Pro rows; the account plumbing (the `/island/pro` ask, `NexoraEvent::Pro`, `studio_pro`) is out; the self-test drops the Pro scenes; the site's pricing section and every Pro tag gone; docs follow | `fix/no-pro` | ✅ merged through the ladder |
 
 ## Task 09 — the Controls tab ✅
 
 | Sub-task | Branch | Status |
 |---|---|---|
-| Guideline + `nexora_core::controls` (pure) + plumbing + `services/controls.rs` (WinRT radios, hotspot, power mode, display topology) + `pages/controls.rs` (2×3 tiles + picker) + self-test scene + icons | `feature/07-controls-tab` | ✅ merged to `dev` |
+| Guideline + `nexora_core::controls` (pure) + plumbing + `services/controls.rs` (WinRT radios, hotspot, power mode, display topology) + `pages/controls.rs` (2×3 tiles + picker) + self-test scene + icons | `feature/07-controls-tab` | ✅ merged through the ladder |
 
 ## CI notes (learned the hard way)
 
