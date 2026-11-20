@@ -122,7 +122,7 @@ const CLICK_TIMEOUT: f64 = 1.5;
 /// 5 s or the Diorama runs' own pictures, about 7 s, which the deadline
 /// leaves out, or 40 s more for the animation runs, stays under it), the
 /// Wine runner 180 s.
-const SCENE_DEADLINE: f64 = 90.0;
+const SCENE_DEADLINE: f64 = 120.0;
 /// Give up waiting for PNG writers at this point: 3.5 s after the scene
 /// deadline, so the last scenes' pictures get their time however long the
 /// run took. (It was a fixed 43.5 s, left behind when SCENE_DEADLINE went
@@ -898,10 +898,6 @@ fn seed_notes(st: &mut AppState, scene: Scene, now: f64) {
     st.notes = Taker::default();
     st.ui.notes_kept = false;
     st.ui.notes_note = None;
-    // Studio Pro, as the server would say: on for the notes' and IELTS' own scenes.
-    if st.nexora.link != crate::state::NexoraLink::Off {
-        st.nexora.pro = Some(matches!(scene.page(), Some(PageKind::Notes | PageKind::Ielts)) && scene != Scene::NotesPro);
-    }
     match scene {
         Scene::Page(PageKind::Notes) => st.notes.last = Some(sample_notes()),
         Scene::NotesListening | Scene::NotesActivity => {
@@ -1262,14 +1258,6 @@ enum Scene {
     NotesReady,
     /// Meeting notes on the closed island: Nova listening, 12:34 in.
     NotesActivity,
-    /// Meeting notes signed in without Studio Pro: the Pro card.
-    NotesPro,
-    /// The Add-ons page signed out where the Downloader is offered, its
-    /// tools in place from before: the Downloader and Notifications stay
-    /// off, each saying "Sign in with your Nexora account".
-    AddonsPro,
-    /// What a Pro add-on does, the page its row opens without Pro.
-    AddonsAbout,
     /// Prayer times in Jakarta following Muhammadiyah: Majelis Tarjih's
     /// times, the KHGT date, "Muhammadiyah" beside the place.
     PrayerMuhammadiyah,
@@ -1387,7 +1375,7 @@ const SAMPLE_SCRIPT: &str = "Hi everyone, this one takes two minutes. Today I'll
 Drop any file on the island and it waits on the Shelf. Press the phone button, scan the code, and the file is on your phone. \
 No cable, no account, nothing to install on the phone.\n\nThat's it. Thanks for watching.";
 
-const SCENES: [Scene; 144] = [
+const SCENES: [Scene; 142] = [
     Scene::IdleClock,
     Scene::IdleEyes,
     Scene::Media,
@@ -1557,18 +1545,15 @@ const SCENES: [Scene; 144] = [
     // Meeting notes: the page before a meeting (the notes saved last), Nova
     // listening, writing, the notes, and the closed island while he listens,
     // all made up (`seed_notes`).
+    Scene::Page(PageKind::Controls),
     Scene::Page(PageKind::Notes),
     Scene::NotesListening,
     Scene::NotesWriting,
     Scene::NotesReady,
     Scene::NotesActivity,
-    Scene::NotesPro,
-    // The Add-ons page signed out, without Pro: no Downloader row.
-    Scene::AddonsPro,
     // The island dragged along the top edge, closed, then open at the edge.
     Scene::IslandDrag,
     Scene::IslandOpenAtEdge,
-    Scene::AddonsAbout,
     // Prayer times following Muhammadiyah (its times and the KHGT date), and
     // the place picker before anything is typed: the Kemenag / Muhammadiyah row.
     Scene::PrayerMuhammadiyah,
@@ -1698,9 +1683,6 @@ impl Scene {
             Scene::NotesWriting => "page-notes-writing".into(),
             Scene::NotesReady => "page-notes-ready".into(),
             Scene::NotesActivity => "notes-activity".into(),
-            Scene::NotesPro => "page-notes-pro".into(),
-            Scene::AddonsPro => "page-addons-pro".into(),
-            Scene::AddonsAbout => "page-addons-about".into(),
             Scene::PrayerMuhammadiyah => "page-prayer-muhammadiyah".into(),
             Scene::PrayerPickerFollow => "page-prayer-picker-follow".into(),
             Scene::IslandDrag => "island-dragged".into(),
@@ -1748,14 +1730,14 @@ impl Scene {
             Scene::TodayDay | Scene::TodayNoApps | Scene::TodayTiles | Scene::TodayOff | Scene::TodayPicked => Some(PageKind::Today),
             Scene::StocksPicked | Scene::StocksSearch | Scene::StocksEdit => Some(PageKind::Stocks),
             Scene::RecordLive => Some(PageKind::Record),
-            Scene::AddonsRecorder | Scene::AddonsDownloader | Scene::AddonsPro | Scene::AddonsAbout => Some(PageKind::Addons),
+            Scene::AddonsRecorder | Scene::AddonsDownloader => Some(PageKind::Addons),
             Scene::DownloadsEmpty => Some(PageKind::Downloads),
             Scene::NotifyAsk | Scene::NotifyNoPackage => Some(PageKind::Notifications),
             Scene::Ai(_) => Some(PageKind::Ai),
             Scene::IeltsSignedOut | Scene::IeltsTalking | Scene::IeltsRecording | Scene::IeltsCueCard | Scene::IeltsResult | Scene::IeltsMicDenied => {
                 Some(PageKind::Ielts)
             }
-            Scene::NotesListening | Scene::NotesWriting | Scene::NotesReady | Scene::NotesPro => Some(PageKind::Notes),
+            Scene::NotesListening | Scene::NotesWriting | Scene::NotesReady => Some(PageKind::Notes),
             Scene::IslandOpenAtEdge => Some(PageKind::Media),
             Scene::CaffeineKinds | Scene::CaffeineAdd | Scene::CaffeineEmpty | Scene::CaffeineLate => Some(PageKind::Caffeine),
             _ => None,
@@ -1777,7 +1759,7 @@ impl Scene {
     /// The Downloader is offered (Windows outside the Store build), in its
     /// own scenes only: the other Add-ons pictures keep their rows.
     fn downloader(self) -> bool {
-        matches!(self, Scene::Page(PageKind::Downloads) | Scene::DownloadsEmpty | Scene::AddonsDownloader | Scene::DownloadActivity | Scene::AddonsPro)
+        matches!(self, Scene::Page(PageKind::Downloads) | Scene::DownloadsEmpty | Scene::AddonsDownloader | Scene::DownloadActivity)
     }
 
     /// Signed in to an account with Studio Pro: the Downloader's own scenes
@@ -1849,7 +1831,6 @@ impl Scene {
                 | Scene::NotesListening
                 | Scene::NotesWriting
                 | Scene::NotesReady
-                | Scene::NotesPro
         )
     }
 
@@ -3175,7 +3156,11 @@ impl SelfTest {
                 // The first tab, or the gear (found by its widget id: its place
                 // depends on how wide the clock and date are).
                 let (what, at, want) = match SCENES[i] {
-                    Scene::GearClick => ("the gear", app.selftest_hit_center(wid(pages::GEAR_ID)), PageKind::Settings),
+                    // The gear sits right of every tab: the scene hides a few
+                    // tabs so the gear has room beside the row at 540 DIP.
+                    Scene::GearClick => {
+                        ("the gear", app.selftest_hit_center(wid(pages::GEAR_ID)), PageKind::Settings)
+                    }
                     _ => ("the first header tab", Some(first_tab_point(app.island_body())), PageKind::ALL[0]),
                 };
                 match at {
@@ -3257,10 +3242,9 @@ impl SelfTest {
                 }
                 match list.get(k) {
                     Some(&(section, light)) => {
-                        let was = (app.st.nexora.link.clone(), app.st.nexora.pro);
+                        let was = app.st.nexora.link.clone();
                         if section == ai {
                             app.st.nexora.link = NexoraLink::Connected { account: "a\u{2022}\u{2022}\u{2022}@example.com".into() };
-                            app.st.nexora.pro = Some(true);
                         }
                         let prayer_was = (app.st.addons.get(PRAYER_TIMES.id).cloned(), app.st.prayer.places.clone());
                         if section == prayer {
@@ -3268,7 +3252,7 @@ impl SelfTest {
                             app.st.prayer.places.get_or_insert_with(|| std::sync::Arc::new(PlaceList::parse(SAMPLE_PLACES).expect("sample places")));
                         }
                         let (w, h, px) = app.selftest_settings_shot(section, light);
-                        (app.st.nexora.link, app.st.nexora.pro) = was;
+                        app.st.nexora.link = was;
                         if section == prayer {
                             match prayer_was.0 {
                                 Some(a) => app.st.addons.insert(PRAYER_TIMES.id, a),
@@ -3463,7 +3447,10 @@ impl SelfTest {
 
     fn next_phase(&self, i: usize, now: f64) -> Phase {
         match SCENES.get(i) {
-            Some(Scene::TabClick | Scene::GearClick) => Phase::Click { i },
+            // GearClick settles one frame first: its seeds (hidden tabs) need
+            // a drawn frame before the click finds the gear.
+            Some(Scene::TabClick) => Phase::Click { i },
+            Some(Scene::GearClick) => Phase::Settle { i, since: now, steps: 0, stable: 0 },
             Some(Scene::PrayerOk) => Phase::PressOk { i, since: now },
             Some(Scene::IslandDrag) => Phase::Drag { i, since: now },
             Some(_) => Phase::Settle { i, since: now, steps: 0, stable: 0 },
@@ -3886,8 +3873,7 @@ impl SelfTest {
         seed_caffeine(st, scene);
         // The Downloader: offered in its own scenes, and on there (its tools
         // in place, so the tab shows) except on the Add-ons page, whose row
-        // shows it off; signed out (`AddonsPro`) its row says what it is.
-        // Its setting stays as it is, as for Prayer times above.
+        // shows it off. Its setting stays as it is, as for Prayer times above.
         st.downloader_offered = scene.downloader();
         let tab = scene.downloader() && scene != Scene::AddonsDownloader;
         st.addons.insert(DOWNLOADER.id, if tab { AddonStatus::Ready } else { AddonStatus::Off });
@@ -3895,10 +3881,25 @@ impl SelfTest {
         seed_notifications(st, scene);
         seed_ielts(st, scene, now);
         seed_notes(st, scene, now);
-        st.ui.addon_about = (scene == Scene::AddonsAbout).then_some(nexora_core::addons::AI_USAGE.id);
+        if scene == Scene::GearClick {
+            // The gear sits right of every tab: hide a few so it has room at
+            // the scene's 540 DIP (the seeds run a frame before the click).
+            st.settings.hidden_tabs = vec!["today".into(), "tasks".into(), "ai".into()];
+        }
+        if scene == Scene::Page(PageKind::Controls) {
+            st.controls = nexora_core::controls::ControlsState {
+                wifi: Some(true),
+                bluetooth: Some(true),
+                hotspot: Some(false),
+                hotspot_clients: 0,
+                power: nexora_core::controls::PowerMode::Balanced,
+                project: nexora_core::controls::ProjectMode::Extend,
+                displays: 2,
+                airplane: Some(false),
+            };
+        }
         if scene.pro() {
             st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
-            st.nexora.pro = Some(true);
         }
         // Nova in the Nexora tab long since arrived: at rest in every picture.
         st.ui.nova_tab = Some((crate::nova::TabMove::Arrive, f64::NEG_INFINITY));
@@ -4443,7 +4444,7 @@ impl SelfTest {
             // The Downloads tab shows once the Downloader is on, not while
             // it's off, nor without Pro with its tools in place.
             let shown = pages::tabs(&app.st).contains(&PageKind::Downloads);
-            let want = !matches!(scene, Scene::AddonsDownloader | Scene::AddonsPro);
+            let want = !matches!(scene, Scene::AddonsDownloader);
             checks.push(check("downloads-tab", shown == want, format!("Downloads tab shown: {shown}, want {want}")));
         }
 

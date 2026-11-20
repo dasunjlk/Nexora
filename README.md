@@ -34,6 +34,8 @@ and opens into quick pages when you point at it.</p>
   Japanese/Korean/Chinese lines.
 - **Live activities at rest** — album art and the sung line, focus timer,
   volume and charging, Bluetooth headphones, the next prayer.
+- **Controls** — Wi-Fi, Bluetooth, hotspot, the power mode, Project and
+  airplane mode, switchable from one main tab.
 - **Quick pages** — Music, Today, Shelf, Tasks, Focus, AI usage, and the
   Nexora account tab; add-on pages for System, Stocks, Caffeine, Health,
   IELTS, **Meeting notes**, Script reader, Prayer times, Downloads and more.
@@ -44,6 +46,8 @@ and opens into quick pages when you point at it.</p>
 - **Meeting notes** — one click records your microphone and the PC's sound
   together; the notes come back as a Markdown file with a summary, decisions,
   action items and the transcript.
+- **Everything is free** — no Pro tier, no locked features, no account
+  required for any of it.
 - **Light by design** — native Rust, no web view, GPU-drawn in step with your
   display, and nothing runs while nothing moves.
 

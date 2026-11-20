@@ -39,6 +39,12 @@ jobs:
       # (nova-studio-cap) generates its theme from a pinned copy of it.
       - name: Design tokens up to date
         run: python3 tools/tokens.py --check
+      # The exe's version resource is hand-written (res/nexora.rc): a release
+      # whose Properties say another version fails the installer's checks.
+      - name: Windows version resource matches the version
+        run: |
+          grep -q "FILEVERSION ${NEXORA_VERSION//./,},0" crates/nexora/res/nexora.rc
+          grep -q "VALUE \"ProductVersion\", \"$NEXORA_VERSION" crates/nexora/res/nexora.rc
 
   # nexora.exe is built once, here. The unit tests, the self-tests and the
   # installer each run on their own machine, side by side.
@@ -667,8 +673,10 @@ jobs:
           }
       - name: Fetch the release to upgrade from
         if: steps.find.outputs.has_previous == 'true'
+        env:
+          PREVIOUS_TAG: ${{ steps.find.outputs.tag }}
         shell: pwsh
-        run: Invoke-WebRequest -Uri "https://github.com/$env:GITHUB_REPOSITORY/releases/download/$($steps.find.outputs.tag)/Nexora-Setup-$($steps.find.outputs.tag.TrimStart('v')).exe" -OutFile previous-setup.exe
+        run: Invoke-WebRequest -Uri "https://github.com/$env:GITHUB_REPOSITORY/releases/download/$env:PREVIOUS_TAG/Nexora-Setup-$($env:PREVIOUS_TAG.TrimStart('v')).exe" -OutFile previous-setup.exe
       - name: Install, check, uninstall
         if: steps.find.outputs.has_previous == 'true'
         shell: pwsh

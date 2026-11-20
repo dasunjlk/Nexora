@@ -54,11 +54,35 @@ branch and re-pushed, never merged red.
 |---|---|---|
 | Release build (3m44s), self-test 144/144 states (classic, Nova, Pill, Diorama at 192/200 DPI), report clean; the stocks frame-time check is machine-load-sensitive and passes when quiet (CI's software renderer reports, not fails) | `feature/05-build-test` ✅ |
 
-## Task 06 — merge ladder & CI ⏳
+## Task 06 — merge ladder & CI ✅
 
 | Sub-task | Branch | Status |
 |---|---|---|
-| 06 | `fix/02a-exec-bits` (with 03c) → `dev` → `testing` → `main` → `production`, CI green at every step; tag `v0.1.0` on `main` publishes the first release | ⏳ in progress |
+| 06a | `fix/02a-exec-bits` (with 03c folded in) — CI green → merged to `dev` | ✅ |
+| 06b | `feature/04b-site`, `feature/04c-server`, `feature/04d-root-docs`, `docs/task-board-03` — each CI green → merged to `dev`; dev re-verified green | ✅ |
+| 06c | `dev` → `testing` — CI green | ✅ |
+| 06d | `testing` → `main` — CI + store + mac green (the Glass smoke flake and the Mac entitlements fix, `hotfix/mac-entitlements`, verified on main) | ✅ |
+| 06e | `main` → `production` — CI green | ✅ |
+| 06f | Tag **v0.1.0** on `main` — release run green: `Nexora-Setup-0.1.0.exe`, `Nexora-Setup.exe`, the portable zip, `Nexora-0.1.0-mac.dmg` + `Nexora-Mac.dmg` published; `latest.json` signed (UPDATE_FEED_KEY) and the website live at dasunjlk.github.io/Nexora | ✅ |
+| fix | the update feed's trust list + secret (`fix/update-feed-key`) | ✅ merged to `main` and `dev` |
+
+## Task 07 — the expanded island starts smaller ✅
+
+| Sub-task | Branch | Status |
+|---|---|---|
+| Default `expanded_width` 620 → 540 DIP; the smoke reads the width from the smoke home instead of a constant | `fix/expanded-size` | ✅ merged to `dev` |
+
+## Task 08 — everything is free (no Pro) ✅
+
+| Sub-task | Branch | Status |
+|---|---|---|
+| `Addon::pro` gone; the Add-ons page has no Pro rows; the account plumbing (the `/island/pro` ask, `NexoraEvent::Pro`, `studio_pro`) is out; the self-test drops the Pro scenes; the site's pricing section and every Pro tag gone; docs follow | `fix/no-pro` | ✅ merged to `dev` |
+
+## Task 09 — the Controls tab ✅
+
+| Sub-task | Branch | Status |
+|---|---|---|
+| Guideline + `nexora_core::controls` (pure) + plumbing + `services/controls.rs` (WinRT radios, hotspot, power mode, display topology) + `pages/controls.rs` (2×3 tiles + picker) + self-test scene + icons | `feature/07-controls-tab` | ✅ merged to `dev` |
 
 ## CI notes (learned the hard way)
 
