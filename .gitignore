@@ -13,3 +13,4 @@ __pycache__/
 
 # local reference tree (upstream, never committed)
 /oyenza-studio-main/
+.zcode/
