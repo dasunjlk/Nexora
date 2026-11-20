@@ -59,8 +59,13 @@ in the repo root.
 ## 3. UX notes
 
 - The island rests as a small pill; hovering lifts it, dwell opens the pages.
-- Tabs: Music, Today, Shelf, Tasks, Focus, AI, Nexora, then add-on tabs and
-  the "+" add-on picker; scroll over the top edge switches pages.
+- Tabs: Music, Controls, Today, Shelf, Tasks, Focus, AI, Nexora, then
+  add-on tabs and the "+" add-on picker; scroll over the top edge switches
+  pages. Controls is the machine's quick-controls page (Wi-Fi, Bluetooth,
+  hotspot, power mode, Project, airplane mode), drawn as a 2×3 tile grid
+  (`services/controls.rs` exists only while the page is open).
+- The expanded card opens at 540 DIP wide by default (480–900 in Settings
+  › Island › Width when open).
 - Right-click menu and the tray icon carry the quick settings; a separate
   borderless Settings window ("Advanced settings") holds everything, shared
   between Windows and macOS drawing code.

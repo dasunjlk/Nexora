@@ -30,6 +30,11 @@ is engineered to cost almost nothing while it sits on screen all day.
   Apple Music (own token); pronunciation line under Japanese/Korean/Chinese.
 - **Live activities at rest** — album art and sung line, focus timer, volume,
   charging, Bluetooth headphones, steps, prayer countdown.
+- **Controls** — a main tab with the machine's quick controls on one page:
+  Wi-Fi, Bluetooth, mobile hotspot, the power mode (Best power efficiency /
+  Balanced / Best performance), Project (PC screen only / Duplicate /
+  Extend / Second screen only) and airplane mode, each switchable from the
+  island.
 - **Pages** — Music, Today (calendar/agenda via optional account), Shelf,
   Tasks, Focus (Pomodoro), AI (AI coding-plan usage), Nexora (account tab);
   add-on pages: Health, System, Stocks, Caffeine, IELTS, **Notes (Meeting

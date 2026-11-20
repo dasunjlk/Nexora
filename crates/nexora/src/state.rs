@@ -754,6 +754,9 @@ fn usage_line(subtitle: &str, nudge: Option<&str>) -> String {
 }
 
 pub struct AppState {
+    /// The machine's quick controls, as the OS last reported them (the
+    /// Controls tab's tiles read it).
+    pub controls: nexora_core::controls::ControlsState,
     pub settings: Settings,
     pub store: Store,
     /// Monotonic seconds at the current frame.
@@ -876,6 +879,7 @@ impl AppState {
             &settings.start_page
         });
         let mut st = Self {
+            controls: nexora_core::controls::ControlsState::default(),
             settings,
             store,
             now: 0.0,

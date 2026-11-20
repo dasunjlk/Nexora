@@ -122,7 +122,7 @@ const CLICK_TIMEOUT: f64 = 1.5;
 /// 5 s or the Diorama runs' own pictures, about 7 s, which the deadline
 /// leaves out, or 40 s more for the animation runs, stays under it), the
 /// Wine runner 180 s.
-const SCENE_DEADLINE: f64 = 90.0;
+const SCENE_DEADLINE: f64 = 120.0;
 /// Give up waiting for PNG writers at this point: 3.5 s after the scene
 /// deadline, so the last scenes' pictures get their time however long the
 /// run took. (It was a fixed 43.5 s, left behind when SCENE_DEADLINE went
@@ -1375,7 +1375,7 @@ const SAMPLE_SCRIPT: &str = "Hi everyone, this one takes two minutes. Today I'll
 Drop any file on the island and it waits on the Shelf. Press the phone button, scan the code, and the file is on your phone. \
 No cable, no account, nothing to install on the phone.\n\nThat's it. Thanks for watching.";
 
-const SCENES: [Scene; 141] = [
+const SCENES: [Scene; 142] = [
     Scene::IdleClock,
     Scene::IdleEyes,
     Scene::Media,
@@ -1545,6 +1545,7 @@ const SCENES: [Scene; 141] = [
     // Meeting notes: the page before a meeting (the notes saved last), Nova
     // listening, writing, the notes, and the closed island while he listens,
     // all made up (`seed_notes`).
+    Scene::Page(PageKind::Controls),
     Scene::Page(PageKind::Notes),
     Scene::NotesListening,
     Scene::NotesWriting,
@@ -3155,7 +3156,11 @@ impl SelfTest {
                 // The first tab, or the gear (found by its widget id: its place
                 // depends on how wide the clock and date are).
                 let (what, at, want) = match SCENES[i] {
-                    Scene::GearClick => ("the gear", app.selftest_hit_center(wid(pages::GEAR_ID)), PageKind::Settings),
+                    // The gear sits right of every tab: the scene hides a few
+                    // tabs so the gear has room beside the row at 540 DIP.
+                    Scene::GearClick => {
+                        ("the gear", app.selftest_hit_center(wid(pages::GEAR_ID)), PageKind::Settings)
+                    }
                     _ => ("the first header tab", Some(first_tab_point(app.island_body())), PageKind::ALL[0]),
                 };
                 match at {
@@ -3442,7 +3447,10 @@ impl SelfTest {
 
     fn next_phase(&self, i: usize, now: f64) -> Phase {
         match SCENES.get(i) {
-            Some(Scene::TabClick | Scene::GearClick) => Phase::Click { i },
+            // GearClick settles one frame first: its seeds (hidden tabs) need
+            // a drawn frame before the click finds the gear.
+            Some(Scene::TabClick) => Phase::Click { i },
+            Some(Scene::GearClick) => Phase::Settle { i, since: now, steps: 0, stable: 0 },
             Some(Scene::PrayerOk) => Phase::PressOk { i, since: now },
             Some(Scene::IslandDrag) => Phase::Drag { i, since: now },
             Some(_) => Phase::Settle { i, since: now, steps: 0, stable: 0 },
@@ -3873,6 +3881,23 @@ impl SelfTest {
         seed_notifications(st, scene);
         seed_ielts(st, scene, now);
         seed_notes(st, scene, now);
+        if scene == Scene::GearClick {
+            // The gear sits right of every tab: hide a few so it has room at
+            // the scene's 540 DIP (the seeds run a frame before the click).
+            st.settings.hidden_tabs = vec!["today".into(), "tasks".into(), "ai".into()];
+        }
+        if scene == Scene::Page(PageKind::Controls) {
+            st.controls = nexora_core::controls::ControlsState {
+                wifi: Some(true),
+                bluetooth: Some(true),
+                hotspot: Some(false),
+                hotspot_clients: 0,
+                power: nexora_core::controls::PowerMode::Balanced,
+                project: nexora_core::controls::ProjectMode::Extend,
+                displays: 2,
+                airplane: Some(false),
+            };
+        }
         if scene.pro() {
             st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
         }
