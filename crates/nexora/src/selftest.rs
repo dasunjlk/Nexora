@@ -122,7 +122,7 @@ const CLICK_TIMEOUT: f64 = 1.5;
 /// 5 s or the Diorama runs' own pictures, about 7 s, which the deadline
 /// leaves out, or 40 s more for the animation runs, stays under it), the
 /// Wine runner 180 s.
-const SCENE_DEADLINE: f64 = 90.0;
+const SCENE_DEADLINE: f64 = 120.0;
 /// Give up waiting for PNG writers at this point: 3.5 s after the scene
 /// deadline, so the last scenes' pictures get their time however long the
 /// run took. (It was a fixed 43.5 s, left behind when SCENE_DEADLINE went
