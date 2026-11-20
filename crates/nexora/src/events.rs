@@ -126,6 +126,8 @@ pub enum NexoraEvent {
 }
 
 pub enum AppEvent {
+    /// The Controls tab's machine snapshot (radios, hotspot, power, project).
+    Controls(Box<nexora_core::controls::ControlsState>),
     /// The current media session changed (None = nothing playing / no session).
     Media(Option<MediaSession>),
     /// Only the timeline/playback state of the current track changed.

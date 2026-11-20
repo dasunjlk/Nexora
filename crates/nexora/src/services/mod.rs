@@ -3,6 +3,7 @@
 
 pub mod addons;
 pub mod adzan;
+pub mod controls;
 pub mod applemusic;
 pub mod applemusic_ui;
 pub mod audio;
@@ -50,6 +51,8 @@ use nexora_core::settings::Settings;
 use windows::Win32::Foundation::{HWND, LPARAM, RECT, WPARAM};
 
 pub struct Services {
+    /// The Controls tab's service: created at start, asleep until its page opens.
+    controls: Option<controls::ControlsService>,
     media: Option<media::MediaService>,
     lyrics: Option<lyrics::LyricsService>,
     _audio: Option<audio::AudioService>,
@@ -104,7 +107,8 @@ impl Services {
             .map(|a| a.id)
             .collect();
         let addons = started("add-ons", addons::AddonService::start(sink.clone(), on));
-        Self { media, lyrics, _audio: audio, _bluetooth: bluetooth, fullscreen, nexora, pairdrop, addons, stocks: std::cell::OnceCell::new(), usage: std::cell::OnceCell::new(), downloader: std::cell::OnceCell::new(), sink: sink.clone() }
+        let controls = Some(controls::ControlsService::start(sink.clone()));
+        Self { controls, media, lyrics, _audio: audio, _bluetooth: bluetooth, fullscreen, nexora, pairdrop, addons, stocks: std::cell::OnceCell::new(), usage: std::cell::OnceCell::new(), downloader: std::cell::OnceCell::new(), sink: sink.clone() }
     }
 
     pub fn stop(self, _helper: HWND) {
@@ -197,6 +201,21 @@ impl Services {
     pub fn nexora_activity(&self, a: nexora::Activity) {
         if let Some(o) = &self.nexora {
             o.set_activity(a);
+        }
+    }
+
+    /// The Controls page came or went: its service refreshes while it's on
+    /// and sleeps otherwise.
+    pub fn set_controls_watch(&self, open: bool) {
+        if let Some(c) = self.controls.as_ref() {
+            c.set_open(open);
+        }
+    }
+
+    /// A tile tap from the Controls page.
+    pub fn controls_cmd(&self, c: nexora_core::controls::ControlsCmd) {
+        if let Some(controls) = self.controls.as_ref() {
+            controls.cmd(c);
         }
     }
 

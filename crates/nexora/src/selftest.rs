@@ -1387,7 +1387,7 @@ const SAMPLE_SCRIPT: &str = "Hi everyone, this one takes two minutes. Today I'll
 Drop any file on the island and it waits on the Shelf. Press the phone button, scan the code, and the file is on your phone. \
 No cable, no account, nothing to install on the phone.\n\nThat's it. Thanks for watching.";
 
-const SCENES: [Scene; 144] = [
+const SCENES: [Scene; 145] = [
     Scene::IdleClock,
     Scene::IdleEyes,
     Scene::Media,
@@ -1557,6 +1557,7 @@ const SCENES: [Scene; 144] = [
     // Meeting notes: the page before a meeting (the notes saved last), Nova
     // listening, writing, the notes, and the closed island while he listens,
     // all made up (`seed_notes`).
+    Scene::Page(PageKind::Controls),
     Scene::Page(PageKind::Notes),
     Scene::NotesListening,
     Scene::NotesWriting,
@@ -3895,6 +3896,18 @@ impl SelfTest {
         seed_notifications(st, scene);
         seed_ielts(st, scene, now);
         seed_notes(st, scene, now);
+        if scene == Scene::Page(PageKind::Controls) {
+            st.controls = nexora_core::controls::ControlsState {
+                wifi: Some(true),
+                bluetooth: Some(true),
+                hotspot: Some(false),
+                hotspot_clients: 0,
+                power: nexora_core::controls::PowerMode::Balanced,
+                project: nexora_core::controls::ProjectMode::Extend,
+                displays: 2,
+                airplane: Some(false),
+            };
+        }
         st.ui.addon_about = (scene == Scene::AddonsAbout).then_some(nexora_core::addons::AI_USAGE.id);
         if scene.pro() {
             st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };

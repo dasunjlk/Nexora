@@ -11,6 +11,7 @@
 
 pub mod addons;
 pub mod caffeine;
+pub mod controls;
 pub mod card;
 pub mod downloads;
 pub mod downloads_offer;
@@ -58,6 +59,9 @@ pub fn header_rect(body: Rect) -> Rect {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum PageKind {
     Media,
+    /// The machine's quick controls: Wi-Fi, Bluetooth, hotspot, energy
+    /// saver, Project and airplane mode, each switchable from the island.
+    Controls,
     Today,
     Shelf,
     Tasks,
@@ -107,8 +111,9 @@ pub enum PageKind {
 impl PageKind {
     /// The tab row's order: the island's own pages, Nexora, then the
     /// add-ons' pages and the "+".
-    pub const ALL: [PageKind; 20] = [
+    pub const ALL: [PageKind; 21] = [
         PageKind::Media,
+        PageKind::Controls,
         PageKind::Today,
         PageKind::Shelf,
         PageKind::Tasks,
@@ -133,6 +138,7 @@ impl PageKind {
     pub fn key(self) -> &'static str {
         match self {
             PageKind::Media => "media",
+            PageKind::Controls => "controls",
             PageKind::Focus => "focus",
             PageKind::Ai => "ai",
             PageKind::Health => "health",
@@ -164,6 +170,7 @@ impl PageKind {
     pub fn title(self) -> &'static str {
         match self {
             PageKind::Media => "Music",
+            PageKind::Controls => "Controls",
             PageKind::Focus => "Focus",
             PageKind::Ai => "AI",
             PageKind::Health => "Health",
@@ -189,6 +196,7 @@ impl PageKind {
     pub fn icon(self) -> Icon {
         match self {
             PageKind::Media => Icon::Music,
+            PageKind::Controls => Icon::Sliders,
             PageKind::Focus => Icon::Timer,
             PageKind::Ai => Icon::Ai,
             PageKind::Health => Icon::Steps,
@@ -230,7 +238,9 @@ impl PageKind {
     /// Notifications, which goes off with its tab (it's offered only where
     /// the copy can read notifications). Nexora stays; the add-ons' pages come
     /// and go with their switches, AI's with Studio Pro.
-    pub const HIDEABLE: [PageKind; 6] = [PageKind::Media, PageKind::Today, PageKind::Shelf, PageKind::Tasks, PageKind::Focus, PageKind::Notifications];
+    pub const HIDEABLE: [PageKind; 7] = [PageKind::Media, PageKind::Today, PageKind::Shelf, PageKind::Tasks, PageKind::Focus, PageKind::Notifications, PageKind::Controls];
+    /// The same list where the copy can't read notifications: without it.
+    pub const HIDEABLE_NO_NOTIFY: [PageKind; 6] = [PageKind::Media, PageKind::Today, PageKind::Shelf, PageKind::Tasks, PageKind::Focus, PageKind::Controls];
 
     pub fn hideable(self) -> bool {
         Self::HIDEABLE.contains(&self)
@@ -254,11 +264,10 @@ pub fn tabs(st: &AppState) -> Vec<PageKind> {
 /// last of [`PageKind::HIDEABLE`], only where the copy can read them
 /// (`AppState::notify_can`).
 pub fn hideable_tabs(st: &AppState) -> &'static [PageKind] {
-    let all = &PageKind::HIDEABLE;
     if st.notify_can {
-        all
+        &PageKind::HIDEABLE
     } else {
-        &all[..all.len() - 1]
+        &PageKind::HIDEABLE_NO_NOTIFY
     }
 }
 
@@ -302,6 +311,7 @@ pub fn step_tab(p: PageKind, st: &AppState, forward: bool) -> PageKind {
 pub fn content_height(p: PageKind, st: &AppState) -> f32 {
     match p {
         PageKind::Media => media::height(st),
+        PageKind::Controls => controls::height(st),
         PageKind::Focus => focus::height(st),
         PageKind::Ai => usage::height(st),
         PageKind::Health => health::height(st),
@@ -445,6 +455,7 @@ pub(crate) fn draw_pages(ui: &mut Ui, st: &mut AppState, body: Rect, header: Rec
 pub(crate) fn draw_page(ui: &mut Ui, st: &mut AppState, area: Rect, page: PageKind) {
     match page {
         PageKind::Media => media::draw(ui, st, area),
+        PageKind::Controls => controls::draw(ui, st, area),
         PageKind::Focus => focus::draw(ui, st, area),
         PageKind::Ai => usage::draw(ui, st, area),
         PageKind::Health => health::draw(ui, st, area),
@@ -773,16 +784,16 @@ mod tests {
         // with Studio Pro; Nexora last, signed in or not.
         use PageKind::*;
         let mut st = state();
-        assert_eq!(tabs(&st), [Media, Today, Shelf, Tasks, Focus, Nexora, Addons]);
+        assert_eq!(tabs(&st), [Media, Controls, Today, Shelf, Tasks, Focus, Nexora, Addons]);
         st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
-        assert_eq!(tabs(&st), [Media, Today, Shelf, Tasks, Focus, Nexora, Addons]);
+        assert_eq!(tabs(&st), [Media, Controls, Today, Shelf, Tasks, Focus, Nexora, Addons]);
         st.nexora.pro = Some(true);
-        assert_eq!(tabs(&st), [Media, Today, Shelf, Tasks, Focus, Ai, Nexora, Addons]);
+        assert_eq!(tabs(&st), [Media, Controls, Today, Shelf, Tasks, Focus, Ai, Nexora, Addons]);
         // The add-ons' pages come after Nexora (Health, Nexora's steps, first), before the "+".
         for id in ["system", "script", "health"] {
             st.addons.insert(id, nexora_core::addons::Status::Ready);
         }
-        assert_eq!(&tabs(&st)[6..], [Nexora, Health, System, Script, Addons]);
+        assert_eq!(&tabs(&st)[7..], [Nexora, Health, System, Script, Addons]);
         // Clipboard left the app: an island last open there opens on Music.
         assert_eq!(PageKind::from_key("clipboard"), Media);
     }
@@ -794,12 +805,12 @@ mod tests {
         st.settings.hidden_tabs = vec!["today".into(), "tasks".into(), "nexora".into(), "addons".into()];
         st.page = Focus;
         // Nexora and the "+" can't be hidden.
-        assert_eq!(tabs(&st), [Media, Shelf, Focus, Nexora, Addons]);
+        assert_eq!(tabs(&st), [Media, Controls, Shelf, Focus, Nexora, Addons]);
         assert_eq!(first_tab(&st), Media);
         // Opened from elsewhere (a meeting's notice opens Today): its tab
         // shows while it's open, and stepping on leaves it behind.
         st.page = Today;
-        assert_eq!(tabs(&st), [Media, Today, Shelf, Focus, Nexora, Addons]);
+        assert_eq!(tabs(&st), [Media, Controls, Today, Shelf, Focus, Nexora, Addons]);
         st.page = step_tab(Today, &st, true);
         assert_eq!(st.page, Shelf);
         assert!(!tabs(&st).contains(&Today));
@@ -813,7 +824,8 @@ mod tests {
         settings.start_page = "today".into();
         settings.remember_page = false;
         settings.hidden_tabs = vec!["media".into(), "today".into()];
-        assert_eq!(AppState::new(settings, Store::default()).page, Shelf);
+        // Music and Today are hidden: the first tab is Controls.
+        assert_eq!(AppState::new(settings, Store::default()).page, Controls);
     }
 
     #[test]
@@ -909,11 +921,16 @@ mod tests {
         // The download can't read other apps' notifications: no tab, nothing listens.
         let mut st = state();
         assert!(!st.notifications_on() && !tabs(&st).contains(&PageKind::Notifications));
-        assert_eq!(hideable_tabs(&st), &PageKind::HIDEABLE[..5], "Settings doesn't offer it");
+        // Controls is hideable everywhere; Notifications only where the copy can read them.
+        let offered = hideable_tabs(&st);
+        assert!(!offered.contains(&PageKind::Notifications), "Settings doesn't offer it");
+        assert!(offered.contains(&PageKind::Controls));
+        assert_eq!(offered.last(), Some(&PageKind::Controls));
         // The Store copy: on for everyone, without an add-on to switch on.
         st.notify_can = true;
         assert!(st.notifications_on() && tabs(&st).contains(&PageKind::Notifications));
-        assert_eq!(hideable_tabs(&st).last(), Some(&PageKind::Notifications));
+        assert!(hideable_tabs(&st).contains(&PageKind::Notifications));
+        assert_eq!(hideable_tabs(&st).last(), Some(&PageKind::Controls));
         // Its chip in Settings' tabs row switches it off, tab and all, even
         // while its page is open.
         st.settings.hidden_tabs = vec!["notifications".into()];
@@ -987,7 +1004,7 @@ mod tests {
         assert!(!tabs(&st).contains(&Ielts), "off for everyone until switched on");
         st.addons.insert("ielts", nexora_core::addons::Status::Ready);
         st.addons.insert("health", nexora_core::addons::Status::Ready);
-        assert_eq!(&tabs(&st)[5..], [Nexora, Health, Ielts, Addons]);
+        assert_eq!(&tabs(&st)[6..], [Nexora, Health, Ielts, Addons]);
         // Signed out it shows the sign-in card; signed in, every state is as
         // tall, and never taller than System: the window keeps its size.
         let signed_out = content_height(Ielts, &st);

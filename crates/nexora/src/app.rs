@@ -769,6 +769,9 @@ impl App {
         services::power::register(self.helper);
         if !fake {
             self.services = Some(Services::start(&self.sink, self.hwnd, self.helper, &self.st.settings, self.nexora_activity()));
+            if let Some(s) = self.services.as_ref() {
+                s.set_controls_watch(self.st.page == PageKind::Controls);
+            }
             self.sync_top_watch();
             self.st.paired = self.services.as_ref().map(|s| paired_phones(s.pairs())).unwrap_or_default();
             self.sync_pair_offer();
@@ -2485,6 +2488,10 @@ impl App {
         // pill catches up then, as nothing else of it moves on its own.
         let unseen = matches!(ev, AppEvent::Download { line: nexora_core::ytdlp::Line::Progress { .. }, .. }) && (self.locked || self.display_off);
         match ev {
+            AppEvent::Controls(c) => {
+                self.st.controls = *c;
+                self.request_frame();
+            }
             AppEvent::Backdrop => {
                 if self.glass.on_backdrop(self.hwnd, &mut self.gfx) {
                     self.request_frame();
@@ -2817,6 +2824,10 @@ impl App {
             } else if matches!(self.st.page, PageKind::Notes | PageKind::Ielts | PageKind::Addons | PageKind::Ai) {
                 self.nexora(NexoraCmd::CheckPro);
             }
+        }
+        // The Controls page came or went: its service lives only while it's on.
+        if let Some(s) = self.services.as_ref() {
+            s.set_controls_watch(self.st.page == PageKind::Controls);
         }
         self.request_frame();
     }
@@ -4776,6 +4787,11 @@ impl App {
         let cmds = std::mem::take(&mut self.st.cmds);
         for c in cmds {
             match c {
+                Command::Controls(cmd) => {
+                    if let Some(s) = self.services.as_ref() {
+                        s.controls_cmd(cmd);
+                    }
+                }
                 Command::Media(m) => {
                     if let Some(s) = self.services.as_ref() {
                         s.media_cmd(m.clone());

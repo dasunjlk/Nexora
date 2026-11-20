@@ -102,6 +102,17 @@ impl Tile {
     }
 }
 
+/// What a tap on a Controls tile asks the OS to do (the page sends it,
+/// `services/controls.rs` carries it out).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ControlsCmd {
+    ToggleRadio(Radio),
+    SetHotspot(bool),
+    SetPower(PowerMode),
+    SetProject(ProjectMode),
+    SetAirplane(bool),
+}
+
 /// The machine's controls, as the OS last reported them and as the person
 /// has them. The page holds one; the service fills it and answers the taps.
 #[derive(Clone, Debug, Default, PartialEq)]
