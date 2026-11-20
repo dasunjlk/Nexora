@@ -980,12 +980,12 @@ mod tests {
 
     #[test]
     fn ielts_has_a_tab_only_while_its_add_on_is_on_after_health() {
-        use PageKind::{Addons, Health, Ielts, Nexora};
+        use PageKind::{Addons, Ai, Health, Ielts, Nexora};
         let mut st = state();
         assert!(!tabs(&st).contains(&Ielts), "off for everyone until switched on");
         st.addons.insert("ielts", nexora_core::addons::Status::Ready);
         st.addons.insert("health", nexora_core::addons::Status::Ready);
-        assert_eq!(&tabs(&st)[5..], [Ai, Nexora, Health, Ielts, Addons]);
+        assert_eq!(&tabs(&st)[6..], [Ai, Nexora, Health, Ielts, Addons]);
         // Signed out it shows the sign-in card; signed in, every state is as
         // tall, and never taller than System: the window keeps its size.
         let h = content_height(Ielts, &st);
