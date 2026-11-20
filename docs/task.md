@@ -66,6 +66,24 @@ branch and re-pushed, never merged red.
 | 06f | Tag **v0.1.0** on `main` — release run green: `Nexora-Setup-0.1.0.exe`, `Nexora-Setup.exe`, the portable zip, `Nexora-0.1.0-mac.dmg` + `Nexora-Mac.dmg` published; `latest.json` signed (UPDATE_FEED_KEY) and the website live at dasunjlk.github.io/Nexora | ✅ |
 | fix | the update feed's trust list + secret (`fix/update-feed-key`) | ✅ merged to `main` and `dev` |
 
+## Task 07 — the expanded island starts smaller ✅
+
+| Sub-task | Branch | Status |
+|---|---|---|
+| Default `expanded_width` 620 → 540 DIP; the smoke reads the width from the smoke home instead of a constant | `fix/expanded-size` | ✅ merged to `dev` |
+
+## Task 08 — everything is free (no Pro) ✅
+
+| Sub-task | Branch | Status |
+|---|---|---|
+| `Addon::pro` gone; the Add-ons page has no Pro rows; the account plumbing (the `/island/pro` ask, `NexoraEvent::Pro`, `studio_pro`) is out; the self-test drops the Pro scenes; the site's pricing section and every Pro tag gone; docs follow | `fix/no-pro` | ✅ merged to `dev` |
+
+## Task 09 — the Controls tab ✅
+
+| Sub-task | Branch | Status |
+|---|---|---|
+| Guideline + `nexora_core::controls` (pure) + plumbing + `services/controls.rs` (WinRT radios, hotspot, power mode, display topology) + `pages/controls.rs` (2×3 tiles + picker) + self-test scene + icons | `feature/07-controls-tab` | ✅ merged to `dev` |
+
 ## CI notes (learned the hard way)
 
 - Commits from Windows drop the executable bit — every `.sh` needed
