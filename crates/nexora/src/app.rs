@@ -5261,6 +5261,14 @@ impl App {
         }
     }
 
+    /// Self-test: widen the island for a scene that needs the whole header
+    /// (the gear-click scene, whose row + gear need 620 DIP).
+    pub fn selftest_set_expanded_width(&mut self, w: f32) {
+        self.st.settings.expanded_width = w;
+        self.layout_surface();
+        self.request_frame();
+    }
+
     /// Self-test: whether the island is open.
     pub fn selftest_expanded(&self) -> bool {
         self.expanded

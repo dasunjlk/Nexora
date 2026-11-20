@@ -95,19 +95,26 @@ fn draw_tile(ui: &mut Ui, st: &mut AppState, r: Rect, tile: Tile) {
         Tile::Project => Icon::Project,
         Tile::Airplane => Icon::Airplane,
     };
-    let badge = Point::new(r.x + 12.0 + 9.0, r.y + 12.0 + 9.0);
+    let badge = Point::new(r.x + 13.0 + 9.0, r.y + 11.0 + 9.0);
     ui.c.fill_circle(badge, 18.0, accent.with_alpha(0.18));
     ui.c.icon(icon, Rect::from_center(badge, 16.0, 16.0), accent);
 
-    let sw = Rect::new(r.right() - 12.0 - 30.0, r.y + 12.0, 30.0, 18.0);
+    let sw = Rect::new(r.right() - 12.0 - 30.0, r.y + 11.0, 30.0, 18.0);
     let (on, line) = state_line(st, tile);
     crate::pages::settings::draw_switch(ui.c, sw, on, accent);
 
-    let tx = r.x + 12.0;
-    let tw = (sw.x - 14.0 - tx).max(0.0);
-    ui.c.text(tile.label(), Rect::new(tx, r.y + 10.0, tw, 18.0), &TextStyle::body().weight(Weight::Semibold));
-    ui.c.text(&line, Rect::new(tx, r.y + 30.0, tw, 17.0), &TextStyle::footnote().color(palette::TEXT_DIM));
-    ui.c.text(&hint_line(st, tile), Rect::new(tx, r.y + 48.0, tw, 16.0), &TextStyle::footnote().color(palette::TEXT_DIM));
+    // The name sits right of the badge (the badge is 36 wide, + 10 gap).
+    let tx = r.x + 13.0 + 36.0 + 10.0;
+    let tw = (sw.x - 12.0 - tx).max(0.0);
+    ui.c.text(tile.label(), Rect::new(tx, r.y + 12.0, tw, 18.0), &TextStyle::body().weight(Weight::Semibold));
+    // The state spans the tile under the header row.
+    let sx = r.x + 13.0;
+    let sw_full = r.w - 26.0;
+    ui.c.text(&line, Rect::new(sx, r.y + 38.0, sw_full, 17.0), &TextStyle::footnote().color(palette::TEXT_DIM));
+    let hint = hint_line(st, tile);
+    if !hint.is_empty() {
+        ui.c.text(&hint, Rect::new(sx, r.y + 56.0, sw_full, 15.0), &TextStyle::footnote().color(palette::TEXT_FAINT));
+    }
 }
 
 /// Whether the control is on, and the state in words. Tapping is drawn by

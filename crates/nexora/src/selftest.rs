@@ -3156,7 +3156,11 @@ impl SelfTest {
                 // The first tab, or the gear (found by its widget id: its place
                 // depends on how wide the clock and date are).
                 let (what, at, want) = match SCENES[i] {
-                    Scene::GearClick => ("the gear", app.selftest_hit_center(wid(pages::GEAR_ID)), PageKind::Settings),
+                    // The gear sits right of every tab: the scene hides a few
+                    // tabs so the gear has room beside the row at 540 DIP.
+                    Scene::GearClick => {
+                        ("the gear", app.selftest_hit_center(wid(pages::GEAR_ID)), PageKind::Settings)
+                    }
                     _ => ("the first header tab", Some(first_tab_point(app.island_body())), PageKind::ALL[0]),
                 };
                 match at {
@@ -3443,7 +3447,10 @@ impl SelfTest {
 
     fn next_phase(&self, i: usize, now: f64) -> Phase {
         match SCENES.get(i) {
-            Some(Scene::TabClick | Scene::GearClick) => Phase::Click { i },
+            // GearClick settles one frame first: its seeds (hidden tabs) need
+            // a drawn frame before the click finds the gear.
+            Some(Scene::TabClick) => Phase::Click { i },
+            Some(Scene::GearClick) => Phase::Settle { i, since: now, steps: 0, stable: 0 },
             Some(Scene::PrayerOk) => Phase::PressOk { i, since: now },
             Some(Scene::IslandDrag) => Phase::Drag { i, since: now },
             Some(_) => Phase::Settle { i, since: now, steps: 0, stable: 0 },
@@ -3874,6 +3881,11 @@ impl SelfTest {
         seed_notifications(st, scene);
         seed_ielts(st, scene, now);
         seed_notes(st, scene, now);
+        if scene == Scene::GearClick {
+            // The gear sits right of every tab: hide a few so it has room at
+            // the scene's 540 DIP (the seeds run a frame before the click).
+            st.settings.hidden_tabs = vec!["today".into(), "tasks".into(), "ai".into()];
+        }
         if scene == Scene::Page(PageKind::Controls) {
             st.controls = nexora_core::controls::ControlsState {
                 wifi: Some(true),
