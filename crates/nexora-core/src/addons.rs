@@ -76,9 +76,6 @@ pub struct Addon {
     /// The release that holds this version of the files.
     pub tag: &'static str,
     pub files: &'static [AddonFile],
-    /// Part of Nexora Pro: it works only for an Nexora account the
-    /// server says has Pro (`GET /island/pro`; `AppState::pro`).
-    pub pro: bool,
 }
 
 impl Addon {
@@ -128,7 +125,6 @@ pub const PRAYER_TIMES: Addon = Addon {
         AddonFile { name: "adzan.m4a", size: 878_695, sha256: "6b8097fa7dfa43bd61ce65894396518ea65dd9d940e56b251ffc4ae5e78c7420", url: None },
         AddonFile { name: "NOTICE.txt", size: 957, sha256: "f3b7a1847b0ae9b1c22facad8131320a78cdf8e9b4720cfd502728d2118f5217", url: None },
     ],
-    pro: false,
 };
 
 /// The Japanese readings add-on's dictionary file (`romanize::JaDict`).
@@ -152,7 +148,6 @@ pub const JAPANESE_READINGS: Addon = Addon {
         AddonFile { name: JA_READINGS_FILE, size: 3_790_036, sha256: "4950e5e42a2a48ad50396304c6bfbb8f9a97b33947e147007943361d65d856c8", url: None },
         AddonFile { name: "NOTICE.txt", size: 4_779, sha256: "951a33f72fc3ea2b70cac8b52cbf2086197744b27214d8b7ed5075508b2a94b8", url: None },
     ],
-    pro: false,
 };
 
 /// Script reader: the Script page, a teleprompter under the webcam. Its
@@ -165,7 +160,6 @@ pub const SCRIPT_READER: Addon = Addon {
     mac_blurb: Some("A teleprompter under your webcam."),
     tag: "",
     files: &[],
-    pro: false,
 };
 
 /// System: the System page (the processor, graphics, memory, drives,
@@ -183,7 +177,6 @@ pub const SYSTEM: Addon = Addon {
     mac_blurb: None,
     tag: "",
     files: &[],
-    pro: false,
 };
 
 /// Health: the Health page, today's steps against the goal and the week,
@@ -199,7 +192,6 @@ pub const HEALTH: Addon = Addon {
     mac_blurb: None,
     tag: "",
     files: &[],
-    pro: false,
 };
 
 /// Stocks: the Stocks page, the IHSG and up to ten IDX stocks with their
@@ -213,7 +205,6 @@ pub const STOCKS: Addon = Addon {
     mac_blurb: None,
     tag: "",
     files: &[],
-    pro: false,
 };
 
 /// Caffeine: the Caffeine page, drinks the person adds (an espresso drink by
@@ -228,7 +219,6 @@ pub const CAFFEINE: Addon = Addon {
     mac_blurb: None,
     tag: "",
     files: &[],
-    pro: false,
 };
 
 /// Screen recorder: the Record page and the recording pill, the face of
@@ -244,7 +234,6 @@ pub const SCREEN_RECORDER: Addon = Addon {
     mac_blurb: None,
     tag: "",
     files: &[],
-    pro: false,
 };
 
 /// Downloader: the Downloads page, which saves the video or sound of a link
@@ -283,7 +272,6 @@ pub const DOWNLOADER_WINDOWS: Addon = Addon {
         AddonFile { name: "ffmpeg.exe", size: 2_298_880, sha256: "8a42638bc2c9bed20670a3e89ccb7117345a941e245d8151aa60066cac0b3993", url: None },
         AddonFile { name: "NOTICE.txt", size: 32_576, sha256: "5a136722d27cf155c11e17ad0a0e2c592538fc51261947d7ad6d4b9a4725aba9", url: None },
     ],
-    pro: true,
 };
 
 /// The Downloader on a Mac: yt-dlp's own Mac build (one file for Apple
@@ -334,7 +322,6 @@ pub const AI_USAGE: Addon = Addon {
     mac_blurb: None,
     tag: "",
     files: &[],
-    pro: true,
 };
 
 /// IELTS: Nova's IELTS Speaking coach, the IELTS page (`crate::ielts`):
@@ -351,7 +338,6 @@ pub const IELTS: Addon = Addon {
     mac_blurb: None,
     tag: "",
     files: &[],
-    pro: true,
 };
 
 /// Meeting notes: the Notes page (`crate::notes`). One click and Nova listens
@@ -369,7 +355,6 @@ pub const MEETING_NOTES: Addon = Addon {
     mac_blurb: None,
     tag: "",
     files: &[],
-    pro: true,
 };
 
 /// Every add-on, in the order the Add-ons page lists them.
@@ -482,22 +467,15 @@ mod tests {
     }
 
     #[test]
-    fn pro_is_ai_usage_meeting_notes_ielts_and_the_downloader() {
-        let pro: Vec<&str> = ALL.iter().filter(|a| a.pro).map(|a| a.id).collect();
-        assert_eq!(pro, vec!["ai", "notes", "ielts", "downloader"]);
-    }
-
-    #[test]
-    fn ai_usage_comes_with_pro_until_switched_off() {
+    fn ai_usage_comes_on_until_switched_off() {
         assert!(!AI_USAGE.downloads() && AI_USAGE.size() == 0);
         assert_eq!(Status::Off.line(&AI_USAGE, false), "Track your AI usage.");
         let mut s = Settings::default();
-        assert!(!s.ai_usage_on(false), "no Pro: no AI tab");
-        assert!(s.ai_usage_on(true), "Pro is the switch");
+        assert!(s.ai_usage_on(), "the AI tab is on by default");
         s.set_addon(AI_USAGE.id, false);
-        assert!(!s.ai_usage_on(true), "switched off by hand: stays off");
+        assert!(!s.ai_usage_on(), "switched off by hand: stays off");
         s.set_addon(AI_USAGE.id, true);
-        assert!(s.ai_usage_on(true) && !s.ai_usage_on(false));
+        assert!(s.ai_usage_on());
     }
 
     #[test]
@@ -674,8 +652,7 @@ mod tests {
                 AddonFile { name: "tool.exe", size: 2_151_363, sha256: "2aeabf0092c3262d6b2609824418f7dd7ed1f1df939f73b2b15645230cac0d77", url: None },
                 AddonFile { name: "NOTICE.txt", size: 0, sha256: "", url: None },
             ],
-            pro: false,
-        };
+                };
         let tool = SOON.files[0];
         assert!(tool.pinned() && !SOON.files[1].pinned() && !SOON.pinned());
         // Half a pin is none.
@@ -742,8 +719,7 @@ mod tests {
             mac_blurb: None,
             tag: "addon-big-1",
             files: &[AddonFile { name: "big.exe", size: 30_100_000, sha256: "f5389d3698ecde4ef06f4e6b1ce0294fe9ac1396228c8990b8d3416d6d177a7d", url: None }],
-            pro: false,
-        };
+                };
         assert_eq!(fmt_bytes(BIG.size()), "30 MB", "its size on the page while it's off");
         assert_eq!(Status::Downloading { done: 12_345_678, total: BIG.size() }.line(&BIG, false), "Downloading · 12 MB of 30 MB");
         assert_eq!(Status::Ready.line(&BIG, false), "On · 30 MB on this PC");

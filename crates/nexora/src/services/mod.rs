@@ -156,14 +156,6 @@ impl Services {
         }
     }
 
-    /// Whether the account has Studio Pro: the Pro add-ons' files come with
-    /// it, and stay as they are without it.
-    pub fn set_pro(&self, pro: bool) {
-        if let Some(a) = &self.addons {
-            a.set_pro(pro);
-        }
-    }
-
     /// Step aside on (the band along the top edge of the island's monitor,
     /// screen pixels) or off: the full-screen watcher reports what reaches it.
     pub fn watch_top(&self, band: Option<RECT>) {

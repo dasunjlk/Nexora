@@ -564,39 +564,6 @@ main { container-type: inline-size; }
 .send-or { margin-top: 8px; font-weight: 400; }
 .sent-note { margin-top: 10px; color: var(--ink); }
 
-/* ---------- pricing: Free, and Pro before it can be bought (no buy button until it can) */
-.price-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-.price-card { border-radius: var(--r); background: var(--alt); padding: 40px 40px 36px; display: flex; flex-direction: column; gap: 12px; }
-.price-card h3 { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
-.price-card .soon { font: 600 12px/1 var(--font-text); letter-spacing: 0; color: var(--new); background: #fff1e5; padding: 6px 10px; border-radius: 980px; }
-.price { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
-.price b { font: 600 48px/1.08349 var(--font-display); letter-spacing: -0.003em; color: var(--ink); }
-.price-list { list-style: none; margin: 8px 0 12px; padding: 0; display: grid; gap: 12px; }
-.price-list li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; align-items: start; }
-.price-list .ico { margin-top: 3px; color: var(--blue); stroke-width: 2.2; }
-.price-list .soon { display: inline-block; margin-left: 4px; padding: 4px 8px; vertical-align: 1px; }
-/* The button sits at the bottom, level with the end of the taller card. */
-.price-card .btn { align-self: flex-start; margin-top: auto; }
-.price-strip { border-radius: 14px; margin-top: 4px; }
-/* Each Pro feature is a row that opens what it does, so people know before they buy. */
-.pro-feats { list-style: none; margin: 8px -12px 0; padding: 0; display: grid; gap: 2px; }
-.pro-feat { all: unset; box-sizing: border-box; cursor: pointer; width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 26px; gap: 14px; align-items: center; padding: 12px; border-radius: 14px; transition: background-color 0.2s var(--ease); }
-.pro-feat:hover { background: rgba(0, 0, 0, 0.05); }
-.pro-feat:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
-.pro-feat b { display: block; color: var(--ink); font-weight: 600; }
-.pro-feat i { width: 26px; height: 26px; border-radius: 50%; background: #333336; color: #fff; display: grid; place-items: center; }
-.pro-feat i .ico { width: 13px; height: 13px; stroke-width: 2.4; }
-.sheet-shot { position: relative; isolation: isolate; overflow: hidden; border-radius: 18px; padding-bottom: 20px; margin: 6px 0 4px; }
-/* The island runs on past the frame: only its top part is the picture. */
-.sheet-shot.cut { padding-bottom: 0; }
-.price-facts { margin-top: 20px; }
-
-.foot { background: var(--alt); padding: 0 0 calc(40px + env(safe-area-inset-bottom, 0px)); }
-.foot .content { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; font: 400 12px/1.33337 var(--font-text); letter-spacing: -0.01em; color: var(--gray); }
-.foot .grow { flex: 1 1 auto; }
-.foot a { color: #424245; text-decoration: none; }
-.foot a:hover { text-decoration: underline; }
-
 /* ---------- the sheets behind "More about ..." */
 dialog.more-sheet { border: 0; padding: 0; width: min(820px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); border-radius: 28px; background: var(--bg); color: var(--ink); box-shadow: 0 40px 100px rgba(0, 0, 0, 0.28); overflow: hidden; }
 dialog.more-sheet[open] { display: flex; flex-direction: column; animation: sheet-in 0.5s var(--ease-out); }
@@ -801,7 +768,7 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
     <div class="side-sec">
       <p class="side-group">Overview</p>
       <a class="side-item" href="#top" data-k="home start download hero notch island"><i class="ic" style="--c:#1d1d1f"><svg class="ico"><use href="#i-screen"/></svg></i><span>A living notch</span></a>
-      <a class="side-item" href="#new" data-k="new release 0.1.0 latest changes caffeine coffee kopi espresso americano latte cappuccino flat white mocha es kopi susu shots beans arabica blend robusta decaf kopi tubruk instant sachet filter cold brew tea green tea energy drink cola your own mg last call bedtime sleep reminder half-life day limit 0.2.29 slide the glass ball drag hand day night switch sunset dusk diorama long pill as long as a notch lamp post bushes fence whole island matches frame cream indigo open card notices 0.2.28 prayer times kemenag muhammadiyah khgt kalender hijriah global tunggal hijri date tanggal hijriah majelis tarjih subuh 18 isbat ramadan syawal 0.2.27 diorama fifth look theme pixel art house tree cat sky day night dawn golden hour sunset sunrise moon stars glass ball resting pill see what pro brings studio pro add-ons every pro feature ai usage claude ultra 10x max 20x clearer adzan azan athan adhan prayer times sound recording antigravity agy ai tab mac top bar mydockfinder menu bar over notifications store tabs phone drop double tap zoom move the island drag along the top edge left right side browser tabs out of the way centre center mac macbook notch pill menu bar settings in the island againgear advanced settings window island closes update in version row check now settings window glides smooth motion 144 fps 120 hz promotion slide switches highlight trackpad scroll reduce motion downloader progress youtube puzzle solving meeting notes mac ielts coach speaking band downloader video sound studio pro settings window gear every setting one place sidebar light dark mode mac window title bar meeting notes record call transcript summary action items pro ai tab usage codex claude code opencode go gemini cursor copilot kimi glm minimax openrouter limits plans resets heads-up tabs hide switch off music today shelf tasks focus prayer countdown ok lyrics come back steps two hours ielts notifications whatsapp telegram mac signed developer id notarized checked by apple opens open anyway gone privacy security permissions once more right click menu stays open island stays open always looks for new versions version check now bluetooth pop-ups headphones speakers paired quiet connected disconnected check for updates every hour check now update available stays lyrics bar zen firefox stocks prices fixed getting prices mac updates install in place ihsg idx saham watchlist chart nexora.trade today five weeks week ahead schedule month grid dots allow turn on prayer times anywhere world city mac youtube spotify browser now playing pill notch nova nexora tab system health add-ons clipboard history gone today your day google calendar gmail meeting join flights bills clipboard add-on touch screen tablet taps tap through notch eyes hide and seek macbook camera update available new version install now next start updater mac installer dmg window steps health nexora sign in mac headphones full screen power island stays maximized windows sing along romaji lyrics mac prayer script reader teleprompter games power"><i class="ic" style="--c:#6e4be8"><svg class="ico"><use href="#i-spark"/></svg></i><span>New in 0.1.0</span></a>
+      <a class="side-item" href="#new" data-k="new release 0.1.0 latest changes caffeine coffee kopi espresso americano latte cappuccino flat white mocha es kopi susu shots beans arabica blend robusta decaf kopi tubruk instant sachet filter cold brew tea green tea energy drink cola your own mg last call bedtime sleep reminder half-life day limit 0.2.29 slide the glass ball drag hand day night switch sunset dusk diorama long pill as long as a notch lamp post bushes fence whole island matches frame cream indigo open card notices 0.2.28 prayer times kemenag muhammadiyah khgt kalender hijriah global tunggal hijri date tanggal hijriah majelis tarjih subuh 18 isbat ramadan syawal 0.2.27 diorama fifth look theme pixel art house tree cat sky day night dawn golden hour sunset sunrise moon stars glass ball resting pill every add-on free ai usage claude ultra 10x max 20x clearer adzan azan athan adhan prayer times sound recording antigravity agy ai tab mac top bar mydockfinder menu bar over notifications store tabs phone drop double tap zoom move the island drag along the top edge left right side browser tabs out of the way centre center mac macbook notch pill menu bar settings in the island againgear advanced settings window island closes update in version row check now settings window glides smooth motion 144 fps 120 hz promotion slide switches highlight trackpad scroll reduce motion downloader progress youtube puzzle solving meeting notes mac ielts coach speaking band downloader video sound settings window gear every setting one place sidebar light dark mode mac window title bar meeting notes record call transcript summary action items ai tab usage codex claude code opencode go gemini cursor copilot kimi glm minimax openrouter limits plans resets heads-up tabs hide switch off music today shelf tasks focus prayer countdown ok lyrics come back steps two hours ielts notifications whatsapp telegram mac signed developer id notarized checked by apple opens open anyway gone privacy security permissions once more right click menu stays open island stays open always looks for new versions version check now bluetooth pop-ups headphones speakers paired quiet connected disconnected check for updates every hour check now update available stays lyrics bar zen firefox stocks prices fixed getting prices mac updates install in place ihsg idx saham watchlist chart nexora.trade today five weeks week ahead schedule month grid dots allow turn on prayer times anywhere world city mac youtube spotify browser now playing pill notch nova nexora tab system health add-ons clipboard history gone today your day google calendar gmail meeting join flights bills clipboard add-on touch screen tablet taps tap through notch eyes hide and seek macbook camera update available new version install now next start updater mac installer dmg window steps health nexora sign in mac headphones full screen power island stays maximized windows sing along romaji lyrics mac prayer script reader teleprompter games power"><i class="ic" style="--c:#6e4be8"><svg class="ico"><use href="#i-spark"/></svg></i><span>New in 0.1.0</span></a>
       <a class="side-item" href="#highlights" data-k="best gallery overview"><i class="ic" style="--c:#ff9f0a"><svg class="ico"><use href="#i-spark"/></svg></i><span>Highlights</span></a>
       <a class="side-item" href="#features" data-k="rest idle music timer volume charging headphones bluetooth money clock eyes prayer countdown"><i class="ic" style="--c:#636366"><svg class="ico"><use href="#i-island"/></svg></i><span>While it rests</span></a>
     </div>
@@ -810,7 +777,7 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
       <a class="side-item" href="#music" data-k="music lyrics spotify apple youtube lrclib songs"><i class="ic" style="--c:#ff2d55"><svg class="ico"><use href="#i-music"/></svg></i><span>Music and lyrics</span></a>
       <a class="side-item" href="#read-along" data-k="korean japanese chinese romaji pinyin pronunciation reading kanji"><i class="ic" style="--c:#af52de"><svg class="ico"><use href="#i-lang"/></svg></i><span>Read along</span></a>
       <a class="side-item" href="#focus" data-k="pomodoro timer focus"><i class="ic" style="--c:#5856d6"><svg class="ico"><use href="#i-timer"/></svg></i><span>Focus</span></a>
-      <a class="side-item" href="#ai" data-k="ai usage codex claude code opencode go gemini cli antigravity agy cursor github copilot kimi code z.ai zai glm minimax openrouter nexora inference limits plan quota credits balance spend resets heads-up notices pro"><i class="ic" style="--c:#00c7be"><svg class="ico"><use href="#i-meter"/></svg></i><span>AI usage</span><span class="tag">Pro</span></a>
+      <a class="side-item" href="#ai" data-k="ai usage codex claude code opencode go gemini cli antigravity agy cursor github copilot kimi code z.ai zai glm minimax openrouter nexora inference limits plan quota credits balance spend resets heads-up notices"><i class="ic" style="--c:#00c7be"><svg class="ico"><use href="#i-meter"/></svg></i><span>AI usage</span></a>
       <a class="side-item" href="#health" data-k="steps health apple health connect add-on"><i class="ic" style="--c:#34c759"><svg class="ico"><use href="#i-steps"/></svg></i><span>Health</span></a>
       <a class="side-item" href="#shelf" data-k="files shelf drag drop"><i class="ic" style="--c:#007aff"><svg class="ico"><use href="#i-tray"/></svg></i><span>Shelf</span></a>
       <a class="side-item" href="#tasks" data-k="todo to-do tasks list"><i class="ic" style="--c:#ff9500"><svg class="ico"><use href="#i-list"/></svg></i><span>Tasks</span></a>
@@ -847,7 +814,6 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
     <div class="side-sec">
       <p class="side-group">Get it</p>
       <a class="side-item" href="#privacy" data-k="privacy data light fast size open source mit"><i class="ic" style="--c:#007aff"><svg class="ico"><use href="#i-lock"/></svg></i><span>Privacy</span></a>
-      <a class="side-item" href="#pricing" data-k="pricing price prices cost free pro plan subscription monthly yearly trial buy ai usage ielts downloader meeting notes notetaker record transcript summary meet zoom teams notifications whatsapp telegram phone link"><i class="ic" style="--c:#34c759"><svg class="ico"><use href="#i-tag"/></svg></i><span>Pricing</span></a>
       <a class="side-item" href="#get" data-k="install download setup smartscreen dmg get"><i class="ic" style="--c:#0071e3"><svg class="ico"><use href="#i-download"/></svg></i><span>Get Nexora</span></a>
     </div>
     <p class="side-empty" id="sideEmpty" hidden>No feature by that name. Try "lyrics" or "files".</p>
@@ -874,7 +840,6 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
   <nav class="top-links" aria-label="Page">
     <a href="#top">Overview</a>
     <a href="#compare">Compare</a>
-    <a href="#pricing">Pricing</a>
     <a href="#get">Install</a>
     <a class="btn btn-sm top-dl" data-download="bar" href="https://github.com/dasunjlk/Nexora/releases/latest/download/Nexora-Setup.exe">Download</a>
   </nav>
@@ -1166,7 +1131,6 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
   <!-- The AI tab, right after Focus in the island's row of tabs. -->
   <section class="sec" id="ai" aria-labelledby="ai-title">
     <div class="content head rv">
-      <p class="t-label new">Studio Pro</p>
       <h3 class="t-l" id="ai-title">Your AI limits, before you hit them.</h3>
       <p class="t-intro"><b>Codex, Claude Code, OpenCode Go</b> and more: what's left of each plan, and when it resets.</p>
       <button class="more" type="button" data-more="m-ai">More about AI usage<i><svg class="ico"><use href="#i-plus"/></svg></i></button>
@@ -1351,7 +1315,7 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
       <div class="head rv">
         <p class="t-label">Add-ons</p>
         <h3 class="t-l" id="addons-title">Download only what you use.</h3>
-        <p class="t-intro">Each stays off until you switch it on. Downloads are <b>checked against a fingerprint</b> built into the app. Without Pro, a Pro add-on says what it does instead.</p>
+        <p class="t-intro">Each stays off until you switch it on, and everything is free. Downloads are <b>checked against a fingerprint</b> built into the app.</p>
         <div class="stats three">
           <div class="stat"><b>959&nbsp;KB</b><span>Prayer times</span></div>
           <div class="stat"><b>3.8&nbsp;MB</b><span>Japanese readings</span></div>
@@ -1361,7 +1325,7 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
       <div class="panel rv-zoom" data-scene="par" style="--band:28px">
         <div class="sky-layer"></div>
         <div class="isl">
-          <img class="look-classic" src="assets/shots/classic/page-addons.webp" alt="The Add-ons tab, a line each: Prayer times (959 KB), Japanese readings (3.8 MB), Script reader, System, Health, Stocks and Caffeine (built in), each with its switch off, then AI usage, Meeting notes and IELTS, each marked Pro with a plus that says what it does" width="660" height="332" loading="lazy">
+          <img class="look-classic" src="assets/shots/classic/page-addons.webp" alt="The Add-ons tab, a line each: Prayer times (959 KB), Japanese readings (3.8 MB), Script reader, System, Health, Stocks and Caffeine (built in), each with its switch off, then AI usage, Meeting notes and IELTS, each with its switch" width="660" height="332" loading="lazy">
           <img class="look-nova" src="assets/shots/nova/page-addons.webp" alt="The Add-ons tab in the Nova theme" width="660" height="332" loading="lazy">
         </div>
       </div>
@@ -1656,7 +1620,7 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
           <tr><th scope="row">Music, with synced lyrics</th><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td></tr>
           <tr><th scope="row">Readings under Korean, Japanese and Chinese lines</th><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td></tr>
           <tr><th scope="row">Focus timer and tasks</th><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td></tr>
-          <tr><th scope="row">AI usage, with heads-up notices (Pro)</th><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td></tr>
+          <tr><th scope="row">AI usage, with heads-up notices</th><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td></tr>
           <tr><th scope="row">Shelf, with Phone drop over the same Wi-Fi</th><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td></tr>
           <tr><th scope="row">System page, an add-on</th><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td></tr>
           <tr><th scope="row">Stocks, an add-on</th><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td><td class="c yes"><svg viewBox="0 0 24 24" role="img" aria-label="Yes"><use href="#i-check"/></svg></td></tr>
@@ -1722,53 +1686,6 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
         <div class="spec"><b>240&nbsp;Hz</b><span class="t-small">In step with your screen, on Windows</span></div>
         <div class="spec"><b>MIT</b><span class="t-small">Free and open source</span></div>
       </div>
-    </div>
-  </section>
-
-  <section class="sec" id="pricing" aria-labelledby="pricing-title">
-    <div class="content head center rv">
-      <h2 class="t-l" id="pricing-title">Studio is free. Pro is on its way.</h2>
-      <p class="t-intro">Everything else Studio does stays free, with no account. <b>Pro brings AI usage, Meeting notes, the IELTS coach and the Downloader,</b> for $2.99 a month or $12 a year.</p>
-    </div>
-    <div class="content price-cards">
-      <article class="price-card rv" aria-labelledby="price-free-title">
-        <h3 class="t-card" id="price-free-title">Free</h3>
-        <p class="price"><b>$0</b></p>
-        <p class="t-tile">Everything outside Pro, on Windows and Mac. <b>No account needed.</b> Free and open source.</p>
-        <ul class="price-list t-tile">
-          <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>Music with synced lyrics, and Read along</span></li>
-          <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>Focus, Tasks, the Shelf and Phone drop</span></li>
-          <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>Today, System, Prayer times, Stocks and Caffeine</span></li>
-          <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>The Classic, Nova, Glass, Pill and Diorama looks</span></li>
-          <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span>WhatsApp and Telegram on the island, on Windows <span class="soon">Soon</span></span></li>
-        </ul>
-        <a class="btn" href="#get">Download free</a>
-      </article>
-      <article class="price-card rv" aria-labelledby="price-pro-title">
-        <h3 class="t-card" id="price-pro-title">Pro <span class="soon">Coming soon</span></h3>
-        <p class="price"><b>$2.99</b><span class="t-small">a month</span></p>
-        <p class="t-small">Or $12 a year, which saves 67%.</p>
-        <div class="strip price-strip"><div class="sky-fill"></div><div class="isl">
-          <img class="look-classic" src="assets/shots/classic/notes-activity.webp" alt="Nova listening on the closed island: the red dot and 12:34 of the meeting so far" width="139" height="32" loading="lazy">
-          <img class="look-nova" src="assets/shots/nova/notes-activity.webp" alt="Nova listening to a meeting on the closed island, in the Nova theme" width="139" height="32" loading="lazy">
-        </div></div>
-        <ul class="pro-feats t-tile" aria-label="What Pro brings. Each opens what it does.">
-          <li><button class="pro-feat" type="button" data-more="m-ai"><span><b>AI usage</b>Track your AI usage: what's left of each plan, and when it resets.</span><i><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg></i></button></li>
-          <li><button class="pro-feat" type="button" data-more="m-notes"><span><b>Meeting notes</b>One click, and Nova listens to your call, with no bot joining, then writes it up.</span><i><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg></i></button></li>
-          <li><button class="pro-feat" type="button" data-more="m-ielts"><span><b>The IELTS coach</b>Nova asks IELTS Speaking questions out loud and gives you a band.</span><i><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg></i></button></li>
-          <li><button class="pro-feat" type="button" data-more="m-downloader"><span><b>The Downloader</b>Paste a link and save its video or sound.</span><i><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg></i></button></li>
-        </ul>
-        <ul class="price-list t-tile">
-          <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span><b>Your recordings go to Nexora's server</b> to be written up or scored, and are deleted once that's done.</span></li>
-          <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span><b>Up to 3 computers</b> on one Nexora account.</span></li>
-        </ul>
-        <p class="t-small">On Windows 10 and 11, and macOS 14 and later (Meeting notes hears the Mac's sound on 14.2 and later). Prices in US dollars, before tax.</p>
-      </article>
-    </div>
-    <div class="content facts price-facts">
-      <div class="fact rv"><h3 class="t-card" style="font-size:21px;line-height:1.19">Try Pro for 7 days.</h3><p class="t-tile">Free, and no card. The 7 days start the first time you switch on Pro.</p></div>
-      <div class="fact rv"><h3 class="t-card" style="font-size:21px;line-height:1.19">No license key.</h3><p class="t-tile">Pro comes with your Nexora account. Sign in with a code, like on a TV. Making an account is free.</p></div>
-      <div class="fact rv"><h3 class="t-card" style="font-size:21px;line-height:1.19">Free stays free.</h3><p class="t-tile">If Pro ends, only AI usage, Meeting notes, IELTS and the Downloader stop. The notes and files you made stay on your computer, and everything else keeps working.</p></div>
     </div>
   </section>
 
@@ -1850,7 +1767,7 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
 <dialog class="more-sheet" id="m-ai" aria-labelledby="m-ai-t">
   <form method="dialog"><button class="sheet-x" aria-label="Close"><svg class="ico"><use href="#i-x"/></svg></button></form>
   <div class="sheet-body">
-    <p class="t-label new">Studio Pro · Windows and Mac</p>
+    <p class="t-label new">An add-on · Windows and Mac</p>
     <h2 class="t-m" id="m-ai-t">Your AI limits, before you hit them.</h2>
     <div class="sheet-shot"><div class="sky-fill"></div><div class="isl"><img class="look-classic" src="assets/shots/classic/page-ai.webp" alt="The AI tab: a card for each AI service, with each limit as a bar" width="660" height="335" loading="lazy"><img class="look-nova" src="assets/shots/nova/page-ai.webp" alt="The AI tab in the Nova theme" width="660" height="335" loading="lazy"></div></div>
     <p>Track your AI usage. The AI tab sits right after Focus. <b>Each AI service on your computer gets a card:</b> your plan, each limit as a bar with when it resets, credits or balance left, and today's spend where the service tells it. Services it doesn't find stay off the list. Under Services, hide any of them, or add one with its key.</p>
@@ -1882,7 +1799,7 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
 <dialog class="more-sheet" id="m-notes" aria-labelledby="m-notes-t">
   <form method="dialog"><button class="sheet-x" aria-label="Close"><svg class="ico"><use href="#i-x"/></svg></button></form>
   <div class="sheet-body">
-    <p class="t-label new">Studio Pro · Windows and Mac</p>
+    <p class="t-label new">An add-on · Windows and Mac</p>
     <h2 class="t-m" id="m-notes-t">Your call, written up.</h2>
     <div class="sheet-shot"><div class="sky-fill"></div><div class="isl"><img class="look-classic" src="assets/shots/classic/page-notes-listening.webp" alt="The Notes page while Nova listens: the time so far and a bar for each sound" width="660" height="259" loading="lazy"><img class="look-nova" src="assets/shots/nova/page-notes-listening.webp" alt="The Notes page while Nova listens, in the Nova theme" width="660" height="259" loading="lazy"></div></div>
     <p><b>One click, and Nova listens to your call</b> in Meet, Zoom, Teams or WhatsApp, with no bot joining. He hears your microphone and your computer's own sound. Stop when it's over, and he writes up the summary, the decisions and who does what, with the whole transcript.</p>
@@ -1894,7 +1811,7 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
 <dialog class="more-sheet" id="m-ielts" aria-labelledby="m-ielts-t">
   <form method="dialog"><button class="sheet-x" aria-label="Close"><svg class="ico"><use href="#i-x"/></svg></button></form>
   <div class="sheet-body">
-    <p class="t-label new">Studio Pro · Windows and Mac</p>
+    <p class="t-label new">An add-on · Windows and Mac</p>
     <h2 class="t-m" id="m-ielts-t">Practise IELTS Speaking, out loud.</h2>
     <div class="sheet-shot cut"><div class="sky-fill"></div><div class="isl"><img class="look-classic" src="assets/shots/classic/page-ielts.webp" alt="The IELTS page: Nova beside five levels, each with its target band, the first ones done and the rest still locked" width="660" height="198" loading="lazy"><img class="look-nova" src="assets/shots/nova/page-ielts.webp" alt="The IELTS page in the Nova theme" width="660" height="198" loading="lazy"></div></div>
     <p><b>Nova asks IELTS Speaking questions out loud,</b> listens to your answers through your microphone and gives you a band.</p>
@@ -1906,7 +1823,7 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
 <dialog class="more-sheet" id="m-downloader" aria-labelledby="m-downloader-t">
   <form method="dialog"><button class="sheet-x" aria-label="Close"><svg class="ico"><use href="#i-x"/></svg></button></form>
   <div class="sheet-body">
-    <p class="t-label new">Studio Pro · Windows and Mac</p>
+    <p class="t-label new">An add-on · Windows and Mac</p>
     <h2 class="t-m" id="m-downloader-t">Paste a link. Keep the video or the sound.</h2>
     <div class="sheet-shot"><div class="sky-fill"></div><div class="isl"><img class="look-classic" src="assets/shots/classic/page-downloads.webp" alt="The Downloads page: paste a link, pick Video or Sound, and each download with its progress" width="660" height="335" loading="lazy"><img class="look-nova" src="assets/shots/nova/page-downloads.webp" alt="The Downloads page in the Nova theme" width="660" height="335" loading="lazy"></div></div>
     <p><b>Paste a link, pick Video or Sound,</b> and watch it come in to Downloads and the Shelf. Only what you have the right to keep.</p>
@@ -2132,7 +2049,7 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
     </ul>
     <h4>New in 0.2.26</h4>
     <ul class="new-list">
-      <li><i class="ic" style="--c:#00c7be"><svg class="ico"><use href="#i-meter"/></svg></i><span><b>Claude's new plan name</b>Claude's old Max 20x plan reads Ultra 10x on the AI tab. On a Mac, since 0.2.25, the tab also shows Antigravity's 5-hour and weekly limits for each group of models. Part of Studio Pro.</span></li>
+      <li><i class="ic" style="--c:#00c7be"><svg class="ico"><use href="#i-meter"/></svg></i><span><b>Claude's new plan name</b>Claude's old Max 20x plan reads Ultra 10x on the AI tab. On a Mac, since 0.2.25, the tab also shows Antigravity's 5-hour and weekly limits for each group of models. A free add-on.</span></li>
     </ul>
     <h4>New in 0.2.25</h4>
     <ul class="new-list">
@@ -2149,14 +2066,14 @@ dialog.more-sheet::backdrop { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-
     </ul>
     <h4>New in 0.2.19</h4>
     <ul class="new-list">
-      <li><i class="ic" style="--c:#34c759"><svg class="ico"><use href="#i-tag"/></svg></i><span><b>Meeting notes on the Mac</b>Nova listens to your call through your Mac's microphone and its own sound, then writes the summary, the decisions and the whole transcript. Studio Pro; the Mac's own sound needs macOS 14.2 or later.</span></li>
-      <li><i class="ic" style="--c:#34c759"><svg class="ico"><use href="#i-tag"/></svg></i><span><b>The IELTS coach</b>Nova asks IELTS Speaking questions out loud, listens to your answers and gives you a band. Studio Pro, now on Windows and Mac.</span></li>
-      <li><i class="ic" style="--c:#34c759"><svg class="ico"><use href="#i-tag"/></svg></i><span><b>The Downloader</b>Paste a link, pick Video or Sound, and watch it come in to Downloads and the Shelf. Studio Pro, on Windows and Mac. Only what you have the right to keep.</span></li>
+      <li><i class="ic" style="--c:#34c759"><svg class="ico"><use href="#i-tag"/></svg></i><span><b>Meeting notes on the Mac</b>Nova listens to your call through your Mac's microphone and its own sound, then writes the summary, the decisions and the whole transcript. A free add-on; the Mac's own sound needs macOS 14.2 or later.</span></li>
+      <li><i class="ic" style="--c:#34c759"><svg class="ico"><use href="#i-tag"/></svg></i><span><b>The IELTS coach</b>Nova asks IELTS Speaking questions out loud, listens to your answers and gives you a band. A free add-on, on Windows and Mac.</span></li>
+      <li><i class="ic" style="--c:#34c759"><svg class="ico"><use href="#i-tag"/></svg></i><span><b>The Downloader</b>Paste a link, pick Video or Sound, and watch it come in to Downloads and the Shelf. A free add-on, on Windows and Mac. Only what you have the right to keep.</span></li>
     </ul>
     <h4>New in 0.2.16</h4>
     <ul class="new-list">
       <li><i class="ic" style="--c:#00c7be"><svg class="ico"><use href="#i-meter"/></svg></i><span><b>A tab for your AI plans</b>What's left of Codex, Claude Code, OpenCode Go and more, and when each one resets. Switch on a heads-up before you run out.</span></li>
-      <li><i class="ic" style="--c:#34c759"><svg class="ico"><use href="#i-tag"/></svg></i><span><b>Meeting notes</b>Nova listens to your call, then writes it up: the summary, action items and the whole transcript. Studio Pro, on Windows; on the Mac too from 0.2.19.</span></li>
+      <li><i class="ic" style="--c:#34c759"><svg class="ico"><use href="#i-tag"/></svg></i><span><b>Meeting notes</b>Nova listens to your call, then writes it up: the summary, action items and the whole transcript. A free add-on, on Windows and on the Mac.</span></li>
       <li><i class="ic" style="--c:#8e8e93"><svg class="ico"><use href="#i-gear"/></svg></i><span><b>Only the tabs you use</b>Switch off Music, Today, Shelf, Tasks or Focus under Tabs in Settings, and it leaves the tab row.</span></li>
       <li><i class="ic" style="--c:#5e5ce6"><svg class="ico"><use href="#i-moon"/></svg></i><span><b>OK on the prayer countdown</b>In the ten minutes before a prayer, OK puts the countdown away, and your song's lyrics come back until the adzan.</span></li>
     </ul>

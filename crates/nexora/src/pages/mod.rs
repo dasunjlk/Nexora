@@ -784,10 +784,6 @@ mod tests {
         // with Studio Pro; Nexora last, signed in or not.
         use PageKind::*;
         let mut st = state();
-        assert_eq!(tabs(&st), [Media, Controls, Today, Shelf, Tasks, Focus, Nexora, Addons]);
-        st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
-        assert_eq!(tabs(&st), [Media, Controls, Today, Shelf, Tasks, Focus, Nexora, Addons]);
-        st.nexora.pro = Some(true);
         assert_eq!(tabs(&st), [Media, Controls, Today, Shelf, Tasks, Focus, Ai, Nexora, Addons]);
         // The add-ons' pages come after Nexora (Health, Nexora's steps, first), before the "+".
         for id in ["system", "script", "health"] {
@@ -805,20 +801,20 @@ mod tests {
         st.settings.hidden_tabs = vec!["today".into(), "tasks".into(), "nexora".into(), "addons".into()];
         st.page = Focus;
         // Nexora and the "+" can't be hidden.
-        assert_eq!(tabs(&st), [Media, Controls, Shelf, Focus, Nexora, Addons]);
+        assert_eq!(tabs(&st), [Media, Controls, Shelf, Focus, Ai, Nexora, Addons]);
         assert_eq!(first_tab(&st), Media);
         // Opened from elsewhere (a meeting's notice opens Today): its tab
         // shows while it's open, and stepping on leaves it behind.
         st.page = Today;
-        assert_eq!(tabs(&st), [Media, Controls, Today, Shelf, Focus, Nexora, Addons]);
+        assert_eq!(tabs(&st), [Media, Controls, Today, Shelf, Focus, Ai, Nexora, Addons]);
         st.page = step_tab(Today, &st, true);
         assert_eq!(st.page, Shelf);
         assert!(!tabs(&st).contains(&Today));
         // Every one of them hidden: the island opens on Nexora.
         st.settings.hidden_tabs = PageKind::HIDEABLE.iter().map(|p| p.key().to_string()).collect();
         st.page = Nexora;
-        assert_eq!(tabs(&st), [Nexora, Addons]);
-        assert_eq!(first_tab(&st), Nexora);
+        assert_eq!(tabs(&st), [Ai, Nexora, Addons]);
+        assert_eq!(first_tab(&st), Ai);
         // A start on a hidden page opens on the first tab instead.
         let mut settings = nexora_core::settings::Settings::default();
         settings.start_page = "today".into();
@@ -833,7 +829,6 @@ mod tests {
         let mut st = state();
         assert!(!tabs(&st).contains(&PageKind::Settings));
         assert!(tabs(&st).contains(&PageKind::Nexora), "signed out it's where to sign in");
-        st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
         let row = tabs(&st);
         assert!(row.contains(&PageKind::Nexora) && !row.contains(&PageKind::Settings));
         // Stepping through the tabs never lands on Settings.
@@ -854,7 +849,6 @@ mod tests {
     fn addons_is_the_last_tab_and_never_makes_the_window_taller() {
         let mut st = state();
         assert_eq!(tabs(&st).last(), Some(&PageKind::Addons));
-        st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
         assert_eq!(tabs(&st).last(), Some(&PageKind::Addons));
         assert_eq!(PageKind::from_key("addons"), PageKind::Addons);
         // The window is as tall as the tallest page (System, laid out for
@@ -876,21 +870,15 @@ mod tests {
     }
 
     #[test]
-    fn ai_has_a_tab_only_with_studio_pro_and_never_makes_the_window_taller() {
+    fn ai_has_a_tab_of_its_own_and_never_makes_the_window_taller() {
         let mut st = state();
-        assert!(!tabs(&st).contains(&PageKind::Ai), "signed out");
-        st.nexora.link = NexoraLink::Connected { account: "a\u{2022}\u{2022}\u{2022}@example.com".into() };
-        assert!(!tabs(&st).contains(&PageKind::Ai), "before the server's answer");
-        st.nexora.pro = Some(false);
-        assert!(!tabs(&st).contains(&PageKind::Ai), "an account without Pro");
-        st.nexora.pro = Some(true);
-        assert!(tabs(&st).contains(&PageKind::Ai), "on with Pro, nothing to switch on");
+        assert!(tabs(&st).contains(&PageKind::Ai), "on by default, no account needed");
         st.settings.set_addon(nexora_core::addons::AI_USAGE.id, false);
         assert!(!tabs(&st).contains(&PageKind::Ai), "switched off under Add-ons");
         assert_eq!(PageKind::from_key("ai"), PageKind::Ai);
-        // Pro isn't known yet at start: an island last open on the AI tab opens on the first tab.
+        // An island last open on the AI tab comes back to it while it's on.
         let store = Store { last_page: "ai".into(), ..Store::default() };
-        assert_eq!(AppState::new(Settings { remember_page: true, ..Settings::default() }, store).page, PageKind::ALL[0]);
+        assert_eq!(AppState::new(Settings { remember_page: true, ..Settings::default() }, store).page, PageKind::Ai);
         assert!(content_height(PageKind::Ai, &st) <= content_height(PageKind::System, &st));
     }
 
@@ -940,23 +928,16 @@ mod tests {
     }
 
     #[test]
-    fn downloads_has_a_tab_only_with_studio_pro() {
+    fn downloads_has_a_tab_while_its_add_on_is_on() {
         for (page, addon) in [(PageKind::Downloads, nexora_core::addons::DOWNLOADER)] {
             let mut st = state();
             st.downloader_offered = true;
             st.settings.set_addon(addon.id, true);
             st.addons.insert(addon.id, nexora_core::addons::Status::Ready);
-            assert!(!tabs(&st).contains(&page), "{}: signed out", addon.id);
-            st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
-            assert!(!tabs(&st).contains(&page), "{}: before the server's answer", addon.id);
-            st.nexora.pro = Some(false);
-            assert!(!tabs(&st).contains(&page), "{}: an account without Pro", addon.id);
-            st.nexora.pro = Some(true);
+            st.addons.insert(addon.id, nexora_core::addons::Status::Ready);
             assert!(tabs(&st).contains(&page), "{}", addon.id);
-            // Signed out again: gone, whatever the server said before.
-            st.nexora.link = NexoraLink::Off;
-            assert!(!tabs(&st).contains(&page), "{}", addon.id);
-            // Pro isn't known yet at start: an island last open on its page opens on the first tab.
+            // The remembered page can't restore the Downloader's tab at start
+            // (offered is a runtime fact): it opens on the first tab.
             let store = Store { last_page: page.key().into(), ..Store::default() };
             let mut settings = Settings { remember_page: true, ..Settings::default() };
             settings.set_addon(addon.id, true);
@@ -970,8 +951,8 @@ mod tests {
         let mut st = state();
         // Signed out: the sign-in card, so no stats are read for tiles.
         assert!(!today::shows_tiles(&st));
-        st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
         assert!(!today::shows_tiles(&st), "getting the day");
+        st.nexora.link = NexoraLink::Connected { account: "a\u{2022}\u{2022}\u{2022}@example.com".into() };
         st.nexora.agenda_state = AgendaState::Unavailable;
         assert!(today::shows_tiles(&st));
         // The day for today, Calendar switched on: the day, and a look at the next minute.
@@ -1004,13 +985,11 @@ mod tests {
         assert!(!tabs(&st).contains(&Ielts), "off for everyone until switched on");
         st.addons.insert("ielts", nexora_core::addons::Status::Ready);
         st.addons.insert("health", nexora_core::addons::Status::Ready);
-        assert_eq!(&tabs(&st)[6..], [Nexora, Health, Ielts, Addons]);
+        assert_eq!(&tabs(&st)[5..], [Ai, Nexora, Health, Ielts, Addons]);
         // Signed out it shows the sign-in card; signed in, every state is as
         // tall, and never taller than System: the window keeps its size.
-        let signed_out = content_height(Ielts, &st);
-        st.nexora.link = NexoraLink::Connected { account: "a•••@example.com".into() };
         let h = content_height(Ielts, &st);
-        assert!(signed_out < h && h <= content_height(PageKind::System, &st), "{signed_out} {h}");
+        assert!(h <= content_height(PageKind::System, &st), "{h}");
         for s in [nexora_core::ielts::Sample::Talking, nexora_core::ielts::Sample::Result, nexora_core::ielts::Sample::MicDenied] {
             st.ielts = nexora_core::ielts::Coach::sample(s, 10.0);
             assert_eq!(content_height(Ielts, &st), h);
