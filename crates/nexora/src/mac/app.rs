@@ -486,9 +486,6 @@ pub struct App {
     today_watch: bool,
     /// The Health page is on screen (it asks for the phone's steps as it opens).
     health_shown: bool,
-    /// The IELTS or Add-ons page is on screen (it asks whether the account
-    /// has Studio Pro as it opens).
-    pro_shown: bool,
     /// Files are being dragged over the island.
     drag_hover: bool,
     /// The right-click menu is open over the open island: the pointer on
@@ -615,7 +612,7 @@ impl App {
         pinfo!("screen {}x{} pt at {}x, notch {:?}", screen.w, screen.h, screen.scale, screen.notch);
         let gfx = Gfx::new(screen.scale);
         let mut st = AppState::new(settings, store);
-        // The Downloader (Studio Pro): the Mac has it too.
+        // The Downloader: the Mac has it too.
         st.downloader_offered = true;
         st.now = clock::mono();
         st.local = clock::local_now();
@@ -673,7 +670,6 @@ impl App {
             nexora_watch: false,
             today_watch: false,
             health_shown: false,
-            pro_shown: false,
             drag_hover: false,
             menu_open: false,
             script_held: false,
@@ -1110,21 +1106,17 @@ impl App {
     /// Hand the add-on switches to the downloader, starting it when one is
     /// on. It checks the files of the ones on (downloading what's missing),
     /// deletes those of one switched off, and sleeps in between; with none
-    /// on, it isn't started (see `AppEvent::Addon` for its end). A Studio Pro
-    /// add-on's files (the Downloader's tools) wait for Pro (`pro_changed`).
+    /// on, it isn't started (see `AppEvent::Addon` for its end).
     fn sync_addons(&mut self) {
         let on: Vec<&'static str> = pages::addons::OFFERED.iter().filter(|a| a.downloads() && self.st.settings.addon_on(a.id)).map(|a| a.id).collect();
-        let pro = self.st.studio_pro() == Some(true);
         match &self.addons {
             Some(svc) => {
                 for a in pages::addons::OFFERED {
                     svc.set(a.id, on.contains(&a.id));
                 }
-                svc.set_pro(pro);
             }
             None if !on.is_empty() => match services::addons::AddonService::start(self.sink.clone(), on) {
                 Ok(svc) => {
-                    svc.set_pro(pro);
                     self.addons = Some(svc);
                 }
                 Err(e) => pwarn!("add-ons: unavailable ({e})"),
@@ -1160,10 +1152,6 @@ impl App {
                 self.st.ui.autostart = Some(services::login::status() == Login::On);
                 pinfo!("settings window: open");
             }
-        }
-        // Add-ons lists IELTS and Meeting notes by the account's Pro, as its tab does.
-        if self.settings_ui.as_ref().is_some_and(|s| s.view.section == Section::Addons) {
-            self.nexora(NexoraCmd::CheckPro);
         }
         self.pending.push(Deferred::ShowSettings);
     }
@@ -1201,9 +1189,6 @@ impl App {
         }
         if out.again {
             settings_host::redraw();
-        }
-        if after != before && after == Section::Addons {
-            self.nexora(NexoraCmd::CheckPro);
         }
         if !self.st.cmds.is_empty() {
             self.request_frame();
@@ -2798,7 +2783,6 @@ impl App {
     fn set_page(&mut self, p: PageKind) {
         if p != self.st.page {
             self.st.page = p;
-            self.st.ui.addon_about = None;
             // Settings is never where the island opens next time.
             if p != PageKind::Settings {
                 self.st.update.sheet = false;
@@ -3169,17 +3153,6 @@ impl App {
         }
     }
 
-    /// The IELTS, Notes, Add-ons or AI page came on screen: whether the account has
-    /// Studio Pro, now (unless just asked). Never signed in: nothing starts.
-    fn set_pro_shown(&mut self, on: bool) {
-        if on != self.pro_shown {
-            self.pro_shown = on;
-            if let (true, Some(o)) = (on, &self.nexora) {
-                o.send(NexoraCmd::CheckPro);
-            }
-        }
-    }
-
     fn tell_nexora_activity(&self) {
         if let Some(o) = &self.nexora {
             o.set_activity(self.nexora_activity());
@@ -3206,11 +3179,9 @@ impl App {
     fn on_nexora(&mut self, ev: NexoraEvent) {
         let now = self.st.now;
         let link_before = self.st.nexora.link.clone();
-        let pro_before = self.st.studio_pro() == Some(true);
         match ev {
             NexoraEvent::Restored { account } => {
                 self.st.nexora.link = NexoraLink::Connected { account };
-                self.ask_pro();
             }
             NexoraEvent::Connecting { code, url, expires_in_s } => {
                 self.st.nexora.link = NexoraLink::Connecting { code, url, until: now + expires_in_s as f64 };
@@ -3226,7 +3197,6 @@ impl App {
                 self.end_sign_in();
                 self.st.notify(Icon::Check, palette::GREEN, "Connected to Nexora", format!("as {account}"), 6.0, Some(NoticeAction::OpenPage(PageKind::Nexora)));
                 self.st.nexora.link = NexoraLink::Connected { account };
-                self.ask_pro();
                 // Signed in from the Today page: back to it, where the day comes in.
                 if std::mem::take(&mut self.st.nexora.from_today) {
                     self.st.page = PageKind::Today;
@@ -3283,7 +3253,6 @@ impl App {
                 self.st.nexora.agenda_state = crate::state::AgendaState::Unavailable;
             }
             NexoraEvent::DayFailed => self.st.nexora.agenda_state = crate::state::AgendaState::Failed,
-            NexoraEvent::Pro(pro) => self.st.nexora.pro = Some(pro),
             // Steps asked for before Health was switched off stay out.
             NexoraEvent::Health(next) if self.st.health_on() => {
                 if let Some(steps) = self.st.take_health(next) {
@@ -3328,32 +3297,6 @@ impl App {
         if self.st.nexora.link != link_before {
             self.refresh_menu();
             self.layout_surface();
-        }
-        if (self.st.studio_pro() == Some(true)) != pro_before {
-            self.pro_changed();
-        }
-    }
-
-    /// Signed in (at start, or just now) with the Downloader switched on:
-    /// whether the account has Studio Pro, now, so its tab doesn't wait for
-    /// the Add-ons page to open (`pages::addons::pro_wanted`).
-    fn ask_pro(&self) {
-        if let (true, Some(o)) = (pages::addons::pro_wanted(&self.st), &self.nexora) {
-            o.send(NexoraCmd::CheckPro);
-        }
-    }
-
-    /// Studio Pro came, or went (the server's word, or signing out): the
-    /// Downloader's downloads stop as it goes, and its files come with it
-    /// (`AddonService::set_pro`). Its tab follows by itself (`downloader_on`),
-    /// and its page on screen leaves for Add-ons (`tick`).
-    fn pro_changed(&mut self) {
-        let pro = self.st.studio_pro() == Some(true);
-        if !pro {
-            self.downloads_off();
-        }
-        if let Some(a) = self.addons.as_ref() {
-            a.set_pro(pro);
         }
     }
 
@@ -3702,7 +3645,6 @@ impl App {
         self.set_nexora_watch(self.mode == Mode::Expanded(PageKind::Nexora));
         self.set_today_watch(self.mode == Mode::Expanded(PageKind::Today));
         self.set_health_shown(self.mode == Mode::Expanded(PageKind::Health));
-        self.set_pro_shown(matches!(self.mode, Mode::Expanded(PageKind::Ielts | PageKind::Notes | PageKind::Addons | PageKind::Ai)));
         self.set_stocks_watch();
         self.set_usage_watch();
         // The Pill theme floats the island below the top edge (below the menu
@@ -4332,10 +4274,9 @@ impl App {
             // of this Mac is read), then its keychain reader on test items.
             "ai-page" => {
                 self.st.notice = None;
-                // AI usage is part of Studio Pro: signed in with it for the AI
-                // steps ("ai-secret" ends them).
+                // The AI steps read a keychain item on test copies
+                // ("ai-secret" ends them).
                 self.st.nexora.link = NexoraLink::Connected { account: "a\u{2022}\u{2022}\u{2022}@example.com".into() };
-                self.st.nexora.pro = Some(true);
                 let now = self.st.now;
                 pages::usage::picture(&mut self.st, pages::usage::Picture::Plans, now);
                 self.set_page(PageKind::Ai);

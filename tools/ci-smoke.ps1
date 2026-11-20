@@ -212,8 +212,10 @@ $panel = ClassAt ($cx + 200) 100
 Expect "expanded-takes-mouse" ($panel -eq "Nexora.Island") "window at ($($cx + 200), 100) = '$panel'"
 if ($pill) {
     # The open card takes the mouse with the gap above it and its margin
-    # (the card is settings.expanded_width, 620 DIP, wide by default).
-    $cardRight = $cx + (Px 310)
+    # (the card is settings.expanded_width wide — read from the smoke home's
+    # settings, so the check follows the app's default).
+    $width = (Get-Content (Join-Path $env:NEXORA_HOME "settings.json") | ConvertFrom-Json).expanded_width
+    $cardRight = $cx + (Px ([int]($width / 2)))
     $open = @(@(($cx + 200), 0), @(($cardRight + (Px 4)), 100)) | ForEach-Object { "($($_[0]), $($_[1]))=$(ClassAt $_[0] $_[1])" }
     Expect "expanded-gap-and-margin" (($open | Where-Object { $_ -notlike "*=Nexora.Island" }).Count -eq 0) "windows at $($open -join ', ')"
     $past = ClassAt ($cardRight + (Px 40)) 100

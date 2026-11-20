@@ -267,7 +267,7 @@ impl Default for Settings {
             use_24h: true,
             hover_delay_ms: 220,
             collapse_delay_ms: 0,
-            expanded_width: 620.0,
+            expanded_width: 540.0,
             hide_in_fullscreen: true,
             step_aside: false,
             monitor: MonitorChoice::Primary,
@@ -350,8 +350,8 @@ impl Settings {
 
     /// AI usage is on for an account with Studio Pro (`pro`): the AI tab shows
     /// and its readers may run. It comes on with Pro, until switched off.
-    pub fn ai_usage_on(&self, pro: bool) -> bool {
-        pro && self.addons.get(crate::addons::AI_USAGE.id).copied().unwrap_or(true)
+    pub fn ai_usage_on(&self) -> bool {
+        self.addons.get(crate::addons::AI_USAGE.id).copied().unwrap_or(true)
     }
 
     /// Clamp values a user may have hand-edited into nonsense.
@@ -392,7 +392,7 @@ impl Settings {
         self.lyrics_offset_ms = self.lyrics_offset_ms.clamp(-5000, 5000);
         self.collapse_delay_ms = self.collapse_delay_ms.min(5000);
         if !self.expanded_width.is_finite() {
-            self.expanded_width = 620.0;
+            self.expanded_width = 540.0;
         }
         self.expanded_width = self.expanded_width.clamp(480.0, 900.0);
         self.island_x = self.island_x.filter(|x| x.is_finite()).map(|x| x.clamp(0.0, 1.0));
