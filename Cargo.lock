@@ -792,7 +792,7 @@ checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
 name = "nexora"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "block2",
  "dispatch2",
@@ -818,7 +818,7 @@ dependencies = [
 
 [[package]]
 name = "nexora-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "hmac",
  "qrcodegen",
@@ -832,11 +832,11 @@ dependencies = [
 
 [[package]]
 name = "nexora-diorama"
-version = "0.1.0"
+version = "0.1.1"
 
 [[package]]
 name = "nexora-usage"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "aes",
  "hmac",
