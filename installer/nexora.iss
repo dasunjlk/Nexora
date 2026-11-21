@@ -3,7 +3,7 @@
 ; Releases ship installer/nexora.nsi (NSIS), which 0.1.x installs came from; CI builds this one too as a check.
 ;
 ; Build after `cargo build -p nexora --release`:
-;   iscc installer\nexora.iss                      -> dist\Nexora-Setup-0.1.0.exe
+;   iscc installer\nexora.iss                      -> dist\Nexora-Setup-0.1.1.exe
 ;   iscc /DAppVersion=0.2.0 installer\nexora.iss   (another version)
 ;
 ; Per-user install: no admin rights and no UAC prompt. The app goes to
@@ -11,7 +11,7 @@
 ; survive uninstalling (only the cache in %LOCALAPPDATA%\Nexora is removed).
 
 #ifndef AppVersion
-  #define AppVersion "0.1.0"
+  #define AppVersion "0.1.1"
 #endif
 #ifndef ExeSource
   #define ExeSource "..\target\release\nexora.exe"
