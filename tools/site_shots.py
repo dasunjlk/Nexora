@@ -128,6 +128,7 @@ KEEP = {
     "game-stats", "page-system-games", "page-system-power-estimate", "page-script", "page-script-reading", "media-lyric",
     "message-notice", "notes-activity",
     "page-ai",
+    "page-controls",
     "page-settings-tabs", "page-notes-listening",
     "page-ielts", "page-downloads", "page-addons-about",
     "page-caffeine",
