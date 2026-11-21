@@ -183,14 +183,14 @@ enum Scene {
     /// The IELTS add-on signed in: on the Mac, for now, the coach is on its
     /// way (its microphone and voice come with branch ielts-coach-mac).
     Ielts,
-    /// The Downloader, signed in with Studio Pro: the Downloads page with a
+    /// The Downloader: the Downloads page with a
     /// download coming in, one waiting, one done and one failed; the closed
     /// island while it downloads (around a notch, the ring and the percent
     /// sit in the ears); and the Add-ons tab with its row.
     Downloads,
     DownloadActivity,
     AddonsDownloader,
-    /// Meeting notes, signed in with Studio Pro: the page while Nova listens
+    /// Meeting notes: the page while Nova listens
     /// (42 s in), the closed island 12 minutes in (around a notch, Nova in
     /// one ear and the time in the other), and the Add-ons tab with every
     /// Pro add-on listed.
@@ -1312,10 +1312,9 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
             Mode::Expanded(PageKind::Ielts)
         }
         Scene::Downloads | Scene::DownloadActivity | Scene::AddonsDownloader => {
-            // The Downloader is an add-on, off by default, for Studio Pro: on
+            // The Downloader is an add-on, off by default: on
             // for its own scenes, signed in with Pro.
             st.nexora = fake_nexora(&st, false);
-            st.nexora.pro = Some(true);
             st.downloader_offered = true;
             st.settings.set_addon(nexora_core::addons::DOWNLOADER.id, true);
             st.addons.insert(nexora_core::addons::DOWNLOADER.id, AddonStatus::Ready);
@@ -1336,9 +1335,8 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
             }
         }
         Scene::NotesListening | Scene::NotesActivity | Scene::AddonsPro => {
-            // Signed in with Studio Pro, every Pro add-on switched on.
+            // Signed in, every add-on switched on.
             st.nexora = fake_nexora(&st, false);
-            st.nexora.pro = Some(true);
             st.downloader_offered = true;
             for a in [nexora_core::addons::MEETING_NOTES, nexora_core::addons::IELTS, nexora_core::addons::DOWNLOADER] {
                 st.settings.set_addon(a.id, true);
@@ -1408,9 +1406,8 @@ fn render_scene(gfx: &mut Gfx, scene: Scene, theme: Theme, notch: Option<Notch>,
             }
         }
         Scene::Ai(shows) => {
-            // AI usage is part of Studio Pro: signed in with it.
+            // AI usage: signed in for the keychain items.
             st.nexora = fake_nexora(&st, false);
-            st.nexora.pro = Some(true);
             let now = st.now;
             crate::pages::usage::picture(&mut st, shows, now);
             st.page = PageKind::Ai;
