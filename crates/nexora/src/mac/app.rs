@@ -2883,6 +2883,9 @@ impl App {
         let cmds = std::mem::take(&mut self.st.cmds);
         for c in cmds {
             match c {
+                // The Controls service runs on the Windows side; on the Mac the
+                // page shows the states the OS reports (stubbed for now).
+                Command::Controls(_) => {}
                 Command::Media(m) => {
                     if let Some(s) = self.media.as_ref() {
                         s.command(m.clone());
