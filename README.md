@@ -1,23 +1,24 @@
 <p align="center"><img src="art/nexora-peek.webp" width="260" alt="Nova peeking over a playing island"></p>
 
-<h1 align="center">21 downloads</h1>
+<h1 align="center">38 downloads</h1>
 
-<p align="center">of Nexora for Windows, from GitHub since 18 Nov 2026<br>Latest release, 0.1.0: <b>21</b> · Last 7 days: <b>21</b> · <b>0</b> stars on GitHub</p>
+<p align="center">of Nexora for Windows, from GitHub since 18 Nov 2026<br>Latest release, 0.1.1: <b>12</b> · Last 7 days: <b>38</b> · <b>0</b> stars on GitHub</p>
 
-<p align="center"><img src="downloads.svg" width="820" alt="Bar chart of downloads per release: 0.1.0 21; and per day, for the last 3 days"></p>
+<p align="center"><img src="downloads.svg" width="820" alt="Bar chart of downloads per release: 0.1.1 12, 0.1.0 26; and per day, for the last 3 days"></p>
 
 ## Per release
 
 | Release | Published | Download button | Versioned installer | Portable zip | Other files | Total |
 | --- | --- | --: | --: | --: | --: | --: |
-| [0.1.0](https://github.com/dasunjlk/Nexora/releases/tag/v0.1.0) | 18 Nov 2026 | 1 | 19 | 1 | 0 | 21 |
-| **All releases** | | **1** | **19** | **1** | **0** | **21** |
+| [0.1.1](https://github.com/dasunjlk/Nexora/releases/tag/v0.1.1) | 21 Nov 2026 | 1 | 10 | 1 | — | 12 |
+| [0.1.0](https://github.com/dasunjlk/Nexora/releases/tag/v0.1.0) | 18 Nov 2026 | 1 | 23 | 1 | 1 | 26 |
+| **All releases** | | **2** | **33** | **2** | **1** | **38** |
 
 ## Per day
 
 | Day | Downloads |
 | --- | --: |
-| Today | 1 |
+| Today | 18 |
 | 20 Nov 2026 | 14 |
 | 19 Nov 2026 | 6 |
 
@@ -37,4 +38,4 @@
 
 </details>
 
-<sub>Updated 21 Nov 2026, 04:17 UTC by [Download stats](https://github.com/dasunjlk/Nexora/actions/workflows/metrics.yml), every hour · Data: [downloads](data/downloads.csv), [CI downloads](data/ci-downloads.csv), [stars](data/repo.csv), [summary.json](summary.json)</sub>
+<sub>Updated 21 Nov 2026, 13:01 UTC by [Download stats](https://github.com/dasunjlk/Nexora/actions/workflows/metrics.yml), every hour · Data: [downloads](data/downloads.csv), [CI downloads](data/ci-downloads.csv), [stars](data/repo.csv), [summary.json](summary.json)</sub>
