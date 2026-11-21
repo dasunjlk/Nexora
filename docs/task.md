@@ -84,7 +84,13 @@ branch and re-pushed, never merged red.
 |---|---|---|
 | Guideline + `nexora_core::controls` (pure) + plumbing + `services/controls.rs` (WinRT radios, hotspot, power mode, display topology) + `pages/controls.rs` (2×3 tiles + picker) + self-test scene + icons | `feature/07-controls-tab` | ✅ merged through the ladder |
 
-## CI notes (learned the hard way)
+## Release v0.1.1 ✅
+
+| Sub-task | Branch | Status |
+|---|---|---|
+| Version 0.1.1 everywhere, release notes, the Controls news tile, fresh 192-DPI shots (`site_shots.py` learned `page-controls`) | `release/0.1.1` | ✅ CI green → merged through the ladder |
+| Tag `v0.1.1` on `main` — ci green, **release published**: `Nexora-Setup-0.1.1.exe`, `Nexora-Setup.exe`, `Nexora-0.1.1-portable.zip`; signed feed 0.1.1 live; site updated | tag | ✅ |
+| Known-issue, deferred by request | mac | ⚠️ The Mac build fails on the tag (three render scenes still seeded `nexora.pro`, and the Mac command match didn't know `Command::Controls`) — fixed on `main` (e2ecc87) after the tag was cut, so the Windows release is unaffected; the DMG is missing from v0.1.1 and the mac fix rides the next release |## CI notes (learned the hard way)
 
 - Commits from Windows drop the executable bit — every `.sh` needed
   `git update-index --chmod=+x`.
