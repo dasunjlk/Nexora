@@ -4,7 +4,7 @@
 
 <p align="center">of Nexora for Windows, from GitHub since 18 Nov 2026<br>Latest release, 0.1.1: <b>12</b> · Last 7 days: <b>38</b> · <b>0</b> stars on GitHub</p>
 
-<p align="center"><img src="downloads.svg" width="820" alt="Bar chart of downloads per release: 0.1.1 12, 0.1.0 26; and per day, for the last 4 days"></p>
+<p align="center"><img src="downloads.svg" width="820" alt="Bar chart of downloads per release: 0.1.1 12, 0.1.0 26; and per day, for the last 5 days"></p>
 
 ## Per release
 
@@ -19,6 +19,7 @@
 | Day | Downloads |
 | --- | --: |
 | Today | 0 |
+| 22 Nov 2026 | 0 |
 | 21 Nov 2026 | 18 |
 | 20 Nov 2026 | 14 |
 | 19 Nov 2026 | 6 |
@@ -39,4 +40,4 @@
 
 </details>
 
-<sub>Updated 22 Nov 2026, 00:41 UTC by [Download stats](https://github.com/dasunjlk/Nexora/actions/workflows/metrics.yml), every hour · Data: [downloads](data/downloads.csv), [CI downloads](data/ci-downloads.csv), [stars](data/repo.csv), [summary.json](summary.json)</sub>
+<sub>Updated 23 Nov 2026, 01:58 UTC by [Download stats](https://github.com/dasunjlk/Nexora/actions/workflows/metrics.yml), every hour · Data: [downloads](data/downloads.csv), [CI downloads](data/ci-downloads.csv), [stars](data/repo.csv), [summary.json](summary.json)</sub>
