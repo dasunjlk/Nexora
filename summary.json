@@ -1,11 +1,11 @@
 {
   "repo": "dasunjlk/Nexora",
-  "checked_at": "2026-11-26T04:28:11Z",
+  "checked_at": "2026-11-27T05:21:58Z",
   "since": "2026-11-18",
   "downloads": 38,
   "github_count": 38,
   "ci_count": 0,
-  "last_7_days": 32,
+  "last_7_days": 18,
   "latest": {
     "release": "v0.1.1",
     "downloads": 12
@@ -72,6 +72,10 @@
     },
     {
       "date": "2026-11-26",
+      "downloads": 0
+    },
+    {
+      "date": "2026-11-27",
       "downloads": 0
     }
   ]
